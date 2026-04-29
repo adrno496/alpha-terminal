@@ -1,0 +1,104 @@
+{
+  "name": "alpha-terminal",
+  "version": "2.1.0",
+  "description": "Bloomberg-style finance analysis terminal — 100% client-side, BYOK.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:all": "electron-builder -mwl",
+    "prepare:mobile": "rm -rf dist-mobile && mkdir dist-mobile && cp index.html styles.css manifest.json service-worker.js dist-mobile/ && cp -r js dist-mobile/",
+    "cap:sync": "npm run prepare:mobile && npx cap sync",
+    "cap:android": "npm run prepare:mobile && npx cap sync android && npx cap open android",
+    "cap:ios": "npm run prepare:mobile && npx cap sync ios && npx cap open ios",
+    "cap:run:android": "npm run prepare:mobile && npx cap run android",
+    "cap:run:ios": "npm run prepare:mobile && npx cap run ios"
+  },
+  "keywords": [
+    "finance",
+    "trading",
+    "investing",
+    "ai",
+    "byok"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@capacitor/cli": "^8.3.1",
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1"
+  },
+  "build": {
+    "appId": "com.alphaterminal.app",
+    "productName": "ALPHA TERMINAL",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "index.html",
+      "styles.css",
+      "manifest.json",
+      "service-worker.js",
+      "main.js",
+      "js/**/*",
+      "package.json",
+      "!node_modules/**/*",
+      "!dist/**/*",
+      "!.git/**/*"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "category": "public.app-category.finance"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Finance"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.3.1",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/ios": "^8.3.1"
+  }
+}

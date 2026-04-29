@@ -1,0 +1,35 @@
+# robots.txt — ALPHA TERMINAL
+# https://alpha-terminal.app/
+
+User-agent: *
+Allow: /
+
+# Crawl-friendly : pages SEO publiques
+Allow: /index.html
+Allow: /features.html
+Allow: /pricing.html
+Allow: /bloomberg-alternative.html
+Allow: /ai-stock-analysis-guide.html
+
+# Bloque les ressources non-utiles au SEO
+Disallow: /android/
+Disallow: /dist/
+Disallow: /dist-mobile/
+Disallow: /node_modules/
+Disallow: /.git/
+
+# Spécifique à GPTBot (OpenAI) et autres scrapers IA — autorisé
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Sitemap
+Sitemap: https://alpha-terminal.app/sitemap.xml

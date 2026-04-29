@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- ====== SEO PRIMARY ====== -->
+  <title>ALPHA TERMINAL — Terminal d'analyse financière IA, 26 modules, BYOK, 79€</title>
+  <meta name="description" content="Terminal d'analyse financière IA pour investisseurs sérieux. 26 modules (10-K Decoder, DCF, Audit Buffett, CEO Forensics, Tax Optimizer 8 pays). 14 LLMs au choix. 100% client-side. 79€ paiement unique vs 24 000€/an Bloomberg." />
+  <meta name="keywords" content="analyse boursière ia, terminal financier ia, bloomberg alternative, ai stock analysis, byok ai finance, dcf calculator ia, 10-k decoder ia, alpha terminal" />
+  <meta name="author" content="ALPHA TERMINAL" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/?lang=en" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/" />
+
+  <!-- ====== OPEN GRAPH ====== -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="ALPHA TERMINAL — Terminal d'analyse financière IA (26 modules, 14 LLMs, BYOK)" />
+  <meta property="og:description" content="79€ une fois, 26 modules d'IA financière, données 100% privées. L'alternative à Bloomberg pour particuliers." />
+  <meta property="og:url" content="https://alpha-terminal.app/" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:site_name" content="ALPHA TERMINAL" />
+
+  <!-- ====== TWITTER CARD ====== -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="ALPHA TERMINAL — 26 modules d'IA financière, 79€" />
+  <meta name="twitter:description" content="Terminal d'analyse fondamentale IA · BYOK · 100% privé · 14 LLMs au choix." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+
+  <!-- ====== TECH ====== -->
+  <meta name="theme-color" content="#00ff88" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect width='100' height='100' fill='%230a0a0a' rx='14'/&gt;&lt;text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'&gt;α&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- ====== JSON-LD : SoftwareApplication + Organization ====== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "ALPHA TERMINAL",
+    "alternateName": ["Alpha Terminal", "AlphaTerminal"],
+    "operatingSystem": "Web, macOS, Windows, Linux, Android, iOS",
+    "applicationCategory": "FinanceApplication",
+    "applicationSubCategory": "Investment Analysis",
+    "description": "Terminal d'analyse financière IA, 26 modules, 14 LLMs, BYOK, 100% client-side. Alternative à Bloomberg pour particuliers.",
+    "url": "https://alpha-terminal.app/",
+    "offers": {
+      "@type": "Offer",
+      "price": "79",
+      "priceCurrency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "category": "OneTimePurchase"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "127",
+      "bestRating": "5"
+    },
+    "softwareVersion": "2.1.0",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ALPHA TERMINAL",
+      "url": "https://alpha-terminal.app/",
+      "email": "savetheworldfr@gmail.com",
+      "sameAs": []
+    }
+  }
+  </script>
+
+  <!-- ====== JSON-LD : WebSite + SearchAction ====== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "ALPHA TERMINAL",
+    "url": "https://alpha-terminal.app/",
+    "description": "Terminal d'analyse financière IA, BYOK, 100% client-side.",
+    "inLanguage": ["fr-FR", "en-US"],
+    "publisher": { "@type": "Organization", "name": "ALPHA TERMINAL" }
+  }
+  </script>
+</head>
+<body>
+  <!-- Welcome / Lock modal -->
+  <div id="lock-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="logo-mark">ALPHA</span>
+        <span class="logo-suffix">TERMINAL</span>
+      </div>
+      <div id="lock-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Generic modal -->
+  <div id="generic-modal" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <span id="generic-modal-title" class="modal-title"></span>
+        <button id="generic-modal-close" class="icon-btn" aria-label="Close">×</button>
+      </div>
+      <div id="generic-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- LANDING PAGE -->
+  <div id="landing" class="landing hidden">
+    <div class="ticker-bar">
+      <div class="ticker-track" id="ticker-track"></div>
+    </div>
+
+    <nav class="landing-nav">
+      <div class="landing-logo">
+        <span class="logo-mark">ALPHA</span><span class="logo-suffix">TERMINAL</span>
+      </div>
+      <div class="landing-nav-links">
+        <a href="#modules">Modules</a>
+        <a href="features.html">Fonctionnalités</a>
+        <a href="pricing.html">Tarif</a>
+        <a href="bloomberg-alternative.html">vs Bloomberg</a>
+        <a href="ai-stock-analysis-guide.html">Guide IA</a>
+        <a href="#faq">FAQ</a>
+        <button class="btn-primary" id="cta-top">Get Started →</button>
+      </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-inner">
+        <h1 class="hero-title">ALPHA<span class="alpha-mark">α</span> TERMINAL</h1>
+        <h2 class="hero-sub" data-i18n-html="land.new.hero_sub"></h2>
+        <p class="hero-pitch" data-i18n-html="land.new.hero_pitch"></p>
+        <div class="hero-cta">
+          <button class="btn-primary big" id="cta-hero" data-i18n="land.new.cta_try"></button>
+          <button class="btn-secondary big" data-demo-trigger>🎬 <span data-i18n="land.cta.demo"></span></button>
+        </div>
+        <div class="hero-benefits">
+          <div class="benefit"><div class="benefit-icon">⚡</div><div data-i18n="land.new.benefit_fast"></div></div>
+          <div class="benefit"><div class="benefit-icon">🔒</div><div data-i18n="land.new.benefit_private"></div></div>
+          <div class="benefit"><div class="benefit-icon">💳</div><div data-i18n="land.new.benefit_no_sub"></div></div>
+        </div>
+
+        <!-- Concrete example block -->
+        <div class="hero-example">
+          <div class="hero-example-label" data-i18n="land.new.example_label"></div>
+          <div class="hero-example-cards">
+            <div class="hero-ex-card buy">
+              <div class="hero-ex-verdict">🟢 <span data-i18n="qa.verdict.buy"></span></div>
+              <div class="hero-ex-asset">AAPL</div>
+              <div class="hero-ex-score">78/100</div>
+            </div>
+            <div class="hero-ex-card sell">
+              <div class="hero-ex-verdict">🔴 <span data-i18n="qa.verdict.sell"></span></div>
+              <div class="hero-ex-asset">TSLA</div>
+              <div class="hero-ex-score">32/100</div>
+            </div>
+            <div class="hero-ex-card hold">
+              <div class="hero-ex-verdict">🟡 <span data-i18n="qa.verdict.hold"></span></div>
+              <div class="hero-ex-asset">BTC</div>
+              <div class="hero-ex-score">58/100</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROBLEM / SOLUTION -->
+    <section class="section reveal">
+      <div class="section-inner two-col">
+        <div class="col">
+          <h3 class="section-title">AVANT</h3>
+          <ul class="dash-list red">
+            <li>15 onglets de recherche ouverts en permanence</li>
+            <li>4h de lecture pour décortiquer un 10-K</li>
+            <li>Tu rates les signaux faibles dans les earnings calls</li>
+            <li>24 000€/an pour Bloomberg (ou rien)</li>
+            <li>Décisions prises avec des infos partielles</li>
+          </ul>
+        </div>
+        <div class="col">
+          <h3 class="section-title green">AVEC ALPHA TERMINAL</h3>
+          <ul class="dash-list green">
+            <li>Une seule app, <strong>26 modules pro</strong></li>
+            <li>Verdict ACHETER/VENDRE/ATTENDRE en 30 secondes</li>
+            <li>CEO Forensics : l'IA décode ce que les CEO cachent</li>
+            <li>Ta propre clé API (~$0.005-0.10 par analyse)</li>
+            <li>Mémoire patrimoine + RAG = analyses personnalisées</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULES GRID -->
+    <section id="modules" class="section reveal">
+      <div class="section-inner">
+        <h3 class="section-title centered">LES 26 MODULES</h3>
+        <p class="section-sub">De l'analyse fondamentale à la fiscalité internationale (8 pays). Audit Buffett-style, CEO Forensics, RAG, mémoire patrimoine, voix… Chaque module est calibré pour produire des analyses actionnables.</p>
+        <div class="modules-grid" id="modules-grid"></div>
+      </div>
+    </section>
+
+    <!-- WHY BYOK -->
+    <section id="why" class="section reveal alt">
+      <div class="section-inner">
+        <h3 class="section-title centered">POURQUOI BYOK ?</h3>
+        <div class="three-col">
+          <div class="why-card">
+            <div class="why-emoji">🔒</div>
+            <h4>100% privé</h4>
+            <p>Tes données ne quittent jamais ton ordinateur. L'app appelle l'API directement depuis ton navigateur. Aucun serveur intermédiaire.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-emoji">💸</div>
+            <h4>Zéro abonnement</h4>
+            <p>Tu paies ALPHA TERMINAL une seule fois. Tu paies uniquement ton usage réel à OpenAI / Anthropic / Google / xAI. Quelques centimes par analyse.</p>
+          </div>
+          <div class="why-card">
+            <div class="why-emoji">🧠</div>
+            <h4>Le meilleur LLM par tâche</h4>
+            <p>Configure 1 à 14 clés (Claude, OpenAI, Gemini, Grok, OpenRouter, Perplexity, Mistral, Cerebras, GitHub Models, NVIDIA NIM, HuggingFace, Cloudflare, Together, Cohere). L'app sélectionne automatiquement le modèle optimal pour chaque tâche.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section reveal">
+      <div class="section-inner">
+        <h3 class="section-title centered">COMMENT ÇA MARCHE</h3>
+        <div class="steps-3">
+          <div class="step"><div class="step-num">1</div><h4>Lance l'app</h4><p>Dans ton navigateur, en 1 clic.</p></div>
+          <div class="step"><div class="step-num">2</div><h4>Connecte une clé API</h4><p>Au moins 1 clé parmi 14 providers (Claude, OpenAI, Gemini, Mistral, Cerebras…).</p></div>
+          <div class="step"><div class="step-num">3</div><h4>Analyse</h4><p>Choisis un module, lance l'analyse, exporte le résultat.</p></div>
+        </div>
+        <p style="text-align:center;margin-top:18px;"><a href="#" id="how-link-keys">Comment créer une clé API ?</a></p>
+      </div>
+    </section>
+
+    <!-- COMPARATIF -->
+    <section class="section reveal alt">
+      <div class="section-inner">
+        <h3 class="section-title centered">COMPARATIF</h3>
+        <div class="compare-wrap">
+          <table class="compare-table">
+            <thead><tr><th></th><th class="us">ALPHA TERMINAL</th><th>Bloomberg</th><th>Koyfin</th><th>Seeking Alpha</th></tr></thead>
+            <tbody>
+              <tr><td>Prix</td><td class="us">79€ une fois</td><td>24 000€/an</td><td>468€/an</td><td>449€/an</td></tr>
+              <tr><td>Analyse IA</td><td class="us">✅ 26 modules</td><td>❌</td><td>❌</td><td>⚠️ Limitée</td></tr>
+              <tr><td>Multi-LLM</td><td class="us">✅ 14 providers</td><td>❌</td><td>❌</td><td>❌</td></tr>
+              <tr><td>Mémoire patrimoine</td><td class="us">✅ Auto-injectée</td><td>⚠️ Manuelle</td><td>⚠️ Manuelle</td><td>❌</td></tr>
+              <tr><td>RAG (tes notes)</td><td class="us">✅ Embeddings</td><td>❌</td><td>❌</td><td>❌</td></tr>
+              <tr><td>Données privées</td><td class="us">✅ Local + chiffré</td><td>❌ Cloud</td><td>❌ Cloud</td><td>❌ Cloud</td></tr>
+              <tr><td>Mobile (Android/iOS)</td><td class="us">✅ Native</td><td>⚠️ Limitée</td><td>✅</td><td>✅</td></tr>
+              <tr><td>Optimisation FR</td><td class="us">✅ Native + 7 autres pays</td><td>❌</td><td>❌</td><td>❌</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESOURCES — 4 SEO pages -->
+    <section id="resources" class="section reveal alt">
+      <div class="section-inner">
+        <h3 class="section-title centered">📚 RESSOURCES</h3>
+        <p class="section-sub">Tout sur ALPHA TERMINAL : fonctionnalités détaillées, tarif, comparatifs, guide IA. Pour les utilisateurs comme pour les curieux.</p>
+        <div class="resources-grid">
+          <a href="features.html" class="resource-card">
+            <div class="resource-icon">📊</div>
+            <h4>Fonctionnalités</h4>
+            <p>Les 26 modules d'analyse financière en détail : 10-K Decoder, DCF, Audit Buffett, CEO Forensics, Tax Optimizer 8 pays, RAG…</p>
+            <span class="resource-cta">Explorer les modules →</span>
+          </a>
+          <a href="pricing.html" class="resource-card">
+            <div class="resource-icon">💰</div>
+            <h4>Tarif</h4>
+            <p>79€ paiement unique vs 24 000€/an Bloomberg. ROI sur 5 ans, coûts BYOK détaillés, comparatif complet vs concurrence.</p>
+            <span class="resource-cta">Voir les tarifs →</span>
+          </a>
+          <a href="bloomberg-alternative.html" class="resource-card">
+            <div class="resource-icon">⚔️</div>
+            <h4>vs Bloomberg</h4>
+            <p>L'alternative à Bloomberg Terminal en 2026 : comparatif détaillé contre Bloomberg, Koyfin, Seeking Alpha, Stock Rover, Atom, TradingView.</p>
+            <span class="resource-cta">Voir le comparatif →</span>
+          </a>
+          <a href="ai-stock-analysis-guide.html" class="resource-card">
+            <div class="resource-icon">🧠</div>
+            <h4>Guide IA</h4>
+            <p>Le guide 2026 complet : Claude vs GPT vs Gemini pour la finance, méthode de prompt, cas pratiques DCF/10-K/audit, pièges à éviter.</p>
+            <span class="resource-cta">Lire le guide →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="section reveal">
+      <div class="section-inner narrow">
+        <h3 class="section-title centered">FAQ</h3>
+        <div class="faq" id="faq-list"></div>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="section cta-final reveal">
+      <div class="section-inner narrow centered">
+        <h3 class="section-title centered">Prêt à analyser comme un pro ?</h3>
+        <button class="btn-primary big" id="cta-final">Get Started — c'est parti →</button>
+        <div class="hero-pills" style="margin-top:18px;">
+          <span>⏱ Setup en 3 minutes</span>
+          <span>🔒 0 donnée envoyée</span>
+          <span>💸 0 abonnement</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="landing-footer">
+      <span>ALPHA TERMINAL · v2.1 · Made in France 🇫🇷</span>
+      <span class="footer-legal-links">
+        <a href="#" data-legal="about">À propos</a> ·
+        <a href="#" data-legal="privacy">Politique de confidentialité</a> ·
+        <a href="#" data-legal="terms">CGU</a> ·
+        <a href="#" data-legal="legal">Mentions légales</a>
+      </span>
+    </footer>
+  </div>
+
+  <!-- App skeleton -->
+  <div id="app" class="app hidden">
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-mark">ALPHA</span>
+        <span class="logo-suffix">TERMINAL</span>
+      </div>
+      <nav id="sidebar-nav" class="sidebar-nav"></nav>
+      <div class="sidebar-bottom">
+        <button class="sidebar-link" data-route="history">
+          <span class="dot"></span> Historique
+        </button>
+        <button class="sidebar-link" data-route="settings">
+          <span class="dot"></span> Settings
+        </button>
+        <button class="sidebar-link" data-route="landing">
+          <span class="dot"></span> About
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="hamburger" class="hamburger-btn" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+          <h1 id="active-title" class="active-title">ALPHA TERMINAL</h1>
+          <span id="active-subtitle" class="active-subtitle"></span>
+        </div>
+        <div class="topbar-right">
+          <span id="api-status" class="api-status">
+            <span class="status-dot"></span>
+            <span class="status-text">API disconnected</span>
+          </span>
+        </div>
+      </header>
+
+      <section id="view" class="view"></section>
+
+      <footer class="footer trust-footer">
+        <span class="trust-badge">🔒 <span data-i18n="trust.private_short"></span></span>
+        <span class="trust-badge">🔑 <span data-i18n="trust.byok_short"></span></span>
+        <span class="trust-badge">💾 <span data-i18n="trust.no_data_stored_short"></span></span>
+        <span class="trust-badge">💳 <span data-i18n="trust.no_subscription_short"></span></span>
+        <span class="trust-version">v2.1 · BYOK</span>
+        <span class="trust-legal">
+          <a href="#" data-app-legal="privacy">Confidentialité</a> ·
+          <a href="#" data-app-legal="terms">CGU</a> ·
+          <a href="#" data-app-legal="legal">Mentions légales</a>
+        </span>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Print view -->
+  <div id="print-view" class="print-view hidden"></div>
+
+  <!-- Vendors -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+    }
+  </script>
+
+  <!-- App -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
