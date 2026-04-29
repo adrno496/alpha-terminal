@@ -381,6 +381,15 @@ function boot() {
 
   // Changement de langue → re-render sans reload (compat Electron)
   window.addEventListener('app:locale-changed', () => {
+    // Si la landing est visible (utilisateur non connecté) → re-render la landing
+    // sans déclencher le lock flow.
+    const landingEl = document.getElementById('landing');
+    const landingVisible = landingEl && !landingEl.classList.contains('hidden');
+    if (landingVisible) {
+      renderLanding({ onCtaClick: startLockFlow });
+      return;
+    }
+
     // Re-render la sidebar (labels + tooltips)
     renderSidebar(navigate);
     // Re-render les boutons sidebar bottom
@@ -405,7 +414,7 @@ function boot() {
       const r = STATE.currentRoute;
       STATE.currentRoute = null; // force re-render
       navigate(r);
-    } else {
+    } else if (isConnected()) {
       navigate('home');
     }
   });

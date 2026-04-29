@@ -100,8 +100,10 @@ export function renderLanding({ onCtaClick }) {
     `).join('');
   }
 
-  // Legal links in footer
+  // Legal links in footer (one-shot binding)
   $$('.landing-footer [data-legal]').forEach(a => {
+    if (a.dataset.bound === '1') return;
+    a.dataset.bound = '1';
     a.addEventListener('click', async (e) => {
       e.preventDefault();
       const which = a.getAttribute('data-legal');
@@ -115,7 +117,9 @@ export function renderLanding({ onCtaClick }) {
   if (navLinks && !navLinks.querySelector('.theme-toggle')) {
     navLinks.insertBefore(makeThemeToggle(), navLinks.querySelector('#cta-top'));
   }
-  if (navLinks && !navLinks.querySelector('.lang-toggle')) {
+  if (navLinks) {
+    // Toujours re-créer le bouton lang pour refléter la locale courante (FR ↔ EN)
+    navLinks.querySelectorAll('.lang-toggle').forEach(el => el.remove());
     navLinks.insertBefore(makeLocaleToggle(), navLinks.querySelector('#cta-top'));
   }
   // Update CTA labels selon locale
@@ -131,26 +135,33 @@ export function renderLanding({ onCtaClick }) {
     const pillsEl = document.querySelector('.hero-pills'); if (pillsEl) pillsEl.textContent = t('land.hero.pills').replace(/●/g, '·').replace(/^·\s*/, '● ');
   }
 
-  // CTAs
+  // CTAs (one-shot binding)
   ['cta-top', 'cta-hero', 'cta-final'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('click', () => onCtaClick && onCtaClick());
+    if (!el || el.dataset.bound === '1') return;
+    el.dataset.bound = '1';
+    el.addEventListener('click', () => onCtaClick && onCtaClick());
   });
   const howLink = $('#how-link-keys');
-  if (howLink) howLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    alert(
-      'Crée ta clé API sur :\n\n' +
-      '• Claude → console.anthropic.com\n' +
-      '• OpenAI → platform.openai.com\n' +
-      '• Gemini → aistudio.google.com\n' +
-      '• Grok → console.x.ai\n\n' +
-      'Une seule suffit pour démarrer.'
-    );
-  });
+  if (howLink && howLink.dataset.bound !== '1') {
+    howLink.dataset.bound = '1';
+    howLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      alert(
+        'Crée ta clé API sur :\n\n' +
+        '• Claude → console.anthropic.com\n' +
+        '• OpenAI → platform.openai.com\n' +
+        '• Gemini → aistudio.google.com\n' +
+        '• Grok → console.x.ai\n\n' +
+        'Une seule suffit pour démarrer.'
+      );
+    });
+  }
 
-  // Smooth scroll links
+  // Smooth scroll links (one-shot binding)
   $$('.landing-nav-links a, .hero-cta a').forEach(a => {
+    if (a.dataset.scrollBound === '1') return;
+    a.dataset.scrollBound = '1';
     a.addEventListener('click', (e) => {
       const href = a.getAttribute('href');
       if (href && href.startsWith('#') && href.length > 1) {
