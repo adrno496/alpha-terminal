@@ -476,6 +476,9 @@ function renderAdvancedTab(c) {
         // Aucune méthode n'a marché — on bascule sur la modale "show JSON" pour copy manuel
         showBackupFallbackModal(json, filename);
         toast(t('settings.adv.backup_failed_show_modal'), 'info');
+      } else if (method === 'cancelled') {
+        // Utilisateur a fermé la dialog system du picker — pas un succès, pas une erreur
+        // (ne rien afficher)
       } else if (method === 'capacitor') {
         toast(t('settings.adv.backup_done_mobile').replace('{n}', n), 'success');
       } else {
