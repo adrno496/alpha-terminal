@@ -1,5 +1,5 @@
 // Provider OpenAI ChatGPT
-import { BaseProvider, consumeSSE, friendlyHttpError } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.openai.com/v1/chat/completions';
@@ -65,7 +65,7 @@ export class OpenAIProvider extends BaseProvider {
         'authorization': `Bearer ${this.apiKey}`
       },
       body: JSON.stringify(body),
-      signal
+      signal: withTimeout(signal, body.stream ? 120_000 : 60_000)
     });
   }
 
@@ -87,7 +87,7 @@ export class OpenAIProvider extends BaseProvider {
         });
         if (res2.ok) return { ok: true, note: 'fallback gpt-4o-mini' };
       }
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
+      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName), status: res.status };
     } catch (e) { return { ok: false, error: e.message }; }
   }
 
@@ -96,7 +96,7 @@ export class OpenAIProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content || '';
@@ -117,7 +117,7 @@ export class OpenAIProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     let fullText = '';
     let usage = { input: 0, output: 0 };

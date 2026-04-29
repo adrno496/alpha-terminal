@@ -1,5 +1,5 @@
 // Provider Google Gemini
-import { BaseProvider, consumeSSE, friendlyHttpError } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -97,11 +97,11 @@ export class GeminiProvider extends BaseProvider {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
-      signal: params.signal
+      signal: withTimeout(params.signal, 60_000)
     });
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     const data = await res.json();
     const text = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').filter(Boolean).join('\n');
@@ -122,11 +122,11 @@ export class GeminiProvider extends BaseProvider {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(body),
-      signal: params.signal
+      signal: withTimeout(params.signal, 120_000)
     });
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     let fullText = '';
     let usage = { input: 0, output: 0 };

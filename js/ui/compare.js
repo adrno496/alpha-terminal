@@ -3,6 +3,7 @@ import { listAnalyses, getAnalysis } from '../core/storage.js';
 import { fmtRelative, escHtml } from '../core/utils.js';
 import { showGenericModal } from './modal.js';
 import { getModuleById } from './sidebar.js';
+import { safeRender } from '../core/safe-render.js';
 
 export async function openComparePicker() {
   const all = await listAnalyses({ limit: 200 });
@@ -38,7 +39,7 @@ export async function openComparePicker() {
 
 function showCompareView(a, b) {
   const ma = getModuleById(a.module), mb = getModuleById(b.module);
-  const renderMd = (md) => window.marked ? window.marked.parse(md) : `<pre>${md}</pre>`;
+  const renderMd = (md) => safeRender(md || '');
   const html = `
     <div class="cmp-grid">
       <div class="cmp-col">

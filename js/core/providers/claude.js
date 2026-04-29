@@ -1,5 +1,5 @@
 // Provider Anthropic Claude
-import { BaseProvider, consumeSSE, friendlyHttpError } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.anthropic.com/v1/messages';
@@ -83,7 +83,7 @@ export class ClaudeProvider extends BaseProvider {
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify(body),
-      signal
+      signal: withTimeout(signal, body.stream ? 120_000 : 60_000)
     });
   }
 
@@ -105,7 +105,7 @@ export class ClaudeProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     const data = await res.json();
     const text = (data.content || []).map(b => b.text || '').filter(Boolean).join('\n');
@@ -125,7 +125,7 @@ export class ClaudeProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     let fullText = '';
     let usage = { input: 0, output: 0 };

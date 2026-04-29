@@ -1,7 +1,7 @@
 // Cohere — https://docs.cohere.com/reference/chat
 // v2 chat endpoint accepts OpenAI-style "messages" but uses different field names
 // for response/usage. SSE streaming format is also Cohere-specific.
-import { BaseProvider, consumeSSE, friendlyHttpError } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.cohere.com/v2/chat';
@@ -66,7 +66,7 @@ export class CohereProvider extends BaseProvider {
         'accept': body.stream ? 'text/event-stream' : 'application/json'
       },
       body: JSON.stringify(body),
-      signal
+      signal: withTimeout(signal, body.stream ? 120_000 : 60_000)
     });
   }
 
@@ -88,7 +88,7 @@ export class CohereProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     const data = await res.json();
     // Cohere v2 chat: data.message.content[0].text
@@ -114,7 +114,7 @@ export class CohereProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     let fullText = '';
     let usage = { input: 0, output: 0 };

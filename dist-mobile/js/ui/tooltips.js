@@ -2,6 +2,7 @@
 // Usage : ajoute un attribut data-tt="key" sur n'importe quel élément, ou data-tt-text="texte direct"
 
 import { t } from '../core/i18n.js';
+import { safeRender } from '../core/safe-render.js';
 
 const GLOSSARY = {
   // Fiscal FR
@@ -121,7 +122,7 @@ export function showModuleHelp(target, moduleId) {
   const helpText = t(helpKey, '');
 
   const md = helpText && helpText !== helpKey ? helpText : t('mod.help.missing');
-  const body = window.marked ? window.marked.parse(md) : `<p>${md}</p>`;
+  const body = safeRender(md || '');
 
   el.innerHTML = `
     <div class="mod-help-popover-head">

@@ -2,6 +2,7 @@
 import { uuid, fmtUSD } from '../core/utils.js';
 import { saveAnalysis, getSettings, setSettings } from '../core/storage.js';
 import { downloadMarkdown, copyToClipboard, printAnalysis, downloadAnalysisPdf } from '../core/export.js';
+import { safeRender } from '../core/safe-render.js';
 import { getModuleById } from '../ui/sidebar.js';
 import { abortCurrentCall, analyzeStream, getOrchestrator, isConnected } from '../core/api.js';
 import { t } from '../core/i18n.js';
@@ -43,8 +44,7 @@ export function prepareStreamContainer(container, module, _title) {
     id,
     body: container.querySelector('[data-stream]'),
     setMd: (md) => {
-      const html = window.marked ? window.marked.parse(md) : `<pre>${md}</pre>`;
-      container.querySelector('[data-stream]').innerHTML = html;
+      container.querySelector('[data-stream]').innerHTML = safeRender(md);
     },
     setStatus: (text) => {
       const s = container.querySelector('.streaming-status');
@@ -62,7 +62,7 @@ export function finalizeStream({ container, streamHandle, module, title, markdow
   const id = streamHandle?.id || uuid();
   const createdAt = new Date().toISOString();
   const mod = getModuleById(module);
-  const html = window.marked ? window.marked.parse(markdown || '') : `<pre>${markdown || ''}</pre>`;
+  const html = safeRender(markdown || '');
   const usageStr = usage
     ? `${(usage.input || 0).toLocaleString()} in / ${(usage.output || 0).toLocaleString()} out · ${fmtUSD(usage.costUSD || 0)}`
     : '';
@@ -100,7 +100,7 @@ export function finalizeStream({ container, streamHandle, module, title, markdow
 export function renderResult(args) { return finalizeStream(args); }
 export function renderExistingResult(container, record) {
   const mod = getModuleById(record.module);
-  const html = window.marked ? window.marked.parse(record.output) : `<pre>${record.output}</pre>`;
+  const html = safeRender(record.output || '');
   const usage = record.usage;
   const usageStr = usage
     ? `${(usage.input||0).toLocaleString()} in / ${(usage.output||0).toLocaleString()} out · ${fmtUSD(usage.costUSD||0)}`

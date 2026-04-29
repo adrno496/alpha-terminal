@@ -1,6 +1,6 @@
 // Provider OpenRouter — proxy LLM aggregator (200+ modèles)
 // API OpenAI-compatible : https://openrouter.ai/api/v1/chat/completions
-import { BaseProvider, consumeSSE, friendlyHttpError } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -65,7 +65,7 @@ export class OpenRouterProvider extends BaseProvider {
         'x-title': 'ALPHA TERMINAL'
       },
       body: JSON.stringify(body),
-      signal
+      signal: withTimeout(signal, body.stream ? 120_000 : 60_000)
     });
   }
 
@@ -87,7 +87,7 @@ export class OpenRouterProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content || '';
@@ -108,7 +108,7 @@ export class OpenRouterProvider extends BaseProvider {
     const res = await this._fetch(body, params.signal);
     if (!res.ok) {
       const t = await res.text();
-      throw new Error(friendlyHttpError(res.status, t, this.displayName));
+      throw makeHttpError(res.status, t, this.displayName, res.headers.get('Retry-After'));
     }
     let fullText = '';
     let usage = { input: 0, output: 0 };

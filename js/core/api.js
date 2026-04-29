@@ -27,7 +27,12 @@ import { sleep } from './utils.js';
 
 let _orchestrator = null;
 const _listeners = new Set();
-let _currentAbort = null;
+
+// AbortController par requestId — fix de la race condition singleton.
+// Permet à l'utilisateur de lancer 2+ analyses en parallèle, et d'annuler
+// individuellement l'une sans tuer les autres.
+const _controllers = new Map(); // requestId -> AbortController
+let _reqCounter = 0;
 
 const PROVIDER_CLASSES = {
   claude:      ClaudeProvider,
@@ -111,7 +116,7 @@ export class APIOrchestrator {
   }
 
   // Streaming canonique pour modules
-  async analyzeStream(moduleId, params, cbs = {}) {
+  async analyzeStream(moduleId, params, cbs = {}, _internalState = null) {
     const settings = getSettings();
     const sel = this.router.selectProvider(moduleId, {
       forceProvider: params.override?.provider,
@@ -119,8 +124,18 @@ export class APIOrchestrator {
       forceModel: params.override?.model
     });
 
+    // Etat interne pour suivre les retries 429 et providers déjà essayés
+    const state = _internalState || {
+      requestId: ++_reqCounter,
+      attempt: 0,
+      maxAttempts: 3,
+      triedProviders: new Set(),
+      backoffMs: 1500
+    };
+    state.triedProviders.add(sel.provider.name);
+
     const controller = new AbortController();
-    _currentAbort = controller;
+    _controllers.set(state.requestId, controller);
 
     const { messages, files } = await this._preparePDFsIfNeeded(
       sel.provider,
@@ -145,21 +160,43 @@ export class APIOrchestrator {
     try {
       result = await sel.provider.stream(callParams, { onDelta: cbs.onDelta });
     } catch (e) {
-      _currentAbort = null;
-      // Auto-fallback : essai avec un autre provider configuré (sauf si override explicite)
-      if (!params.override?.provider && Object.keys(this.providers).length > 1) {
-        const otherNames = Object.keys(this.providers).filter(n => n !== sel.provider.name);
-        if (otherNames.length) {
-          if (cbs.onFallback) cbs.onFallback(sel.provider.name, otherNames[0], e.message);
+      _controllers.delete(state.requestId);
+
+      // 429 RATE LIMIT — backoff exponentiel + retry sur même provider
+      // (avec respect de Retry-After si fourni)
+      if (e?.status === 429 && state.attempt < state.maxAttempts) {
+        state.attempt++;
+        let waitMs = state.backoffMs;
+        if (e.retryAfter) {
+          const ra = parseInt(e.retryAfter, 10);
+          if (!isNaN(ra) && ra > 0) waitMs = Math.min(ra * 1000, 30_000);
+        }
+        if (cbs.onFallback) cbs.onFallback(sel.provider.name, sel.provider.name, `429 — retry dans ${Math.round(waitMs/1000)}s (${state.attempt}/${state.maxAttempts})`);
+        await sleep(waitMs);
+        state.backoffMs = Math.min(state.backoffMs * 2, 16_000);
+        return await this.analyzeStream(moduleId, params, cbs, state);
+      }
+
+      // Si user a annulé : ne pas fallback, propager
+      if (e?.name === 'AbortError' || controller.signal.aborted) {
+        throw e;
+      }
+
+      // Auto-fallback : essayer un autre provider non-encore-tenté (sauf override explicite)
+      if (!params.override?.provider) {
+        const candidates = Object.keys(this.providers).filter(n => !state.triedProviders.has(n));
+        if (candidates.length) {
+          const next = candidates[0];
+          if (cbs.onFallback) cbs.onFallback(sel.provider.name, next, e.message);
           return await this.analyzeStream(moduleId, {
             ...params,
-            override: { ...(params.override || {}), provider: otherNames[0] }
-          }, cbs);
+            override: { ...(params.override || {}), provider: next }
+          }, cbs, state);
         }
       }
       throw e;
     }
-    _currentAbort = null;
+    _controllers.delete(state.requestId);
 
     addCost(result.costUSD || 0, sel.provider.name);
     if (cbs.onDone) cbs.onDone(result);
@@ -168,7 +205,8 @@ export class APIOrchestrator {
       provider: sel.provider.name,
       providerDisplay: sel.provider.displayName,
       isOptimal: sel.isOptimal,
-      reason: sel.reason
+      reason: sel.reason,
+      requestId: state.requestId
     };
   }
 }
@@ -201,11 +239,23 @@ export function getOrchestrator() {
 
 export function isConnected() { return !!_orchestrator; }
 export function onConnectionChange(fn) { _listeners.add(fn); return () => _listeners.delete(fn); }
-export function abortCurrentCall() {
-  if (_currentAbort) {
-    try { _currentAbort.abort(); } catch {}
-    _currentAbort = null;
+// Abort une requête spécifique (ou toutes si pas d'arg)
+// Backwards-compatible : `abortCurrentCall()` sans arg abort TOUS les calls en cours.
+// Avec un requestId : abort uniquement celui-ci → l'utilisateur peut lancer
+// 2 analyses en parallèle et n'annuler que l'une.
+export function abortCurrentCall(requestId) {
+  if (requestId != null) {
+    const c = _controllers.get(requestId);
+    if (c) {
+      try { c.abort(); } catch {}
+      _controllers.delete(requestId);
+    }
+    return;
   }
+  for (const [id, c] of _controllers) {
+    try { c.abort(); } catch {}
+  }
+  _controllers.clear();
 }
 
 // Validation d'une clé arbitraire (pour le wizard)

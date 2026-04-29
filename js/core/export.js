@@ -1,4 +1,5 @@
 // Export d'une analyse : markdown, copy clipboard, print PDF
+import { safeRender } from './safe-render.js';
 
 export function downloadMarkdown(filename, content) {
   const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
@@ -31,7 +32,7 @@ export async function copyToClipboard(text) {
 // Print PDF (via dialogue navigateur) — utile sur desktop pour ajustements fins
 export function printAnalysis({ title, module, createdAt, markdown }) {
   const view = document.getElementById('print-view');
-  const html = window.marked ? window.marked.parse(markdown) : `<pre>${markdown}</pre>`;
+  const html = safeRender(markdown || '');
   view.innerHTML = buildPrintHtml({ title, module, createdAt, html });
   view.classList.remove('hidden');
   setTimeout(() => {
@@ -66,6 +67,8 @@ function loadHtml2Pdf() {
     if (window.html2pdf) return resolve(window.html2pdf);
     const script = document.createElement('script');
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    script.integrity = 'sha384-Yv5O+t3uE3hunW8uyrbpPW3iw6/5/Y7HitWJBLgqfMoA36NogMmy+8wWZMpn3HWc';
+    script.crossOrigin = 'anonymous';
     script.onload = () => window.html2pdf ? resolve(window.html2pdf) : reject(new Error('html2pdf not loaded'));
     script.onerror = () => reject(new Error('Failed to load html2pdf from CDN'));
     document.head.appendChild(script);
@@ -74,7 +77,7 @@ function loadHtml2Pdf() {
 }
 
 export async function downloadAnalysisPdf({ title, module, createdAt, markdown, filename }) {
-  const html = window.marked ? window.marked.parse(markdown) : `<pre>${markdown}</pre>`;
+  const html = safeRender(markdown || '');
 
   // Build a clean, light-themed PDF view (avoid the dark theme of the app for readability)
   const wrapper = document.createElement('div');

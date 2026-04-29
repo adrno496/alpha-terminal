@@ -5,11 +5,34 @@ const DB_NAME = 'alpha-terminal';
 const DB_VERSION = 5;
 
 let _dbPromise = null;
+let _dbAvailable = null; // null = unknown, true = OK, false = unavailable (private mode etc.)
+const _dbAvailListeners = new Set();
+
+// Permet aux UIs (banner) d'écouter le statut IndexedDB
+export function onDbAvailabilityChange(fn) {
+  _dbAvailListeners.add(fn);
+  if (_dbAvailable !== null) fn(_dbAvailable);
+  return () => _dbAvailListeners.delete(fn);
+}
+export function isDbAvailable() { return _dbAvailable !== false; }
+
+function setDbAvailable(v) {
+  _dbAvailable = v;
+  _dbAvailListeners.forEach(fn => { try { fn(v); } catch {} });
+}
 
 function openDB() {
   if (_dbPromise) return _dbPromise;
   _dbPromise = new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    let req;
+    try {
+      req = indexedDB.open(DB_NAME, DB_VERSION);
+    } catch (e) {
+      // Certains navigateurs jettent synchroniously en navigation privée
+      console.warn('[storage] indexedDB.open threw synchronously:', e);
+      setDbAvailable(false);
+      return reject(new Error('IndexedDB indisponible (navigation privée ?)'));
+    }
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('analyses')) {
@@ -36,10 +59,29 @@ function openDB() {
         ts.createIndex('ticker', 'ticker', { unique: false });
       }
     };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    req.onsuccess = () => { setDbAvailable(true); resolve(req.result); };
+    req.onerror = () => {
+      console.warn('[storage] IndexedDB open failed:', req.error);
+      setDbAvailable(false);
+      reject(req.error || new Error('IndexedDB unavailable'));
+    };
+    req.onblocked = () => {
+      console.warn('[storage] IndexedDB blocked — autre onglet ouvre une version différente');
+      // On laisse la promise pending, l'utilisateur doit fermer les autres onglets
+    };
+    // Timeout : si onsuccess/onerror ne se déclenchent jamais (rare bug Safari private)
+    setTimeout(() => {
+      if (_dbAvailable === null) {
+        setDbAvailable(false);
+        reject(new Error('IndexedDB timeout — navigation privée ?'));
+      }
+    }, 5000);
   });
-  return _dbPromise;
+  return _dbPromise.catch(err => {
+    // Reset le promise pour permettre un retry futur si l'environnement change
+    _dbPromise = null;
+    throw err;
+  });
 }
 
 function tx(store, mode = 'readonly') {

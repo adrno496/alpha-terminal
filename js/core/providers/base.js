@@ -73,3 +73,51 @@ export function friendlyHttpError(status, text, providerName) {
   if (status >= 500) return `${prefix} Erreur serveur (${status}).`;
   return `${prefix} HTTP ${status}: ${t}`;
 }
+
+// Erreur enrichie avec status HTTP (utilisée par l'orchestrator pour le retry 429)
+export function makeHttpError(status, text, providerName, retryAfter) {
+  const err = new Error(friendlyHttpError(status, text, providerName));
+  err.status = status;
+  err.providerName = providerName;
+  if (retryAfter != null) err.retryAfter = retryAfter;
+  return err;
+}
+
+// Timeout helper. Compose un AbortSignal user (optionnel) avec un timeout.
+// Retourne un signal qui s'abort si l'un des deux trigger.
+//   const signal = withTimeout(userSignal, 30_000);
+//   fetch(url, { signal });
+const DEFAULT_TIMEOUT_MS = 60_000;
+
+export function withTimeout(userSignal, ms = DEFAULT_TIMEOUT_MS) {
+  // AbortSignal.any est natif depuis Chrome 116/Safari 17.4 — fallback manuel sinon
+  const timeoutSignal = AbortSignal.timeout
+    ? AbortSignal.timeout(ms)
+    : (() => {
+        const c = new AbortController();
+        setTimeout(() => c.abort(new DOMException('Request timed out', 'TimeoutError')), ms);
+        return c.signal;
+      })();
+  if (!userSignal) return timeoutSignal;
+  if (AbortSignal.any) {
+    try { return AbortSignal.any([userSignal, timeoutSignal]); } catch {}
+  }
+  // Fallback : combiner manuellement
+  const combined = new AbortController();
+  const onAbort = () => combined.abort(userSignal.reason || timeoutSignal.reason);
+  if (userSignal.aborted) onAbort();
+  else userSignal.addEventListener('abort', onAbort, { once: true });
+  if (timeoutSignal.aborted) onAbort();
+  else timeoutSignal.addEventListener('abort', onAbort, { once: true });
+  return combined.signal;
+}
+
+// Wrapper user-friendly pour catch les erreurs réseau (timeout vs autre)
+export function isTimeoutError(err) {
+  if (!err) return false;
+  if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+    if ((err.message || '').toLowerCase().includes('timed out')) return true;
+    if (err.cause && err.cause.name === 'TimeoutError') return true;
+  }
+  return false;
+}

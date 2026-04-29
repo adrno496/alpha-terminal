@@ -8,6 +8,7 @@ import { downloadMarkdown, copyToClipboard } from '../core/export.js';
 import { abortCurrentCall } from '../core/api.js';
 import { moduleHeader, wireProviderSelector, getModuleOverride, isRagEnabledFor } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
+import { safeRender } from '../core/safe-render.js';
 
 const MODULE_ID = 'quick-analysis';
 
@@ -190,7 +191,7 @@ function renderQuickResult(out, input, text, apiResult, isPortfolio) {
   const scoreColor = score < 40 ? '#ff3355' : score < 70 ? '#ffaa00' : '#00ff88';
   const breakdown = data?.score_breakdown || {};
 
-  const html = window.marked ? window.marked.parse(md) : `<pre>${escapeHtml(md)}</pre>`;
+  const html = safeRender(md || '');
 
   out.innerHTML = `
     <div class="qa-result">

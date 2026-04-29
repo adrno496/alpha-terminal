@@ -3,6 +3,7 @@ import { $ } from '../core/utils.js';
 import { DEMO_QUICK, formatDemoAsMarkdown } from '../core/demo-data.js';
 import { showGenericModal } from './modal.js';
 import { t } from '../core/i18n.js';
+import { safeRender } from '../core/safe-render.js';
 
 export function showDemoGallery() {
   const html = `
@@ -47,7 +48,7 @@ export function showDemoGallery() {
 
 function showDemoFullAnalysis(demo) {
   const md = formatDemoAsMarkdown(demo);
-  const html = window.marked ? window.marked.parse(md) : `<pre>${md}</pre>`;
+  const html = safeRender(md || '');
   const v = demo.verdict;
   const color = v === 'BUY' ? 'var(--accent-green)' : v === 'SELL' ? 'var(--accent-red)' : 'var(--accent-amber)';
   const emoji = v === 'BUY' ? '🟢' : v === 'SELL' ? '🔴' : '🟡';

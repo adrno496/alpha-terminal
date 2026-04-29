@@ -2,7 +2,7 @@
 import { $, fmtUSD, fmtRelative, escHtml } from './core/utils.js';
 import { isConnected, onConnectionChange, abortCurrentCall } from './core/api.js';
 import { hasVault } from './core/crypto.js';
-import { listAnalyses, getSettings, setSettings } from './core/storage.js';
+import { listAnalyses, getSettings, setSettings, onDbAvailabilityChange } from './core/storage.js';
 import { getCost, onCostChange } from './core/cost-tracker.js';
 
 import { renderSidebar, setActiveSidebar, getModuleById } from './ui/sidebar.js';
@@ -42,6 +42,7 @@ import { renderPortfolioAuditView }     from './modules/portfolio-audit.js';
 import { renderYoutubeTranscriptView }  from './modules/youtube-transcript.js';
 
 import { renderExistingResult } from './modules/_shared.js';
+import { safeRender } from './core/safe-render.js';
 import { makeLocaleToggle, t, applyI18nAttributes } from './core/i18n.js';
 import { isTourCompleted, startTour } from './ui/tour.js';
 import { initKeyboard } from './ui/keyboard.js';
@@ -283,6 +284,22 @@ function boot() {
   onCostChange(refreshCostBadge);
   refreshApiStatus();
 
+  // Bannière "navigation privée" si IndexedDB indisponible
+  onDbAvailabilityChange((available) => {
+    let banner = document.getElementById('db-unavailable-banner');
+    if (available) {
+      if (banner) banner.remove();
+      return;
+    }
+    if (banner) return;
+    banner = document.createElement('div');
+    banner.id = 'db-unavailable-banner';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;padding:10px 16px;background:#b8860b;color:#fff;font-size:13px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);';
+    banner.innerHTML = '⚠️ <strong>Stockage local indisponible</strong> — Navigation privée détectée. Tes analyses ne seront pas sauvegardées. <button style="margin-left:8px;background:transparent;border:1px solid #fff;color:#fff;padding:2px 8px;cursor:pointer;border-radius:3px;">Fermer</button>';
+    banner.querySelector('button').addEventListener('click', () => banner.remove());
+    document.body.appendChild(banner);
+  });
+
   initCmdK(navigate);
   initTooltips();
   initTheme();
@@ -398,7 +415,7 @@ function boot() {
     if (shared) {
       // Affiche dans une modale, pas besoin de vault
       import('./ui/modal.js').then(({ showGenericModal }) => {
-        const html = window.marked ? window.marked.parse(shared.output) : `<pre>${shared.output}</pre>`;
+        const html = safeRender(shared.output || '');
         showGenericModal(`🔗 ${shared.title || 'Analyse partagée'}`, `<div class="result"><div class="result-body">${html}</div></div>`, { wide: true });
       });
       return;
