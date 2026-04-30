@@ -4,7 +4,6 @@ import { $ } from '../core/utils.js';
 import { listWealth } from '../core/wealth.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
-import { getDB } from '../core/storage.js';
 
 const MODULE_ID = 'capital-gains-tracker';
 const STORAGE_KEY = 'alpha-terminal:cg:lots';
