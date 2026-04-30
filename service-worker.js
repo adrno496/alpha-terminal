@@ -1,6 +1,6 @@
-// Service Worker v8 — offline-first sur assets statiques (JS/CSS/HTML/datasets),
-// network-first sur reste. Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v8';
+// Service Worker v9 — network-first pour HTML/navigation (toujours frais),
+// cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
+const CACHE = 'alpha-terminal-v9';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
@@ -9,17 +9,9 @@ const PRECACHE_URLS = [
   '/index.html',
   '/manifest.json',
   '/styles.css',
-  '/main.js',
-  '/api-costs.html',
-  '/pricing.html',
-  '/features.html',
-  '/bloomberg-alternative.html',
-  '/ai-stock-analysis-guide.html',
-  '/data/etf-fees-fr.json',
-  '/data/dividends-fr.json',
-  '/data/wealth-rules-fr.json',
-  '/data/csv-bank-presets.json',
-  '/data/categorization-keywords.json'
+  '/icons/logo.png',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
 self.addEventListener('install', (e) => {
@@ -54,9 +46,25 @@ self.addEventListener('fetch', (e) => {
   // 2. Cross-origin (CDN fonts, jsPDF, etc.) : laisser passer sans cache
   if (url.origin !== location.origin) return;
 
-  // 3. Stratégie cache-first pour les assets statiques (JS, CSS, JSON datasets, images)
-  //    → app marche 100% offline une fois cachée.
-  const isStaticAsset = /\.(js|css|json|png|jpg|jpeg|svg|woff2?|ttf|eot|html)$/i.test(url.pathname) || url.pathname === '/';
+  // 3a. NETWORK-FIRST pour HTML / navigation : toujours servir la version fraîche.
+  //     Évite les bugs de "vieux index.html servi" après une mise à jour.
+  const isHTML = /\.html$/i.test(url.pathname) || url.pathname === '/' || e.request.mode === 'navigate';
+  if (isHTML && e.request.method === 'GET') {
+    e.respondWith(
+      fetch(e.request).then(r => {
+        if (r.ok) {
+          const clone = r.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+        }
+        return r;
+      }).catch(() => caches.match(e.request).then(c => c || caches.match('/index.html') || new Response('Offline', { status: 503 })))
+    );
+    return;
+  }
+
+  // 3b. Stratégie cache-first pour les assets statiques (JS, CSS, JSON, images, fonts)
+  //     → app marche 100% offline + chargement instantané.
+  const isStaticAsset = /\.(js|mjs|css|json|png|jpg|jpeg|svg|webp|gif|ico|woff2?|ttf|eot)$/i.test(url.pathname);
 
   if (isStaticAsset && e.request.method === 'GET') {
     e.respondWith(
