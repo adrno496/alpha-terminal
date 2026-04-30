@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "updatedAt": "2026-04-30",
+    "source": "Boursorama + Yahoo Finance (historical)",
+    "currency": "EUR",
+    "note": "Dividendes historiques. Les valeurs futures sont des projections basées sur la dernière annonce."
+  },
+  "stocks": {
+    "MC.PA":     { "name": "LVMH",                    "ticker": "MC",     "exchange": "EPA", "lastDividend": 13.00, "frequency": "annual",    "exDate": "2026-04-23", "paymentDate": "2026-04-29", "currency": "EUR", "growth5y": 12.4, "consecutiveYears": 8 },
+    "OR.PA":     { "name": "L'Oréal",                 "ticker": "OR",     "exchange": "EPA", "lastDividend": 6.60,  "frequency": "annual",    "exDate": "2026-04-30", "paymentDate": "2026-05-04", "currency": "EUR", "growth5y": 9.2,  "consecutiveYears": 30 },
+    "SAN.PA":    { "name": "Sanofi",                  "ticker": "SAN",    "exchange": "EPA", "lastDividend": 3.76,  "frequency": "annual",    "exDate": "2026-05-15", "paymentDate": "2026-05-22", "currency": "EUR", "growth5y": 1.5,  "consecutiveYears": 28 },
+    "TTE.PA":    { "name": "TotalEnergies",           "ticker": "TTE",    "exchange": "EPA", "lastDividend": 3.16,  "frequency": "quarterly", "exDate": "2026-09-23", "paymentDate": "2026-10-01", "currency": "EUR", "growth5y": 3.0,  "consecutiveYears": 20 },
+    "AIR.PA":    { "name": "Airbus",                  "ticker": "AIR",    "exchange": "EPA", "lastDividend": 2.00,  "frequency": "annual",    "exDate": "2026-04-22", "paymentDate": "2026-04-26", "currency": "EUR", "growth5y": 8.0,  "consecutiveYears": 4 },
+    "AI.PA":     { "name": "Air Liquide",             "ticker": "AI",     "exchange": "EPA", "lastDividend": 3.20,  "frequency": "annual",    "exDate": "2026-05-13", "paymentDate": "2026-05-17", "currency": "EUR", "growth5y": 5.8,  "consecutiveYears": 40 },
+    "BNP.PA":    { "name": "BNP Paribas",             "ticker": "BNP",    "exchange": "EPA", "lastDividend": 4.60,  "frequency": "annual",    "exDate": "2026-05-21", "paymentDate": "2026-05-23", "currency": "EUR", "growth5y": 18.5, "consecutiveYears": 3 },
+    "GLE.PA":    { "name": "Société Générale",        "ticker": "GLE",    "exchange": "EPA", "lastDividend": 0.90,  "frequency": "annual",    "exDate": "2026-06-03", "paymentDate": "2026-06-05", "currency": "EUR", "growth5y": 0,    "consecutiveYears": 2 },
+    "ACA.PA":    { "name": "Crédit Agricole",         "ticker": "ACA",    "exchange": "EPA", "lastDividend": 1.05,  "frequency": "annual",    "exDate": "2026-05-26", "paymentDate": "2026-05-28", "currency": "EUR", "growth5y": 6.0,  "consecutiveYears": 10 },
+    "CS.PA":     { "name": "AXA",                     "ticker": "CS",     "exchange": "EPA", "lastDividend": 1.98,  "frequency": "annual",    "exDate": "2026-04-22", "paymentDate": "2026-04-26", "currency": "EUR", "growth5y": 7.5,  "consecutiveYears": 11 },
+    "DG.PA":     { "name": "Vinci",                   "ticker": "DG",     "exchange": "EPA", "lastDividend": 4.75,  "frequency": "annual",    "exDate": "2026-04-15", "paymentDate": "2026-04-19", "currency": "EUR", "growth5y": 5.0,  "consecutiveYears": 12 },
+    "BN.PA":     { "name": "Danone",                  "ticker": "BN",     "exchange": "EPA", "lastDividend": 2.10,  "frequency": "annual",    "exDate": "2026-05-02", "paymentDate": "2026-05-06", "currency": "EUR", "growth5y": 0,    "consecutiveYears": 0 },
+    "MT.PA":     { "name": "ArcelorMittal",           "ticker": "MT",     "exchange": "EPA", "lastDividend": 0.50,  "frequency": "annual",    "exDate": "2026-06-10", "paymentDate": "2026-06-14", "currency": "EUR", "growth5y": 0,    "consecutiveYears": 0 },
+    "SU.PA":     { "name": "Schneider Electric",      "ticker": "SU",     "exchange": "EPA", "lastDividend": 3.50,  "frequency": "annual",    "exDate": "2026-05-08", "paymentDate": "2026-05-13", "currency": "EUR", "growth5y": 8.0,  "consecutiveYears": 12 },
+    "EN.PA":     { "name": "Bouygues",                "ticker": "EN",     "exchange": "EPA", "lastDividend": 1.90,  "frequency": "annual",    "exDate": "2026-04-30", "paymentDate": "2026-05-05", "currency": "EUR", "growth5y": 0,    "consecutiveYears": 5 },
+    "CAP.PA":    { "name": "Capgemini",               "ticker": "CAP",    "exchange": "EPA", "lastDividend": 3.40,  "frequency": "annual",    "exDate": "2026-05-26", "paymentDate": "2026-05-30", "currency": "EUR", "growth5y": 6.5,  "consecutiveYears": 8 },
+    "SAF.PA":    { "name": "Safran",                  "ticker": "SAF",    "exchange": "EPA", "lastDividend": 2.10,  "frequency": "annual",    "exDate": "2026-05-26", "paymentDate": "2026-05-30", "currency": "EUR", "growth5y": 4.0,  "consecutiveYears": 5 },
+    "HO.PA":     { "name": "Thales",                  "ticker": "HO",     "exchange": "EPA", "lastDividend": 3.40,  "frequency": "annual",    "exDate": "2026-05-22", "paymentDate": "2026-05-27", "currency": "EUR", "growth5y": 4.5,  "consecutiveYears": 7 },
+    "VIE.PA":    { "name": "Veolia",                  "ticker": "VIE",    "exchange": "EPA", "lastDividend": 1.25,  "frequency": "annual",    "exDate": "2026-05-15", "paymentDate": "2026-05-19", "currency": "EUR", "growth5y": 4.5,  "consecutiveYears": 10 },
+    "ENGI.PA":   { "name": "Engie",                   "ticker": "ENGI",   "exchange": "EPA", "lastDividend": 1.43,  "frequency": "annual",    "exDate": "2026-05-04", "paymentDate": "2026-05-09", "currency": "EUR", "growth5y": 5.5,  "consecutiveYears": 4 },
+    "DSY.PA":    { "name": "Dassault Systèmes",       "ticker": "DSY",    "exchange": "EPA", "lastDividend": 0.30,  "frequency": "annual",    "exDate": "2026-05-22", "paymentDate": "2026-05-26", "currency": "EUR", "growth5y": 7.0,  "consecutiveYears": 14 },
+    "STMPA.PA":  { "name": "STMicroelectronics",      "ticker": "STMPA",  "exchange": "EPA", "lastDividend": 0.36,  "frequency": "quarterly", "exDate": "2026-03-22", "paymentDate": "2026-03-29", "currency": "USD", "growth5y": 6.0,  "consecutiveYears": 3 },
+    "PUB.PA":    { "name": "Publicis",                "ticker": "PUB",    "exchange": "EPA", "lastDividend": 3.40,  "frequency": "annual",    "exDate": "2026-05-30", "paymentDate": "2026-06-03", "currency": "EUR", "growth5y": 7.0,  "consecutiveYears": 4 },
+    "CA.PA":     { "name": "Carrefour",               "ticker": "CA",     "exchange": "EPA", "lastDividend": 0.87,  "frequency": "annual",    "exDate": "2026-05-26", "paymentDate": "2026-05-29", "currency": "EUR", "growth5y": 4.0,  "consecutiveYears": 4 },
+    "RNO.PA":    { "name": "Renault",                 "ticker": "RNO",    "exchange": "EPA", "lastDividend": 2.20,  "frequency": "annual",    "exDate": "2026-05-23", "paymentDate": "2026-05-27", "currency": "EUR", "growth5y": 0,    "consecutiveYears": 1 },
+    "STLAP.PA":  { "name": "Stellantis",              "ticker": "STLAP",  "exchange": "EPA", "lastDividend": 1.55,  "frequency": "annual",    "exDate": "2026-04-22", "paymentDate": "2026-04-26", "currency": "EUR", "growth5y": 0,    "consecutiveYears": 3 },
+    "ML.PA":     { "name": "Michelin",                "ticker": "ML",     "exchange": "EPA", "lastDividend": 1.35,  "frequency": "annual",    "exDate": "2026-05-19", "paymentDate": "2026-05-22", "currency": "EUR", "growth5y": 4.0,  "consecutiveYears": 10 },
+    "RI.PA":     { "name": "Pernod Ricard",           "ticker": "RI",     "exchange": "EPA", "lastDividend": 4.70,  "frequency": "annual",    "exDate": "2026-07-15", "paymentDate": "2026-07-18", "currency": "EUR", "growth5y": 6.5,  "consecutiveYears": 14 },
+    "KER.PA":    { "name": "Kering",                  "ticker": "KER",    "exchange": "EPA", "lastDividend": 6.00,  "frequency": "annual",    "exDate": "2026-05-05", "paymentDate": "2026-05-09", "currency": "EUR", "growth5y": -2.0, "consecutiveYears": 0 },
+    "EL.PA":     { "name": "EssilorLuxottica",        "ticker": "EL",     "exchange": "EPA", "lastDividend": 3.95,  "frequency": "annual",    "exDate": "2026-05-26", "paymentDate": "2026-05-30", "currency": "EUR", "growth5y": 6.0,  "consecutiveYears": 5 },
+    "RMS.PA":    { "name": "Hermès International",    "ticker": "RMS",    "exchange": "EPA", "lastDividend": 15.00, "frequency": "annual",    "exDate": "2026-04-22", "paymentDate": "2026-04-29", "currency": "EUR", "growth5y": 14.0, "consecutiveYears": 13 }
+  }
+}

@@ -50,6 +50,15 @@ import { tryLoadSharedFromHash } from './ui/sharing.js';
 import { showDemoGallery } from './ui/demo-mode.js';
 import { openComparePicker } from './ui/compare.js';
 
+// V7 — Finances perso
+import { renderBudgetView }                from './modules/budget.js';
+import { renderFeesAnalysisView }          from './modules/fees-analysis.js';
+import { renderDividendsTrackerView }      from './modules/dividends-tracker.js';
+import { renderDiversificationScoreView }  from './modules/diversification-score.js';
+import { renderWealthMethodView }          from './modules/wealth-method.js';
+import { renderCsvImportView }             from './modules/csv-import.js';
+import { renderInsightsEngineView }        from './modules/insights-engine.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -77,6 +86,14 @@ const ROUTES = {
   'knowledge-base':      { render: renderKnowledgeBaseView,      label: 'Knowledge Base' },
   'portfolio-audit':     { render: renderPortfolioAuditView,     label: '🔎 Portfolio Audit' },
   'youtube-transcript':  { render: renderYoutubeTranscriptView,  label: '🎙 YouTube + CEO Forensics' },
+  // V7 — Finances perso
+  'budget':                { render: renderBudgetView,               label: '💰 Budget' },
+  'fees-analysis':         { render: renderFeesAnalysisView,         label: '🔥 Frais cachés' },
+  'dividends-tracker':     { render: renderDividendsTrackerView,     label: '💸 Dividendes' },
+  'diversification-score': { render: renderDiversificationScoreView, label: '🎯 Score Diversification' },
+  'wealth-method':         { render: renderWealthMethodView,         label: '📚 Méthode patrimoniale' },
+  'csv-import':            { render: renderCsvImportView,            label: '📥 Import CSV' },
+  'insights-engine':       { render: renderInsightsEngineView,       label: '✨ Insights' },
 };
 
 const STATE = { currentRoute: null };
@@ -138,6 +155,41 @@ async function renderHome(viewEl) {
   let providers = [];
   try { const { getOrchestrator } = await import('./core/api.js'); providers = getOrchestrator().getProviderNames(); } catch {}
 
+  // V7 — Finances perso : score + insights + dividends/fees glance
+  let financesPersoCards = '';
+  try {
+    const { listWealth } = await import('./core/wealth.js');
+    const { computeDiversificationScore } = await import('./modules/diversification-score.js');
+    const { runInsightsEngine } = await import('./modules/insights-engine.js');
+    const holdings = await listWealth().catch(() => []);
+    if (holdings.length > 0) {
+      const score = computeDiversificationScore(holdings);
+      const insights = await runInsightsEngine();
+      const top3 = (insights || []).slice(0, 3);
+      const totalValue = holdings.reduce((s, h) => s + (Number(h.value) || 0), 0);
+      const colorMap = { high: 'var(--accent-red)', medium: 'var(--accent-orange)', low: 'var(--text-muted)' };
+      const ip = (p) => p === 'alert' ? 'var(--accent-red)' : p === 'warning' ? 'var(--accent-orange)' : p === 'celebration' ? 'var(--accent-green)' : 'var(--accent-blue)';
+      financesPersoCards = `
+        <div class="card" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
+          <div data-route="diversification-score" style="cursor:pointer;padding:14px;background:var(--bg-tertiary);border-radius:6px;text-align:center;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">🎯 ${t('mod.diversification-score.label')}</div>
+            <div style="font-size:36px;font-weight:700;font-family:var(--font-mono);color:${score.total < 50 ? 'var(--accent-orange)' : score.total < 70 ? 'var(--accent-green)' : 'var(--accent-green)'};">${score.total}</div>
+            <div style="font-size:10px;color:var(--text-muted);">/ 100 — ${score.total < 50 ? '⚠️ à améliorer' : score.total < 70 ? '👍 correct' : '🏆 excellent'}</div>
+          </div>
+          <div data-route="insights-engine" style="cursor:pointer;padding:14px;background:var(--bg-tertiary);border-radius:6px;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">✨ ${t('mod.insights-engine.label')} (${(insights || []).length})</div>
+            ${top3.length ? top3.map(i => `<div style="font-size:11.5px;line-height:1.4;margin-bottom:4px;border-left:3px solid ${ip(i.priority)};padding-left:6px;">${(i.message || '').slice(0, 110)}${(i.message || '').length > 110 ? '…' : ''}</div>`).join('') : '<div style="font-size:11px;color:var(--text-muted);">Aucun insight détecté.</div>'}
+          </div>
+          <div data-route="fees-analysis" style="cursor:pointer;padding:14px;background:var(--bg-tertiary);border-radius:6px;text-align:center;">
+            <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">🔥 ${t('mod.fees-analysis.label')}</div>
+            <div style="font-size:18px;font-weight:600;font-family:var(--font-mono);">${totalValue ? fmtUSD(totalValue).replace('$', '€') : '—'}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">→ Calculer l'impact des frais sur 30 ans</div>
+          </div>
+        </div>
+      `;
+    }
+  } catch (e) { console.warn('Finances perso cards failed:', e); }
+
   viewEl.innerHTML = `
     <div class="module-header">
       <h2>${t('home.welcome')}</h2>
@@ -153,6 +205,8 @@ async function renderHome(viewEl) {
       <div class="stat"><div class="stat-label">${t('home.api_calls')}</div><div class="stat-value">${cost.calls || 0}</div></div>
       <div class="stat"><div class="stat-label">${t('home.providers')}</div><div class="stat-value ${providers.length ? 'green' : 'red'}">${providers.length}</div></div>
     </div>
+
+    ${financesPersoCards}
 
     ${providers.length ? `
     <div class="card">

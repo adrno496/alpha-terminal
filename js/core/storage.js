@@ -2,7 +2,7 @@
 // + helpers localStorage pour settings non-sensibles
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 6;
+const DB_VERSION = 7;
 
 let _dbPromise = null;
 let _dbAvailable = null; // null = unknown, true = OK, false = unavailable (private mode etc.)
@@ -57,6 +57,21 @@ function openDB() {
         const ts = db.createObjectStore('transcripts', { keyPath: 'id' });
         ts.createIndex('createdAt', 'createdAt', { unique: false });
         ts.createIndex('ticker', 'ticker', { unique: false });
+      }
+      // v7 — Finances perso (3 nouveaux stores)
+      if (!db.objectStoreNames.contains('budget_entries')) {
+        const be = db.createObjectStore('budget_entries', { keyPath: 'id' });
+        be.createIndex('month', 'month', { unique: false });
+        be.createIndex('type', 'type', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('dividends_history')) {
+        const dh = db.createObjectStore('dividends_history', { keyPath: 'id' });
+        dh.createIndex('date', 'date', { unique: false });
+        dh.createIndex('ticker', 'ticker', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('insights_state')) {
+        const is = db.createObjectStore('insights_state', { keyPath: 'id' });
+        is.createIndex('generatedAt', 'generatedAt', { unique: false });
       }
     };
     req.onsuccess = () => { setDbAvailable(true); resolve(req.result); };

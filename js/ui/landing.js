@@ -31,6 +31,14 @@ const MODULE_DETAILS = {
   get 'knowledge-base'()      { return { icon: '📚', flow: 'Notes/PDFs → RAG' }; },
   get 'portfolio-audit'()     { return { icon: '🔎', flow: 'Holdings → Score 0-100' }; },
   get 'youtube-transcript'()  { return { icon: '🎙', flow: 'Transcript → CEO Forensics' }; },
+  // V7 — Finances perso
+  get 'budget'()                { return { icon: '💰', flow: 'Revenus / dépenses → Taux d\'épargne' }; },
+  get 'fees-analysis'()         { return { icon: '🔥', flow: 'Holdings → Impact frais 30 ans' }; },
+  get 'dividends-tracker'()     { return { icon: '💸', flow: 'Holdings → Calendrier annuel' }; },
+  get 'diversification-score'() { return { icon: '🎯', flow: 'Holdings → Score 0-100' }; },
+  get 'wealth-method'()         { return { icon: '📚', flow: 'Patrimoine → Checklist FR' }; },
+  get 'csv-import'()            { return { icon: '📥', flow: 'CSV bancaire → Budget' }; },
+  get 'insights-engine'()       { return { icon: '✨', flow: 'Patrimoine → Alertes hebdo' }; }
 };
 
 const FAQ_FR = [

@@ -188,3 +188,138 @@ export function kellySimulation(canvas, { winrate, R, capital, kelly, runs = 100
     }
   });
 }
+
+// === V7 — Finances perso ===
+
+// Calendrier mensuel des dividendes (bar chart 12 mois).
+//   monthlyTotals : tableau de 12 nombres (€) jan..dec
+export function dividendCalendar(canvas, monthlyTotals) {
+  ensureChart();
+  const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Dividendes attendus (€)',
+        data: monthlyTotals,
+        backgroundColor: '#00ff88',
+        borderColor: '#0a0a0a',
+        borderWidth: 1,
+        borderRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => `${ctx.raw.toFixed(0)} €`
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: GRID }, ticks: { color: TEXT_MUTED } },
+        y: {
+          beginAtZero: true,
+          grid: { color: GRID },
+          ticks: { color: TEXT_MUTED, callback: (v) => v + ' €' }
+        }
+      }
+    }
+  });
+}
+
+// Gauge score de diversification (0-100). Identique pattern à gaugeSentiment mais palette différente.
+export function diversificationGauge(canvas, score) {
+  ensureChart();
+  const color = score < 30 ? '#ff3355' : score < 50 ? '#ffaa00' : score < 70 ? '#88ee66' : '#00ff88';
+  return new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [score, 100 - score],
+        backgroundColor: [color, '#1f1f1f'],
+        borderColor: '#0a0a0a',
+        borderWidth: 2,
+        circumference: 180,
+        rotation: 270
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
+    }
+  });
+}
+
+// Budget : bar empilé revenus → dépenses fixes / variables / épargne
+//   data : { revenus, fixes, variables, epargne }
+export function budgetWaterfall(canvas, data) {
+  ensureChart();
+  return new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: ['Mois courant'],
+      datasets: [
+        { label: 'Revenus',     data: [data.revenus],   backgroundColor: '#00ff88', stack: 'in' },
+        { label: 'Dépenses fixes',    data: [data.fixes],     backgroundColor: '#ff3355', stack: 'out' },
+        { label: 'Dépenses variables',data: [data.variables], backgroundColor: '#ffaa00', stack: 'out' },
+        { label: 'Épargne / invest', data: [data.epargne],   backgroundColor: '#4488ff', stack: 'out' }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: TEXT_PRIMARY } },
+        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toFixed(0)} €` } }
+      },
+      scales: {
+        x: { stacked: true, grid: { color: GRID }, ticks: { color: TEXT_MUTED } },
+        y: { stacked: true, grid: { color: GRID }, ticks: { color: TEXT_MUTED, callback: (v) => v + ' €' } }
+      }
+    }
+  });
+}
+
+// Impact frais composé sur 10/20/30 ans
+//   scenarios : [{ label, points: [{years, value}] }, ...]
+export function feesImpact10y20y30y(canvas, scenarios) {
+  ensureChart();
+  return new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: scenarios[0]?.points.map(p => p.years + ' ans') || [],
+      datasets: scenarios.map((s, idx) => ({
+        label: s.label,
+        data: s.points.map(p => p.value),
+        borderColor: COLORS[idx % COLORS.length],
+        backgroundColor: COLORS[idx % COLORS.length] + '22',
+        fill: false,
+        tension: 0.2,
+        pointRadius: 4
+      }))
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: TEXT_PRIMARY } },
+        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toLocaleString('fr-FR', { maximumFractionDigits: 0 })} €` } }
+      },
+      scales: {
+        x: { grid: { color: GRID }, ticks: { color: TEXT_MUTED } },
+        y: {
+          beginAtZero: false,
+          grid: { color: GRID },
+          ticks: { color: TEXT_MUTED, callback: (v) => (v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v) + ' €' }
+        }
+      }
+    }
+  });
+}

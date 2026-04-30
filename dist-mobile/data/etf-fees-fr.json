@@ -1,0 +1,60 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "updatedAt": "2026-04-30",
+    "source": "JustETF + Boursorama (TER official)",
+    "currency": "EUR"
+  },
+  "etfs": {
+    "CW8": { "name": "Amundi MSCI World UCITS ETF", "isin": "LU1681043599", "ter": 0.38, "type": "world_eq", "region": "global", "replication": "synthetic", "accumulation": true },
+    "EWLD": { "name": "Lyxor MSCI World UCITS ETF", "isin": "FR0010315770", "ter": 0.30, "type": "world_eq", "region": "global", "replication": "synthetic", "accumulation": true },
+    "IWDA": { "name": "iShares Core MSCI World UCITS ETF", "isin": "IE00B4L5Y983", "ter": 0.20, "type": "world_eq", "region": "global", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "VWCE": { "name": "Vanguard FTSE All-World UCITS ETF", "isin": "IE00BK5BQT80", "ter": 0.22, "type": "world_eq", "region": "global", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "PE500": { "name": "Amundi S&P 500 UCITS ETF", "isin": "LU1681048804", "ter": 0.15, "type": "us_eq", "region": "us", "replication": "synthetic", "accumulation": true },
+    "CSPX": { "name": "iShares Core S&P 500 UCITS ETF", "isin": "IE00B5BMR087", "ter": 0.07, "type": "us_eq", "region": "us", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "VUAA": { "name": "Vanguard S&P 500 UCITS ETF (Acc)", "isin": "IE00BFMXXD54", "ter": 0.07, "type": "us_eq", "region": "us", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "EIMI": { "name": "iShares Core MSCI Emerging Markets IMI UCITS ETF", "isin": "IE00BKM4GZ66", "ter": 0.18, "type": "em_eq", "region": "emerging", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "AEEM": { "name": "Amundi MSCI Emerging Markets UCITS ETF", "isin": "LU1681045370", "ter": 0.20, "type": "em_eq", "region": "emerging", "replication": "synthetic", "accumulation": true },
+    "ESE": { "name": "Lyxor MSCI Europe UCITS ETF", "isin": "FR0010261198", "ter": 0.15, "type": "eu_eq", "region": "europe", "replication": "synthetic", "accumulation": true, "best_in_class": true },
+    "MEUD": { "name": "Lyxor Core STOXX Europe 600 UCITS ETF", "isin": "LU0908500753", "ter": 0.07, "type": "eu_eq", "region": "europe", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "CAC": { "name": "Lyxor CAC 40 UCITS ETF", "isin": "FR0007052782", "ter": 0.25, "type": "fr_eq", "region": "france", "replication": "physical", "accumulation": false },
+    "CACX": { "name": "Lyxor CAC 40 UCITS ETF (Acc)", "isin": "FR0007052782", "ter": 0.25, "type": "fr_eq", "region": "france", "replication": "physical", "accumulation": true },
+    "RS2K": { "name": "iShares Russell 2000 UCITS ETF", "isin": "IE00BJZ2DD79", "ter": 0.30, "type": "us_smallcap", "region": "us", "replication": "physical", "accumulation": true },
+    "WSML": { "name": "iShares MSCI World Small Cap UCITS ETF", "isin": "IE00BF4RFH31", "ter": 0.35, "type": "world_smallcap", "region": "global", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "AGGH": { "name": "iShares Core Global Aggregate Bond UCITS ETF", "isin": "IE00BDBRDM35", "ter": 0.10, "type": "bond_global", "region": "global", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "EUNA": { "name": "iShares Core Euro Government Bond UCITS ETF", "isin": "IE00B4WXJJ64", "ter": 0.07, "type": "bond_eu_gov", "region": "europe", "replication": "physical", "accumulation": true, "best_in_class": true },
+    "SGLD": { "name": "Invesco Physical Gold ETC", "isin": "IE00B579F325", "ter": 0.12, "type": "gold", "region": "global", "replication": "physical_gold", "accumulation": true, "best_in_class": true },
+    "RSP": { "name": "iShares STOXX Europe 600 Real Estate UCITS ETF", "isin": "DE000A0Q4R44", "ter": 0.46, "type": "reit_eu", "region": "europe", "replication": "physical", "accumulation": false },
+    "INRG": { "name": "iShares Global Clean Energy UCITS ETF", "isin": "IE00B1XNHC34", "ter": 0.65, "type": "thematic", "region": "global", "replication": "physical", "accumulation": true },
+    "WAT": { "name": "Lyxor World Water UCITS ETF", "isin": "FR0010527275", "ter": 0.60, "type": "thematic", "region": "global", "replication": "synthetic", "accumulation": false }
+  },
+  "alternatives": {
+    "world_eq": ["IWDA", "VWCE"],
+    "us_eq": ["CSPX", "VUAA"],
+    "em_eq": ["EIMI"],
+    "eu_eq": ["MEUD", "ESE"],
+    "world_smallcap": ["WSML"],
+    "bond_global": ["AGGH"],
+    "bond_eu_gov": ["EUNA"],
+    "gold": ["SGLD"]
+  },
+  "av_contracts": {
+    "linxea_spirit2":      { "name": "Linxea Spirit 2 (Spirica)",        "annualFees": 0.50, "entryFee": 0, "arbitrageFee": 0,    "rating": "best_in_class" },
+    "lucya_cardif":        { "name": "Lucya Cardif (Cardif)",            "annualFees": 0.50, "entryFee": 0, "arbitrageFee": 0,    "rating": "best_in_class" },
+    "linxea_avenir2":      { "name": "Linxea Avenir 2 (Suravenir)",      "annualFees": 0.60, "entryFee": 0, "arbitrageFee": 0,    "rating": "good" },
+    "boursorama_vie":      { "name": "Boursorama Vie",                   "annualFees": 0.75, "entryFee": 0, "arbitrageFee": 0,    "rating": "good" },
+    "fortuneo_vie":        { "name": "Fortuneo Vie",                     "annualFees": 0.75, "entryFee": 0, "arbitrageFee": 0,    "rating": "good" },
+    "yomoni":              { "name": "Yomoni Vie (gestion pilotée)",     "annualFees": 1.60, "entryFee": 0, "arbitrageFee": 0,    "rating": "expensive_but_managed" },
+    "nalo":                { "name": "Nalo Patrimoine",                  "annualFees": 1.65, "entryFee": 0, "arbitrageFee": 0,    "rating": "expensive_but_managed" },
+    "traditional_bank":    { "name": "AV banque traditionnelle (BNP, SG, CA…)", "annualFees": 1.00, "entryFee": 3.00, "arbitrageFee": 0.50, "rating": "expensive" }
+  },
+  "brokers": {
+    "trade_republic":  { "name": "Trade Republic",  "perOrderEUR": 0.99, "type": "online" },
+    "boursorama":      { "name": "Boursorama",      "perOrderEUR": 1.99, "type": "online" },
+    "fortuneo":        { "name": "Fortuneo",        "perOrderEUR": 1.95, "type": "online" },
+    "bourse_direct":   { "name": "Bourse Direct",   "perOrderEUR": 4.00, "type": "online" },
+    "degiro":          { "name": "Degiro",          "perOrderEUR": 1.00, "type": "online" },
+    "saxo_bank":       { "name": "Saxo Bank",       "perOrderEUR": 5.00, "type": "online" },
+    "traditional_bank":{ "name": "Banque traditionnelle (BNP, SG, CA…)", "perOrderEUR": 12.00, "type": "traditional" }
+  }
+}

@@ -2,9 +2,9 @@
 // Permet de migrer entre appareils (PC ↔ smartphone, ancien ↔ nouveau, etc.)
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 6;
+const DB_VERSION = 7;
 
-const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts'];
+const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state'];
 
 // localStorage keys gérées par l'app (filtre pour ne pas exporter les clés du navigateur d'autres sites)
 const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:'];
@@ -42,6 +42,20 @@ function openDB() {
         const ts = db.createObjectStore('transcripts', { keyPath: 'id' });
         ts.createIndex('createdAt', 'createdAt', { unique: false });
         ts.createIndex('ticker', 'ticker', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('budget_entries')) {
+        const be = db.createObjectStore('budget_entries', { keyPath: 'id' });
+        be.createIndex('month', 'month', { unique: false });
+        be.createIndex('type', 'type', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('dividends_history')) {
+        const dh = db.createObjectStore('dividends_history', { keyPath: 'id' });
+        dh.createIndex('date', 'date', { unique: false });
+        dh.createIndex('ticker', 'ticker', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('insights_state')) {
+        const is = db.createObjectStore('insights_state', { keyPath: 'id' });
+        is.createIndex('generatedAt', 'generatedAt', { unique: false });
       }
     };
   });
@@ -123,6 +137,20 @@ async function ensureStoresExist(db) {
         ts.createIndex('createdAt', 'createdAt', { unique: false });
         ts.createIndex('ticker', 'ticker', { unique: false });
       }
+      if (!newDb.objectStoreNames.contains('budget_entries')) {
+        const be = newDb.createObjectStore('budget_entries', { keyPath: 'id' });
+        be.createIndex('month', 'month', { unique: false });
+        be.createIndex('type', 'type', { unique: false });
+      }
+      if (!newDb.objectStoreNames.contains('dividends_history')) {
+        const dh = newDb.createObjectStore('dividends_history', { keyPath: 'id' });
+        dh.createIndex('date', 'date', { unique: false });
+        dh.createIndex('ticker', 'ticker', { unique: false });
+      }
+      if (!newDb.objectStoreNames.contains('insights_state')) {
+        const is = newDb.createObjectStore('insights_state', { keyPath: 'id' });
+        is.createIndex('generatedAt', 'generatedAt', { unique: false });
+      }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -163,6 +191,9 @@ export async function exportFullBackup() {
       wealth: indexedDBDump.wealth?.length || 0,
       wealth_snapshots: indexedDBDump.wealth_snapshots?.length || 0,
       transcripts: indexedDBDump.transcripts?.length || 0,
+      budget_entries: indexedDBDump.budget_entries?.length || 0,
+      dividends_history: indexedDBDump.dividends_history?.length || 0,
+      insights_state: indexedDBDump.insights_state?.length || 0,
       localStorageKeys: Object.keys(localStorageDump).length
     },
     indexedDB: indexedDBDump,

@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "updatedAt": "2026-04-30",
+    "language": "fr",
+    "note": "Mots-clés (lowercase) pour auto-catégoriser les transactions bancaires FR"
+  },
+  "categories": {
+    "loyer":        { "icon": "🏠", "type": "fixe",     "keywords": ["loyer", "agence immo", "location", "syndic", "copropriete"] },
+    "credit_immo":  { "icon": "🏦", "type": "fixe",     "keywords": ["pret immo", "credit immo", "prelevement banque", "echeance pret"] },
+    "credit_conso": { "icon": "💳", "type": "fixe",     "keywords": ["pret conso", "credit conso", "cetelem", "cofidis", "sofinco"] },
+    "energie":      { "icon": "⚡", "type": "fixe",     "keywords": ["edf", "engie", "total energies", "totalenergies", "ekwateur", "octopus energy", "enercoop"] },
+    "internet":     { "icon": "🌐", "type": "fixe",     "keywords": ["orange", "sfr", "bouygues telecom", "free", "freebox", "red by sfr", "sosh", "b&you", "bouygues"] },
+    "mobile":       { "icon": "📱", "type": "fixe",     "keywords": ["sosh", "free mobile", "lebara", "lyca", "prixtel", "syma"] },
+    "assurance":    { "icon": "🛡️", "type": "fixe",     "keywords": ["assurance", "macif", "maaf", "matmut", "axa", "allianz", "groupama", "gmf", "april", "mutuelle"] },
+    "abonnement":   { "icon": "📺", "type": "fixe",     "keywords": ["netflix", "spotify", "amazon prime", "disney", "apple.com", "google one", "icloud", "youtube", "deezer", "canal+", "molotov"] },
+    "courses":      { "icon": "🛒", "type": "variable", "keywords": ["leclerc", "carrefour", "auchan", "monoprix", "lidl", "intermarche", "casino", "franprix", "picard", "biocoop", "naturalia", "u express", "super u", "hyper u", "amazon"] },
+    "restaurant":   { "icon": "🍽️", "type": "variable", "keywords": ["mcdonald", "mcdo", "kfc", "burger king", "subway", "restaurant", "pizza", "sushi", "boulangerie", "starbucks", "deliveroo", "uber eats", "ubereats", "frichti", "just eat"] },
+    "transport":    { "icon": "🚗", "type": "variable", "keywords": ["sncf", "ratp", "navigo", "uber", "lyft", "free now", "bolt", "blablacar", "ouigo", "tgv", "transilien"] },
+    "carburant":    { "icon": "⛽", "type": "variable", "keywords": ["station service", "total", "shell", "bp", "esso", "intermarche carburant", "leclerc carburant", "carrefour station", "avia"] },
+    "loisirs":      { "icon": "🎮", "type": "variable", "keywords": ["cinema", "ugc", "pathe", "mk2", "fnac", "decathlon", "go sport", "boulanger", "darty", "playstation", "xbox", "steam", "nintendo"] },
+    "voyage":       { "icon": "✈️", "type": "variable", "keywords": ["airbnb", "booking", "hotels", "ryanair", "easyjet", "transavia", "air france", "trainline", "expedia", "vinted travel"] },
+    "vetements":    { "icon": "👕", "type": "variable", "keywords": ["zara", "h&m", "uniqlo", "shein", "vinted", "vestiaire", "kiabi", "celio", "pimkie", "jules", "primark", "mango"] },
+    "sante":        { "icon": "💊", "type": "variable", "keywords": ["pharmacie", "doctolib", "medecin", "dentiste", "kine", "kinesitherapeute", "opticien", "optic", "laboratoire", "biologique"] },
+    "banque":       { "icon": "🏛️", "type": "fixe",     "keywords": ["frais bancaires", "cotisation carte", "agios", "commission", "frais tenue compte"] },
+    "salaire":      { "icon": "💼", "type": "revenu",   "keywords": ["salaire", "paie", "remuneration", "virement employeur", "paye", "appointements"] },
+    "dividende":    { "icon": "💸", "type": "revenu",   "keywords": ["dividende", "coupon", "interets", "rente"] },
+    "loyer_recu":   { "icon": "🏘️", "type": "revenu",   "keywords": ["loyer recu", "location recue"] },
+    "epargne":      { "icon": "💰", "type": "epargne",  "keywords": ["livret a", "lddss", "ldd", "lep", "csl", "compte epargne"] },
+    "investissement":{"icon": "📈", "type": "epargne",  "keywords": ["pea", "compte titres", "etoro", "trade republic", "boursorama bourse", "fortuneo bourse", "degiro", "interactive brokers", "saxo"] },
+    "av_versement": { "icon": "🛡️", "type": "epargne",  "keywords": ["assurance vie", "linxea", "lucya", "boursorama vie", "fortuneo vie", "yomoni", "nalo"] },
+    "crypto":       { "icon": "₿",  "type": "epargne",  "keywords": ["coinbase", "binance", "kraken", "crypto.com", "bitpanda", "ledger"] },
+    "impots":       { "icon": "🇫🇷", "type": "fixe",     "keywords": ["impots", "dgfip", "tresor public", "taxe fonciere", "taxe habitation"] },
+    "garde_enfant": { "icon": "👶", "type": "fixe",     "keywords": ["creche", "nounou", "ass mat", "perisco", "centre loisirs"] },
+    "ecole":        { "icon": "🎓", "type": "fixe",     "keywords": ["ecole", "cantine", "scolaire", "universite", "fac", "u-paris"] },
+    "animaux":      { "icon": "🐾", "type": "variable", "keywords": ["veterinaire", "veto", "animalerie", "maxizoo", "tom & co"] },
+    "cadeaux":      { "icon": "🎁", "type": "variable", "keywords": ["fnac.com", "amazon cadeaux", "nature & decouvertes"] },
+    "autre":        { "icon": "·",  "type": "variable", "keywords": [] }
+  }
+}

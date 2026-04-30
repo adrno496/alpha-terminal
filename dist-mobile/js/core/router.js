@@ -174,7 +174,30 @@ export const MODULE_ROUTING = {
     fallbackProviders: ['openai', 'grok', 'openrouter'],
     recommendedTier: 'flagship',
     reason: 'Transcript long + CEO Forensics — context long requis'
+  },
+  // V7 — Finances perso (LLM-augmented seulement)
+  'fees-analysis': {
+    needsCapabilities: [],
+    optimalProviders: ['claude', 'openai'],
+    fallbackProviders: ['gemini', 'grok', 'openrouter'],
+    recommendedTier: 'flagship',
+    reason: 'Calcul fiscal nuancé + reco patrimoniale personnalisée'
+  },
+  'wealth-method': {
+    needsCapabilities: [],
+    optimalProviders: ['claude', 'openai'],
+    fallbackProviders: ['gemini', 'grok', 'openrouter'],
+    recommendedTier: 'flagship',
+    reason: 'Méthode patrimoniale FR — nuance fiscale + plan personnalisé'
+  },
+  'insights-engine': {
+    needsCapabilities: [],
+    optimalProviders: ['claude', 'openai', 'gemini'],
+    fallbackProviders: ['grok', 'openrouter'],
+    recommendedTier: 'fast',
+    reason: 'Synthèse courte d\'insights — modèle léger suffit'
   }
+  // budget, dividends-tracker, diversification-score, csv-import : pure local, pas de routing LLM
 };
 
 export class SmartRouter {

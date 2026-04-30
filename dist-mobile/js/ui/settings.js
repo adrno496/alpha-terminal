@@ -481,6 +481,9 @@ function renderAdvancedTab(c) {
         c.wealth_snapshots ? `${c.wealth_snapshots} snapshots` : null,
         c.knowledge ? `${c.knowledge} KB` : null,
         c.transcripts ? `${c.transcripts} transcripts` : null,
+        c.budget_entries ? `${c.budget_entries} budget` : null,
+        c.dividends_history ? `${c.dividends_history} divs` : null,
+        c.insights_state ? `${c.insights_state} insights` : null,
         c.writingStyles ? `${c.writingStyles} styles` : null,
         c.localStorageKeys ? `${c.localStorageKeys} settings` : null
       ].filter(Boolean).join(' · ') || 'aucune donnée';

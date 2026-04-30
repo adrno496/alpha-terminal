@@ -10,7 +10,7 @@ const SNAPSHOT_STORE = 'wealth_snapshots';
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 6);
+    const req = indexedDB.open(DB_NAME, 7);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('analyses')) {
@@ -29,6 +29,20 @@ function openDB() {
         const ts = db.createObjectStore('transcripts', { keyPath: 'id' });
         ts.createIndex('createdAt', 'createdAt', { unique: false });
         ts.createIndex('ticker', 'ticker', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('budget_entries')) {
+        const be = db.createObjectStore('budget_entries', { keyPath: 'id' });
+        be.createIndex('month', 'month', { unique: false });
+        be.createIndex('type', 'type', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('dividends_history')) {
+        const dh = db.createObjectStore('dividends_history', { keyPath: 'id' });
+        dh.createIndex('date', 'date', { unique: false });
+        dh.createIndex('ticker', 'ticker', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('insights_state')) {
+        const is = db.createObjectStore('insights_state', { keyPath: 'id' });
+        is.createIndex('generatedAt', 'generatedAt', { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);

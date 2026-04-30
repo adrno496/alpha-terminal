@@ -69,6 +69,19 @@ const CATEGORIES = [
       { id: 'tax-optimizer-fr',  num: '06' },
       { id: 'tax-international', num: '06b' }
     ]
+  },
+  {
+    id: 'finances-perso',
+    titleKey: 'cat.finances-perso',
+    modules: [
+      { id: 'budget',                num: '21' },
+      { id: 'fees-analysis',         num: '22' },
+      { id: 'dividends-tracker',     num: '23' },
+      { id: 'diversification-score', num: '24' },
+      { id: 'wealth-method',         num: '25' },
+      { id: 'csv-import',            num: '26' },
+      { id: 'insights-engine',       num: '27' }
+    ]
   }
 ];
 
