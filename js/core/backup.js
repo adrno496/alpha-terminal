@@ -21,8 +21,29 @@ function openDB() {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
-    // upgrade ne fait rien : si la version actuelle de l'app est < 5, l'app a déjà bumpé.
-    req.onupgradeneeded = () => {};
+    // CRITIQUE : si backup.js est le premier à ouvrir la DB (avant storage.js / wealth.js),
+    // il faut créer TOUS les stores ici, sinon ils n'existeront jamais et les données seront
+    // perdues / non exportées. Doit rester aligné avec storage.js#openDB.
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('analyses')) {
+        const s = db.createObjectStore('analyses', { keyPath: 'id' });
+        s.createIndex('module', 'module', { unique: false });
+        s.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('writingStyles')) db.createObjectStore('writingStyles', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('knowledge'))     db.createObjectStore('knowledge',     { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('wealth'))        db.createObjectStore('wealth',        { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('wealth_snapshots')) {
+        const ws = db.createObjectStore('wealth_snapshots', { keyPath: 'id' });
+        ws.createIndex('date', 'date', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('transcripts')) {
+        const ts = db.createObjectStore('transcripts', { keyPath: 'id' });
+        ts.createIndex('createdAt', 'createdAt', { unique: false });
+        ts.createIndex('ticker', 'ticker', { unique: false });
+      }
+    };
   });
 }
 

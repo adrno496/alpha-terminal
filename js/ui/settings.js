@@ -472,7 +472,18 @@ function renderAdvancedTab(c) {
     try {
       const result = await downloadFullBackup();
       const { payload, method, json, filename } = result;
-      const n = payload.counts.analyses;
+      const c = payload.counts || {};
+      // Breakdown complet pour que l'utilisateur voie que tout est sauvé (pas que les analyses)
+      const breakdown = [
+        c.analyses ? `${c.analyses} analyses` : null,
+        c.wealth ? `${c.wealth} holdings` : null,
+        c.wealth_snapshots ? `${c.wealth_snapshots} snapshots` : null,
+        c.knowledge ? `${c.knowledge} KB` : null,
+        c.transcripts ? `${c.transcripts} transcripts` : null,
+        c.writingStyles ? `${c.writingStyles} styles` : null,
+        c.localStorageKeys ? `${c.localStorageKeys} settings` : null
+      ].filter(Boolean).join(' · ') || 'aucune donnée';
+
       if (method === 'failed') {
         // Aucune méthode n'a marché — on bascule sur la modale "show JSON" pour copy manuel
         showBackupFallbackModal(json, filename);
@@ -481,9 +492,9 @@ function renderAdvancedTab(c) {
         // Utilisateur a fermé la dialog system du picker — pas un succès, pas une erreur
         // (ne rien afficher)
       } else if (method === 'capacitor') {
-        toast(t('settings.adv.backup_done_mobile').replace('{n}', n), 'success');
+        toast(`📦 Backup mobile : ${breakdown}`, 'success');
       } else {
-        toast(t('settings.adv.backup_done').replace('{n}', n), 'success');
+        toast(`📦 Backup : ${breakdown}`, 'success');
       }
     } catch (err) {
       console.error(err);
@@ -502,7 +513,18 @@ function renderAdvancedTab(c) {
     try {
       const r = await copyBackupToClipboard();
       btn.disabled = false; btn.textContent = old;
-      if (r.ok) toast(t('settings.adv.backup_copied').replace('{n}', r.payload.counts.analyses), 'success');
+      if (r.ok) {
+        const c = r.payload.counts || {};
+        const breakdown = [
+          c.analyses ? `${c.analyses} analyses` : null,
+          c.wealth ? `${c.wealth} holdings` : null,
+          c.wealth_snapshots ? `${c.wealth_snapshots} snapshots` : null,
+          c.knowledge ? `${c.knowledge} KB` : null,
+          c.transcripts ? `${c.transcripts} transcripts` : null,
+          c.writingStyles ? `${c.writingStyles} styles` : null
+        ].filter(Boolean).join(' · ') || 'aucune donnée';
+        toast(`📋 Copié : ${breakdown}`, 'success');
+      }
       else { showBackupFallbackModal(r.json, ''); toast(t('settings.adv.backup_failed_show_modal'), 'info'); }
     } catch (err) {
       btn.disabled = false; btn.textContent = old;
