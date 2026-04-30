@@ -1722,6 +1722,26 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
 }
 .rag-toggle:has(input:checked) { border-color: var(--accent-blue); color: var(--accent-blue); }
 
+.wealth-toggle {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer; user-select: none;
+  padding: 4px 9px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-tertiary);
+  transition: all 0.15s;
+}
+.wealth-toggle input { display: none; }
+.wealth-toggle.on,
+.wealth-toggle:has(input:checked) {
+  border-color: var(--accent-green);
+  background: rgba(0,255,136,0.12);
+  color: var(--accent-green);
+}
+.wealth-toggle:hover { border-color: var(--accent-green); }
+
 /* ===========================================================
    Knowledge Base
    =========================================================== */

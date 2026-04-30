@@ -191,6 +191,28 @@ export function showApiError(container, err) {
 }
 
 // Module header avec barre de provider override + RAG toggle + bouton example
+// Modules où le toggle "💼 Patrimoine" n'a pas de sens (modules pure-local sans LLM
+// OU modules dont le contexte patrimoine n'apporte rien d'analytique)
+const NO_WEALTH_TOGGLE = new Set([
+  'knowledge-base', 'budget', 'csv-import', 'price-alerts', 'live-watcher',
+  'macro-events-calendar', 'earnings-calendar', 'subscriptions-detector',
+  'estate-doc-generator', 'whitepaper-reader'
+]);
+
+function wealthToggleHtml(moduleId) {
+  if (!moduleId || NO_WEALTH_TOGGLE.has(moduleId)) return '';
+  // Lecture sync via localStorage (évite import async ici)
+  const disabled = (() => {
+    try { return JSON.parse(localStorage.getItem('alpha-terminal:wealth-context-disabled') || '[]').includes(moduleId); }
+    catch { return false; }
+  })();
+  const on = !disabled;
+  return `<label class="wealth-toggle ${on ? 'on' : ''}" title="${on ? 'Patrimoine complet injecté dans l\\'analyse — clique pour désactiver' : 'Patrimoine non injecté — clique pour activer'}">
+    <input type="checkbox" data-wealth-toggle="${moduleId}" ${on ? 'checked' : ''} />
+    💼 ${on ? 'Patrimoine ✓' : 'Patrimoine'}
+  </label>`;
+}
+
 export function moduleHeader(title, desc, { example, moduleId } = {}) {
   return `
     <div class="module-header">
@@ -198,6 +220,7 @@ export function moduleHeader(title, desc, { example, moduleId } = {}) {
         <h2>${title}</h2>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" data-module-toolbar="${moduleId || ''}">
           ${moduleId && moduleId !== 'knowledge-base' ? providerSelectorHtml(moduleId) : ''}
+          ${wealthToggleHtml(moduleId)}
           ${moduleId && moduleId !== 'knowledge-base' ? `<label class="rag-toggle" title="${t('rag.title')}"><input type="checkbox" data-rag="${moduleId}" /> 📚 KB</label>` : ''}
           ${example ? `<button class="btn-ghost" data-example>${example}</button>` : ''}
         </div>
@@ -330,6 +353,32 @@ export function wireProviderSelector(viewEl, moduleId) {
     rag.checked = isRagEnabledFor(moduleId);
     rag.addEventListener('change', () => setRagEnabled(moduleId, rag.checked));
   }
+
+}
+
+// Global delegation : un seul handler pour TOUS les toggles 💼 Patrimoine,
+// quels que soient les modules qui rendent moduleHeader (avec ou sans wireProviderSelector).
+if (typeof document !== 'undefined' && !window.__wealthToggleWired) {
+  window.__wealthToggleWired = true;
+  document.addEventListener('change', async (e) => {
+    const cb = e.target.closest('input[data-wealth-toggle]');
+    if (!cb) return;
+    const moduleId = cb.getAttribute('data-wealth-toggle');
+    const { setWealthContextEnabled } = await import('../core/wealth.js');
+    setWealthContextEnabled(moduleId, cb.checked);
+    const label = cb.closest('.wealth-toggle');
+    if (label) {
+      label.classList.toggle('on', cb.checked);
+      label.title = cb.checked
+        ? "Patrimoine complet injecté dans l'analyse — clique pour désactiver"
+        : "Patrimoine non injecté — clique pour activer";
+      for (const node of label.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          node.textContent = cb.checked ? ' 💼 Patrimoine ✓' : ' 💼 Patrimoine';
+        }
+      }
+    }
+  });
 }
 
 // Récupère l'override courant pour un module

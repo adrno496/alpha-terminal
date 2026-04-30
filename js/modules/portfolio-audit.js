@@ -89,7 +89,7 @@ async function importFromWealth() {
   const out = $('#audit-wealth-summary');
   try {
     const list = await listWealth();
-    const investable = list.filter(h => ['stocks', 'etf', 'crypto'].includes(h.category) && h.value > 0);
+    const investable = list.filter(h => h.value > 0);
     if (!investable.length) {
       out.innerHTML = `<span style="color:var(--accent-amber);">${t('mod.portfolio-audit.wealth_empty')}</span>`;
       return;
@@ -169,7 +169,7 @@ async function run() {
 
   if (visibleTab === 'wealth' || importedFromWealth) {
     const list = await listWealth();
-    const investable = list.filter(h => ['stocks', 'etf', 'crypto'].includes(h.category) && h.value > 0);
+    const investable = list.filter(h => h.value > 0);
     positions = investable.map(h => ({
       ticker: h.ticker || h.name,
       name: h.name,
