@@ -333,5 +333,22 @@ Suis le format imposé. Termine OBLIGATOIREMENT par le bloc \`\`\`json MEMORY_SN
 
     if (memorySnapshot) toast(t('mod.youtube-transcript.toast_saved'), 'success');
     else toast(t('mod.youtube-transcript.toast_saved_no_mem'), 'info');
+
+    // === Extract price alerts from the LLM output ===
+    try {
+      const { extractAlertsFromTranscript, bulkSaveAlerts } = await import('../core/price-alerts.js');
+      const alerts = extractAlertsFromTranscript({
+        transcriptId: rec.id,
+        videoTitle: rec.title,
+        ticker: rec.ticker,
+        markdownOutput: rec.llmSummary
+      });
+      if (alerts.length > 0) {
+        const n = await bulkSaveAlerts(alerts);
+        toast(`🚨 ${n} ${getLocale() === 'en' ? 'price alert(s) extracted from transcript' : 'alerte(s) prix extraite(s) du transcript'}`, 'success');
+        // Renvoie l'événement pour que le voyant rouge se mette à jour
+        window.dispatchEvent(new CustomEvent('app:alerts-updated'));
+      }
+    } catch (e) { console.warn('[youtube] alert extraction failed:', e); }
   } catch {}
 }

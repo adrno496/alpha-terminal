@@ -80,7 +80,8 @@ const CATEGORIES = [
       { id: 'diversification-score', num: '24' },
       { id: 'wealth-method',         num: '25' },
       { id: 'csv-import',            num: '26' },
-      { id: 'insights-engine',       num: '27' }
+      { id: 'insights-engine',       num: '27' },
+      { id: 'price-alerts',          num: '28' }
     ]
   }
 ];

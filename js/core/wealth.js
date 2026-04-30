@@ -10,7 +10,7 @@ const SNAPSHOT_STORE = 'wealth_snapshots';
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 7);
+    const req = indexedDB.open(DB_NAME, 8);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('analyses')) {
@@ -43,6 +43,11 @@ function openDB() {
       if (!db.objectStoreNames.contains('insights_state')) {
         const is = db.createObjectStore('insights_state', { keyPath: 'id' });
         is.createIndex('generatedAt', 'generatedAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('price_alerts')) {
+        const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
+        pa.createIndex('ticker', 'ticker', { unique: false });
+        pa.createIndex('status', 'status', { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);
@@ -220,15 +225,32 @@ export async function buildWealthContext(targetCurrency = 'EUR') {
     const catTotal = totals.byCategory[cat.id] || 0;
     const pct = totals.total > 0 ? (catTotal / totals.total * 100).toFixed(1) : '0';
     lines.push(`${cat.icon} ${cat.label} (${pct}% — ${sym}${fmtNum(catTotal)}):`);
-    for (const h of items.slice(0, 12)) {
+    // On envoie TOUTES les lignes au LLM (max 200 par catégorie pour rester sous quota tokens
+    // sur des portfolios massifs). Le coût d'1 ligne ~ 30-50 tokens, marge confortable.
+    const HOLDINGS_PER_CAT_HARD_CAP = 200;
+    for (const h of items.slice(0, HOLDINGS_PER_CAT_HARD_CAP)) {
       const v = h.value || 0;
       const ccy = h.currency || 'EUR';
       const ccySym = ({ USD: '$', EUR: '€', GBP: '£' })[ccy] || ccy;
       const tk = h.ticker ? ` [${h.ticker}]` : '';
       const acc = h.account ? ` · ${h.account}` : '';
-      lines.push(`  - ${h.name}${tk}: ${ccySym}${fmtNum(v)}${h.quantity ? ' (qty ' + h.quantity + ')' : ''}${acc}`);
+      // Pour l'immobilier : ajouter loanRemaining + propertyType + cashflow si dispo
+      let immoSuffix = '';
+      if (h.category === 'real_estate') {
+        const parts = [];
+        if (h.propertyType) parts.push(h.propertyType === 'locatif' ? 'locatif' : h.propertyType === 'secondary_residence' ? 'résidence secondaire' : 'résidence principale');
+        if (Array.isArray(h.loans) && h.loans.length) {
+          const totalRemaining = h.loans.reduce((s, l) => s + (Number(l.remaining) || Number(l.amount) || 0), 0);
+          if (totalRemaining > 0) parts.push(`reste à payer ${ccySym}${fmtNum(totalRemaining)}`);
+        } else if (h.loanAmount) {
+          parts.push(`prêt ${ccySym}${fmtNum(h.loanAmount)}`);
+        }
+        if (h.monthlyRent) parts.push(`loyer ${ccySym}${fmtNum(h.monthlyRent)}/mois`);
+        if (parts.length) immoSuffix = ' · ' + parts.join(' · ');
+      }
+      lines.push(`  - ${h.name}${tk}: ${ccySym}${fmtNum(v)}${h.quantity ? ' (qty ' + h.quantity + ')' : ''}${acc}${immoSuffix}`);
     }
-    if (items.length > 12) lines.push(`  - … +${items.length - 12} more in this category`);
+    if (items.length > HOLDINGS_PER_CAT_HARD_CAP) lines.push(`  - … +${items.length - HOLDINGS_PER_CAT_HARD_CAP} more (truncated)`);
   }
   lines.push('');
   lines.push('Use this context to tailor your analysis: consider existing exposure, diversification, concentration risk, currency mix. Avoid recommending what the user already heavily owns unless thesis is exceptionally strong.');

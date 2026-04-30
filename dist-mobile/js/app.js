@@ -58,6 +58,8 @@ import { renderDiversificationScoreView }  from './modules/diversification-score
 import { renderWealthMethodView }          from './modules/wealth-method.js';
 import { renderCsvImportView }             from './modules/csv-import.js';
 import { renderInsightsEngineView }        from './modules/insights-engine.js';
+import { renderPriceAlertsView }           from './modules/price-alerts.js';
+import { bootAlertCheck, updateAlertBadge } from './ui/alerts-banner.js';
 
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
@@ -94,6 +96,7 @@ const ROUTES = {
   'wealth-method':         { render: renderWealthMethodView,         label: '📚 Méthode patrimoniale' },
   'csv-import':            { render: renderCsvImportView,            label: '📥 Import CSV' },
   'insights-engine':       { render: renderInsightsEngineView,       label: '✨ Insights' },
+  'price-alerts':          { render: renderPriceAlertsView,          label: '🚨 Alertes prix' },
 };
 
 const STATE = { currentRoute: null };
@@ -155,6 +158,13 @@ async function renderHome(viewEl) {
   let providers = [];
   try { const { getOrchestrator } = await import('./core/api.js'); providers = getOrchestrator().getProviderNames(); } catch {}
 
+  // V8 — Bannière alertes prix triggered (en haut, voyant rouge clignotant)
+  let alertBanner = '';
+  try {
+    const { buildHomeAlertBanner } = await import('./ui/alerts-banner.js');
+    alertBanner = await buildHomeAlertBanner();
+  } catch (e) { console.warn('Alert banner failed:', e); }
+
   // V7 — Finances perso : score + insights + dividends/fees glance
   let financesPersoCards = '';
   try {
@@ -205,6 +215,8 @@ async function renderHome(viewEl) {
       <div class="stat"><div class="stat-label">${t('home.api_calls')}</div><div class="stat-value">${cost.calls || 0}</div></div>
       <div class="stat"><div class="stat-label">${t('home.providers')}</div><div class="stat-value ${providers.length ? 'green' : 'red'}">${providers.length}</div></div>
     </div>
+
+    ${alertBanner}
 
     ${financesPersoCards}
 
@@ -323,6 +335,11 @@ function boot() {
     b.addEventListener('click', () => navigate(b.getAttribute('data-route')));
   });
   document.querySelector('.sidebar-logo')?.addEventListener('click', () => navigate('home'));
+
+  // === Price alerts : boot check (1h throttle) + badge sidebar ===
+  // Lance en background : ne bloque pas le boot. Fire l'event si nouvelles alertes triggered.
+  bootAlertCheck().then(() => updateAlertBadge()).catch(() => {});
+  window.addEventListener('app:alerts-updated', () => updateAlertBadge());
 
   // In-app footer legal links
   document.querySelectorAll('[data-app-legal]').forEach(a => {

@@ -598,6 +598,9 @@ const DICT = {
     'mod.insights-engine.help': '**À quoi ça sert :** notifications automatiques sur ton patrimoine — milestones (100K€, 500K€, 1M€), alertes concentration, fenêtres fiscales (PEA 5 ans, AV 8 ans), dérive d\'allocation.\n\n**Comment :** ~30 règles évaluées chaque semaine. Tu peux dismiss un insight pour ne plus le voir. Carte "Insights de la semaine" sur le home dashboard.\n\n**Quand :** automatique, vérifie au démarrage de l\'app.',
     'mod.insights-engine.run': '✨ Générer mes insights',
     'mod.insights-engine.example': 'Charger un exemple',
+    'mod.price-alerts.label': '🚨 Alertes prix',
+    'mod.price-alerts.desc': 'Alertes prix extraites des transcripts YouTube + manuelles, vérifiées contre les cours live',
+    'mod.price-alerts.help': '**À quoi ça sert :** quand tu analyses une vidéo YouTube qui mentionne des niveaux de prix (entrée, sortie, stop-loss, objectif) sur des actifs, ils sont extraits automatiquement. Si le cours franchit le seuil, un voyant rouge s\'affiche partout dans l\'app.\n\n**Comment :** vérification automatique horaire au boot. Manual check via le bouton "🔄 Vérifier les cours". Tu peux aussi créer des alertes manuelles.\n\n**Quand :** dès qu\'un transcript YouTube est analysé, ou en revue quotidienne.',
 
     // === Onboarding tour ===
     'tour.next': 'Suivant',
@@ -1218,6 +1221,9 @@ const DICT = {
     'mod.insights-engine.help': '**Purpose:** automatic notifications about your wealth — milestones (€100K, €500K, €1M), concentration alerts, tax windows (PEA 5y, life-insurance 8y), allocation drift.\n\n**How:** ~30 rules evaluated weekly. You can dismiss an insight to never see it again. "Insights of the week" card on the home dashboard.\n\n**When:** automatic, runs on app start.',
     'mod.insights-engine.run': '✨ Generate insights',
     'mod.insights-engine.example': 'Load an example',
+    'mod.price-alerts.label': '🚨 Price alerts',
+    'mod.price-alerts.desc': 'Price alerts extracted from YouTube transcripts + manual, checked against live prices',
+    'mod.price-alerts.help': '**Purpose:** when you analyze a YouTube video that mentions price levels (entry, exit, stop-loss, target) on traded assets, they are extracted automatically. When live price crosses the threshold, a red indicator appears everywhere in the app.\n\n**How:** automatic hourly check on boot. Manual check via "🔄 Check prices now". You can also create alerts manually.\n\n**When:** as soon as a YouTube transcript is analyzed, or on daily review.',
 
     'tour.next': 'Next',
     'tour.back': 'Back',

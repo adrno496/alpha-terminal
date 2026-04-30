@@ -38,7 +38,8 @@ const MODULE_DETAILS = {
   get 'diversification-score'() { return { icon: '🎯', flow: 'Holdings → Score 0-100' }; },
   get 'wealth-method'()         { return { icon: '📚', flow: 'Patrimoine → Checklist FR' }; },
   get 'csv-import'()            { return { icon: '📥', flow: 'CSV bancaire → Budget' }; },
-  get 'insights-engine'()       { return { icon: '✨', flow: 'Patrimoine → Alertes hebdo' }; }
+  get 'insights-engine'()       { return { icon: '✨', flow: 'Patrimoine → Alertes hebdo' }; },
+  get 'price-alerts'()          { return { icon: '🚨', flow: 'YouTube → Niveaux → Voyant rouge' }; }
 };
 
 const FAQ_FR = [

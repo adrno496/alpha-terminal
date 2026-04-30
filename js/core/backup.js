@@ -2,9 +2,9 @@
 // Permet de migrer entre appareils (PC ↔ smartphone, ancien ↔ nouveau, etc.)
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 7;
+const DB_VERSION = 8;
 
-const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state'];
+const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts'];
 
 // localStorage keys gérées par l'app (filtre pour ne pas exporter les clés du navigateur d'autres sites)
 const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:'];
@@ -56,6 +56,11 @@ function openDB() {
       if (!db.objectStoreNames.contains('insights_state')) {
         const is = db.createObjectStore('insights_state', { keyPath: 'id' });
         is.createIndex('generatedAt', 'generatedAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('price_alerts')) {
+        const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
+        pa.createIndex('ticker', 'ticker', { unique: false });
+        pa.createIndex('status', 'status', { unique: false });
       }
     };
   });
@@ -297,37 +302,57 @@ export async function downloadFullBackup() {
 }
 
 async function saveViaCapacitor(json, filename) {
-  if (!window.Capacitor) return false;
-  try {
-    // Lazy import des plugins (peuvent ne pas être installés)
-    const Filesystem = window.Capacitor.Plugins?.Filesystem;
-    const Share      = window.Capacitor.Plugins?.Share;
-    if (!Filesystem) return false;
+  if (!window.Capacitor) {
+    console.warn('[backup] window.Capacitor not present');
+    return false;
+  }
+  const plugins = window.Capacitor.Plugins || {};
+  const Filesystem = plugins.Filesystem;
+  const Share      = plugins.Share;
 
-    // Écrit le fichier dans Documents (visible dans le file manager)
-    const directory = 'DOCUMENTS'; // mappé par Capacitor sur le bon dossier par OS
+  // Diagnostic explicite : si plugins absents, on log ce qu'on a
+  if (!Filesystem) {
+    console.error('[backup] @capacitor/filesystem plugin NOT installed. Available plugins:', Object.keys(plugins));
+    console.error('[backup] Run: npm install @capacitor/filesystem @capacitor/share && npx cap sync android');
+    return false;
+  }
+
+  try {
+    // Écrit dans Documents (visible dans le file manager Android)
+    const directory = 'DOCUMENTS';
+    console.log('[backup] Writing via Capacitor Filesystem to', directory + '/' + filename);
     await Filesystem.writeFile({
       path: filename,
       data: json,
       directory,
-      encoding: 'utf8'
+      encoding: 'utf8',
+      recursive: true
     });
+    console.log('[backup] File written successfully');
 
-    // Si le plugin Share est dispo, propose le partage (utilisateur peut envoyer vers Drive, mail, etc.)
+    // Si Share dispo, ouvre la dialog de partage
     if (Share) {
-      const uri = await Filesystem.getUri({ path: filename, directory });
       try {
+        const uri = await Filesystem.getUri({ path: filename, directory });
+        console.log('[backup] Sharing URI:', uri.uri);
         await Share.share({
           title: 'ALPHA TERMINAL Backup',
           text: 'Backup ' + filename,
           url: uri.uri,
           dialogTitle: 'Sauvegarder le backup'
         });
-      } catch { /* user cancel ok */ }
+      } catch (shareErr) {
+        // User cancel = OK ; autre erreur = log mais le fichier est déjà écrit
+        if (shareErr?.message && !/cancel/i.test(shareErr.message)) {
+          console.warn('[backup] Share failed (file still saved):', shareErr);
+        }
+      }
+    } else {
+      console.warn('[backup] @capacitor/share plugin missing — file saved but no share dialog. Look in /Documents.');
     }
     return true;
   } catch (e) {
-    console.warn('Capacitor write failed:', e);
+    console.error('[backup] Capacitor writeFile failed:', e);
     return false;
   }
 }

@@ -40,6 +40,18 @@ Si tu connais le contexte récent (cours de bourse, news), confronte le sentimen
 ## 7. VERDICT
 1 phrase : "Cela supporte une position [bullish / bearish / neutre] basée sur les signaux verbaux."
 
+## 8. NIVEAUX DE PRIX À SURVEILLER
+Si le transcript mentionne des niveaux de prix (entrée, sortie, stop-loss, objectif, support, résistance) sur des actifs côtés, liste-les ici sous CE FORMAT EXACT pour permettre l'extraction automatique d'alertes :
+
+- TICKER · entrée · 180.50$
+- TICKER · sortie · 220.00$
+- TICKER · stop · 165.00$
+- TICKER · objectif · 250.00€
+- TICKER · résistance · 195.00$
+- TICKER · support · 170.00$
+
+Une ligne par niveau. Si aucun niveau précis n'est mentionné, écris "Aucun niveau de prix précis identifié dans le transcript." et passe.
+
 ---
 
 ## MEMORY_SNAPSHOT
@@ -107,6 +119,18 @@ If you know the recent context (stock price, news), compare the earnings call se
 
 ## 7. VERDICT
 1 sentence: "This supports a [bullish / bearish / neutral] position based on verbal signals."
+
+## 8. PRICE LEVELS TO WATCH
+If the transcript mentions price levels (entry, exit, stop-loss, target, support, resistance) on traded assets, list them here in THIS EXACT FORMAT for automatic alert extraction:
+
+- TICKER · entry · 180.50$
+- TICKER · exit · 220.00$
+- TICKER · stop · 165.00$
+- TICKER · target · 250.00€
+- TICKER · resistance · 195.00$
+- TICKER · support · 170.00$
+
+One line per level. If no specific level is mentioned, write "No specific price level identified in the transcript." and skip.
 
 ---
 

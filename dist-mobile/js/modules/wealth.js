@@ -324,7 +324,18 @@ async function openEditor(id) {
   };
 
   const { showGenericModal, closeGenericModal } = await import('../ui/modal.js');
-  const { computeRealEstateMetrics, fmtMonths } = await import('../core/real-estate.js');
+  const { computeRealEstateMetrics, computeLoanMetrics, normalizeLoans, fmtMonths, LOAN_TYPES, loanTypesGrouped } = await import('../core/real-estate.js');
+
+  // Initialise le tableau loans depuis l'existant (migration legacy fields → loans[])
+  const initLoans = normalizeLoans(h).map(l => ({ ...l }));
+  if (h.category === 'real_estate' && initLoans.length === 0) {
+    initLoans.push({ id: uuid(), type: 'amortizing_fixed', label: 'Prêt principal', amount: 0, rate: 0, durationMonths: 0, startDate: '' });
+  }
+  // Stocké en local au scope de la modale ; commit sur Save
+  let loans = initLoans;
+  // Estimations historiques (re-estimate value)
+  let valueHistory = Array.isArray(h.valueHistory) ? h.valueHistory.slice() : [];
+
   showGenericModal(existing ? 'Edit holding' : 'Add holding', `
     <div class="field-row">
       <div class="field"><label class="field-label">Name *</label><input id="he-name" class="input" value="${escHtml(h.name)}" placeholder="ex: Apple Inc, Bitcoin, RP Lyon..." /></div>
@@ -340,6 +351,7 @@ async function openEditor(id) {
     <!-- ======= IMMOBILIER (visible si category=real_estate) ======= -->
     <div id="he-realestate-block" style="display:${h.category === 'real_estate' ? 'block' : 'none'};border:1px solid var(--border);border-radius:6px;padding:14px;margin:14px 0;background:var(--bg-tertiary);">
       <div style="font-weight:600;font-size:13px;margin-bottom:10px;">🏠 Détails immobilier</div>
+
       <div class="field-row">
         <div class="field"><label class="field-label">Type de bien</label>
           <select id="he-prop-type" class="input">
@@ -352,18 +364,24 @@ async function openEditor(id) {
         <div class="field"><label class="field-label">Prix d'achat (€)</label><input id="he-purchase-price" class="input" type="number" step="100" value="${h.purchasePrice || ''}" placeholder="280000" /></div>
       </div>
 
-      <div style="font-size:12px;font-weight:600;margin:12px 0 6px;color:var(--text-secondary);">💳 Prêt immobilier</div>
-      <div class="field-row">
-        <div class="field"><label class="field-label">Montant emprunté (€)</label><input id="he-loan-amount" class="input" type="number" step="100" value="${h.loanAmount || ''}" placeholder="240000" /></div>
-        <div class="field"><label class="field-label">Taux d'intérêt annuel (%)</label><input id="he-loan-rate" class="input" type="number" step="0.01" value="${h.loanRate ? (h.loanRate * 100).toFixed(2) : ''}" placeholder="2.50" /></div>
+      <!-- Bouton ré-estimer la valeur du bien -->
+      <div style="margin:12px 0;padding:10px;background:var(--bg-secondary);border-radius:4px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:12px;">
+          📊 <strong>Estimation actuelle</strong> : utilise le total <em>quantité × prix unitaire</em> ci-dessous (ou le bouton ⚡ pour mettre à jour rapidement).
+        </div>
+        <button type="button" id="he-reestimate" class="btn-secondary" style="font-size:12px;">⚡ Mettre à jour l'estimation</button>
       </div>
-      <div class="field-row">
-        <div class="field"><label class="field-label">Durée (années)</label><input id="he-loan-years" class="input" type="number" step="1" min="1" max="35" value="${h.loanDuration ? Math.round(h.loanDuration / 12) : ''}" placeholder="20" /></div>
-        <div class="field"><label class="field-label">1er prélèvement</label><input id="he-loan-start" class="input" type="date" value="${h.loanStartDate || ''}" /></div>
+      <div id="he-value-history" style="font-size:11px;color:var(--text-muted);margin-top:6px;"></div>
+
+      <!-- Liste des prêts (multi) -->
+      <div style="font-size:12px;font-weight:600;margin:14px 0 6px;color:var(--text-secondary);display:flex;justify-content:space-between;align-items:center;">
+        <span>💳 Prêts immobiliers</span>
+        <button type="button" id="he-add-loan" class="btn-secondary" style="font-size:11px;padding:3px 8px;">+ Ajouter un prêt</button>
       </div>
+      <div id="he-loans-list"></div>
 
       <div id="he-prop-rental-block" style="display:${h.propertyType === 'locatif' ? 'block' : 'none'};">
-        <div style="font-size:12px;font-weight:600;margin:12px 0 6px;color:var(--text-secondary);">🏘️ Locatif</div>
+        <div style="font-size:12px;font-weight:600;margin:14px 0 6px;color:var(--text-secondary);">🏘️ Locatif</div>
         <div class="field-row">
           <div class="field"><label class="field-label">Loyer mensuel hors charges (€)</label><input id="he-rent" class="input" type="number" step="10" value="${h.monthlyRent || ''}" placeholder="1100" /></div>
           <div class="field"><label class="field-label">Charges copropriété (€/mois)</label><input id="he-charges" class="input" type="number" step="10" value="${h.monthlyCharges || ''}" placeholder="80" /></div>
@@ -402,6 +420,10 @@ async function openEditor(id) {
   // Toggle real-estate block en fonction de la catégorie
   document.getElementById('he-cat').addEventListener('change', (e) => {
     document.getElementById('he-realestate-block').style.display = e.target.value === 'real_estate' ? 'block' : 'none';
+    if (e.target.value === 'real_estate' && loans.length === 0) {
+      loans.push({ id: uuid(), type: 'amortizing_fixed', label: 'Prêt principal', amount: 0, rate: 0, durationMonths: 0, startDate: '' });
+    }
+    renderLoansList();
     updateRealEstatePreview();
   });
   document.getElementById('he-prop-type').addEventListener('change', (e) => {
@@ -409,49 +431,168 @@ async function openEditor(id) {
     updateRealEstatePreview();
   });
 
-  // Live preview des calculs immo
+  // ===== Liste des prêts =====
+  const groups = loanTypesGrouped();
+  const typeOptionsHtml = (selected) => {
+    const groupLabels = { global: '— Standard / Global —', fr: '— France —', us: '— USA —', uk: '— UK —' };
+    return Object.entries(groups).map(([region, items]) => {
+      if (!items.length) return '';
+      return `<optgroup label="${groupLabels[region] || region}">${items.map(it => `<option value="${it.id}" ${selected === it.id ? 'selected' : ''}>${it.label_fr}</option>`).join('')}</optgroup>`;
+    }).join('');
+  };
+
+  function renderLoansList() {
+    const container = document.getElementById('he-loans-list');
+    if (!container) return;
+    if (loans.length === 0) {
+      container.innerHTML = '<p style="font-size:12px;color:var(--text-muted);text-align:center;padding:10px;">Aucun prêt. Cliquez sur "+ Ajouter un prêt" si le bien est financé.</p>';
+      return;
+    }
+    container.innerHTML = loans.map((l, idx) => {
+      const ratePct = l.rate ? (l.rate * 100).toFixed(2) : '';
+      const years = l.durationMonths ? Math.round(l.durationMonths / 12) : '';
+      const def = LOAN_TYPES[l.type] || LOAN_TYPES.amortizing_fixed;
+      const showDeferral = l.type === 'ptz_fr';
+      const showAmortMonths = l.type === 'balloon';
+      const showFixedPeriod = l.type === 'arm';
+      const showOffset = l.type === 'uk_offset';
+      const isZeroRate = l.type === 'ptz_fr';
+      return `
+        <div class="loan-item" data-loan-idx="${idx}" style="border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:8px;background:var(--bg-secondary);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <input class="input loan-label" data-idx="${idx}" type="text" value="${escHtml(l.label || 'Prêt ' + (idx + 1))}" placeholder="Nom du prêt (ex: Principal, Travaux, PTZ)" style="flex:1;margin-right:8px;font-size:12px;" />
+            <button type="button" class="btn-ghost loan-del" data-idx="${idx}" style="color:var(--accent-red);font-size:14px;">×</button>
+          </div>
+          <div class="field" style="margin:6px 0;">
+            <label class="field-label">Type de prêt</label>
+            <select class="input loan-type" data-idx="${idx}">${typeOptionsHtml(l.type || 'amortizing_fixed')}</select>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${escHtml(def.description_fr || '')}</div>
+          </div>
+          <div class="field-row-3">
+            <div class="field"><label class="field-label">Montant emprunté (€)</label><input class="input loan-amount" data-idx="${idx}" type="number" step="100" value="${l.amount || ''}" /></div>
+            <div class="field" style="display:${isZeroRate ? 'none' : 'block'};"><label class="field-label">Taux annuel (%)</label><input class="input loan-rate" data-idx="${idx}" type="number" step="0.01" value="${ratePct}" /></div>
+            <div class="field"><label class="field-label">Durée (années)</label><input class="input loan-years" data-idx="${idx}" type="number" step="1" min="1" max="40" value="${years}" /></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label class="field-label">1er prélèvement</label><input class="input loan-start" data-idx="${idx}" type="date" value="${l.startDate || ''}" /></div>
+            ${showDeferral ? `<div class="field"><label class="field-label">Différé (mois)</label><input class="input loan-deferral" data-idx="${idx}" type="number" min="0" value="${l.deferralMonths || ''}" /></div>` : ''}
+            ${showAmortMonths ? `<div class="field"><label class="field-label">Amortissement théorique (mois)</label><input class="input loan-amort-months" data-idx="${idx}" type="number" min="12" value="${l.amortizationMonths || 360}" /></div>` : ''}
+            ${showFixedPeriod ? `<div class="field"><label class="field-label">Période fixe initiale (mois)</label><input class="input loan-fixed-period" data-idx="${idx}" type="number" min="12" value="${l.fixedPeriodMonths || 60}" /></div>` : ''}
+            ${showOffset ? `<div class="field"><label class="field-label">Offset savings (€)</label><input class="input loan-offset" data-idx="${idx}" type="number" min="0" value="${l.offsetSavings || ''}" /></div>` : ''}
+          </div>
+          <div class="loan-mini-preview" data-idx="${idx}" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:6px;"></div>
+        </div>
+      `;
+    }).join('');
+
+    // Rebind events
+    container.querySelectorAll('.loan-del').forEach(b => b.addEventListener('click', () => {
+      const i = parseInt(b.dataset.idx, 10);
+      loans.splice(i, 1);
+      renderLoansList();
+      updateRealEstatePreview();
+    }));
+
+    const updateLoanField = (idx, field, val) => {
+      if (!loans[idx]) return;
+      loans[idx][field] = val;
+    };
+    container.querySelectorAll('.loan-label').forEach(el => el.addEventListener('input', () => updateLoanField(+el.dataset.idx, 'label', el.value)));
+    container.querySelectorAll('.loan-type').forEach(el => el.addEventListener('change', () => {
+      updateLoanField(+el.dataset.idx, 'type', el.value);
+      renderLoansList(); // re-render pour afficher les bons champs spécifiques
+      updateRealEstatePreview();
+    }));
+    container.querySelectorAll('.loan-amount').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'amount', parseFloat(el.value) || 0); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-rate').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'rate', (parseFloat(el.value) || 0) / 100); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-years').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'durationMonths', (parseInt(el.value, 10) || 0) * 12); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-start').forEach(el => el.addEventListener('change', () => { updateLoanField(+el.dataset.idx, 'startDate', el.value || null); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-deferral').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'deferralMonths', parseInt(el.value, 10) || 0); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-amort-months').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'amortizationMonths', parseInt(el.value, 10) || 360); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-fixed-period').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'fixedPeriodMonths', parseInt(el.value, 10) || 60); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-offset').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'offsetSavings', parseFloat(el.value) || 0); updateRealEstatePreview(); }));
+  }
+
+  document.getElementById('he-add-loan').addEventListener('click', () => {
+    loans.push({ id: uuid(), type: 'amortizing_fixed', label: 'Prêt ' + (loans.length + 1), amount: 0, rate: 0, durationMonths: 0, startDate: '' });
+    renderLoansList();
+    updateRealEstatePreview();
+  });
+
+  // Bouton ré-estimer la valeur du bien : ouvre une mini-modale pour saisir la nouvelle estimation
+  document.getElementById('he-reestimate').addEventListener('click', () => {
+    const cur = (parseFloat(document.getElementById('he-qty').value) || 0) * (parseFloat(document.getElementById('he-unit-price').value) || 0);
+    const newVal = prompt(`Nouvelle estimation de la valeur du bien (€).\nValeur actuelle : ${Math.round(cur).toLocaleString('fr-FR')} €\n\nSaisis la nouvelle valeur estimée :`, cur || '');
+    if (newVal === null) return;
+    const v = parseFloat(newVal);
+    if (isNaN(v) || v <= 0) { toast('Valeur invalide', 'error'); return; }
+    // Met à jour qty=1 + unitPrice=v (convention pour immo : qty=1 m² unique, prix=valeur totale)
+    document.getElementById('he-qty').value = 1;
+    document.getElementById('he-unit-price').value = v;
+    updateTotalPreview();
+    updateRealEstatePreview();
+    valueHistory.push({ date: new Date().toISOString().slice(0, 10), value: v, source: 'manual' });
+    renderValueHistory();
+    toast('Estimation mise à jour', 'success');
+  });
+
+  function renderValueHistory() {
+    const el = document.getElementById('he-value-history');
+    if (!el) return;
+    if (!valueHistory.length) { el.innerHTML = ''; return; }
+    const recent = valueHistory.slice(-5).reverse();
+    el.innerHTML = '📈 Historique estimations : ' + recent.map(h => `${h.date} : ${Math.round(h.value).toLocaleString('fr-FR')} €`).join(' · ');
+  }
+  renderValueHistory();
+
+  // Live preview des calculs immo (aggregate multi-prêts)
   function updateRealEstatePreview() {
     if (document.getElementById('he-cat').value !== 'real_estate') return;
-    const principal   = parseFloat(document.getElementById('he-loan-amount').value) || 0;
-    const ratePct     = parseFloat(document.getElementById('he-loan-rate').value)   || 0;
-    const years       = parseInt(document.getElementById('he-loan-years').value, 10) || 0;
-    const startDate   = document.getElementById('he-loan-start').value;
-    const purchase    = parseFloat(document.getElementById('he-purchase-price').value) || 0;
-    const currentVal  = (parseFloat(document.getElementById('he-qty').value) || 0) * (parseFloat(document.getElementById('he-unit-price').value) || 0);
-    const propType    = document.getElementById('he-prop-type').value;
-    const rent        = parseFloat(document.getElementById('he-rent')?.value)    || 0;
-    const charges     = parseFloat(document.getElementById('he-charges')?.value) || 0;
-    const tax         = parseFloat(document.getElementById('he-tax')?.value)     || 0;
+    const purchase = parseFloat(document.getElementById('he-purchase-price').value) || 0;
+    const currentVal = (parseFloat(document.getElementById('he-qty').value) || 0) * (parseFloat(document.getElementById('he-unit-price').value) || 0);
+    const propType = document.getElementById('he-prop-type').value;
+    const rent = parseFloat(document.getElementById('he-rent')?.value) || 0;
+    const charges = parseFloat(document.getElementById('he-charges')?.value) || 0;
+    const tax = parseFloat(document.getElementById('he-tax')?.value) || 0;
 
     const m = computeRealEstateMetrics({
       value: currentVal || purchase,
       purchasePrice: purchase,
-      loanAmount: principal,
-      loanRate: ratePct / 100,
-      loanDuration: years * 12,
-      loanStartDate: startDate,
       monthlyRent: rent,
       monthlyCharges: charges,
       propertyTax: tax,
-      propertyType: propType
+      propertyType: propType,
+      loans
     });
 
     const preview = document.getElementById('he-realestate-preview');
     if (!preview) return;
-    if (principal === 0 && years === 0) {
-      preview.innerHTML = '<span style="color:var(--text-muted);">Renseigne montant emprunté + taux + durée pour voir les calculs.</span>';
+    const fmt = (n) => Math.round(n).toLocaleString('fr-FR');
+
+    if (loans.length === 0) {
+      let html = `<span style="color:var(--text-muted);">Aucun prêt saisi — bien possédé sans financement.</span>`;
+      if (currentVal > 0 && purchase > 0) {
+        html += `<br>📈 <strong>Plus-value</strong> : <span style="color:${m.capitalGain >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.capitalGain >= 0 ? '+' : ''}${fmt(m.capitalGain)} € (${m.capitalGainPct >= 0 ? '+' : ''}${m.capitalGainPct.toFixed(1)}%)</span>`;
+      }
+      preview.innerHTML = html;
       return;
     }
-    const fmt = (n) => Math.round(n).toLocaleString('fr-FR');
+
+    // Mini-preview par prêt
+    m.loans.forEach(({ loan, metrics }, idx) => {
+      const miniEl = document.querySelector(`.loan-mini-preview[data-idx="${idx}"]`);
+      if (!miniEl) return;
+      if (metrics.monthly === 0 && metrics.remaining === 0) { miniEl.innerHTML = ''; return; }
+      miniEl.innerHTML = `💸 ${fmt(metrics.monthly)} €/mois · 📉 restant ${fmt(metrics.remaining)} € · 📅 ${fmtMonths(metrics.monthsElapsed)} / ${fmtMonths((loan.durationMonths || 0))} (${metrics.progressPct.toFixed(0)}%)`;
+    });
+
     let html = `
-      💸 <strong>Mensualité</strong> : ${fmt(m.monthlyPayment)} €
-      · 📅 <strong>Écoulé</strong> : ${fmtMonths(m.monthsElapsed)} / ${fmtMonths(years * 12)} (${m.progressPct.toFixed(0)}%)
+      💸 <strong>Mensualité totale</strong> : ${fmt(m.monthlyPayment)} €
+      · 📉 <strong>Capital restant dû total</strong> : <span style="color:var(--accent-orange);">${fmt(m.remaining)} €</span>
       <br>
-      📉 <strong>Capital restant dû</strong> : <span style="color:var(--accent-orange);">${fmt(m.remaining)} €</span>
-      · ✅ <strong>Capital remboursé</strong> : ${fmt(m.principalRepaid)} €
-      <br>
-      💰 <strong>Intérêts payés à ce jour</strong> : ${fmt(m.interestPaid)} €
-      · 📊 <strong>Intérêts totaux du prêt</strong> : ${fmt(m.totalInterest)} €
+      ✅ <strong>Capital remboursé</strong> : ${fmt(m.principalRepaid)} €
+      · 💰 <strong>Intérêts payés à ce jour</strong> : ${fmt(m.interestPaid)} €
+      · 📊 <strong>Intérêts totaux à terme</strong> : ${fmt(m.totalInterest)} €
     `;
     if (currentVal > 0) {
       html += `<br>📈 <strong>Équité (valeur - capital restant)</strong> : <span style="color:var(--accent-green);">${fmt(m.equity)} €</span> · <strong>LTV</strong> : ${m.ltv.toFixed(1)}%`;
@@ -469,10 +610,11 @@ async function openEditor(id) {
     preview.innerHTML = html;
   }
 
-  ['he-loan-amount','he-loan-rate','he-loan-years','he-loan-start','he-purchase-price','he-rent','he-charges','he-tax','he-prop-type','he-qty','he-unit-price'].forEach(id => {
+  ['he-purchase-price','he-rent','he-charges','he-tax','he-prop-type','he-qty','he-unit-price'].forEach(id => {
     const el = document.getElementById(id);
     if (el) { el.addEventListener('input', updateRealEstatePreview); el.addEventListener('change', updateRealEstatePreview); }
   });
+  renderLoansList();
   updateRealEstatePreview();
 
   // Live preview du total (qty × unit price)
@@ -513,22 +655,21 @@ async function openEditor(id) {
     };
     // Real-estate fields (uniquement si category=real_estate, sinon on les efface pour éviter du noise)
     if (cat === 'real_estate') {
-      const ratePct = parseFloat(document.getElementById('he-loan-rate').value) || 0;
-      const years   = parseInt(document.getElementById('he-loan-years').value, 10) || 0;
       const propType = document.getElementById('he-prop-type').value;
-      updated.propertyType    = propType;
-      updated.purchaseDate    = document.getElementById('he-purchase-date').value || null;
-      updated.purchasePrice   = parseFloat(document.getElementById('he-purchase-price').value) || 0;
-      updated.loanAmount      = parseFloat(document.getElementById('he-loan-amount').value) || 0;
-      updated.loanRate        = ratePct / 100;
-      updated.loanDuration    = years * 12;
-      updated.loanStartDate   = document.getElementById('he-loan-start').value || null;
-      updated.monthlyRent     = propType === 'locatif' ? (parseFloat(document.getElementById('he-rent')?.value)    || 0) : 0;
-      updated.monthlyCharges  = propType === 'locatif' ? (parseFloat(document.getElementById('he-charges')?.value) || 0) : 0;
-      updated.propertyTax     = propType === 'locatif' ? (parseFloat(document.getElementById('he-tax')?.value)     || 0) : 0;
+      updated.propertyType   = propType;
+      updated.purchaseDate   = document.getElementById('he-purchase-date').value || null;
+      updated.purchasePrice  = parseFloat(document.getElementById('he-purchase-price').value) || 0;
+      // Multi-prêts : on persiste le array `loans` (chaque prêt a son type, montant, taux, durée…)
+      updated.loans = loans.filter(l => (l.amount || 0) > 0); // élimine les prêts vides
+      updated.valueHistory = valueHistory;
+      updated.monthlyRent    = propType === 'locatif' ? (parseFloat(document.getElementById('he-rent')?.value)    || 0) : 0;
+      updated.monthlyCharges = propType === 'locatif' ? (parseFloat(document.getElementById('he-charges')?.value) || 0) : 0;
+      updated.propertyTax    = propType === 'locatif' ? (parseFloat(document.getElementById('he-tax')?.value)     || 0) : 0;
+      // On retire les anciens champs flat single-loan (s'ils existaient en legacy)
+      delete updated.loanAmount; delete updated.loanRate; delete updated.loanDuration; delete updated.loanStartDate;
     } else {
-      // Si on change de catégorie, on retire les champs immo (sinon ils restent dormants)
       delete updated.propertyType; delete updated.purchaseDate; delete updated.purchasePrice;
+      delete updated.loans;        delete updated.valueHistory;
       delete updated.loanAmount;   delete updated.loanRate;     delete updated.loanDuration;
       delete updated.loanStartDate;delete updated.monthlyRent;  delete updated.monthlyCharges;
       delete updated.propertyTax;

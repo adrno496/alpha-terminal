@@ -8,7 +8,7 @@ const STORE = 'transcripts';
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 7);
+    const req = indexedDB.open(DB_NAME, 8);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('analyses')) {
@@ -41,6 +41,11 @@ function openDB() {
       if (!db.objectStoreNames.contains('insights_state')) {
         const is = db.createObjectStore('insights_state', { keyPath: 'id' });
         is.createIndex('generatedAt', 'generatedAt', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('price_alerts')) {
+        const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
+        pa.createIndex('ticker', 'ticker', { unique: false });
+        pa.createIndex('status', 'status', { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);
