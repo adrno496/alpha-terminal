@@ -65,27 +65,31 @@ function addDismissed(id) {
 
 const PRIORITY_ORDER = { celebration: 0, alert: 1, warning: 2, info: 3 };
 
+// Helper bilingue : retourne FR ou EN selon la locale courante
+function L(fr, en) { return getLocale() === 'en' ? en : fr; }
+
 const INSIGHT_RULES = [
   // MILESTONES
   {
     id: 'milestone_100k',
     priority: 'celebration',
     condition: (ctx) => ctx.previousValue < 100000 && ctx.totalValue >= 100000,
-    message: (ctx) => '🏆 100K€ atteints ! Tu fais partie du top 30% des Français en patrimoine financier.',
+    message: () => L('🏆 100K€ atteints ! Tu fais partie du top 30% des Français en patrimoine financier.',
+                     '🏆 €100K reached! You\'re in the top 30% of French households by financial wealth.'),
     moduleLink: 'wealth'
   },
   {
     id: 'milestone_500k',
     priority: 'celebration',
     condition: (ctx) => ctx.previousValue < 500000 && ctx.totalValue >= 500000,
-    message: (ctx) => '🏆 500K€ atteints ! Top 10% des Français.',
+    message: () => L('🏆 500K€ atteints ! Top 10% des Français.', '🏆 €500K reached! Top 10% of French households.'),
     moduleLink: 'wealth'
   },
   {
     id: 'milestone_1m',
     priority: 'celebration',
     condition: (ctx) => ctx.previousValue < 1000000 && ctx.totalValue >= 1000000,
-    message: (ctx) => '🏆 1M€ ! Bienvenue dans le top 1% des Français.',
+    message: () => L('🏆 1M€ ! Bienvenue dans le top 1% des Français.', '🏆 €1M! Welcome to the top 1% of French households.'),
     moduleLink: 'wealth'
   },
   // PERFORMANCE
@@ -93,14 +97,16 @@ const INSIGHT_RULES = [
     id: 'best_month_ever',
     priority: 'celebration',
     condition: (ctx) => ctx.monthlyChangePct > 5 && ctx.totalValue > ctx.bestEverValue,
-    message: (ctx) => `🎉 Meilleur mois jamais : +${ctx.monthlyChangePct.toFixed(1)}% (+${fmt(ctx.monthlyChangeEur)} €).`,
+    message: (ctx) => L(`🎉 Meilleur mois jamais : +${ctx.monthlyChangePct.toFixed(1)}% (+${fmt(ctx.monthlyChangeEur)} €).`,
+                        `🎉 Best month ever: +${ctx.monthlyChangePct.toFixed(1)}% (+€${fmt(ctx.monthlyChangeEur)}).`),
     moduleLink: 'wealth'
   },
   {
     id: 'rough_month',
     priority: 'warning',
     condition: (ctx) => ctx.monthlyChangePct < -5,
-    message: (ctx) => `📉 Mois compliqué : ${ctx.monthlyChangePct.toFixed(1)}% (${fmt(ctx.monthlyChangeEur)} €). Pas de panique : c'est normal en investissement long terme.`,
+    message: (ctx) => L(`📉 Mois compliqué : ${ctx.monthlyChangePct.toFixed(1)}% (${fmt(ctx.monthlyChangeEur)} €). Pas de panique : c'est normal en investissement long terme.`,
+                        `📉 Tough month: ${ctx.monthlyChangePct.toFixed(1)}% (€${fmt(ctx.monthlyChangeEur)}). Don't panic — this is normal in long-term investing.`),
     moduleLink: 'wealth'
   },
   // CONCENTRATION
@@ -108,7 +114,8 @@ const INSIGHT_RULES = [
     id: 'concentration_alert',
     priority: 'alert',
     condition: (ctx) => ctx.maxPositionPct > 30,
-    message: (ctx) => `⚠️ Position dominante : ${ctx.maxPositionTicker || 'une ligne'} = ${ctx.maxPositionPct.toFixed(0)}% de ton portefeuille. Considère diversifier en dessous de 25%.`,
+    message: (ctx) => L(`⚠️ Position dominante : ${ctx.maxPositionTicker || 'une ligne'} = ${ctx.maxPositionPct.toFixed(0)}% de ton portefeuille. Considère diversifier en dessous de 25%.`,
+                        `⚠️ Dominant position: ${ctx.maxPositionTicker || 'one holding'} = ${ctx.maxPositionPct.toFixed(0)}% of your portfolio. Consider diversifying below 25%.`),
     moduleLink: 'diversification-score'
   },
   // SCORE
@@ -116,7 +123,8 @@ const INSIGHT_RULES = [
     id: 'low_diversification_score',
     priority: 'warning',
     condition: (ctx) => ctx.diversificationScore != null && ctx.diversificationScore < 50,
-    message: (ctx) => `🎯 Score de diversification : ${ctx.diversificationScore}/100. Voir les recommandations pour passer au-dessus de 70.`,
+    message: (ctx) => L(`🎯 Score de diversification : ${ctx.diversificationScore}/100. Voir les recommandations pour passer au-dessus de 70.`,
+                        `🎯 Diversification score: ${ctx.diversificationScore}/100. See recommendations to push it above 70.`),
     moduleLink: 'diversification-score'
   },
   // FRAIS
@@ -124,7 +132,8 @@ const INSIGHT_RULES = [
     id: 'high_av_fees',
     priority: 'warning',
     condition: (ctx) => ctx.avFeesMax > 0.0080,
-    message: (ctx) => `💸 Tes frais d'AV sont élevés (${(ctx.avFeesMax * 100).toFixed(2)}%). Économie possible : ~11k€ sur 30 ans en passant à Linxea Spirit 2 / Lucya (0.50%).`,
+    message: (ctx) => L(`💸 Tes frais d'AV sont élevés (${(ctx.avFeesMax * 100).toFixed(2)}%). Économie possible : ~11k€ sur 30 ans en passant à Linxea Spirit 2 / Lucya (0.50%).`,
+                        `💸 Your life-insurance fees are high (${(ctx.avFeesMax * 100).toFixed(2)}%). Possible saving: ~€11K over 30 years by switching to Linxea Spirit 2 / Lucya (0.50%).`),
     moduleLink: 'fees-analysis'
   },
   // FISCAL WINDOWS — PEA 5 ans
@@ -132,7 +141,8 @@ const INSIGHT_RULES = [
     id: 'pea_5y_close',
     priority: 'info',
     condition: (ctx) => ctx.peaDaysTo5Years != null && ctx.peaDaysTo5Years > 0 && ctx.peaDaysTo5Years < 90,
-    message: (ctx) => `🎯 Ton PEA aura 5 ans dans ${ctx.peaDaysTo5Years} jours → exonération IR sur les retraits dès cette date.`,
+    message: (ctx) => L(`🎯 Ton PEA aura 5 ans dans ${ctx.peaDaysTo5Years} jours → exonération IR sur les retraits dès cette date.`,
+                        `🎯 Your PEA will be 5 years old in ${ctx.peaDaysTo5Years} days → income-tax exemption on withdrawals from then on.`),
     moduleLink: 'wealth-method'
   },
   // FISCAL WINDOWS — AV 8 ans
@@ -140,7 +150,8 @@ const INSIGHT_RULES = [
     id: 'av_8y_close',
     priority: 'info',
     condition: (ctx) => ctx.avDaysTo8Years != null && ctx.avDaysTo8Years > 0 && ctx.avDaysTo8Years < 90,
-    message: (ctx) => `📅 Ton AV aura 8 ans dans ${ctx.avDaysTo8Years} jours → abattement 4 600€/an sur les rachats.`,
+    message: (ctx) => L(`📅 Ton AV aura 8 ans dans ${ctx.avDaysTo8Years} jours → abattement 4 600€/an sur les rachats.`,
+                        `📅 Your life-insurance will be 8 years old in ${ctx.avDaysTo8Years} days → €4,600/year allowance on withdrawals.`),
     moduleLink: 'wealth-method'
   },
   // BUDGET
@@ -148,14 +159,16 @@ const INSIGHT_RULES = [
     id: 'savings_rate_low',
     priority: 'warning',
     condition: (ctx) => ctx.savingsRate != null && ctx.savingsRate < 0.10 && ctx.budgetEntriesCount > 3,
-    message: (ctx) => `💰 Taux d'épargne : ${(ctx.savingsRate * 100).toFixed(0)}%. Cible recommandée : 20-30%. Voir où optimiser tes dépenses.`,
+    message: (ctx) => L(`💰 Taux d'épargne : ${(ctx.savingsRate * 100).toFixed(0)}%. Cible recommandée : 20-30%. Voir où optimiser tes dépenses.`,
+                        `💰 Savings rate: ${(ctx.savingsRate * 100).toFixed(0)}%. Target: 20-30%. See where to optimize your spending.`),
     moduleLink: 'budget'
   },
   {
     id: 'savings_rate_great',
     priority: 'celebration',
     condition: (ctx) => ctx.savingsRate != null && ctx.savingsRate >= 0.30,
-    message: (ctx) => `🌟 Excellent taux d'épargne : ${(ctx.savingsRate * 100).toFixed(0)}%. Tu es en mode FIRE/early retirement.`,
+    message: (ctx) => L(`🌟 Excellent taux d'épargne : ${(ctx.savingsRate * 100).toFixed(0)}%. Tu es en mode FIRE/early retirement.`,
+                        `🌟 Excellent savings rate: ${(ctx.savingsRate * 100).toFixed(0)}%. You're on the FIRE / early-retirement path.`),
     moduleLink: 'budget'
   },
   // DEFENSIVE
@@ -163,7 +176,8 @@ const INSIGHT_RULES = [
     id: 'no_defensive_assets',
     priority: 'warning',
     condition: (ctx) => ctx.bondsPct < 5 && ctx.goldPct < 3 && ctx.totalValue > 50000,
-    message: (ctx) => `🛡️ Aucun actif défensif (bonds/or). À ce niveau de patrimoine, considère 5-15% défensif (AGGH, EUNA, SGLD).`,
+    message: () => L('🛡️ Aucun actif défensif (bonds/or). À ce niveau de patrimoine, considère 5-15% défensif (AGGH, EUNA, SGLD).',
+                     '🛡️ No defensive assets (bonds/gold). At this wealth level, consider 5-15% defensive allocation (AGGH, EUNA, SGLD).'),
     moduleLink: 'wealth-method'
   },
   // CASH
@@ -171,7 +185,8 @@ const INSIGHT_RULES = [
     id: 'cash_too_high',
     priority: 'warning',
     condition: (ctx) => ctx.cashPct > 25 && ctx.cashValue > 30000,
-    message: (ctx) => `💵 Cash dormant excessif : ${fmt(ctx.cashValue)} € (${ctx.cashPct.toFixed(0)}%). Au-delà de 6 mois de dépenses, l'inflation grignote ~3%/an.`,
+    message: (ctx) => L(`💵 Cash dormant excessif : ${fmt(ctx.cashValue)} € (${ctx.cashPct.toFixed(0)}%). Au-delà de 6 mois de dépenses, l'inflation grignote ~3%/an.`,
+                        `💵 Excess idle cash: €${fmt(ctx.cashValue)} (${ctx.cashPct.toFixed(0)}%). Beyond 6 months of expenses, inflation eats ~3%/year.`),
     moduleLink: 'wealth-method'
   },
   // FR BIAS
@@ -179,7 +194,8 @@ const INSIGHT_RULES = [
     id: 'fr_bias_extreme',
     priority: 'warning',
     condition: (ctx) => ctx.frExposurePct > 70 && ctx.totalValue > 30000,
-    message: (ctx) => `🇫🇷 Biais domestique extrême : ${ctx.frExposurePct.toFixed(0)}% France. La France = 3% de la capi mondiale, considère ETF World/All-World.`,
+    message: (ctx) => L(`🇫🇷 Biais domestique extrême : ${ctx.frExposurePct.toFixed(0)}% France. La France = 3% de la capi mondiale, considère ETF World/All-World.`,
+                        `🇫🇷 Extreme home bias: ${ctx.frExposurePct.toFixed(0)}% France. France = 3% of world market cap; consider World/All-World ETFs.`),
     moduleLink: 'diversification-score'
   }
 ];

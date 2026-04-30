@@ -204,16 +204,17 @@ async function refresh(viewEl, holdings) {
     grouped[rule.priority || 'low'].push(rule);
   }
 
+  const pickLocale = (r, field) => isEN && r[field + '_en'] ? r[field + '_en'] : r[field];
   const renderRule = (r) => `
     <div class="card" style="border-left:4px solid ${priorityColor(r.priority)};margin-bottom:10px;" data-rule="${r.id}">
       <div style="display:flex;justify-content:space-between;align-items:start;gap:10px;">
         <div style="flex:1;">
-          <div style="font-weight:600;font-size:14px;">${escape(r.title)}</div>
+          <div style="font-weight:600;font-size:14px;">${escape(pickLocale(r, 'title'))}</div>
           <div style="font-size:11px;color:var(--text-muted);margin:2px 0 8px;">${priorityLabel(r.priority, isEN)} · ${escape(r.category)}</div>
-          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">${escape(r.action)}</div>
+          <div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">${escape(pickLocale(r, 'action'))}</div>
           <details style="font-size:12px;color:var(--text-muted);">
             <summary style="cursor:pointer;">${isEN ? 'Why' : 'Pourquoi'}</summary>
-            <div style="margin-top:6px;line-height:1.5;">${escape(r.explanation)}</div>
+            <div style="margin-top:6px;line-height:1.5;">${escape(pickLocale(r, 'explanation'))}</div>
           </details>
         </div>
         <div style="display:flex;flex-direction:column;gap:4px;">
@@ -251,7 +252,33 @@ async function refresh(viewEl, holdings) {
     const out = document.querySelector(`[data-rule-out="${ruleId}"]`);
     if (!rule || !out) return;
     out.innerHTML = '';
-    const userMsg = `Approfondis cette règle de méthode patrimoniale dans ma situation :
+    const userMsg = isEN
+      ? `Deep-dive this French wealth-method rule for my situation:
+
+RULE: ${rule.title_en || rule.title}
+ACTION: ${rule.action_en || rule.action}
+EXPLANATION: ${rule.explanation_en || rule.explanation}
+PRIORITY: ${rule.priority}
+
+MY CONTEXT:
+- Total wealth: €${fmt(ctx.total_wealth)}
+- Age: ${ctx.age}
+- Marginal tax rate (TMI): ${ctx.tmi}%
+- Has children: ${ctx.has_children ? 'yes' : 'no'}
+- PEA opened: ${ctx.has_pea ? 'yes' : 'no'}
+- PER opened: ${ctx.has_per ? 'yes' : 'no'}
+- Livret A: €${fmt(ctx.livret_a_balance)}
+- Cash: €${fmt(ctx.cash_balance)} (${ctx.cash_pct.toFixed(1)}%)
+- Stocks/ETF: ${ctx.stocks_pct.toFixed(1)}%
+- Bonds: ${ctx.bonds_pct.toFixed(1)}%
+- Gold: ${ctx.gold_pct.toFixed(1)}%
+- Crypto: ${ctx.crypto_pct.toFixed(1)}%
+- Real estate: ${ctx.real_estate_pct.toFixed(1)}%
+- FR exposure: ${ctx.fr_exposure_pct.toFixed(1)}%
+- Max life-insurance fees: ${(ctx.av_annual_fees * 100).toFixed(2)}%
+
+Provide: (1) why it matters for me, (2) numerical impact in MY situation, (3) 3-step action plan, (4) warnings.`
+      : `Approfondis cette règle de méthode patrimoniale dans ma situation :
 
 RÈGLE : ${rule.title}
 ACTION : ${rule.action}

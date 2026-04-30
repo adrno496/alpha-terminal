@@ -226,7 +226,18 @@ async function refresh(viewEl, holdings) {
     if (lines.length === 0) { toast(isEN ? 'No fee data to analyze' : 'Aucune donnée de frais à analyser', 'error'); return; }
     const out = $('#fee-llm-out');
     const totalLost = lines.reduce((s, l) => s + l.impact.totalLostToFees, 0);
-    const userMsg = `Analyse mes frais sur ce portefeuille :
+    const userMsg = isEN
+      ? `Analyze the fees on this portfolio:
+- Total capital: €${fmt(totalCapital)}
+- Total annual fees: €${fmt(annualFeeTotal)} (= ${(annualFeeTotal / totalCapital * 100).toFixed(2)}% weighted)
+- Cumulative loss over ${horizon} years: €${fmt(totalLost)}
+- Return assumption: ${(annualReturn * 100).toFixed(1)}%/year
+
+Per-line breakdown:
+${lines.map(l => `- ${l.ticker || l.name} (${(l.ter * 100).toFixed(2)}% TER): €${fmt(l.value)} → annual cost €${fmt(l.annualFee)}, lost over ${horizon}y €${fmt(l.impact.totalLostToFees)}`).join('\n')}
+
+Provide: (1) summary, (2) per-line detail, (3) cheaper alternatives, (4) 3-5 step action plan, (5) tax warnings.`
+      : `Analyse mes frais sur ce portefeuille :
 - Capital total : ${fmt(totalCapital)} €
 - Frais annuels totaux : ${fmt(annualFeeTotal)} € (= ${(annualFeeTotal / totalCapital * 100).toFixed(2)}% pondéré)
 - Manque à gagner cumulé sur ${horizon} ans : ${fmt(totalLost)} €

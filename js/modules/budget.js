@@ -89,42 +89,45 @@ export function projectWealth(monthlyInvest, years, annualReturn = 0.07) {
 
 // ============== UI ==============
 
-const DEFAULT_CATEGORIES = {
-  revenu: [
-    { id: 'salaire',     label: 'Salaire net', icon: '💼' },
-    { id: 'freelance',   label: 'Freelance / mission', icon: '💻' },
-    { id: 'dividendes',  label: 'Dividendes', icon: '💸' },
-    { id: 'loyers',      label: 'Loyers reçus', icon: '🏘️' },
-    { id: 'autre_rev',   label: 'Autre', icon: '·' }
-  ],
-  fixe: [
-    { id: 'loyer',       label: 'Loyer / Crédit immo', icon: '🏠' },
-    { id: 'charges',     label: 'Charges (eau, élec, gaz)', icon: '⚡' },
-    { id: 'internet',    label: 'Internet / Téléphone', icon: '🌐' },
-    { id: 'assurance',   label: 'Assurances', icon: '🛡️' },
-    { id: 'abonnement',  label: 'Abonnements', icon: '📺' },
-    { id: 'credit_conso',label: 'Crédit conso/auto', icon: '💳' },
-    { id: 'impots_fix',  label: 'Impôts mensualisés', icon: '🇫🇷' }
-  ],
-  variable: [
-    { id: 'courses',     label: 'Courses', icon: '🛒' },
-    { id: 'restaurant',  label: 'Restaurants/Sorties', icon: '🍽️' },
-    { id: 'transport',   label: 'Transport', icon: '🚗' },
-    { id: 'loisirs',     label: 'Loisirs/Voyages', icon: '🎮' },
-    { id: 'vetements',   label: 'Vêtements', icon: '👕' },
-    { id: 'sante',       label: 'Santé', icon: '💊' },
-    { id: 'cadeaux',     label: 'Cadeaux', icon: '🎁' },
-    { id: 'imprevus',    label: 'Imprévus', icon: '·' }
-  ],
-  epargne: [
-    { id: 'livret_a',    label: 'Livret A / LDDS', icon: '💰' },
-    { id: 'av_versement',label: 'Versement AV', icon: '🛡️' },
-    { id: 'pea_versement',label:'Versement PEA', icon: '📈' },
-    { id: 'pee_perco',   label: 'PEE / PERCO', icon: '🏢' },
-    { id: 'crypto_dca',  label: 'DCA crypto', icon: '₿' },
-    { id: 'etf_dca',     label: 'DCA ETF', icon: '📊' }
-  ]
-};
+function getDefaultCategories() {
+  const isEN = getLocale() === 'en';
+  return {
+    revenu: [
+      { id: 'salaire',     label: isEN ? 'Net salary' : 'Salaire net', icon: '💼' },
+      { id: 'freelance',   label: isEN ? 'Freelance / contract' : 'Freelance / mission', icon: '💻' },
+      { id: 'dividendes',  label: isEN ? 'Dividends' : 'Dividendes', icon: '💸' },
+      { id: 'loyers',      label: isEN ? 'Rental income' : 'Loyers reçus', icon: '🏘️' },
+      { id: 'autre_rev',   label: isEN ? 'Other' : 'Autre', icon: '·' }
+    ],
+    fixe: [
+      { id: 'loyer',       label: isEN ? 'Rent / Mortgage' : 'Loyer / Crédit immo', icon: '🏠' },
+      { id: 'charges',     label: isEN ? 'Utilities (water, gas, electricity)' : 'Charges (eau, élec, gaz)', icon: '⚡' },
+      { id: 'internet',    label: isEN ? 'Internet / Phone' : 'Internet / Téléphone', icon: '🌐' },
+      { id: 'assurance',   label: isEN ? 'Insurance' : 'Assurances', icon: '🛡️' },
+      { id: 'abonnement',  label: isEN ? 'Subscriptions' : 'Abonnements', icon: '📺' },
+      { id: 'credit_conso',label: isEN ? 'Consumer/auto loan' : 'Crédit conso/auto', icon: '💳' },
+      { id: 'impots_fix',  label: isEN ? 'Monthly taxes' : 'Impôts mensualisés', icon: '🇫🇷' }
+    ],
+    variable: [
+      { id: 'courses',     label: isEN ? 'Groceries' : 'Courses', icon: '🛒' },
+      { id: 'restaurant',  label: isEN ? 'Restaurants/Outings' : 'Restaurants/Sorties', icon: '🍽️' },
+      { id: 'transport',   label: isEN ? 'Transport' : 'Transport', icon: '🚗' },
+      { id: 'loisirs',     label: isEN ? 'Leisure/Travel' : 'Loisirs/Voyages', icon: '🎮' },
+      { id: 'vetements',   label: isEN ? 'Clothing' : 'Vêtements', icon: '👕' },
+      { id: 'sante',       label: isEN ? 'Health' : 'Santé', icon: '💊' },
+      { id: 'cadeaux',     label: isEN ? 'Gifts' : 'Cadeaux', icon: '🎁' },
+      { id: 'imprevus',    label: isEN ? 'Unexpected' : 'Imprévus', icon: '·' }
+    ],
+    epargne: [
+      { id: 'livret_a',    label: isEN ? 'Savings account (Livret A/LDDS)' : 'Livret A / LDDS', icon: '💰' },
+      { id: 'av_versement',label: isEN ? 'Life-insurance contribution' : 'Versement AV', icon: '🛡️' },
+      { id: 'pea_versement',label: isEN ? 'PEA contribution' : 'Versement PEA', icon: '📈' },
+      { id: 'pee_perco',   label: isEN ? 'PEE / PERCO' : 'PEE / PERCO', icon: '🏢' },
+      { id: 'crypto_dca',  label: isEN ? 'Crypto DCA' : 'DCA crypto', icon: '₿' },
+      { id: 'etf_dca',     label: isEN ? 'ETF DCA' : 'DCA ETF', icon: '📊' }
+    ]
+  };
+}
 
 function currentMonth() {
   const d = new Date();
@@ -274,7 +277,7 @@ function renderEntriesList(entries, isEN) {
 function openEntryModal(viewEl, type) {
   const isEN = getLocale() === 'en';
   const month = $('#budget-month').value || currentMonth();
-  const cats = DEFAULT_CATEGORIES[type] || [];
+  const cats = getDefaultCategories()[type] || [];
 
   const w = document.createElement('div');
   w.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
@@ -346,7 +349,7 @@ async function loadExample(viewEl) {
   ];
   for (const e of examples) await saveBudgetEntry({ month, ...e });
   refresh(viewEl);
-  toast('Exemple chargé', 'success');
+  toast(getLocale() === 'en' ? 'Example loaded' : 'Exemple chargé', 'success');
 }
 
 function fmt(n) {

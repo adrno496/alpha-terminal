@@ -147,11 +147,16 @@ async function refreshUI() {
   // Holdings list
   const list = await listWealth();
   list.sort((a, b) => (b.value || 0) - (a.value || 0));
+
+  // Carte récap immobilier (si au moins un bien immo avec prêt)
+  await renderRealEstateSummary(list);
+
   const listEl = $('#wl-list');
   if (listEl) {
     if (!list.length) {
       listEl.innerHTML = `<div class="alert alert-info">Aucune holding. Ajoute ta première position avec le bouton "+ Add holding".</div>`;
     } else {
+      const { computeRealEstateMetrics, fmtMonths } = await import('../core/real-estate.js');
       listEl.innerHTML = `
         <table class="wealth-table">
           <thead><tr><th></th><th>Name</th><th>Ticker</th><th>Category</th><th>Account</th><th>Qty</th><th>Unit price</th><th>Total value</th><th>Auto</th><th></th></tr></thead>
@@ -162,6 +167,29 @@ async function refreshUI() {
               const ccySym = ({ USD: '$', EUR: '€', GBP: '£' })[ccy] || ccy;
               // Unit price : stocké directement, ou dérivé (lastPrice si auto, ou value/qty)
               const unitP = h.unitPrice || h.lastPrice || (h.quantity ? h.value / h.quantity : 0);
+              // Mini-récap immo sous la ligne si applicable
+              let immoRow = '';
+              if (h.category === 'real_estate' && h.loanAmount > 0) {
+                const m = computeRealEstateMetrics(h);
+                const typeLabel = h.propertyType === 'locatif' ? '🏘️ Locatif' : h.propertyType === 'secondary_residence' ? '🏖️ Secondaire' : '🏠 RP';
+                const cashflowChip = h.propertyType === 'locatif' && m.monthlyRent > 0
+                  ? ` · 💰 CF mensuel : <strong style="color:${m.monthlyCashflow >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.monthlyCashflow >= 0 ? '+' : ''}${fmtMoney(m.monthlyCashflow)} €</strong>`
+                  : '';
+                const yieldChip = h.propertyType === 'locatif' && m.grossYield > 0
+                  ? ` · 💎 Brute : ${m.grossYield.toFixed(2)}% / Nette : ${m.netYield.toFixed(2)}%`
+                  : '';
+                immoRow = `
+                  <tr data-id="${h.id}-immo" class="wl-immo-row">
+                    <td colspan="10" style="padding:6px 12px;background:var(--bg-tertiary);font-size:11.5px;font-family:var(--font-mono);color:var(--text-secondary);border-top:0;">
+                      ${typeLabel} · 💸 Mensualité : <strong>${fmtMoney(m.monthlyPayment)} €</strong>
+                      · 📉 Restant : <strong style="color:var(--accent-orange);">${fmtMoney(m.remaining)} €</strong>
+                      · 📅 ${fmtMonths(m.monthsElapsed)} / ${fmtMonths((h.loanDuration || 0))} (${m.progressPct.toFixed(0)}%)
+                      · 📈 Équité : <strong style="color:var(--accent-green);">${fmtMoney(m.equity)} €</strong>
+                      · LTV : ${m.ltv.toFixed(0)}%${cashflowChip}${yieldChip}
+                    </td>
+                  </tr>
+                `;
+              }
               return `
                 <tr data-id="${h.id}">
                   <td>${cat.icon}</td>
@@ -178,6 +206,7 @@ async function refreshUI() {
                     <button class="btn-ghost wl-del" data-id="${h.id}">×</button>
                   </td>
                 </tr>
+                ${immoRow}
               `;
             }).join('')}
           </tbody>
@@ -199,16 +228,103 @@ function fmtMoney(n) {
   return Math.round(n).toLocaleString('fr-FR');
 }
 
+// Carte récap globale immobilier (somme valeur, somme dette, équité, cash-flow agrégé)
+async function renderRealEstateSummary(list) {
+  // Insère ou met à jour une card au-dessus de #wl-list dans le card existant
+  const wlList = document.getElementById('wl-list');
+  if (!wlList) return;
+  let card = document.getElementById('wl-immo-summary');
+
+  const properties = (list || []).filter(h => h.category === 'real_estate');
+  if (properties.length === 0) {
+    if (card) card.remove();
+    return;
+  }
+
+  const { computeRealEstateMetrics, fmtMonths } = await import('../core/real-estate.js');
+  let totalValue = 0, totalRemaining = 0, totalEquity = 0, totalMonthlyPayment = 0;
+  let totalMonthlyRent = 0, totalMonthlyCharges = 0, totalAnnualPropertyTax = 0;
+  let totalCashflow = 0;
+  let totalPurchase = 0, totalCapitalGain = 0;
+  const perProperty = [];
+
+  for (const h of properties) {
+    const m = computeRealEstateMetrics(h);
+    totalValue += m.currentValue;
+    totalRemaining += m.remaining;
+    totalEquity += m.equity;
+    totalMonthlyPayment += m.monthlyPayment;
+    totalMonthlyRent += m.monthlyRent;
+    totalMonthlyCharges += m.monthlyCharges;
+    totalAnnualPropertyTax += m.propertyTaxYear;
+    if (m.isRental) totalCashflow += m.monthlyCashflow;
+    totalPurchase += Number(h.purchasePrice) || 0;
+    totalCapitalGain += m.capitalGain;
+    perProperty.push({ h, m });
+  }
+
+  const aggLtv = totalValue > 0 ? (totalRemaining / totalValue) * 100 : 0;
+  const aggCapitalGainPct = totalPurchase > 0 ? (totalCapitalGain / totalPurchase) * 100 : 0;
+
+  const html = `
+    <div id="wl-immo-summary" style="margin-bottom:16px;padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-blue);border-radius:6px;">
+      <div style="font-weight:600;font-size:13px;margin-bottom:10px;">🏠 Patrimoine immobilier (${properties.length} bien${properties.length > 1 ? 's' : ''})</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;font-size:12px;font-family:var(--font-mono);">
+        <div><div style="color:var(--text-muted);font-size:10px;">Valeur totale</div><strong style="font-size:15px;">${fmtMoney(totalValue)} €</strong></div>
+        <div><div style="color:var(--text-muted);font-size:10px;">Capital restant dû</div><strong style="font-size:15px;color:var(--accent-orange);">${fmtMoney(totalRemaining)} €</strong></div>
+        <div><div style="color:var(--text-muted);font-size:10px;">Équité (net)</div><strong style="font-size:15px;color:var(--accent-green);">${fmtMoney(totalEquity)} €</strong></div>
+        <div><div style="color:var(--text-muted);font-size:10px;">LTV global</div><strong style="font-size:15px;">${aggLtv.toFixed(1)}%</strong></div>
+        <div><div style="color:var(--text-muted);font-size:10px;">Mensualités totales</div><strong style="font-size:15px;">${fmtMoney(totalMonthlyPayment)} €/mois</strong></div>
+        ${totalMonthlyRent > 0 ? `<div><div style="color:var(--text-muted);font-size:10px;">Loyers reçus</div><strong style="font-size:15px;color:var(--accent-green);">+${fmtMoney(totalMonthlyRent)} €/mois</strong></div>` : ''}
+        ${totalCashflow !== 0 ? `<div><div style="color:var(--text-muted);font-size:10px;">Cash-flow locatif net</div><strong style="font-size:15px;color:${totalCashflow >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${totalCashflow >= 0 ? '+' : ''}${fmtMoney(totalCashflow)} €/mois</strong></div>` : ''}
+        ${totalPurchase > 0 ? `<div><div style="color:var(--text-muted);font-size:10px;">Plus-value totale</div><strong style="font-size:15px;color:${totalCapitalGain >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${totalCapitalGain >= 0 ? '+' : ''}${fmtMoney(totalCapitalGain)} € (${aggCapitalGainPct >= 0 ? '+' : ''}${aggCapitalGainPct.toFixed(1)}%)</strong></div>` : ''}
+      </div>
+      ${perProperty.length > 1 ? `
+      <details style="margin-top:10px;font-size:11px;color:var(--text-muted);">
+        <summary style="cursor:pointer;">Détail par bien</summary>
+        <table style="width:100%;margin-top:6px;font-size:11px;border-collapse:collapse;">
+          <thead><tr style="border-bottom:1px solid var(--border);text-align:left;">
+            <th style="padding:4px;">Bien</th><th style="padding:4px;">Type</th><th style="padding:4px;text-align:right;">Restant</th><th style="padding:4px;text-align:right;">Équité</th><th style="padding:4px;text-align:right;">LTV</th><th style="padding:4px;text-align:right;">CF mois</th>
+          </tr></thead>
+          <tbody>
+            ${perProperty.map(({ h, m }) => `
+              <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:4px;">${escHtml(h.name)}</td>
+                <td style="padding:4px;">${h.propertyType === 'locatif' ? '🏘️' : h.propertyType === 'secondary_residence' ? '🏖️' : '🏠'}</td>
+                <td style="padding:4px;text-align:right;font-family:var(--font-mono);color:var(--accent-orange);">${fmtMoney(m.remaining)}</td>
+                <td style="padding:4px;text-align:right;font-family:var(--font-mono);color:var(--accent-green);">${fmtMoney(m.equity)}</td>
+                <td style="padding:4px;text-align:right;font-family:var(--font-mono);">${m.ltv.toFixed(0)}%</td>
+                <td style="padding:4px;text-align:right;font-family:var(--font-mono);color:${m.monthlyCashflow >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.isRental ? (m.monthlyCashflow >= 0 ? '+' : '') + fmtMoney(m.monthlyCashflow) : '—'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </details>` : ''}
+    </div>
+  `;
+
+  if (card) {
+    card.outerHTML = html;
+  } else {
+    wlList.insertAdjacentHTML('beforebegin', html);
+  }
+}
+
 async function openEditor(id) {
   const list = await listWealth();
   const existing = id ? list.find(h => h.id === id) : null;
   const h = existing || {
     id: uuid(),
     name: '', ticker: '', category: 'stocks', account: '',
-    quantity: 0, value: 0, currency: 'EUR', autoValue: false, notes: ''
+    quantity: 0, value: 0, currency: 'EUR', autoValue: false, notes: '',
+    // Real-estate defaults
+    propertyType: 'residence_principale', purchaseDate: '', purchasePrice: 0,
+    loanAmount: 0, loanRate: 0, loanDuration: 0, loanStartDate: '',
+    monthlyRent: 0, monthlyCharges: 0, propertyTax: 0
   };
 
   const { showGenericModal, closeGenericModal } = await import('../ui/modal.js');
+  const { computeRealEstateMetrics, fmtMonths } = await import('../core/real-estate.js');
   showGenericModal(existing ? 'Edit holding' : 'Add holding', `
     <div class="field-row">
       <div class="field"><label class="field-label">Name *</label><input id="he-name" class="input" value="${escHtml(h.name)}" placeholder="ex: Apple Inc, Bitcoin, RP Lyon..." /></div>
@@ -220,6 +336,45 @@ async function openEditor(id) {
       </div>
       <div class="field"><label class="field-label">Account / Broker</label><input id="he-account" class="input" value="${escHtml(h.account || '')}" placeholder="PEA Boursorama, IBKR, MetaMask..." /></div>
     </div>
+
+    <!-- ======= IMMOBILIER (visible si category=real_estate) ======= -->
+    <div id="he-realestate-block" style="display:${h.category === 'real_estate' ? 'block' : 'none'};border:1px solid var(--border);border-radius:6px;padding:14px;margin:14px 0;background:var(--bg-tertiary);">
+      <div style="font-weight:600;font-size:13px;margin-bottom:10px;">🏠 Détails immobilier</div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Type de bien</label>
+          <select id="he-prop-type" class="input">
+            <option value="residence_principale" ${h.propertyType==='residence_principale'?'selected':''}>🏠 Résidence principale</option>
+            <option value="locatif" ${h.propertyType==='locatif'?'selected':''}>🏘️ Locatif</option>
+            <option value="secondary_residence" ${h.propertyType==='secondary_residence'?'selected':''}>🏖️ Résidence secondaire</option>
+          </select>
+        </div>
+        <div class="field"><label class="field-label">Date d'achat</label><input id="he-purchase-date" class="input" type="date" value="${h.purchaseDate || ''}" /></div>
+        <div class="field"><label class="field-label">Prix d'achat (€)</label><input id="he-purchase-price" class="input" type="number" step="100" value="${h.purchasePrice || ''}" placeholder="280000" /></div>
+      </div>
+
+      <div style="font-size:12px;font-weight:600;margin:12px 0 6px;color:var(--text-secondary);">💳 Prêt immobilier</div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Montant emprunté (€)</label><input id="he-loan-amount" class="input" type="number" step="100" value="${h.loanAmount || ''}" placeholder="240000" /></div>
+        <div class="field"><label class="field-label">Taux d'intérêt annuel (%)</label><input id="he-loan-rate" class="input" type="number" step="0.01" value="${h.loanRate ? (h.loanRate * 100).toFixed(2) : ''}" placeholder="2.50" /></div>
+      </div>
+      <div class="field-row">
+        <div class="field"><label class="field-label">Durée (années)</label><input id="he-loan-years" class="input" type="number" step="1" min="1" max="35" value="${h.loanDuration ? Math.round(h.loanDuration / 12) : ''}" placeholder="20" /></div>
+        <div class="field"><label class="field-label">1er prélèvement</label><input id="he-loan-start" class="input" type="date" value="${h.loanStartDate || ''}" /></div>
+      </div>
+
+      <div id="he-prop-rental-block" style="display:${h.propertyType === 'locatif' ? 'block' : 'none'};">
+        <div style="font-size:12px;font-weight:600;margin:12px 0 6px;color:var(--text-secondary);">🏘️ Locatif</div>
+        <div class="field-row">
+          <div class="field"><label class="field-label">Loyer mensuel hors charges (€)</label><input id="he-rent" class="input" type="number" step="10" value="${h.monthlyRent || ''}" placeholder="1100" /></div>
+          <div class="field"><label class="field-label">Charges copropriété (€/mois)</label><input id="he-charges" class="input" type="number" step="10" value="${h.monthlyCharges || ''}" placeholder="80" /></div>
+          <div class="field"><label class="field-label">Taxe foncière (€/an)</label><input id="he-tax" class="input" type="number" step="10" value="${h.propertyTax || ''}" placeholder="1200" /></div>
+        </div>
+      </div>
+
+      <!-- Aperçu calculs en live -->
+      <div id="he-realestate-preview" style="margin-top:12px;padding:10px;background:var(--bg-secondary);border-radius:4px;font-size:12px;font-family:var(--font-mono);"></div>
+    </div>
+
     <div class="field-row-3">
       <div class="field"><label class="field-label">Quantity owned</label><input id="he-qty" class="input" type="number" step="any" value="${h.quantity || ''}" placeholder="ex: 100 shares, 0.5 BTC, 1 m²..." /></div>
       <div class="field"><label class="field-label">Currency</label>
@@ -230,6 +385,7 @@ async function openEditor(id) {
     <div class="field" style="background:var(--bg-tertiary);padding:10px 14px;border-radius:4px;border-left:3px solid var(--accent-green);">
       <span style="font-size:11px;color:var(--text-secondary);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:0.05em;">Total value (auto-calculated)</span>
       <div id="he-total-preview" style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--accent-green);margin-top:4px;">—</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Pour l'immobilier : valeur actuelle estimée du bien (utilisée pour calculer LTV et plus-value).</div>
     </div>
     <div class="field">
       <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
@@ -242,6 +398,82 @@ async function openEditor(id) {
       <button id="he-save" class="btn-primary">${existing ? 'Update' : 'Add'}</button>
     </div>
   `, { wide: true });
+
+  // Toggle real-estate block en fonction de la catégorie
+  document.getElementById('he-cat').addEventListener('change', (e) => {
+    document.getElementById('he-realestate-block').style.display = e.target.value === 'real_estate' ? 'block' : 'none';
+    updateRealEstatePreview();
+  });
+  document.getElementById('he-prop-type').addEventListener('change', (e) => {
+    document.getElementById('he-prop-rental-block').style.display = e.target.value === 'locatif' ? 'block' : 'none';
+    updateRealEstatePreview();
+  });
+
+  // Live preview des calculs immo
+  function updateRealEstatePreview() {
+    if (document.getElementById('he-cat').value !== 'real_estate') return;
+    const principal   = parseFloat(document.getElementById('he-loan-amount').value) || 0;
+    const ratePct     = parseFloat(document.getElementById('he-loan-rate').value)   || 0;
+    const years       = parseInt(document.getElementById('he-loan-years').value, 10) || 0;
+    const startDate   = document.getElementById('he-loan-start').value;
+    const purchase    = parseFloat(document.getElementById('he-purchase-price').value) || 0;
+    const currentVal  = (parseFloat(document.getElementById('he-qty').value) || 0) * (parseFloat(document.getElementById('he-unit-price').value) || 0);
+    const propType    = document.getElementById('he-prop-type').value;
+    const rent        = parseFloat(document.getElementById('he-rent')?.value)    || 0;
+    const charges     = parseFloat(document.getElementById('he-charges')?.value) || 0;
+    const tax         = parseFloat(document.getElementById('he-tax')?.value)     || 0;
+
+    const m = computeRealEstateMetrics({
+      value: currentVal || purchase,
+      purchasePrice: purchase,
+      loanAmount: principal,
+      loanRate: ratePct / 100,
+      loanDuration: years * 12,
+      loanStartDate: startDate,
+      monthlyRent: rent,
+      monthlyCharges: charges,
+      propertyTax: tax,
+      propertyType: propType
+    });
+
+    const preview = document.getElementById('he-realestate-preview');
+    if (!preview) return;
+    if (principal === 0 && years === 0) {
+      preview.innerHTML = '<span style="color:var(--text-muted);">Renseigne montant emprunté + taux + durée pour voir les calculs.</span>';
+      return;
+    }
+    const fmt = (n) => Math.round(n).toLocaleString('fr-FR');
+    let html = `
+      💸 <strong>Mensualité</strong> : ${fmt(m.monthlyPayment)} €
+      · 📅 <strong>Écoulé</strong> : ${fmtMonths(m.monthsElapsed)} / ${fmtMonths(years * 12)} (${m.progressPct.toFixed(0)}%)
+      <br>
+      📉 <strong>Capital restant dû</strong> : <span style="color:var(--accent-orange);">${fmt(m.remaining)} €</span>
+      · ✅ <strong>Capital remboursé</strong> : ${fmt(m.principalRepaid)} €
+      <br>
+      💰 <strong>Intérêts payés à ce jour</strong> : ${fmt(m.interestPaid)} €
+      · 📊 <strong>Intérêts totaux du prêt</strong> : ${fmt(m.totalInterest)} €
+    `;
+    if (currentVal > 0) {
+      html += `<br>📈 <strong>Équité (valeur - capital restant)</strong> : <span style="color:var(--accent-green);">${fmt(m.equity)} €</span> · <strong>LTV</strong> : ${m.ltv.toFixed(1)}%`;
+      if (purchase > 0) {
+        html += ` · <strong>Plus-value</strong> : <span style="color:${m.capitalGain >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.capitalGain >= 0 ? '+' : ''}${fmt(m.capitalGain)} € (${m.capitalGainPct >= 0 ? '+' : ''}${m.capitalGainPct.toFixed(1)}%)</span>`;
+      }
+    }
+    if (propType === 'locatif' && rent > 0) {
+      html += `<br>🏘️ <strong>Cash-flow mensuel</strong> : <span style="color:${m.monthlyCashflow >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.monthlyCashflow >= 0 ? '+' : ''}${fmt(m.monthlyCashflow)} €</span>`;
+      html += ` · <strong>Cash-flow annuel</strong> : ${m.annualCashflow >= 0 ? '+' : ''}${fmt(m.annualCashflow)} €`;
+      if (purchase > 0) {
+        html += `<br>💎 <strong>Rentabilité brute</strong> : ${m.grossYield.toFixed(2)}% · <strong>nette</strong> : ${m.netYield.toFixed(2)}%`;
+      }
+    }
+    preview.innerHTML = html;
+  }
+
+  ['he-loan-amount','he-loan-rate','he-loan-years','he-loan-start','he-purchase-price','he-rent','he-charges','he-tax','he-prop-type','he-qty','he-unit-price'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('input', updateRealEstatePreview); el.addEventListener('change', updateRealEstatePreview); }
+  });
+  updateRealEstatePreview();
 
   // Live preview du total (qty × unit price)
   function updateTotalPreview() {
@@ -265,11 +497,12 @@ async function openEditor(id) {
   document.getElementById('he-save').addEventListener('click', async () => {
     const qty = parseFloat(document.getElementById('he-qty').value) || 0;
     const unitPrice = parseFloat(document.getElementById('he-unit-price').value) || 0;
+    const cat = document.getElementById('he-cat').value;
     const updated = {
       ...h,
       name: document.getElementById('he-name').value.trim(),
       ticker: document.getElementById('he-ticker').value.trim().toUpperCase(),
-      category: document.getElementById('he-cat').value,
+      category: cat,
       account: document.getElementById('he-account').value.trim(),
       quantity: qty,
       currency: document.getElementById('he-ccy').value,
@@ -278,6 +511,28 @@ async function openEditor(id) {
       autoValue: document.getElementById('he-auto').checked,
       notes: document.getElementById('he-notes').value.trim()
     };
+    // Real-estate fields (uniquement si category=real_estate, sinon on les efface pour éviter du noise)
+    if (cat === 'real_estate') {
+      const ratePct = parseFloat(document.getElementById('he-loan-rate').value) || 0;
+      const years   = parseInt(document.getElementById('he-loan-years').value, 10) || 0;
+      const propType = document.getElementById('he-prop-type').value;
+      updated.propertyType    = propType;
+      updated.purchaseDate    = document.getElementById('he-purchase-date').value || null;
+      updated.purchasePrice   = parseFloat(document.getElementById('he-purchase-price').value) || 0;
+      updated.loanAmount      = parseFloat(document.getElementById('he-loan-amount').value) || 0;
+      updated.loanRate        = ratePct / 100;
+      updated.loanDuration    = years * 12;
+      updated.loanStartDate   = document.getElementById('he-loan-start').value || null;
+      updated.monthlyRent     = propType === 'locatif' ? (parseFloat(document.getElementById('he-rent')?.value)    || 0) : 0;
+      updated.monthlyCharges  = propType === 'locatif' ? (parseFloat(document.getElementById('he-charges')?.value) || 0) : 0;
+      updated.propertyTax     = propType === 'locatif' ? (parseFloat(document.getElementById('he-tax')?.value)     || 0) : 0;
+    } else {
+      // Si on change de catégorie, on retire les champs immo (sinon ils restent dormants)
+      delete updated.propertyType; delete updated.purchaseDate; delete updated.purchasePrice;
+      delete updated.loanAmount;   delete updated.loanRate;     delete updated.loanDuration;
+      delete updated.loanStartDate;delete updated.monthlyRent;  delete updated.monthlyCharges;
+      delete updated.propertyTax;
+    }
     if (!updated.name) { toast('Name required', 'warning'); return; }
     await saveHolding(updated);
     closeGenericModal();
