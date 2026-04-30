@@ -71,7 +71,7 @@ const ABOUT_EN = `
 100% client-side, no subscription, built for retail and pro investors who want to keep
 control of their data and costs.</p>
 
-<h3>📊 26 analysis modules</h3>
+<h3>📊 46 analysis modules</h3>
 <ul>
   <li><strong>Fast decision:</strong> Quick Analysis (30s verdict), Watchlist + Daily Brief.</li>
   <li><strong>Fundamental:</strong> 10-K Decoder, DCF, Investment Memo, Pre-Mortem, Stock Screener, Research Agent, Portfolio Audit (Buffett-style).</li>

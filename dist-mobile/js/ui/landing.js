@@ -1,6 +1,6 @@
 // Landing page : rendu, ticker animé, modules grid, FAQ, navigation vers wizard
 import { $, $$ } from '../core/utils.js';
-import { MODULES } from './sidebar.js';
+import { MODULES, CATEGORIES } from './sidebar.js';
 import { makeThemeToggle } from './theme.js';
 import { makeLocaleToggle, t, getLocale } from '../core/i18n.js';
 
@@ -102,10 +102,10 @@ export function renderLanding({ onCtaClick }) {
     setInterval(() => renderTicker(ticker).catch(() => {}), 90_000);
   }
 
-  // Modules grid
+  // Modules grid — rangées défilantes par catégorie
   const grid = $('#modules-grid');
   if (grid) {
-    grid.innerHTML = MODULES.map(m => {
+    const cardHtml = (m) => {
       const d = MODULE_DETAILS[m.id] || { icon: '·', flow: '' };
       return `
         <div class="module-card" data-mod="${m.id}">
@@ -114,9 +114,49 @@ export function renderLanding({ onCtaClick }) {
           <h4>${m.label}</h4>
           <p>${m.desc}</p>
           <div class="module-card-flow">${d.flow}</div>
+        </div>`;
+    };
+    const renderRow = (catId, title, mods) => `
+      <div class="module-cat" data-cat="${catId}">
+        <div class="module-cat-header">
+          <h4 class="module-cat-title">${title}</h4>
+          <div class="module-cat-controls">
+            <span class="module-cat-count">${mods.length}</span>
+            <button class="module-cat-arrow" data-scroll="left" aria-label="Précédent">‹</button>
+            <button class="module-cat-arrow" data-scroll="right" aria-label="Suivant">›</button>
+          </div>
         </div>
-      `;
-    }).join('');
+        <div class="module-cat-track">
+          ${mods.map(m => cardHtml({ ...m, label: t(`mod.${m.id}.label`), desc: t(`mod.${m.id}.desc`) })).join('')}
+        </div>
+      </div>`;
+
+    // "Essentials" row : ALWAYS_VISIBLE modules (extracted from MODULES top of list)
+    const allIds = MODULES.map(m => m.id);
+    const catIds = new Set(CATEGORIES.flatMap(c => c.modules.map(mm => mm.id)));
+    const essentials = MODULES.filter(m => !catIds.has(m.id));
+
+    let html = '';
+    if (essentials.length) {
+      html += renderRow('essentials', getLocale() === 'en' ? '⭐ Essentials' : '⭐ Essentiels', essentials);
+    }
+    for (const cat of CATEGORIES) {
+      html += renderRow(cat.id, t(cat.titleKey), cat.modules);
+    }
+    grid.innerHTML = html;
+    grid.classList.add('modules-grid--rows');
+
+    // Scroll arrow handlers
+    grid.querySelectorAll('.module-cat').forEach(catEl => {
+      const track = catEl.querySelector('.module-cat-track');
+      catEl.querySelectorAll('[data-scroll]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const dir = btn.dataset.scroll === 'right' ? 1 : -1;
+          const step = Math.max(280, track.clientWidth * 0.8);
+          track.scrollBy({ left: dir * step, behavior: 'smooth' });
+        });
+      });
+    });
   }
 
   // FAQ

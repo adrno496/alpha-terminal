@@ -1,6 +1,6 @@
-// Service Worker v6 — offline-first sur assets statiques (JS/CSS/HTML/datasets),
+// Service Worker v8 — offline-first sur assets statiques (JS/CSS/HTML/datasets),
 // network-first sur reste. Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v6';
+const CACHE = 'alpha-terminal-v8';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
