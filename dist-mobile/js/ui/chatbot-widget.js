@@ -1,0 +1,348 @@
+// Chatbot widget : bouton flottant + panel chat persistant cross-page.
+// Provider/model picker pour choisir l'IA. Streaming via orchestrator existant.
+// Historique stocké en localStorage (cap 50 messages).
+
+import { uuid } from '../core/utils.js';
+import { isConnected, getOrchestrator, KNOWN_PROVIDERS, analyzeStream } from '../core/api.js';
+import { getLocale } from '../core/i18n.js';
+import { safeRender } from '../core/safe-render.js';
+
+const HISTORY_KEY = 'alpha-terminal:chatbot:history';
+const PROVIDER_KEY = 'alpha-terminal:chatbot:provider';
+const TIER_KEY = 'alpha-terminal:chatbot:tier';
+const OPEN_KEY = 'alpha-terminal:chatbot:open';
+const HISTORY_CAP = 50;
+
+const PROVIDER_META = Object.fromEntries(KNOWN_PROVIDERS.map(p => [p.name, p]));
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+  catch { return []; }
+}
+function setHistory(arr) {
+  const trimmed = arr.slice(-HISTORY_CAP);
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(trimmed));
+}
+function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+}
+
+function isOpen() { return localStorage.getItem(OPEN_KEY) === '1'; }
+function setOpen(v) { localStorage.setItem(OPEN_KEY, v ? '1' : '0'); }
+
+function getSelectedProvider() {
+  return localStorage.getItem(PROVIDER_KEY) || 'auto';
+}
+function setSelectedProvider(p) {
+  localStorage.setItem(PROVIDER_KEY, p);
+}
+function getSelectedTier() {
+  return localStorage.getItem(TIER_KEY) || 'balanced';
+}
+function setSelectedTier(t) {
+  localStorage.setItem(TIER_KEY, t);
+}
+
+let mounted = false;
+let panelEl = null;
+let bubbleEl = null;
+let isStreaming = false;
+let abortController = null;
+
+const SYSTEM_PROMPT_FR = `Tu es l'assistant ALPHA TERMINAL — un copilote intégré à une app d'analyse financière BYOK pour particuliers (40 modules : analyse fondamentale, fiscalité FR, immobilier multi-prêts, budget, dividendes, FIRE, IFI, score diversification, etc.).
+
+Réponds en français. Style direct, concret, professionnel. Format markdown.
+
+Si l'utilisateur pose une question liée à un module spécifique de l'app, suggère-lui d'aller dans ce module pour une analyse plus complète. Modules clés : Quick Analysis, Patrimoine, Méthode patrimoniale, Frais cachés, Dividendes, Goals, Tax Optimizer FR, IFI Simulator, FIRE Calculator, Live Watcher.
+
+Ne jamais conseiller d'acheter/vendre un actif spécifique sans warning fiscal.`;
+
+const SYSTEM_PROMPT_EN = `You are the ALPHA TERMINAL assistant — a copilot built into a BYOK financial analysis app for retail investors (40 modules: fundamental analysis, FR taxation, real estate multi-loans, budget, dividends, FIRE, IFI, diversification score, etc.).
+
+Reply in English. Direct, concrete, professional tone. Markdown format.
+
+If the user asks about a topic that has a dedicated module, suggest they navigate to it for deeper analysis. Key modules: Quick Analysis, Wealth, Wealth Method, Hidden Fees, Dividends, Goals, Tax Optimizer FR, IFI Simulator, FIRE Calculator, Live Watcher.
+
+Never recommend buying/selling a specific asset without a tax/risk warning.`;
+
+export function mountChatbotWidget() {
+  if (mounted) return;
+  mounted = true;
+  injectStyles();
+  buildBubble();
+  buildPanel();
+  if (isOpen()) togglePanel(true);
+}
+
+function injectStyles() {
+  if (document.getElementById('chatbot-widget-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'chatbot-widget-styles';
+  s.textContent = `
+    .cbw-bubble { position:fixed; bottom:18px; right:18px; z-index:9998; width:54px; height:54px; border-radius:50%; background:linear-gradient(135deg, #00ff88, #00cc6a); color:#000; border:0; cursor:pointer; box-shadow:0 4px 16px rgba(0,255,136,0.3); display:flex; align-items:center; justify-content:center; font-size:24px; transition:transform .15s; }
+    .cbw-bubble:hover { transform:scale(1.08); }
+    .cbw-bubble.has-unread::after { content:''; position:absolute; top:6px; right:6px; width:10px; height:10px; background:var(--accent-red); border-radius:50%; border:2px solid var(--bg-primary); }
+    .cbw-panel { position:fixed; bottom:84px; right:18px; z-index:9998; width:380px; max-width:calc(100vw - 28px); height:540px; max-height:calc(100vh - 110px); background:var(--bg-secondary); border:1px solid var(--border); border-radius:10px; box-shadow:0 6px 22px rgba(0,0,0,0.4); display:flex; flex-direction:column; overflow:hidden; transform:translateY(20px); opacity:0; pointer-events:none; transition:transform .2s, opacity .2s; }
+    .cbw-panel.open { transform:translateY(0); opacity:1; pointer-events:auto; }
+    .cbw-header { padding:10px 12px; border-bottom:1px solid var(--border); background:var(--bg-tertiary); display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .cbw-header strong { font-size:13px; }
+    .cbw-controls { display:flex; gap:4px; align-items:center; }
+    .cbw-controls select { font-size:11px; padding:3px 6px; background:var(--bg-secondary); color:var(--text-primary); border:1px solid var(--border); border-radius:3px; }
+    .cbw-controls button { background:transparent; border:0; color:var(--text-muted); cursor:pointer; padding:3px 6px; font-size:14px; }
+    .cbw-controls button:hover { color:var(--text-primary); }
+    .cbw-body { flex:1; overflow-y:auto; padding:10px; display:flex; flex-direction:column; gap:8px; font-size:12.5px; line-height:1.5; }
+    .cbw-msg { padding:8px 10px; border-radius:8px; max-width:85%; word-break:break-word; }
+    .cbw-msg.user { align-self:flex-end; background:#00ff88; color:#000; }
+    .cbw-msg.assistant { align-self:flex-start; background:var(--bg-tertiary); color:var(--text-primary); }
+    .cbw-msg .msg-meta { font-size:9.5px; color:var(--text-muted); margin-top:3px; }
+    .cbw-msg.user .msg-meta { color:rgba(0,0,0,0.55); }
+    .cbw-msg pre, .cbw-msg code { font-size:11px; }
+    .cbw-msg p { margin:0 0 6px; }
+    .cbw-empty { text-align:center; color:var(--text-muted); padding:24px 12px; font-size:12px; }
+    .cbw-input-row { padding:8px; border-top:1px solid var(--border); display:flex; gap:6px; align-items:flex-end; }
+    .cbw-input-row textarea { flex:1; resize:none; min-height:36px; max-height:120px; background:var(--bg-tertiary); color:var(--text-primary); border:1px solid var(--border); border-radius:6px; padding:8px; font-size:12.5px; font-family:inherit; }
+    .cbw-input-row button { padding:8px 12px; border:0; border-radius:6px; cursor:pointer; font-size:12.5px; font-weight:600; background:#00ff88; color:#000; }
+    .cbw-input-row button:disabled { opacity:0.5; cursor:not-allowed; }
+    .cbw-typing { font-size:11px; color:var(--text-muted); padding:0 10px 4px; font-style:italic; }
+    @media (max-width:520px) {
+      .cbw-panel { right:8px; left:8px; width:auto; height:75vh; bottom:80px; }
+      .cbw-bubble { bottom:14px; right:14px; }
+    }
+  `;
+  document.head.appendChild(s);
+}
+
+function buildBubble() {
+  bubbleEl = document.createElement('button');
+  bubbleEl.className = 'cbw-bubble';
+  bubbleEl.title = getLocale() === 'en' ? 'Open assistant chat' : 'Ouvrir le chat assistant';
+  bubbleEl.innerHTML = '💬';
+  bubbleEl.addEventListener('click', () => togglePanel());
+  document.body.appendChild(bubbleEl);
+}
+
+function buildPanel() {
+  panelEl = document.createElement('div');
+  panelEl.className = 'cbw-panel';
+  panelEl.innerHTML = `
+    <div class="cbw-header">
+      <strong>💬 <span data-cbw-title></span></strong>
+      <div class="cbw-controls">
+        <select data-cbw-provider title="Provider"></select>
+        <select data-cbw-tier title="Model tier">
+          <option value="fast">⚡ fast</option>
+          <option value="balanced" selected>⚖️ balanced</option>
+          <option value="flagship">🏆 flagship</option>
+        </select>
+        <button data-cbw-clear title="${getLocale() === 'en' ? 'Clear' : 'Effacer'}">🗑</button>
+        <button data-cbw-close title="${getLocale() === 'en' ? 'Close' : 'Fermer'}">×</button>
+      </div>
+    </div>
+    <div class="cbw-body" data-cbw-body></div>
+    <div class="cbw-typing" data-cbw-typing style="display:none;"></div>
+    <div class="cbw-input-row">
+      <textarea data-cbw-input rows="1" placeholder="${getLocale() === 'en' ? 'Ask me anything…' : 'Pose-moi une question…'}"></textarea>
+      <button data-cbw-send>${getLocale() === 'en' ? 'Send' : 'Envoyer'}</button>
+    </div>
+  `;
+  document.body.appendChild(panelEl);
+
+  // Title
+  panelEl.querySelector('[data-cbw-title]').textContent = getLocale() === 'en' ? 'ALPHA Assistant' : 'Assistant ALPHA';
+
+  // Provider picker
+  refreshProviderPicker();
+
+  // Tier picker
+  panelEl.querySelector('[data-cbw-tier]').value = getSelectedTier();
+  panelEl.querySelector('[data-cbw-tier]').addEventListener('change', e => setSelectedTier(e.target.value));
+
+  // Listeners
+  panelEl.querySelector('[data-cbw-close]').addEventListener('click', () => togglePanel(false));
+  panelEl.querySelector('[data-cbw-clear]').addEventListener('click', () => {
+    if (!confirm(getLocale() === 'en' ? 'Clear chat history?' : 'Effacer l\'historique ?')) return;
+    clearHistory();
+    refreshMessages();
+  });
+
+  const input = panelEl.querySelector('[data-cbw-input]');
+  const sendBtn = panelEl.querySelector('[data-cbw-send]');
+  const onSend = () => {
+    if (isStreaming) return;
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    autoResize(input);
+    sendMessage(text);
+  };
+  sendBtn.addEventListener('click', onSend);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onSend();
+    }
+  });
+  input.addEventListener('input', () => autoResize(input));
+
+  // Re-render provider picker quand les clés changent
+  window.addEventListener('app:locale-changed', () => {
+    panelEl.querySelector('[data-cbw-title]').textContent = getLocale() === 'en' ? 'ALPHA Assistant' : 'Assistant ALPHA';
+    panelEl.querySelector('[data-cbw-input]').placeholder = getLocale() === 'en' ? 'Ask me anything…' : 'Pose-moi une question…';
+    panelEl.querySelector('[data-cbw-send]').textContent = getLocale() === 'en' ? 'Send' : 'Envoyer';
+    refreshProviderPicker();
+    refreshMessages();
+  });
+
+  refreshMessages();
+}
+
+function refreshProviderPicker() {
+  const sel = panelEl.querySelector('[data-cbw-provider]');
+  if (!sel) return;
+  const isEN = getLocale() === 'en';
+  let configured = [];
+  if (isConnected()) {
+    try { configured = getOrchestrator().getProviderNames(); } catch {}
+  }
+  const opts = [`<option value="auto" ${getSelectedProvider() === 'auto' ? 'selected' : ''}>${isEN ? 'Auto (smart)' : 'Auto (smart)'}</option>`];
+  for (const name of configured) {
+    const meta = PROVIDER_META[name];
+    if (!meta) continue;
+    opts.push(`<option value="${name}" ${getSelectedProvider() === name ? 'selected' : ''}>${meta.icon} ${meta.displayName}</option>`);
+  }
+  if (configured.length === 0) {
+    opts.push(`<option disabled>${isEN ? '(no key configured)' : '(aucune clé configurée)'}</option>`);
+  }
+  sel.innerHTML = opts.join('');
+  sel.value = getSelectedProvider();
+  sel.onchange = (e) => setSelectedProvider(e.target.value);
+}
+
+function togglePanel(force) {
+  const open = force === undefined ? !panelEl.classList.contains('open') : force;
+  panelEl.classList.toggle('open', open);
+  setOpen(open);
+  if (open) {
+    bubbleEl.classList.remove('has-unread');
+    refreshProviderPicker();
+    setTimeout(() => panelEl.querySelector('[data-cbw-input]')?.focus(), 100);
+  }
+}
+
+function refreshMessages() {
+  const body = panelEl.querySelector('[data-cbw-body]');
+  if (!body) return;
+  const history = getHistory();
+  const isEN = getLocale() === 'en';
+  if (history.length === 0) {
+    body.innerHTML = `<div class="cbw-empty">${isEN ? '👋 Ask me about your wealth, fees, taxes, or any module of the app.' : '👋 Pose-moi une question sur ton patrimoine, tes frais, fiscalité, ou n\'importe quel module de l\'app.'}</div>`;
+    return;
+  }
+  body.innerHTML = history.map(m => {
+    const meta = m.role === 'assistant' && m.provider
+      ? `<div class="msg-meta">${(PROVIDER_META[m.provider]?.icon || '·')} ${PROVIDER_META[m.provider]?.displayName || m.provider}${m.tier ? ' · ' + m.tier : ''}${m.cost ? ` · $${m.cost.toFixed(4)}` : ''}</div>`
+      : '';
+    const html = m.role === 'assistant' ? safeRender(m.content || '') : escape(m.content || '').replace(/\n/g, '<br>');
+    return `<div class="cbw-msg ${m.role}">${html}${meta}</div>`;
+  }).join('');
+  body.scrollTop = body.scrollHeight;
+}
+
+async function sendMessage(text) {
+  if (!isConnected()) {
+    const isEN = getLocale() === 'en';
+    const history = getHistory();
+    history.push({ role: 'user', content: text, ts: Date.now() });
+    history.push({
+      role: 'assistant',
+      content: isEN
+        ? '🔑 No API key configured. Click the lock icon in the topbar or go to Settings to add one (Claude, OpenAI, Gemini, etc.).'
+        : '🔑 Aucune clé API configurée. Clique sur l\'icône cadenas dans la topbar ou va dans Settings pour ajouter une clé (Claude, OpenAI, Gemini, etc.).',
+      ts: Date.now()
+    });
+    setHistory(history);
+    refreshMessages();
+    return;
+  }
+
+  const history = getHistory();
+  history.push({ role: 'user', content: text, ts: Date.now() });
+  setHistory(history);
+  refreshMessages();
+
+  isStreaming = true;
+  const sendBtn = panelEl.querySelector('[data-cbw-send]');
+  const typingEl = panelEl.querySelector('[data-cbw-typing]');
+  if (sendBtn) sendBtn.disabled = true;
+  if (typingEl) { typingEl.style.display = ''; typingEl.textContent = getLocale() === 'en' ? '✦ Thinking…' : '✦ Réflexion…'; }
+
+  // Construit le contexte messages : on garde les 10 derniers pour limiter les tokens
+  const recentHistory = history.slice(-11, -1).map(m => ({ role: m.role, content: m.content }));
+  const messages = [...recentHistory, { role: 'user', content: text }];
+
+  // Override provider/model selon le picker
+  const providerSel = getSelectedProvider();
+  const tier = getSelectedTier();
+  const override = {
+    tier,
+    ...(providerSel !== 'auto' ? { provider: providerSel } : {})
+  };
+
+  // Placeholder message assistant en cours de stream
+  const assistantMsg = { role: 'assistant', content: '', ts: Date.now(), provider: null, tier, cost: 0 };
+  history.push(assistantMsg);
+
+  try {
+    const isEN = getLocale() === 'en';
+    let chosenProvider = null;
+    let chosenModel = null;
+    const result = await analyzeStream('chatbot', {
+      system: isEN ? SYSTEM_PROMPT_EN : SYSTEM_PROMPT_FR,
+      messages,
+      override,
+      maxTokens: 1500
+    }, {
+      onSelected: (sel) => {
+        chosenProvider = sel.provider.name;
+        chosenModel = sel.model;
+        assistantMsg.provider = chosenProvider;
+        if (typingEl) typingEl.textContent = `✦ ${PROVIDER_META[chosenProvider]?.displayName || chosenProvider} · ${sel.tier}`;
+      },
+      onDelta: (delta) => {
+        assistantMsg.content += delta;
+        // Re-render seulement le dernier message pour perf
+        const body = panelEl.querySelector('[data-cbw-body]');
+        if (body) {
+          // Naive re-render
+          refreshMessages();
+        }
+      }
+    });
+    // Stocke le coût si dispo (result.costUSD ou result.usage?.costUSD selon provider)
+    const cost = result?.costUSD || result?.usage?.costUSD || 0;
+    if (cost) assistantMsg.cost = cost;
+    // Si onDelta n'a rien streamé (rare), récupère depuis result.text
+    if (!assistantMsg.content && result?.text) assistantMsg.content = result.text;
+    setHistory(history);
+    refreshMessages();
+    if (!isOpen()) bubbleEl.classList.add('has-unread');
+  } catch (e) {
+    console.error('[chatbot]', e);
+    assistantMsg.content = (getLocale() === 'en' ? '❌ Error: ' : '❌ Erreur : ') + (e?.message || 'unknown');
+    setHistory(history);
+    refreshMessages();
+  } finally {
+    isStreaming = false;
+    if (sendBtn) sendBtn.disabled = false;
+    if (typingEl) typingEl.style.display = 'none';
+  }
+}
+
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = Math.min(120, textarea.scrollHeight) + 'px';
+}
+
+function escape(s) {
+  return String(s || '').replace(/[<>&]/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
+}

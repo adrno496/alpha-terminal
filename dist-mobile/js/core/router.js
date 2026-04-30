@@ -196,6 +196,13 @@ export const MODULE_ROUTING = {
     fallbackProviders: ['grok', 'openrouter'],
     recommendedTier: 'fast',
     reason: 'Synthèse courte d\'insights — modèle léger suffit'
+  },
+  'chatbot': {
+    needsCapabilities: [],
+    optimalProviders: ['claude', 'openai', 'gemini', 'grok', 'mistral', 'cerebras', 'openrouter'],
+    fallbackProviders: ['perplexity', 'github', 'nvidia', 'huggingface', 'cloudflare', 'together', 'cohere'],
+    recommendedTier: 'balanced',
+    reason: 'Assistant chat général — flexible sur tous les providers'
   }
   // budget, dividends-tracker, diversification-score, csv-import : pure local, pas de routing LLM
 };

@@ -515,6 +515,11 @@ function boot() {
     applyI18nAttributes();
     // Clear browse-mode si l'utilisateur a fini par configurer son vault
     localStorage.removeItem('alpha-terminal:browse-mode');
+    // Mount du chatbot widget (bouton flottant disponible sur toutes les pages)
+    try {
+      const { mountChatbotWidget } = await import('./ui/chatbot-widget.js');
+      mountChatbotWidget();
+    } catch (e) { console.warn('Chatbot widget mount failed:', e); }
     const initial = (location.hash || '').slice(1);
     if (ROUTES[initial] || initial === 'history' || initial === 'settings' || initial === 'home') {
       navigate(initial);
@@ -545,9 +550,14 @@ function boot() {
   // Browse mode : l'utilisateur a cliqué "Browse first" sur le wizard.
   // On masque la modale + on affiche l'app avec sidebar mais isConnected() = false.
   // L'access aux modules est libre, mais runAnalysis() redirigera vers le lock flow.
-  window.addEventListener('app:browse-mode-enabled', () => {
+  window.addEventListener('app:browse-mode-enabled', async () => {
     hideLanding();
     applyI18nAttributes();
+    // Mount chatbot aussi en browse mode (le widget gère le cas "pas de clé")
+    try {
+      const { mountChatbotWidget } = await import('./ui/chatbot-widget.js');
+      mountChatbotWidget();
+    } catch {}
     // Indicateur visuel discret en topbar
     let pill = document.getElementById('browse-mode-pill');
     if (!pill) {
