@@ -2,7 +2,7 @@
 import { $, $$ } from '../core/utils.js';
 import { MODULES, CATEGORIES } from './sidebar.js';
 import { makeThemeToggle } from './theme.js';
-import { makeLocaleToggle, t, getLocale } from '../core/i18n.js';
+import { makeLocaleToggle, t, getLocale, applyI18nAttributes } from '../core/i18n.js';
 
 const MODULE_DETAILS = {
   get 'quick-analysis'()      { return { icon: '⚡', flow: 'Ticker → Verdict 30s' }; },
@@ -193,6 +193,8 @@ export function renderLanding({ onCtaClick }) {
     navLinks.querySelectorAll('.lang-toggle').forEach(el => el.remove());
     navLinks.insertBefore(makeLocaleToggle(), navLinks.querySelector('#cta-top'));
   }
+  // Apply data-i18n attributes (notamment le banner "free LLMs")
+  applyI18nAttributes(document.getElementById('landing') || document);
   // Update CTA labels selon locale
   const ctaTop = $('#cta-top'); if (ctaTop) ctaTop.textContent = t('land.cta.start');
   const ctaHero = $('#cta-hero'); if (ctaHero) ctaHero.textContent = t('land.cta.start');

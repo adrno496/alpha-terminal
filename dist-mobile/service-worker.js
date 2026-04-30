@@ -1,6 +1,6 @@
-// Service Worker v13 — network-first pour HTML/navigation (toujours frais),
+// Service Worker v14 — network-first pour HTML/navigation (toujours frais),
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v13';
+const CACHE = 'alpha-terminal-v14';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.

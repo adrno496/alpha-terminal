@@ -728,7 +728,11 @@ const DICT = {
     'land.new.example_label': 'Exemples (mode démo, sans clé API) :',
     'land.new.proof_label': '100% local · Open-source friendly · Paiement unique',
     'land.free_llms.title': 'Démarre gratuit',
-    'land.free_llms.subtitle': '6 providers IA disponibles sans payer',
+    'land.free_llms.subtitle': '7 providers IA disponibles sans débourser un centime',
+    'land.free_llms.tag_free': 'gratuit',
+    'land.free_llms.tag_free_tier': 'tier gratuit',
+    'land.free_llms.tag_free_credits': 'crédits offerts',
+    'land.free_llms.tag_trial': 'clé d\'essai',
     'land.free_llms.tip': '👉 <strong>Pour explorer l\'app : ces providers gratuits suffisent.</strong> Pour des analyses de niveau pro (10-K decoder, DCF nuancé, CEO Forensics, fiscal complexe), passe sur <strong>Claude Sonnet, GPT-4o ou Gemini Pro</strong> — comptes ~$0,005-0,10 par analyse, payés direct au provider (BYOK).'
   },
   en: {
@@ -1431,7 +1435,11 @@ const DICT = {
     'land.new.example_label': 'Live examples (demo mode, no API key) :',
     'land.new.proof_label': '100% local · Open-source friendly · One-time payment',
     'land.free_llms.title': 'Start for free',
-    'land.free_llms.subtitle': '6 AI providers available at no cost',
+    'land.free_llms.subtitle': '7 AI providers available at zero cost',
+    'land.free_llms.tag_free': 'free',
+    'land.free_llms.tag_free_tier': 'free tier',
+    'land.free_llms.tag_free_credits': 'free credits',
+    'land.free_llms.tag_trial': 'trial key',
     'land.free_llms.tip': '👉 <strong>To explore the app: these free providers are enough.</strong> For pro-grade analyses (10-K decoder, nuanced DCF, CEO Forensics, complex tax), upgrade to <strong>Claude Sonnet, GPT-4o or Gemini Pro</strong> — about $0.005-0.10 per analysis, paid directly to the provider (BYOK).'
   }
 };

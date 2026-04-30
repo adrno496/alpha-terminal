@@ -2003,31 +2003,34 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
 
 .sidebar-categories { padding: 0 8px; }
 .sidebar-cat {
-  margin-bottom: 4px; border-radius: 6px; overflow: hidden;
+  margin-bottom: 5px; border-radius: 6px; overflow: hidden;
   border-left: 3px solid var(--cat-color, var(--border));
-  background: linear-gradient(90deg, color-mix(in srgb, var(--cat-color, transparent) 8%, transparent) 0%, transparent 60%);
+  background: var(--cat-bg, transparent);
   transition: background 0.2s;
 }
-.sidebar-cat[open] {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--cat-color, transparent) 14%, transparent) 0%, color-mix(in srgb, var(--cat-color, transparent) 4%, transparent) 100%);
-}
-/* Couleurs par catégorie — palette financière distincte */
-.sidebar-cat[data-cat="fundamentals"]      { --cat-color: #00ff88; }
-.sidebar-cat[data-cat="macro"]             { --cat-color: #4da6ff; }
-.sidebar-cat[data-cat="crypto"]            { --cat-color: #f7931a; }
-.sidebar-cat[data-cat="sentiment"]         { --cat-color: #ff6b6b; }
-.sidebar-cat[data-cat="tools"]             { --cat-color: #b388ff; }
-.sidebar-cat[data-cat="tax"]               { --cat-color: #ffd166; }
-.sidebar-cat[data-cat="budget-daily"]      { --cat-color: #06d6a0; }
-.sidebar-cat[data-cat="wealth-overview"]   { --cat-color: #118ab2; }
-.sidebar-cat[data-cat="income-costs"]      { --cat-color: #ef476f; }
-.sidebar-cat[data-cat="planning-goals"]    { --cat-color: #ffa600; }
-.sidebar-cat[data-cat="alerts-live"]       { --cat-color: #ff4b4b; }
-.sidebar-cat[data-cat="tax-advanced"]      { --cat-color: #ffc857; }
-.sidebar-cat[data-cat="esg"]               { --cat-color: #2ec4b6; }
-.sidebar-cat-title:hover { background: color-mix(in srgb, var(--cat-color, var(--accent-green)) 15%, transparent); color: var(--text-primary); }
+.sidebar-cat[open] { background: var(--cat-bg-open, rgba(255,255,255,0.04)); }
+.sidebar-cat-title:hover { background: var(--cat-bg-hover, rgba(0,255,136,0.08)); color: var(--text-primary); }
 .sidebar-cat[open] > .sidebar-cat-title .sidebar-cat-chevron { transform: rotate(90deg); color: var(--cat-color, var(--accent-green)); }
-.sidebar-cat-count { background: color-mix(in srgb, var(--cat-color, var(--bg-tertiary)) 18%, var(--bg-tertiary)); color: var(--text-secondary); }
+.sidebar-cat-count {
+  background: var(--cat-bg-chip, var(--bg-tertiary));
+  color: var(--cat-color, var(--text-secondary));
+  font-weight: 600;
+}
+
+/* Couleurs par catégorie — palette financière distincte (RGBA explicites pour compat. max) */
+.sidebar-cat[data-cat="fundamentals"]      { --cat-color:#00ff88; --cat-bg:rgba(0,255,136,.06);  --cat-bg-open:rgba(0,255,136,.12);  --cat-bg-hover:rgba(0,255,136,.18);  --cat-bg-chip:rgba(0,255,136,.18); }
+.sidebar-cat[data-cat="macro"]             { --cat-color:#4da6ff; --cat-bg:rgba(77,166,255,.06); --cat-bg-open:rgba(77,166,255,.12); --cat-bg-hover:rgba(77,166,255,.18); --cat-bg-chip:rgba(77,166,255,.18); }
+.sidebar-cat[data-cat="crypto"]            { --cat-color:#f7931a; --cat-bg:rgba(247,147,26,.06); --cat-bg-open:rgba(247,147,26,.12); --cat-bg-hover:rgba(247,147,26,.20); --cat-bg-chip:rgba(247,147,26,.20); }
+.sidebar-cat[data-cat="sentiment"]         { --cat-color:#ff6b6b; --cat-bg:rgba(255,107,107,.06); --cat-bg-open:rgba(255,107,107,.12); --cat-bg-hover:rgba(255,107,107,.18); --cat-bg-chip:rgba(255,107,107,.18); }
+.sidebar-cat[data-cat="tools"]             { --cat-color:#b388ff; --cat-bg:rgba(179,136,255,.06); --cat-bg-open:rgba(179,136,255,.12); --cat-bg-hover:rgba(179,136,255,.20); --cat-bg-chip:rgba(179,136,255,.20); }
+.sidebar-cat[data-cat="tax"]               { --cat-color:#ffd166; --cat-bg:rgba(255,209,102,.06); --cat-bg-open:rgba(255,209,102,.12); --cat-bg-hover:rgba(255,209,102,.20); --cat-bg-chip:rgba(255,209,102,.20); }
+.sidebar-cat[data-cat="budget-daily"]      { --cat-color:#06d6a0; --cat-bg:rgba(6,214,160,.06); --cat-bg-open:rgba(6,214,160,.12); --cat-bg-hover:rgba(6,214,160,.20); --cat-bg-chip:rgba(6,214,160,.20); }
+.sidebar-cat[data-cat="wealth-overview"]   { --cat-color:#118ab2; --cat-bg:rgba(17,138,178,.10); --cat-bg-open:rgba(17,138,178,.20); --cat-bg-hover:rgba(17,138,178,.28); --cat-bg-chip:rgba(17,138,178,.28); }
+.sidebar-cat[data-cat="income-costs"]      { --cat-color:#ef476f; --cat-bg:rgba(239,71,111,.06); --cat-bg-open:rgba(239,71,111,.14); --cat-bg-hover:rgba(239,71,111,.22); --cat-bg-chip:rgba(239,71,111,.22); }
+.sidebar-cat[data-cat="planning-goals"]    { --cat-color:#ffa600; --cat-bg:rgba(255,166,0,.06); --cat-bg-open:rgba(255,166,0,.14); --cat-bg-hover:rgba(255,166,0,.22); --cat-bg-chip:rgba(255,166,0,.22); }
+.sidebar-cat[data-cat="alerts-live"]       { --cat-color:#ff4b4b; --cat-bg:rgba(255,75,75,.06); --cat-bg-open:rgba(255,75,75,.14); --cat-bg-hover:rgba(255,75,75,.22); --cat-bg-chip:rgba(255,75,75,.22); }
+.sidebar-cat[data-cat="tax-advanced"]      { --cat-color:#ffc857; --cat-bg:rgba(255,200,87,.06); --cat-bg-open:rgba(255,200,87,.14); --cat-bg-hover:rgba(255,200,87,.22); --cat-bg-chip:rgba(255,200,87,.22); }
+.sidebar-cat[data-cat="esg"]               { --cat-color:#2ec4b6; --cat-bg:rgba(46,196,182,.06); --cat-bg-open:rgba(46,196,182,.14); --cat-bg-hover:rgba(46,196,182,.22); --cat-bg-chip:rgba(46,196,182,.22); }
 .sidebar-cat-title {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--font-mono);
