@@ -1278,7 +1278,38 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   margin-left: auto;
   margin-right: auto;
 }
-.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; }
+.hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 22px; }
+.free-llms-banner {
+  max-width: 740px; margin: 0 auto 28px;
+  padding: 16px 18px;
+  border: 1px solid color-mix(in srgb, var(--accent-green) 35%, transparent);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0,255,136,0.06) 0%, rgba(0,255,136,0.02) 60%, transparent 100%);
+  text-align: left;
+  box-shadow: 0 0 24px rgba(0, 255, 136, 0.08);
+}
+.free-llms-banner-head { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
+.free-llms-pill {
+  padding: 5px 12px; border-radius: 14px; font-size: 12px; font-weight: 600;
+  background: var(--accent-green); color: #0a0a0a;
+}
+.free-llms-pill.alt { background: rgba(255,255,255,0.06); color: var(--text-secondary); border: 1px solid var(--border); font-weight: 500; }
+.free-llms-providers { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.free-llm-chip {
+  font-size: 12px; padding: 5px 10px; border-radius: 8px;
+  background: var(--bg-tertiary); border: 1px solid var(--border);
+  font-family: var(--font-mono); white-space: nowrap;
+}
+.free-llm-chip em {
+  font-style: normal; font-size: 10px; color: var(--accent-green);
+  margin-left: 4px; padding: 1px 5px; background: rgba(0,255,136,0.12); border-radius: 4px;
+}
+.free-llms-tip { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.free-llms-tip strong { color: var(--text-primary); }
+@media (max-width: 600px) {
+  .free-llms-banner { padding: 14px; }
+  .free-llm-chip { font-size: 11px; }
+}
 .btn-primary.big, .btn-secondary.big {
   padding: 14px 28px;
   font-size: 14px;
@@ -1971,8 +2002,32 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
 .sidebar-adv-toggle:hover { color: var(--text-primary); border-color: var(--border-strong); }
 
 .sidebar-categories { padding: 0 8px; }
-.sidebar-cat { margin-bottom: 4px; border-radius: 6px; overflow: hidden; }
-.sidebar-cat[open] { background: rgba(255, 255, 255, 0.02); }
+.sidebar-cat {
+  margin-bottom: 4px; border-radius: 6px; overflow: hidden;
+  border-left: 3px solid var(--cat-color, var(--border));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cat-color, transparent) 8%, transparent) 0%, transparent 60%);
+  transition: background 0.2s;
+}
+.sidebar-cat[open] {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--cat-color, transparent) 14%, transparent) 0%, color-mix(in srgb, var(--cat-color, transparent) 4%, transparent) 100%);
+}
+/* Couleurs par catégorie — palette financière distincte */
+.sidebar-cat[data-cat="fundamentals"]      { --cat-color: #00ff88; }
+.sidebar-cat[data-cat="macro"]             { --cat-color: #4da6ff; }
+.sidebar-cat[data-cat="crypto"]            { --cat-color: #f7931a; }
+.sidebar-cat[data-cat="sentiment"]         { --cat-color: #ff6b6b; }
+.sidebar-cat[data-cat="tools"]             { --cat-color: #b388ff; }
+.sidebar-cat[data-cat="tax"]               { --cat-color: #ffd166; }
+.sidebar-cat[data-cat="budget-daily"]      { --cat-color: #06d6a0; }
+.sidebar-cat[data-cat="wealth-overview"]   { --cat-color: #118ab2; }
+.sidebar-cat[data-cat="income-costs"]      { --cat-color: #ef476f; }
+.sidebar-cat[data-cat="planning-goals"]    { --cat-color: #ffa600; }
+.sidebar-cat[data-cat="alerts-live"]       { --cat-color: #ff4b4b; }
+.sidebar-cat[data-cat="tax-advanced"]      { --cat-color: #ffc857; }
+.sidebar-cat[data-cat="esg"]               { --cat-color: #2ec4b6; }
+.sidebar-cat-title:hover { background: color-mix(in srgb, var(--cat-color, var(--accent-green)) 15%, transparent); color: var(--text-primary); }
+.sidebar-cat[open] > .sidebar-cat-title .sidebar-cat-chevron { transform: rotate(90deg); color: var(--cat-color, var(--accent-green)); }
+.sidebar-cat-count { background: color-mix(in srgb, var(--cat-color, var(--bg-tertiary)) 18%, var(--bg-tertiary)); color: var(--text-secondary); }
 .sidebar-cat-title {
   display: flex; align-items: center; gap: 8px;
   font-family: var(--font-mono);
