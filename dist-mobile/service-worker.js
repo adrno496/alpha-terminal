@@ -1,6 +1,6 @@
 // Service Worker minimal — network-first pour JS/CSS/HTML (toujours frais)
 // Cache uniquement comme fallback offline. Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v3';
+const CACHE = 'alpha-terminal-v4';
 
 self.addEventListener('install', (e) => {
   self.skipWaiting();

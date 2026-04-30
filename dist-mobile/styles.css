@@ -1224,12 +1224,13 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   margin: 0 auto;
 }
 .landing-logo { display: flex; align-items: baseline; gap: 6px; }
-.landing-nav-links { display: flex; align-items: center; gap: 24px; }
+.landing-nav-links { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
 .landing-nav-links a {
   color: var(--text-secondary);
   font-size: 13px;
   text-decoration: none;
   font-weight: 500;
+  white-space: nowrap;
 }
 .landing-nav-links a:hover { color: var(--text-primary); text-decoration: none; }
 
