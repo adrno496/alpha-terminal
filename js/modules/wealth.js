@@ -67,8 +67,10 @@ export async function renderWealthView(viewEl) {
     </div>
 
     <div class="card">
-      <div class="card-title">Use my wealth as context — per module</div>
-      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">Les modules suivants peuvent utiliser ton patrimoine comme contexte (analyses adaptées à ta situation réelle). Coche pour activer.</p>
+      <div class="card-title">💼 Patrimoine en contexte — activé partout par défaut</div>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">
+        <strong style="color:var(--accent-green);">✅ Toutes les analyses IA reçoivent l'intégralité de ton patrimoine</strong> (toutes les lignes, sans exception, sans plafond). Décoche un module pour désactiver l'injection sur ce module en particulier.
+      </p>
       <div id="wl-toggles" class="wl-toggles-grid"></div>
     </div>
   `;
@@ -796,18 +798,35 @@ async function importData(e) {
 import { isWealthContextEnabledFor, setWealthContextEnabled } from '../core/wealth.js';
 
 const MODULE_TOGGLE_OPTIONS = [
-  { id: 'quick-analysis',     label: '⚡ Quick Analysis',  hint: 'Verdict adapté à ton exposition existante' },
-  { id: 'research-agent',     label: '🚀 Research Agent', hint: 'Recherche en contexte de ton portfolio' },
-  { id: 'pre-mortem',         label: '🔥 Pre-Mortem',     hint: 'Challenge tes thèses sur ce que tu détiens' },
-  { id: 'stock-screener',     label: '📊 Stock Screener', hint: 'Évite de proposer ce que tu as déjà' },
-  { id: 'portfolio-rebalancer', label: '💼 Portfolio Reb.', hint: 'Pré-rempli avec ton patrimoine réel' },
-  { id: 'stress-test',        label: '💥 Stress Test',    hint: 'Test ton vrai portfolio contre les régimes' },
-  { id: 'tax-optimizer-fr',   label: '🇫🇷 Tax FR',          hint: 'Optimisation fiscale réelle' },
-  { id: 'tax-international',  label: '🌍 Tax International', hint: 'Optimisation fiscale réelle' },
-  { id: 'fire-calculator',    label: '🔥 FIRE Calc.',      hint: 'Calcul FIRE basé sur ton patrimoine actuel' },
-  { id: 'investment-memo',    label: '📑 Memo',            hint: 'Memo en contexte de ton allocation' },
-  { id: 'battle-mode',        label: '⚔️ Battle Mode',     hint: 'Compare en tenant compte de ton existant' },
-  { id: 'watchlist',          label: '👁 Watchlist',       hint: 'Brief matinal personnalisé' }
+  { id: 'quick-analysis',        label: '⚡ Quick Analysis' },
+  { id: 'research-agent',        label: '🚀 Research Agent' },
+  { id: 'decoder-10k',           label: '📊 10-K Decoder' },
+  { id: 'dcf',                   label: '🧮 DCF' },
+  { id: 'pre-mortem',            label: '🔥 Pre-Mortem' },
+  { id: 'stock-screener',        label: '📊 Stock Screener' },
+  { id: 'portfolio-audit',       label: '🔎 Portfolio Audit' },
+  { id: 'portfolio-rebalancer',  label: '💼 Portfolio Rebalancer' },
+  { id: 'investment-memo',       label: '📑 Investment Memo' },
+  { id: 'macro-dashboard',       label: '🌍 Macro Dashboard' },
+  { id: 'stress-test',           label: '💥 Stress Test' },
+  { id: 'battle-mode',           label: '⚔️ Battle Mode' },
+  { id: 'sentiment-tracker',     label: '📡 Sentiment Tracker' },
+  { id: 'earnings-call',         label: '🎙️ Earnings Call' },
+  { id: 'newsletter-investor',   label: '✍️ Newsletter Voice' },
+  { id: 'youtube-transcript',    label: '🎙 YouTube + CEO' },
+  { id: 'crypto-fundamental',    label: '🪙 Crypto Fundamental' },
+  { id: 'whitepaper-reader',     label: '⚠️ Whitepaper Reader' },
+  { id: 'position-sizing',       label: '🎯 Position Sizing' },
+  { id: 'trade-journal',         label: '📖 Trade Journal' },
+  { id: 'fire-calculator',       label: '🔥 FIRE Calculator' },
+  { id: 'tax-optimizer-fr',      label: '🇫🇷 Tax FR' },
+  { id: 'tax-international',     label: '🌍 Tax International' },
+  { id: 'watchlist',             label: '👁 Watchlist' },
+  { id: 'fees-analysis',         label: '🔥 Frais cachés' },
+  { id: 'wealth-method',         label: '📚 Méthode patrimoniale' },
+  { id: 'insights-engine',       label: '✨ Insights' },
+  { id: 'donations-succession',  label: '🎁 Donations & Succession' },
+  { id: 'estate-doc-generator',  label: '📜 Estate Documents' }
 ];
 
 function renderToggles() {
@@ -818,7 +837,7 @@ function renderToggles() {
       <input type="checkbox" data-mod="${m.id}" ${isWealthContextEnabledFor(m.id) ? 'checked' : ''} />
       <div>
         <strong>${m.label}</strong>
-        <span>${m.hint}</span>
+        <span style="color:var(--text-muted);font-size:11px;">Patrimoine complet injecté</span>
       </div>
     </label>
   `).join('');

@@ -476,15 +476,31 @@ async function cgHistorical(id, days) {
 }
 
 // === Toggle helpers (per-module preference) ===
-const TOGGLE_KEY = 'alpha-terminal:wealth-context';
-export function isWealthContextEnabledFor(moduleId) {
-  try { return JSON.parse(localStorage.getItem(TOGGLE_KEY) || '[]').includes(moduleId); }
-  catch { return false; }
+// NOUVEAU comportement : opt-OUT. Par défaut TOUS les modules reçoivent le patrimoine
+// complet en contexte. L'utilisateur peut désactiver par module via la liste DISABLED_KEY.
+const DISABLED_KEY = 'alpha-terminal:wealth-context-disabled';
+// Ancienne clé conservée pour migration douce (elle était opt-in : modules cochés = enabled)
+const LEGACY_ENABLED_KEY = 'alpha-terminal:wealth-context';
+
+function _getDisabled() {
+  try { return new Set(JSON.parse(localStorage.getItem(DISABLED_KEY) || '[]')); }
+  catch { return new Set(); }
 }
+
+export function isWealthContextEnabledFor(moduleId) {
+  // Par défaut : ON pour tous les modules wealth-aware.
+  // L'utilisateur ne peut désactiver QUE via la liste explicit-disable.
+  return !_getDisabled().has(moduleId);
+}
+
 export function setWealthContextEnabled(moduleId, on) {
-  let arr;
-  try { arr = JSON.parse(localStorage.getItem(TOGGLE_KEY) || '[]'); } catch { arr = []; }
-  const set = new Set(arr);
-  if (on) set.add(moduleId); else set.delete(moduleId);
-  localStorage.setItem(TOGGLE_KEY, JSON.stringify([...set]));
+  const disabled = _getDisabled();
+  if (on) disabled.delete(moduleId); else disabled.add(moduleId);
+  localStorage.setItem(DISABLED_KEY, JSON.stringify([...disabled]));
+  // Garde la clé legacy synchro pour compat éventuelle
+  try {
+    const legacy = new Set(JSON.parse(localStorage.getItem(LEGACY_ENABLED_KEY) || '[]'));
+    if (on) legacy.add(moduleId); else legacy.delete(moduleId);
+    localStorage.setItem(LEGACY_ENABLED_KEY, JSON.stringify([...legacy]));
+  } catch {}
 }
