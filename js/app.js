@@ -593,20 +593,11 @@ function boot() {
       const { mountChatbotWidget } = await import('./ui/chatbot-widget.js');
       mountChatbotWidget();
     } catch {}
-    // Indicateur visuel discret en topbar
-    let pill = document.getElementById('browse-mode-pill');
-    if (!pill) {
-      pill = document.createElement('button');
-      pill.id = 'browse-mode-pill';
-      pill.style.cssText = 'background:var(--accent-orange);color:#000;padding:5px 12px;border:0;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;margin-right:8px;';
-      pill.textContent = '👀 ' + (getLocale() === 'en' ? 'Browse mode — Click to set up keys' : 'Mode exploration — Configurer mes clés');
-      pill.addEventListener('click', () => {
-        localStorage.removeItem('alpha-terminal:browse-mode');
-        openLockFlow();
-      });
-      const right = document.querySelector('.topbar-right');
-      if (right) right.insertBefore(pill, right.firstChild);
-    }
+    // Pas de pill "browse mode" — l'utilisateur peut maintenant utiliser les 4 modules
+    // toujours-visibles avec une clé gratuite, donc pas besoin d'un indicateur permanent.
+    // Si jamais on en a besoin plus tard, retirer ce nettoyage et restaurer le pill.
+    const oldPill = document.getElementById('browse-mode-pill');
+    if (oldPill) oldPill.remove();
     navigate('home');
   });
 
