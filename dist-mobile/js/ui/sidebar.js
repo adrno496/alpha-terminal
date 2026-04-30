@@ -74,35 +74,71 @@ const CATEGORIES = [
     ]
   },
   {
-    id: 'finances-perso',
-    titleKey: 'cat.finances-perso',
+    id: 'budget-daily',
+    titleKey: 'cat.budget-daily',
     modules: [
-      { id: 'budget',                num: '21' },
-      { id: 'fees-analysis',         num: '22' },
-      { id: 'dividends-tracker',     num: '23' },
-      { id: 'diversification-score', num: '24' },
-      { id: 'wealth-method',         num: '25' },
-      { id: 'csv-import',            num: '26' },
-      { id: 'insights-engine',       num: '27' },
-      { id: 'price-alerts',          num: '28' },
-      { id: 'live-watcher',          num: '29' },
-      { id: 'goals',                 num: '30' },
-      { id: 'projection',            num: '31' },
-      { id: 'accounts-view',         num: '32' },
-      { id: 'ifi-simulator',         num: '33' },
-      { id: 'tax-loss-harvesting',   num: '34' },
-      { id: 'subscriptions-detector',num: '35' },
-      { id: 'envelope-optimizer',    num: '36' },
-      { id: 'donations-succession',  num: '37' },
-      { id: 'capital-gains-tracker', num: '38' },
-      { id: 'backtest',              num: '39' },
-      { id: 'multi-currency-pnl',    num: '40' },
-      { id: 'earnings-calendar',     num: '41' },
-      { id: 'correlation-matrix',    num: '42' },
-      { id: 'esg-impact',            num: '43' },
-      { id: 'estate-doc-generator',  num: '44' },
-      { id: 'macro-events-calendar', num: '45' },
-      { id: 'performance-attribution', num: '46' }
+      { id: 'budget',                 num: '21' },
+      { id: 'csv-import',             num: '26' },
+      { id: 'subscriptions-detector', num: '35' }
+    ]
+  },
+  {
+    id: 'wealth-overview',
+    titleKey: 'cat.wealth-overview',
+    modules: [
+      { id: 'wealth-method',          num: '25' },
+      { id: 'accounts-view',          num: '32' },
+      { id: 'projection',             num: '31' },
+      { id: 'diversification-score',  num: '24' },
+      { id: 'performance-attribution',num: '46' },
+      { id: 'correlation-matrix',     num: '42' }
+    ]
+  },
+  {
+    id: 'income-costs',
+    titleKey: 'cat.income-costs',
+    modules: [
+      { id: 'dividends-tracker',      num: '23' },
+      { id: 'fees-analysis',          num: '22' },
+      { id: 'multi-currency-pnl',     num: '40' }
+    ]
+  },
+  {
+    id: 'planning-goals',
+    titleKey: 'cat.planning-goals',
+    modules: [
+      { id: 'goals',                  num: '30' },
+      { id: 'backtest',               num: '39' },
+      { id: 'capital-gains-tracker',  num: '38' }
+    ]
+  },
+  {
+    id: 'alerts-live',
+    titleKey: 'cat.alerts-live',
+    modules: [
+      { id: 'insights-engine',        num: '27' },
+      { id: 'price-alerts',           num: '28' },
+      { id: 'live-watcher',           num: '29' },
+      { id: 'earnings-calendar',      num: '41' },
+      { id: 'macro-events-calendar',  num: '45' }
+    ]
+  },
+  {
+    id: 'tax-advanced',
+    titleKey: 'cat.tax-advanced',
+    modules: [
+      { id: 'envelope-optimizer',     num: '36' },
+      { id: 'tax-loss-harvesting',    num: '34' },
+      { id: 'ifi-simulator',          num: '33' },
+      { id: 'donations-succession',   num: '37' },
+      { id: 'estate-doc-generator',   num: '44' }
+    ]
+  },
+  {
+    id: 'esg',
+    titleKey: 'cat.esg',
+    modules: [
+      { id: 'esg-impact',             num: '43' }
     ]
   }
 ];
@@ -164,22 +200,38 @@ export function renderSidebar(onNavigate) {
     </button>
   `;
 
-  // Categories (only if advanced mode)
+  // Categories (only if advanced mode) — collapsible <details>
   if (advanced) {
+    const openSet = new Set(JSON.parse(localStorage.getItem('alpha-terminal:sidebar-open-cats') || '[]'));
+    // Toujours déplier la 1ère catégorie au tout premier affichage
+    if (openSet.size === 0 && !localStorage.getItem('alpha-terminal:sidebar-cats-init')) {
+      openSet.add(CATEGORIES[0].id);
+      localStorage.setItem('alpha-terminal:sidebar-cats-init', '1');
+    }
     html += `<div class="sidebar-categories">`;
-    html += CATEGORIES.map(cat => `
-      <div class="sidebar-cat">
-        <div class="sidebar-cat-title">${t(cat.titleKey)}</div>
-        ${cat.modules.map(m => `
-          <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">
-            <span class="num">${m.num}</span>
-            <span class="lbl">${t(`mod.${m.id}.label`)}</span>
-            ${sideBadges(m.id)}
-            <span class="mod-help-btn" data-mod-help="${m.id}" role="button" tabindex="0" aria-label="Help">?</span>
-          </button>
-        `).join('')}
-      </div>
-    `).join('');
+    html += CATEGORIES.map(cat => {
+      const recoCount = cat.modules.filter(m => recoSet.has(m.id)).length;
+      const isOpen = openSet.has(cat.id);
+      return `
+      <details class="sidebar-cat" data-cat="${cat.id}"${isOpen ? ' open' : ''}>
+        <summary class="sidebar-cat-title">
+          <span class="sidebar-cat-chevron">▸</span>
+          <span class="sidebar-cat-label">${t(cat.titleKey)}</span>
+          <span class="sidebar-cat-count">${cat.modules.length}</span>
+          ${recoCount > 0 ? `<span class="sidebar-cat-reco" title="${recoCount} recommandé${recoCount>1?'s':''}">⭐${recoCount}</span>` : ''}
+        </summary>
+        <div class="sidebar-cat-modules">
+          ${cat.modules.map(m => `
+            <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">
+              <span class="num">${m.num}</span>
+              <span class="lbl">${t(`mod.${m.id}.label`)}</span>
+              ${sideBadges(m.id)}
+              <span class="mod-help-btn" data-mod-help="${m.id}" role="button" tabindex="0" aria-label="Help">?</span>
+            </button>
+          `).join('')}
+        </div>
+      </details>`;
+    }).join('');
     html += `</div>`;
   }
 
@@ -215,6 +267,15 @@ export function renderSidebar(onNavigate) {
   if (advBtn) advBtn.addEventListener('click', () => {
     setAdvanced(!getAdvanced());
     renderSidebar(onNavigate);
+  });
+
+  // Persistance des catégories ouvertes/fermées
+  $$('.sidebar-cat').forEach(detEl => {
+    detEl.addEventListener('toggle', () => {
+      const open = [];
+      $$('.sidebar-cat').forEach(d => { if (d.open) open.push(d.dataset.cat); });
+      localStorage.setItem('alpha-terminal:sidebar-open-cats', JSON.stringify(open));
+    });
   });
 
   // Sidebar bottom labels

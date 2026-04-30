@@ -217,30 +217,11 @@ export async function getTotals(targetCurrency = 'EUR') {
 // A6 — Filtre les holdings selon le module pour économiser les tokens.
 // Pour tax-optimizer-fr : seulement holdings FR + AV + PEA.
 // Pour crypto-fundamental : seulement crypto.
-// Pour decoder-10k / dcf / quick-analysis : seulement stocks + ETF.
-// Pour ifi-simulator : seulement real_estate.
-// Pour les autres modules wealth-aware : tout (full context).
-function filterHoldingsForModule(list, moduleId) {
-  if (!moduleId) return list;
-  const isFr = (h) => /\.PA$|FR$/.test((h.ticker || '').toUpperCase()) || (h.currency || 'EUR') === 'EUR';
-  if (moduleId === 'tax-optimizer-fr') {
-    return list.filter(h => isFr(h) || ['retirement', 'real_estate'].includes(h.category) || /AV|PEA|PER|LDDS|Livret/i.test(h.account || ''));
-  }
-  if (moduleId === 'crypto-fundamental' || moduleId === 'whitepaper-reader') {
-    return list.filter(h => h.category === 'crypto');
-  }
-  if (moduleId === 'ifi-simulator' || moduleId === 'fees-analysis-immo') {
-    return list.filter(h => h.category === 'real_estate');
-  }
-  if (moduleId === 'decoder-10k' || moduleId === 'dcf' || moduleId === 'pre-mortem' || moduleId === 'investment-memo') {
-    return list.filter(h => ['stocks', 'etf'].includes(h.category));
-  }
-  if (moduleId === 'dividends-tracker') {
-    return list.filter(h => ['stocks', 'etf'].includes(h.category) && h.ticker);
-  }
-  if (moduleId === 'tax-international') {
-    return list.filter(h => !isFr(h) || h.category !== 'cash');
-  }
+// Le user a explicitement demandé que TOUTES les lignes du patrimoine soient envoyées
+// à TOUS les modules wealth-aware. On ne filtre plus rien — full context partout.
+// (Cas particuliers comme ifi-simulator gèrent eux-mêmes le filtrage côté logique métier
+// avant de prompter le LLM, donc envoyer tout ne casse rien.)
+function filterHoldingsForModule(list /* , moduleId */) {
   return list;
 }
 
@@ -263,10 +244,9 @@ export async function buildWealthContext(targetCurrency = 'EUR', moduleId = null
     const catTotal = totals.byCategory[cat.id] || 0;
     const pct = totals.total > 0 ? (catTotal / totals.total * 100).toFixed(1) : '0';
     lines.push(`${cat.icon} ${cat.label} (${pct}% — ${sym}${fmtNum(catTotal)}):`);
-    // On envoie TOUTES les lignes au LLM (max 200 par catégorie pour rester sous quota tokens
-    // sur des portfolios massifs). Le coût d'1 ligne ~ 30-50 tokens, marge confortable.
-    const HOLDINGS_PER_CAT_HARD_CAP = 200;
-    for (const h of items.slice(0, HOLDINGS_PER_CAT_HARD_CAP)) {
+    // On envoie TOUTES les lignes au LLM, sans cap. Le user veut tout son patrimoine pris en compte.
+    // (Coût ~30-50 tokens par ligne — sur 1000 lignes = ~50K tokens, OK pour les modèles flagship.)
+    for (const h of items) {
       const v = h.value || 0;
       const ccy = h.currency || 'EUR';
       const ccySym = ({ USD: '$', EUR: '€', GBP: '£' })[ccy] || ccy;
@@ -288,7 +268,6 @@ export async function buildWealthContext(targetCurrency = 'EUR', moduleId = null
       }
       lines.push(`  - ${h.name}${tk}: ${ccySym}${fmtNum(v)}${h.quantity ? ' (qty ' + h.quantity + ')' : ''}${acc}${immoSuffix}`);
     }
-    if (items.length > HOLDINGS_PER_CAT_HARD_CAP) lines.push(`  - … +${items.length - HOLDINGS_PER_CAT_HARD_CAP} more (truncated)`);
   }
   lines.push('');
   lines.push('Use this context to tailor your analysis: consider existing exposure, diversification, concentration risk, currency mix. Avoid recommending what the user already heavily owns unless thesis is exceptionally strong.');

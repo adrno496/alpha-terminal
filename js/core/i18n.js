@@ -564,6 +564,13 @@ const DICT = {
     'cat.tools': '⚙️ Outils & utilitaires',
     'cat.tax': '🇫🇷 Fiscalité',
     'cat.finances-perso': '💰 Finances perso',
+    'cat.budget-daily': '💰 Budget & quotidien',
+    'cat.wealth-overview': '📊 Patrimoine & vue d\'ensemble',
+    'cat.income-costs': '💸 Revenus & frais',
+    'cat.planning-goals': '🎯 Planification & stratégie',
+    'cat.alerts-live': '🚨 Alertes & temps réel',
+    'cat.tax-advanced': '🇫🇷 Fiscalité avancée & succession',
+    'cat.esg': '🌍 ESG & impact',
 
     // === Modules finances perso (V7) ===
     'mod.budget.label': '💰 Budget mensuel',
@@ -1263,6 +1270,13 @@ const DICT = {
     'cat.tools': '⚙️ Tools & utilities',
     'cat.tax': '🇫🇷 Taxation',
     'cat.finances-perso': '💰 Personal finance',
+    'cat.budget-daily': '💰 Budget & daily',
+    'cat.wealth-overview': '📊 Wealth & overview',
+    'cat.income-costs': '💸 Income & fees',
+    'cat.planning-goals': '🎯 Planning & strategy',
+    'cat.alerts-live': '🚨 Alerts & live',
+    'cat.tax-advanced': '🇫🇷 Advanced tax & estate',
+    'cat.esg': '🌍 ESG & impact',
 
     // === Personal finance modules (V7) ===
     'mod.budget.label': '💰 Monthly budget',
