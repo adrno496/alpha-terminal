@@ -42,6 +42,8 @@ export function renderQuickAnalysisView(viewEl) {
       </div>
 
       <div id="qa-portfolio" class="qa-input-block hidden">
+        <button id="qa-import-wealth" class="btn-primary" style="margin-bottom:10px;background:rgba(0,255,136,0.15);color:var(--accent-green);border:1px solid var(--accent-green);">📥 Importer mon patrimoine</button>
+        <div id="qa-import-status" style="font-size:12px;color:var(--text-muted);margin-bottom:10px;"></div>
         <textarea id="qa-portfolio-input" class="textarea" rows="5" placeholder="${t('qa.portfolio.placeholder')}"></textarea>
         <div class="qa-examples">
           <button class="qa-example-pill" data-ex="AAPL 40%, NVDA 25%, BTC 20%, GOLD 15%" data-type="portfolio">${t('qa.example.tech_heavy')}</button>
@@ -89,6 +91,45 @@ export function renderQuickAnalysisView(viewEl) {
 
   $('#qa-run').addEventListener('click', run);
   $('#qa-input').addEventListener('keydown', e => { if (e.key === 'Enter') run(); });
+
+  // Import all wealth → format as portfolio string + auto-switch to portfolio mode
+  const importBtn = $('#qa-import-wealth');
+  if (importBtn) importBtn.addEventListener('click', importMyWealth);
+}
+
+async function importMyWealth() {
+  const status = $('#qa-import-status');
+  const ta = $('#qa-portfolio-input');
+  try {
+    const { listWealth } = await import('../core/wealth.js');
+    const list = await listWealth();
+    if (!list.length) {
+      status.innerHTML = `<span style="color:var(--accent-orange);">⚠️ Aucune ligne dans ton patrimoine. Va dans 💼 Patrimoine pour en ajouter.</span>`;
+      return;
+    }
+    const total = list.reduce((s, h) => s + (Number(h.value) || 0), 0);
+    if (total <= 0) {
+      status.innerHTML = `<span style="color:var(--accent-orange);">⚠️ Patrimoine sans valeur. Vérifie les valorisations dans 💼 Patrimoine.</span>`;
+      return;
+    }
+    // Format : "Name [Ticker] X% (compte) [catégorie]"
+    const lines = list
+      .filter(h => (Number(h.value) || 0) > 0)
+      .sort((a, b) => (b.value || 0) - (a.value || 0))
+      .map(h => {
+        const pct = ((h.value / total) * 100).toFixed(2);
+        const name = h.name || h.ticker || '?';
+        const tk = h.ticker && h.ticker !== name ? ` [${h.ticker}]` : '';
+        const acc = h.account ? ` · ${h.account}` : '';
+        const cat = h.category ? ` (${h.category})` : '';
+        return `${name}${tk} ${pct}%${acc}${cat}`;
+      });
+    ta.value = lines.join('\n');
+    status.innerHTML = `<span style="color:var(--accent-green);">✅ ${lines.length} positions importées · Total ${Math.round(total).toLocaleString('fr-FR')} € · Clique <strong>${t('qa.run')}</strong> pour analyser.</span>`;
+    ta.focus();
+  } catch (e) {
+    status.innerHTML = `<span style="color:var(--accent-red);">Erreur: ${e.message}</span>`;
+  }
 }
 
 async function run() {
