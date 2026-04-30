@@ -222,7 +222,8 @@ button { font-family: inherit; cursor: pointer; }
   background: var(--bg-primary);
   min-height: 56px;
 }
-.topbar-left { display: flex; align-items: baseline; gap: 12px; }
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-logo { width: 28px; height: 28px; border-radius: 6px; flex-shrink: 0; object-fit: contain; }
 .active-title {
   font-size: 15px;
   font-weight: 700;
@@ -1223,7 +1224,8 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   max-width: 1200px;
   margin: 0 auto;
 }
-.landing-logo { display: flex; align-items: baseline; gap: 6px; }
+.landing-logo { display: flex; align-items: center; gap: 8px; }
+.landing-logo-img { width: 32px; height: 32px; border-radius: 8px; object-fit: contain; }
 .landing-nav-links { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; justify-content: flex-end; }
 .landing-nav-links a {
   color: var(--text-secondary);

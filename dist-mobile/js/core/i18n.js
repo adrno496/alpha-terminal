@@ -631,6 +631,53 @@ const DICT = {
     'mod.envelope-optimizer.desc': 'Répartition recommandée PEA/AV/PER/CTO selon ton âge + TMI',
     'mod.envelope-optimizer.help': '**À quoi ça sert :** te dit la répartition idéale de tes investissements entre PEA / Assurance-vie / PER / CTO selon ton âge et ta tranche marginale d\'imposition.\n\n**Comment :** algorithme local + heuristiques FR (jeune actif → PEA dominant, pré-retraite → PER + AV, retraite → AV transmission).\n\n**Quand :** après chaque versement important ou changement de situation (héritage, augmentation, mariage).',
 
+    // V11 — Donations & Succession / Capital Gains / Backtest
+    'mod.donations-succession.label': '🎁 Donations & Succession FR',
+    'mod.donations-succession.desc': 'Simulateur abattements 100k€/15 ans, AV 152 500€, démembrement, droits de succession',
+    'mod.donations-succession.help': '**À quoi ça sert :** simule l\'impact fiscal d\'une donation ou d\'une succession en France selon les abattements 2026 (100k€/enfant tous les 15 ans, 152 500€ AV avant 70 ans).\n\n**Comment :** calculs locaux selon les barèmes du CGI (art. 779, 777, 990 I, 757 B). Simule aussi le démembrement temporaire (donation nue-propriété).\n\n**Quand :** avant chaque donation importante ou pour optimiser ta transmission patrimoniale.',
+    'mod.donations-succession.example': 'Charger un exemple',
+
+    'mod.capital-gains-tracker.label': '🧾 Capital Gains (FIFO/CMP)',
+    'mod.capital-gains-tracker.desc': 'Suivi des lots d\'achat (FIFO/LIFO/CMP) pour anticiper les plus-values avant vente',
+    'mod.capital-gains-tracker.help': '**À quoi ça sert :** suit ton coût d\'achat lot par lot pour calculer la plus-value latente selon FIFO, LIFO ou CMP avant chaque vente.\n\n**Comment :** ajoute manuellement chaque lot ou importe depuis Patrimoine. La simulation de vente compare l\'imposition des 3 méthodes.\n\n**Quand :** avant toute vente sur CTO pour minimiser la plus-value imposable (PFU 30%).',
+    'mod.capital-gains-tracker.example': 'Charger 3 lots Apple démo',
+
+    'mod.backtest.label': '🔁 Backtest',
+    'mod.backtest.desc': 'Simule DCA / lump-sum sur portefeuilles types (1990-2025) avec données historiques',
+    'mod.backtest.help': '**À quoi ça sert :** "Combien j\'aurais aujourd\'hui si j\'avais investi 200€/mois sur le MSCI World depuis 2010 ?" — simule les stratégies DCA et lump-sum sur 6 portefeuilles types.\n\n**Comment :** données historiques annuelles embarquées (S&P 500, MSCI World, CAC 40 GR, Bonds Euro, Bitcoin). Calcule CAGR, multiple, max drawdown.\n\n**Quand :** avant de te lancer dans une stratégie pour valider sa robustesse historique.',
+    'mod.backtest.example': 'DCA 200€/mois MSCI World 2010-2025',
+
+    // V12 — 7 modules
+    'mod.multi-currency-pnl.label': '💱 Multi-currency P&L',
+    'mod.multi-currency-pnl.desc': 'Décompose ta perf par devise et calcule l\'impact FX',
+    'mod.multi-currency-pnl.help': '**À quoi ça sert :** sépare ta performance "spot" (l\'actif a monté) de l\'impact des taux de change. Ex: ton S&P 500 a fait +12% en USD, mais le USD a baissé de 3% vs EUR → tu as fait +9% net.\n\n**Comment :** détecte automatiquement la devise de chaque holding (suffixe ticker, catégorie crypto), tu peux surcharger les taux de change.\n\n**Quand :** revue trimestrielle, surtout si tu as >30% en USD ou autres devises.',
+    'mod.multi-currency-pnl.example': 'Calculer maintenant',
+
+    'mod.earnings-calendar.label': '📅 Earnings Calendar',
+    'mod.earnings-calendar.desc': 'Calendrier des résultats trimestriels filtré sur tes positions',
+    'mod.earnings-calendar.help': '**À quoi ça sert :** liste les prochains résultats trimestriels uniquement pour les actions/ETF que tu détiens, avec le compte à rebours en jours.\n\n**Comment :** dates inférées par cycle trimestriel typique (avr/juil/oct/jan). Tu peux corriger manuellement chaque ticker.\n\n**Quand :** chaque lundi pour anticiper la semaine et préparer les positions.',
+    'mod.earnings-calendar.example': 'Rafraîchir',
+
+    'mod.correlation-matrix.label': '🌡️ Correlation Matrix',
+    'mod.correlation-matrix.desc': 'Heatmap des corrélations entre classes d\'actifs + corrélation moyenne de ton portefeuille',
+    'mod.correlation-matrix.help': '**À quoi ça sert :** mesure la "vraie" diversification : un portefeuille de 10 ETF tech a une corrélation ~0.95, donc 10 lignes mais 1 seule exposition.\n\n**Comment :** matrice basée sur moyennes long terme (MSCI, BlackRock, Vanguard). Pondérée par tes positions pour obtenir un score 0-1.\n\n**Quand :** après chaque rebalancing pour vérifier que tu diversifies vraiment.',
+
+    'mod.esg-impact.label': '🌍 ESG Impact',
+    'mod.esg-impact.desc': 'Score E/S/G par holding + exposition fossile + controverses',
+    'mod.esg-impact.help': '**À quoi ça sert :** voir l\'empreinte ESG de ton portefeuille : score Environment / Social / Governance par position, exposition aux énergies fossiles, principales controverses.\n\n**Comment :** base de données heuristique embarquée (sources publiques MSCI ESG / Sustainalytics 2024). Pour des scores certifiés, regarde les fonds Art. 8/9 SFDR.\n\n**Quand :** alignement avec tes valeurs personnelles + conformité SFDR si tu gères pour des tiers.',
+
+    'mod.estate-doc-generator.label': '📜 Estate Documents FR',
+    'mod.estate-doc-generator.desc': 'Templates testament olographe, mandat protection future, lettre instructions notaire',
+    'mod.estate-doc-generator.help': '**À quoi ça sert :** génère un brouillon des 3 documents essentiels pour préparer ta succession en France.\n\n**Comment :** templates juridiques pré-remplis avec tes infos personnelles. Le testament olographe DOIT être recopié à la main intégralement (art. 970 Code civil).\n\n**Quand :** dès aujourd\'hui — 70% des Français meurent sans testament. Brouillon → relecture notaire → finalisation.',
+
+    'mod.macro-events-calendar.label': '🏛️ Macro Events',
+    'mod.macro-events-calendar.desc': 'Calendrier Fed/BCE/CPI/NFP/élections — 90 jours à venir',
+    'mod.macro-events-calendar.help': '**À quoi ça sert :** anticipe les événements macro à fort impact marché (réunions banques centrales, statistiques d\'inflation, emploi US).\n\n**Comment :** dates 2026 connues + saisie d\'événements custom (élections, sommets, rapports d\'entreprise spécifiques).\n\n**Quand :** revue hebdo le lundi pour voir ce qui peut bouger les marchés cette semaine.',
+
+    'mod.performance-attribution.label': '📈 Performance Attribution',
+    'mod.performance-attribution.desc': 'Attribution Brinson : alpha vs benchmark décomposé en allocation + sélection',
+    'mod.performance-attribution.help': '**À quoi ça sert :** sépare ta performance en 2 sources : (1) allocation = bonnes pondérations sectorielles vs MSCI World, (2) sélection = bonnes actions choisies dans chaque secteur.\n\n**Comment :** modèle Brinson appliqué sur perf 12 mois TTM, benchmark = MSCI World standard.\n\n**Quand :** revue annuelle pour comprendre POURQUOI ton portefeuille a fait +X% (chance ou skill ?).',
+
     // === Onboarding tour ===
     'tour.next': 'Suivant',
     'tour.back': 'Précédent',
@@ -1282,6 +1329,51 @@ const DICT = {
     'mod.envelope-optimizer.label': '🇫🇷 Tax-envelope Optimizer',
     'mod.envelope-optimizer.desc': 'Recommended PEA/AV/PER/CTO split based on your age + tax bracket',
     'mod.envelope-optimizer.help': '**Purpose:** tells you the ideal split of your investments between PEA / life-insurance / PER / CTO based on your age and marginal tax bracket.\n\n**How:** local algorithm + FR heuristics (young → PEA-heavy, pre-retirement → PER + life-insurance, retirement → life-insurance for transmission).\n\n**When:** after a large contribution or change in situation (inheritance, raise, marriage).',
+
+    'mod.donations-succession.label': '🎁 Donations & Inheritance (FR)',
+    'mod.donations-succession.desc': 'FR-specific gift/inheritance simulator: 100k€/15y abatement, 152,500€ life-insurance, dismemberment',
+    'mod.donations-succession.help': '**Purpose:** simulate the tax impact of a gift or inheritance in France with the 2026 abatements (100k€/child every 15 years, 152,500€ life-insurance before age 70).\n\n**How:** local calculations following French tax code (art. 779, 777, 990 I, 757 B). Also simulates temporary dismemberment (bare-ownership gifts).\n\n**When:** before any large gift, or to optimize your wealth transfer plan.',
+    'mod.donations-succession.example': 'Load example',
+
+    'mod.capital-gains-tracker.label': '🧾 Capital Gains (FIFO/WAC)',
+    'mod.capital-gains-tracker.desc': 'Lot-by-lot cost basis tracking (FIFO/LIFO/Weighted Avg) to anticipate gains before selling',
+    'mod.capital-gains-tracker.help': '**Purpose:** tracks your purchase cost lot by lot to compute unrealized gains under FIFO, LIFO or weighted-average before any sell.\n\n**How:** manually add each lot or import from Wealth. The sell simulator compares tax impact across the 3 methods.\n\n**When:** before any taxable sale to minimize the realized gain (FR PFU 30%, US LT/ST cap gains).',
+    'mod.capital-gains-tracker.example': 'Load 3 Apple demo lots',
+
+    'mod.backtest.label': '🔁 Backtest',
+    'mod.backtest.desc': 'Simulate DCA / lump-sum on classic portfolios (1990-2025) with embedded historical data',
+    'mod.backtest.help': '**Purpose:** "What would I have today if I had DCA-ed 200€/month into MSCI World since 2010?" — simulates DCA and lump-sum on 6 classic portfolios.\n\n**How:** embedded annual returns (S&P 500, MSCI World, CAC 40 GR, Euro Bonds, Bitcoin). Computes CAGR, multiple, max drawdown.\n\n**When:** before committing to a strategy, validate its historical robustness.',
+    'mod.backtest.example': 'DCA 200€/mo MSCI World 2010-2025',
+
+    'mod.multi-currency-pnl.label': '💱 Multi-currency P&L',
+    'mod.multi-currency-pnl.desc': 'Decompose your performance by currency and compute FX impact',
+    'mod.multi-currency-pnl.help': '**Purpose:** separates your "spot" return (the asset went up) from FX impact. E.g., S&P 500 gained +12% in USD but USD lost 3% vs EUR → you actually netted +9%.\n\n**How:** auto-detects each holding currency (ticker suffix, crypto category), you can override the FX rates.\n\n**When:** quarterly review, especially if you have >30% in USD or other currencies.',
+    'mod.multi-currency-pnl.example': 'Compute now',
+
+    'mod.earnings-calendar.label': '📅 Earnings Calendar',
+    'mod.earnings-calendar.desc': 'Quarterly earnings calendar filtered to your holdings',
+    'mod.earnings-calendar.help': '**Purpose:** lists upcoming quarterly earnings for the stocks/ETFs you own only, with day countdown.\n\n**How:** dates inferred from typical quarterly cycle (Apr/Jul/Oct/Jan). You can override per ticker.\n\n**When:** every Monday to plan the week and prep positions.',
+    'mod.earnings-calendar.example': 'Refresh',
+
+    'mod.correlation-matrix.label': '🌡️ Correlation Matrix',
+    'mod.correlation-matrix.desc': 'Asset class correlation heatmap + your portfolio average correlation',
+    'mod.correlation-matrix.help': '**Purpose:** measures "true" diversification: a portfolio of 10 tech ETFs has ~0.95 correlation, meaning 10 lines but 1 single exposure.\n\n**How:** matrix from long-term averages (MSCI, BlackRock, Vanguard). Weighted by your positions for a 0-1 score.\n\n**When:** after each rebalancing to verify you\'re actually diversifying.',
+
+    'mod.esg-impact.label': '🌍 ESG Impact',
+    'mod.esg-impact.desc': 'E/S/G score per holding + fossil exposure + key controversies',
+    'mod.esg-impact.help': '**Purpose:** see the ESG footprint of your portfolio: Environment / Social / Governance score per position, fossil fuel exposure, top controversies.\n\n**How:** embedded heuristic database (public sources MSCI ESG / Sustainalytics 2024). For certified scores, look at SFDR Art. 8/9 funds.\n\n**When:** to align with your values + SFDR compliance if you manage for third parties.',
+
+    'mod.estate-doc-generator.label': '📜 Estate Documents (FR)',
+    'mod.estate-doc-generator.desc': 'Templates: handwritten will, advance directive, letter of instructions to notary',
+    'mod.estate-doc-generator.help': '**Purpose:** generate a draft of the 3 essential documents to prepare your French inheritance.\n\n**How:** legal templates pre-filled with your details. The handwritten will (testament olographe) MUST be entirely recopied by hand (Art. 970 French Civil Code).\n\n**When:** today — 70% of French people die without a will. Draft → notary review → finalize.',
+
+    'mod.macro-events-calendar.label': '🏛️ Macro Events',
+    'mod.macro-events-calendar.desc': 'Fed/ECB/CPI/NFP/elections calendar — next 90 days',
+    'mod.macro-events-calendar.help': '**Purpose:** anticipate high-impact macro events (central bank meetings, inflation prints, US jobs).\n\n**How:** known 2026 dates + custom event entry (elections, summits, specific company reports).\n\n**When:** weekly Monday review to see what could move markets this week.',
+
+    'mod.performance-attribution.label': '📈 Performance Attribution',
+    'mod.performance-attribution.desc': 'Brinson attribution: alpha vs benchmark decomposed into allocation + selection',
+    'mod.performance-attribution.help': '**Purpose:** splits your performance into 2 sources: (1) allocation = right sector weights vs MSCI World, (2) selection = right stocks within each sector.\n\n**How:** Brinson model on 12-month TTM, benchmark = standard MSCI World.\n\n**When:** annual review to understand WHY your portfolio did +X% (luck or skill?).',
 
     'tour.next': 'Next',
     'tour.back': 'Back',

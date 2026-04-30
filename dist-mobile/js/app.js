@@ -73,6 +73,20 @@ import { renderTaxLossHarvestingView }      from './modules/tax-loss-harvesting.
 import { renderSubscriptionsDetectorView }  from './modules/subscriptions-detector.js';
 import { renderEnvelopeOptimizerView }      from './modules/envelope-optimizer.js';
 
+// V11 — Donations & Succession / Capital Gains / Backtest
+import { renderDonationsSuccessionView }    from './modules/donations-succession.js';
+import { renderCapitalGainsTrackerView }    from './modules/capital-gains-tracker.js';
+import { renderBacktestView }               from './modules/backtest.js';
+
+// V12 — Multi-currency P&L / Earnings Calendar / Correlation / ESG / Estate / Macro / Attribution
+import { renderMultiCurrencyPnlView }       from './modules/multi-currency-pnl.js';
+import { renderEarningsCalendarView }       from './modules/earnings-calendar.js';
+import { renderCorrelationMatrixView }      from './modules/correlation-matrix.js';
+import { renderEsgImpactView }              from './modules/esg-impact.js';
+import { renderEstateDocGeneratorView }     from './modules/estate-doc-generator.js';
+import { renderMacroEventsCalendarView }    from './modules/macro-events-calendar.js';
+import { renderPerformanceAttributionView } from './modules/performance-attribution.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -119,6 +133,18 @@ const ROUTES = {
   'tax-loss-harvesting':   { render: renderTaxLossHarvestingView,    label: '🧮 Tax-Loss Harvesting' },
   'subscriptions-detector':{ render: renderSubscriptionsDetectorView, label: '🔍 Détecteur abonnements' },
   'envelope-optimizer':    { render: renderEnvelopeOptimizerView,    label: '🇫🇷 Optimiseur enveloppe fiscale' },
+  // V11
+  'donations-succession':  { render: renderDonationsSuccessionView,  label: '🎁 Donations & Succession FR' },
+  'capital-gains-tracker': { render: renderCapitalGainsTrackerView,  label: '🧾 Capital Gains (FIFO/CMP)' },
+  'backtest':              { render: renderBacktestView,             label: '🔁 Backtest' },
+  // V12
+  'multi-currency-pnl':    { render: renderMultiCurrencyPnlView,     label: '💱 Multi-currency P&L' },
+  'earnings-calendar':     { render: renderEarningsCalendarView,     label: '📅 Earnings Calendar' },
+  'correlation-matrix':    { render: renderCorrelationMatrixView,    label: '🌡️ Correlation Matrix' },
+  'esg-impact':            { render: renderEsgImpactView,            label: '🌍 ESG Impact' },
+  'estate-doc-generator':  { render: renderEstateDocGeneratorView,   label: '📜 Estate Documents FR' },
+  'macro-events-calendar': { render: renderMacroEventsCalendarView,  label: '🏛️ Macro Events' },
+  'performance-attribution':{ render: renderPerformanceAttributionView, label: '📈 Performance Attribution' },
 };
 
 const STATE = { currentRoute: null };

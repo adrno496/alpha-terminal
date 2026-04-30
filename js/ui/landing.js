@@ -49,32 +49,44 @@ const MODULE_DETAILS = {
   // V10
   get 'tax-loss-harvesting'()   { return { icon: '🧮', flow: 'CTO → Ventes optimales → Économie fiscale' }; },
   get 'subscriptions-detector'(){ return { icon: '🔍', flow: 'Budget → Récurrences + doublons' }; },
-  get 'envelope-optimizer'()    { return { icon: '🇫🇷', flow: 'Âge + TMI → Répartition PEA/AV/PER/CTO' }; }
+  get 'envelope-optimizer'()    { return { icon: '🇫🇷', flow: 'Âge + TMI → Répartition PEA/AV/PER/CTO' }; },
+  // V11
+  get 'donations-succession'()  { return { icon: '🎁', flow: 'Patrimoine → Abattements 100k€/15ans + AV → Droits dus' }; },
+  get 'capital-gains-tracker'() { return { icon: '🧾', flow: 'Lots d\'achat → FIFO/LIFO/CMP → Plus-value optimisée' }; },
+  get 'backtest'()              { return { icon: '🔁', flow: 'Stratégie + période → CAGR + Max DD historique' }; },
+  // V12
+  get 'multi-currency-pnl'()    { return { icon: '💱', flow: 'Patrimoine + FX → P&L net spot + impact devise' }; },
+  get 'earnings-calendar'()     { return { icon: '📅', flow: 'Tes positions → Prochains résultats J-X' }; },
+  get 'correlation-matrix'()    { return { icon: '🌡️', flow: 'Allocation → Heatmap + corrélation moyenne' }; },
+  get 'esg-impact'()            { return { icon: '🌍', flow: 'Holdings → Score E/S/G + fossile + controverses' }; },
+  get 'estate-doc-generator'()  { return { icon: '📜', flow: 'Infos perso → Testament + mandat + lettre notaire' }; },
+  get 'macro-events-calendar'() { return { icon: '🏛️', flow: 'Fed/BCE/CPI → Agenda 90 jours' }; },
+  get 'performance-attribution'(){ return { icon: '📈', flow: 'Perf annuelle → Allocation + sélection (Brinson)' }; }
 };
 
 const FAQ_FR = [
-  { q: 'Faut-il être développeur pour utiliser l\'app ?', a: 'Non. Tu télécharges, tu colles ta clé API, et tu utilises les 26 modules comme une app classique. Aucune ligne de code n\'est requise.' },
+  { q: 'Faut-il être développeur pour utiliser l\'app ?', a: 'Non. Tu télécharges, tu colles ta clé API, et tu utilises les 46 modules comme une app classique. Aucune ligne de code n\'est requise.' },
   { q: 'Quels providers d\'IA sont supportés ?', a: '14 providers : <strong>Anthropic Claude, OpenAI, Google Gemini, xAI Grok, OpenRouter, Perplexity, Mistral, Cerebras, GitHub Models, NVIDIA NIM, Hugging Face, Cloudflare Workers AI, Together AI, Cohere</strong>. Une seule clé suffit pour démarrer ; plus tu en mets, plus l\'app sélectionne le meilleur modèle pour chaque tâche.' },
   { q: 'Comment créer une clé API ?', a: 'Liens directs dans le wizard de configuration. Pour démarrer rapidement : <a href="https://console.anthropic.com/settings/keys" target="_blank">Claude</a> · <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a> · <a href="https://aistudio.google.com/app/apikey" target="_blank">Gemini</a>. GitHub Models est gratuit (rate-limit) avec un PAT GitHub.' },
   { q: 'Mes données sont-elles vraiment privées ?', a: '<strong>Oui, 100%</strong>. L\'app appelle l\'API du provider directement depuis ton navigateur. <strong>Aucun serveur intermédiaire Alpha</strong>. Tes clés API sont chiffrées localement (AES-GCM 256 + PBKDF2 100K iterations). Vérifie toi-même : ouvre DevTools → Network, tu verras uniquement des appels vers les APIs des providers. Toutes tes analyses sont stockées dans IndexedDB local.' },
   { q: 'Combien ça coûte par analyse ?', a: 'Variable selon module et provider. Quick Analysis : ~$0.005-0.02. 10-K Decoder : ~$0.05-1.00. Position Sizing : ~$0.01. Sentiment scan : ~$0.05-0.20 (web search facturé en plus). Cerebras et GitHub Models offrent un tier quasi-gratuit. <strong>Tu paies au provider directement</strong>.' },
   { q: 'Comment fonctionne la mémoire patrimoine ?', a: 'Le module "Patrimoine" stocke localement tes holdings (actions, ETF, crypto, immo, cash). Chaque module peut activer "💼 Use my wealth" pour injecter ce contexte dans l\'analyse — l\'IA adapte ses recommandations à TA situation réelle. Auto-refresh des prix via 11 data providers (FMP, Polygon, Finnhub, CoinGecko, etc.).' },
   { q: 'Qu\'est-ce que la Knowledge Base (RAG) ?', a: 'Tu indexes tes notes, theses, PDFs personnels. L\'app utilise les embeddings OpenAI pour recherche sémantique. Active "📚 KB" dans n\'importe quel module → tes documents pertinents sont auto-injectés dans le prompt. Sans clé OpenAI : fallback keyword matching.' },
-  { q: 'Que se passe-t-il si je n\'ai qu\'une seule clé API ?', a: 'Tous les 26 modules tournent. Pour les modules PDF, si ton provider ne supporte pas le PDF natif (OpenAI, Grok, Mistral), l\'app extrait le texte côté client. Tout fonctionne.' },
+  { q: 'Que se passe-t-il si je n\'ai qu\'une seule clé API ?', a: 'Tous les 46 modules tournent. Pour les modules PDF, si ton provider ne supporte pas le PDF natif (OpenAI, Grok, Mistral), l\'app extrait le texte côté client. Tout fonctionne.' },
   { q: 'Y a-t-il des mises à jour ?', a: 'Oui. Les noms de modèles évoluent rapidement chez tous les providers — l\'app les laisse éditables dans Settings → Modèles pour que tu puisses suivre les releases sans attendre une mise à jour.' },
   { q: 'Compatible mobile ?', a: 'Oui. Build Android natif via Capacitor 8 (Google Play). Sidebar drawer, formulaires single-column, modales plein écran. iOS également supporté (build Xcode requis).' },
   { q: 'Que se passe-t-il si je perds mon mot de passe ?', a: 'Tes clés API sont chiffrées avec ce mot de passe. <strong>Sans le mot de passe, tu ne peux pas récupérer le vault</strong>. Tu peux le reset (effacer les clés) et recommencer la config — tes analyses passées restent accessibles.' }
 ];
 
 const FAQ_EN = [
-  { q: 'Do I need to be a developer to use the app?', a: 'No. Download, paste your API key, use the 26 modules like any app. No code required.' },
+  { q: 'Do I need to be a developer to use the app?', a: 'No. Download, paste your API key, use the 46 modules like any app. No code required.' },
   { q: 'Which AI providers are supported?', a: '14 providers: <strong>Anthropic Claude, OpenAI, Google Gemini, xAI Grok, OpenRouter, Perplexity, Mistral, Cerebras, GitHub Models, NVIDIA NIM, Hugging Face, Cloudflare Workers AI, Together AI, Cohere</strong>. One key is enough to start; the more you add, the smarter the per-task routing.' },
   { q: 'How do I create an API key?', a: 'Direct links in the setup wizard. To start quickly: <a href="https://console.anthropic.com/settings/keys" target="_blank">Claude</a> · <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI</a> · <a href="https://aistudio.google.com/app/apikey" target="_blank">Gemini</a>. GitHub Models is free (rate-limited) with a GitHub PAT.' },
   { q: 'Is my data really private?', a: '<strong>Yes, 100%</strong>. The app calls the provider API directly from your browser. <strong>No Alpha intermediary server</strong>. Your API keys are encrypted locally (AES-GCM 256 + PBKDF2 100K iterations). Verify it yourself: open DevTools → Network — you\'ll only see calls to provider APIs. All your analyses are stored in local IndexedDB.' },
   { q: 'How much does each analysis cost?', a: 'Varies by module and provider. Quick Analysis: ~$0.005-0.02. 10-K Decoder: ~$0.05-1.00. Position Sizing: ~$0.01. Sentiment scan: ~$0.05-0.20 (web search billed extra). Cerebras and GitHub Models offer near-free tiers. <strong>You pay the provider directly</strong>.' },
   { q: 'How does the wealth memory work?', a: 'The "Wealth" module stores your holdings locally (stocks, ETFs, crypto, real estate, cash). Any module can enable "💼 Use my wealth" to inject this context into the analysis — the AI tailors recommendations to YOUR real situation. Auto-refresh prices via 11 data providers.' },
   { q: 'What is the Knowledge Base (RAG)?', a: 'Index your personal notes, theses, PDFs. The app uses OpenAI embeddings for semantic search. Toggle "📚 KB" in any module → your relevant docs are auto-injected. Without an OpenAI key: keyword matching fallback.' },
-  { q: 'What if I only have one API key?', a: 'All 26 modules work. For PDF modules, if your provider doesn\'t support native PDF (OpenAI, Grok, Mistral), the app extracts text client-side. Everything works.' },
+  { q: 'What if I only have one API key?', a: 'All 46 modules work. For PDF modules, if your provider doesn\'t support native PDF (OpenAI, Grok, Mistral), the app extracts text client-side. Everything works.' },
   { q: 'Are there updates?', a: 'Yes. Model names evolve quickly across all providers — the app lets you edit them in Settings → Models so you can follow releases without waiting for an app update.' },
   { q: 'Mobile compatible?', a: 'Yes. Native Android build via Capacitor 8 (Google Play). Sidebar drawer, single-column forms, full-screen modals. iOS also supported (Xcode build required).' },
   { q: 'What if I lose my password?', a: 'Your API keys are encrypted with it. <strong>Without the password, you cannot recover the vault</strong>. You can reset (wipe the keys) and reconfigure — past analyses remain accessible.' }

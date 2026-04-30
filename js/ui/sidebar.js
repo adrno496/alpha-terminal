@@ -92,7 +92,17 @@ const CATEGORIES = [
       { id: 'ifi-simulator',         num: '33' },
       { id: 'tax-loss-harvesting',   num: '34' },
       { id: 'subscriptions-detector',num: '35' },
-      { id: 'envelope-optimizer',    num: '36' }
+      { id: 'envelope-optimizer',    num: '36' },
+      { id: 'donations-succession',  num: '37' },
+      { id: 'capital-gains-tracker', num: '38' },
+      { id: 'backtest',              num: '39' },
+      { id: 'multi-currency-pnl',    num: '40' },
+      { id: 'earnings-calendar',     num: '41' },
+      { id: 'correlation-matrix',    num: '42' },
+      { id: 'esg-impact',            num: '43' },
+      { id: 'estate-doc-generator',  num: '44' },
+      { id: 'macro-events-calendar', num: '45' },
+      { id: 'performance-attribution', num: '46' }
     ]
   }
 ];
