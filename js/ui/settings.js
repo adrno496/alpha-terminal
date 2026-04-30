@@ -200,8 +200,130 @@ function renderRoutingTab(c) {
   const settings = getSettings();
   const overrides = settings.moduleOverrides || {};
   const avail = getOrchestrator().getProviderNames();
+  const isEN = getLocale() === 'en';
+
+  // Coûts estimés par module : utilise modelPricing pour le modèle actuellement choisi
+  // Hypothèses moyennes par catégorie de module : input tokens × output tokens
+  const MODULE_TOKEN_PROFILES = {
+    'quick-analysis':         { input: 1500,  output: 800,  label_fr: 'Quick Analysis (verdict 30s)', label_en: 'Quick Analysis (30s verdict)' },
+    'research-agent':         { input: 8000,  output: 4000, label_fr: 'Research Agent (analyse complète)', label_en: 'Research Agent (full analysis)' },
+    'decoder-10k':            { input: 25000, output: 5000, label_fr: '10-K Decoder (PDF entier)', label_en: '10-K Decoder (full PDF)' },
+    'dcf':                    { input: 2500,  output: 2000, label_fr: 'DCF / Fair Value', label_en: 'DCF / Fair Value' },
+    'macro-dashboard':        { input: 3000,  output: 2500, label_fr: 'Macro Dashboard', label_en: 'Macro Dashboard' },
+    'crypto-fundamental':     { input: 4000,  output: 2500, label_fr: 'Crypto Fundamental', label_en: 'Crypto Fundamental' },
+    'earnings-call':          { input: 30000, output: 4000, label_fr: 'Earnings Call (transcript)', label_en: 'Earnings Call (transcript)' },
+    'whitepaper-reader':      { input: 20000, output: 3000, label_fr: 'Whitepaper Reader', label_en: 'Whitepaper Reader' },
+    'sentiment-tracker':      { input: 4000,  output: 2000, label_fr: 'Sentiment Tracker (web search)', label_en: 'Sentiment Tracker (web search)' },
+    'newsletter-investor':    { input: 5000,  output: 4000, label_fr: 'Newsletter (Voice clone)', label_en: 'Newsletter (Voice clone)' },
+    'investment-memo':        { input: 4000,  output: 3500, label_fr: 'Investment Memo', label_en: 'Investment Memo' },
+    'pre-mortem':             { input: 3500,  output: 3000, label_fr: 'Pre-Mortem', label_en: 'Pre-Mortem' },
+    'stock-screener':         { input: 3000,  output: 2500, label_fr: 'Stock Screener', label_en: 'Stock Screener' },
+    'portfolio-rebalancer':   { input: 4000,  output: 3000, label_fr: 'Portfolio Rebalancer', label_en: 'Portfolio Rebalancer' },
+    'tax-optimizer-fr':       { input: 3500,  output: 3500, label_fr: 'Tax Optimizer FR', label_en: 'Tax Optimizer FR' },
+    'tax-international':      { input: 3500,  output: 3500, label_fr: 'Tax Optimizer Int\'l', label_en: 'Tax Optimizer Int\'l' },
+    'position-sizing':        { input: 1200,  output: 800,  label_fr: 'Position Sizing', label_en: 'Position Sizing' },
+    'fire-calculator':        { input: 2000,  output: 2500, label_fr: 'FIRE Calculator', label_en: 'FIRE Calculator' },
+    'stress-test':            { input: 4000,  output: 3000, label_fr: 'Stress Test', label_en: 'Stress Test' },
+    'battle-mode':            { input: 5000,  output: 4000, label_fr: 'Battle Mode (5 rounds)', label_en: 'Battle Mode (5 rounds)' },
+    'watchlist':              { input: 4000,  output: 2500, label_fr: 'Watchlist (brief 24h)', label_en: 'Watchlist (24h brief)' },
+    'portfolio-audit':        { input: 6000,  output: 4500, label_fr: 'Portfolio Audit (Buffett-style)', label_en: 'Portfolio Audit (Buffett-style)' },
+    'youtube-transcript':     { input: 35000, output: 4000, label_fr: 'YouTube + CEO Forensics', label_en: 'YouTube + CEO Forensics' },
+    'fees-analysis':          { input: 4000,  output: 3500, label_fr: 'Frais cachés', label_en: 'Hidden Fees' },
+    'wealth-method':          { input: 3000,  output: 2500, label_fr: 'Méthode patrimoniale', label_en: 'Wealth Method' },
+    'insights-engine':        { input: 1500,  output: 1000, label_fr: 'Insights auto', label_en: 'Auto Insights' },
+    'chatbot':                { input: 1000,  output: 600,  label_fr: 'Chat assistant (par message)', label_en: 'Chat assistant (per message)' },
+    'trade-journal':          { input: 3000,  output: 2500, label_fr: 'Trade Journal', label_en: 'Trade Journal' },
+    'knowledge-base':         { input: 3000,  output: 2000, label_fr: 'Knowledge Base (RAG)', label_en: 'Knowledge Base (RAG)' }
+  };
+
+  // Calcule le coût USD pour un module donné selon le modèle sélectionné dans la routing preview
+  function estimateModuleCostUSD(moduleId, providerName, modelId) {
+    const p = MODULE_TOKEN_PROFILES[moduleId];
+    if (!p) return null;
+    let pricing = null;
+    try {
+      // Cherche dans le catalogue le modèle correspondant
+      // (lazy require de modelPricing pour éviter import au load)
+      const orch = getOrchestrator();
+      const provider = orch?.providers?.[providerName];
+      if (!provider) return null;
+      const caps = provider.getCapabilities();
+      pricing = caps?.pricing?.[modelId];
+      if (!pricing && provider.estimateCostUSD) {
+        return provider.estimateCostUSD(p.input, p.output, modelId);
+      }
+    } catch {}
+    if (!pricing) return null;
+    return (p.input / 1e6) * pricing.input + (p.output / 1e6) * pricing.output;
+  }
+
+  // Synthèse des coûts par tier (moyenne sur l'ensemble des modules connus)
+  const tierAverages = { fast: [], balanced: [], flagship: [] };
+  for (const [id, sel] of Object.entries(preview)) {
+    const tier = sel.tier || 'balanced';
+    const cost = estimateModuleCostUSD(id, sel.provider, sel.model);
+    if (cost != null && tierAverages[tier]) tierAverages[tier].push(cost);
+  }
+  const avg = (arr) => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;
 
   c.innerHTML = `
+    <div class="card" style="border-left:4px solid var(--accent-green);">
+      <div class="card-title">💰 ${isEN ? 'Estimated API costs' : 'Coûts API estimés'}</div>
+      <p style="color:var(--text-secondary);font-size:13px;margin:0 0 14px;">
+        ${isEN
+          ? 'Approximate cost per analysis based on the model currently selected for each module. <strong>You pay your AI provider directly</strong> (BYOK) — ALPHA TERMINAL never proxies or stores your usage.'
+          : 'Coût approximatif par analyse selon le modèle actuellement sélectionné pour chaque module. <strong>Tu paies ton provider IA directement</strong> (BYOK) — ALPHA TERMINAL ne stocke ni ne re-route ton usage.'}
+      </p>
+
+      <div class="stat-grid" style="margin-bottom:14px;">
+        <div class="stat"><div class="stat-label">⚡ ${isEN ? 'Fast tier average' : 'Moyenne fast'}</div><div class="stat-value">${fmtUSD(avg(tierAverages.fast))}</div><div style="font-size:10px;color:var(--text-muted);">${isEN ? 'per analysis' : 'par analyse'}</div></div>
+        <div class="stat"><div class="stat-label">⚖️ ${isEN ? 'Balanced tier' : 'Moyenne balanced'}</div><div class="stat-value">${fmtUSD(avg(tierAverages.balanced))}</div><div style="font-size:10px;color:var(--text-muted);">${isEN ? 'per analysis' : 'par analyse'}</div></div>
+        <div class="stat"><div class="stat-label">🏆 ${isEN ? 'Flagship tier' : 'Moyenne flagship'}</div><div class="stat-value">${fmtUSD(avg(tierAverages.flagship))}</div><div style="font-size:10px;color:var(--text-muted);">${isEN ? 'per analysis' : 'par analyse'}</div></div>
+      </div>
+
+      <details style="margin-bottom:8px;">
+        <summary style="cursor:pointer;font-size:12.5px;color:var(--text-secondary);padding:6px 0;">${isEN ? '📋 Detail per module' : '📋 Détail par module'}</summary>
+        <table class="wiz-routing" style="margin-top:8px;font-size:12px;">
+          <thead><tr>
+            <th>${isEN ? 'Module' : 'Module'}</th>
+            <th>${isEN ? 'Selected provider' : 'Provider sélectionné'}</th>
+            <th style="text-align:right;">${isEN ? 'Input/Output (tokens)' : 'Input/Output (tokens)'}</th>
+            <th style="text-align:right;">${isEN ? 'Cost / analysis' : 'Coût / analyse'}</th>
+            <th style="text-align:right;">${isEN ? '×100 analyses' : '×100 analyses'}</th>
+          </tr></thead>
+          <tbody>
+            ${Object.entries(preview).filter(([id]) => MODULE_TOKEN_PROFILES[id]).map(([id, sel]) => {
+              const p = MODULE_TOKEN_PROFILES[id];
+              const cost = estimateModuleCostUSD(id, sel.provider, sel.model);
+              const label = isEN ? (p.label_en || id) : (p.label_fr || id);
+              return `<tr>
+                <td><strong>${label}</strong></td>
+                <td>${sel.icon || ''} ${sel.providerDisplay || sel.provider} <span style="color:var(--text-muted);font-size:10.5px;">(${sel.tier})</span></td>
+                <td style="text-align:right;font-family:var(--font-mono);font-size:11px;">${p.input.toLocaleString()} / ${p.output.toLocaleString()}</td>
+                <td style="text-align:right;font-family:var(--font-mono);">${cost != null ? fmtUSD(cost) : '<span style="color:var(--text-muted);">?</span>'}</td>
+                <td style="text-align:right;font-family:var(--font-mono);color:var(--text-muted);">${cost != null ? fmtUSD(cost * 100) : '—'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </details>
+
+      <div style="background:var(--bg-tertiary);padding:10px;border-radius:4px;font-size:12px;line-height:1.6;">
+        <strong>💡 ${isEN ? 'Order of magnitude' : 'Ordres de grandeur'} :</strong><br>
+        ${isEN
+          ? '• Light analyses (Quick Analysis, Position Sizing, Chatbot) : <strong>$0.001–$0.01</strong><br>• Mid analyses (DCF, Macro, Crypto fund.) : <strong>$0.02–$0.10</strong><br>• Heavy analyses (10-K, Earnings, YouTube) : <strong>$0.10–$0.50</strong><br>• Web search modules add <strong>$0.005–$0.02</strong> per call (Perplexity/Grok native, others billed separately).'
+          : '• Analyses légères (Quick Analysis, Position Sizing, Chat) : <strong>$0,001–$0,01</strong><br>• Analyses moyennes (DCF, Macro, Crypto fond.) : <strong>$0,02–$0,10</strong><br>• Analyses lourdes (10-K, Earnings, YouTube) : <strong>$0,10–$0,50</strong><br>• Modules avec web search ajoutent <strong>$0,005–$0,02</strong> par appel (Perplexity/Grok natif, autres facturés séparément).'}
+        <br><br>
+        <strong>📊 ${isEN ? 'Realistic monthly budget' : 'Budget mensuel réaliste'} :</strong><br>
+        ${isEN
+          ? '• Casual user (5 analyses/week) : <strong>$2–$8/month</strong><br>• Active user (3 analyses/day) : <strong>$15–$40/month</strong><br>• Power user (research-agent + 10-K + youtube daily) : <strong>$50–$150/month</strong>'
+          : '• Utilisateur occasionnel (5 analyses/semaine) : <strong>$2–$8/mois</strong><br>• Utilisateur actif (3 analyses/jour) : <strong>$15–$40/mois</strong><br>• Power user (research-agent + 10-K + youtube quotidien) : <strong>$50–$150/mois</strong>'}
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin:8px 0 0;">
+        🔗 <a href="api-costs.html" target="_blank" rel="noopener">${isEN ? 'Full BYOK pricing guide →' : 'Guide complet des coûts BYOK →'}</a>
+      </p>
+    </div>
+
     <div class="card">
       <div class="card-title">${t('settings.routing.title')}</div>
       <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">${t('settings.routing.desc')}</p>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Coûts API IA pour analyse financière BYOK — guide complet 2026 | ALPHA TERMINAL</title>
+  <meta name="description" content="Combien coûte vraiment l'analyse financière avec une IA en BYOK ? Tarifs Claude, OpenAI, Gemini, Grok, Mistral. Coût par module ALPHA TERMINAL : Quick Analysis, 10-K Decoder, DCF, Tax Optimizer FR. Budget mensuel réaliste $2-150." />
+  <meta name="keywords" content="prix api claude, tarif chatgpt api, coût gemini api, byok finance, prix gpt-5 par token, tarif analyse ia finance, alpha terminal coûts, api ia tarif 2026" />
+  <meta name="author" content="ALPHA TERMINAL" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/api-costs.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-costs.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-costs.html?lang=en" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Coûts API IA pour analyse financière BYOK — guide complet 2026" />
+  <meta property="og:description" content="Tarifs détaillés Claude, OpenAI, Gemini, Grok par token. Coût par module d'analyse ALPHA TERMINAL. Budget mensuel réaliste $2 à $150 selon usage." />
+  <meta property="og:url" content="https://alpha-terminal.app/api-costs.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:locale" content="fr_FR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Coûts API IA en BYOK : combien ça coûte vraiment ?" />
+  <meta name="twitter:description" content="Tarifs Claude, OpenAI, Gemini par token. Coût par module ALPHA TERMINAL. Budget réaliste $2-$150/mois." />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a' rx='14'/><text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'>α</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Coûts API IA pour analyse financière BYOK — guide complet 2026",
+    "description": "Guide détaillé des tarifs des APIs IA (Claude, OpenAI, Gemini, Grok, Mistral) pour l'analyse financière en BYOK. Coût par module et budget réaliste.",
+    "author": { "@type": "Organization", "name": "ALPHA TERMINAL" },
+    "datePublished": "2026-04-30",
+    "dateModified": "2026-04-30",
+    "publisher": {
+      "@type": "Organization",
+      "name": "ALPHA TERMINAL",
+      "url": "https://alpha-terminal.app/"
+    },
+    "image": "https://alpha-terminal.app/og-home.png"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Combien coûte une analyse financière avec une API d'IA ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Entre $0,001 et $0,50 selon le module. Une analyse rapide (Quick Analysis, ~2k tokens) coûte ~$0,005. Une analyse approfondie d'un rapport 10-K (~30k tokens d'input) coûte $0,10-$0,50 selon le modèle (Claude Opus, GPT-5, Gemini)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quel est le budget mensuel réaliste pour utiliser une app BYOK ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Utilisateur occasionnel (5 analyses/semaine) : $2-$8/mois. Utilisateur actif (3 analyses/jour) : $15-$40/mois. Power user (research-agent + 10-K + youtube quotidien) : $50-$150/mois. Soit 100 à 200 fois moins cher qu'un abonnement Bloomberg Terminal ($24 000/an)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Quelle est la différence entre les tiers fast / balanced / flagship ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Fast : modèles légers ($0,80-$1/M tokens input) — rapides mais moins nuancés. Balanced : modèles principaux ($1-$3/M tokens) — meilleur rapport qualité/prix, recommandé par défaut. Flagship : modèles top-tier ($5-$15/M tokens) — pour les analyses complexes (10-K, fiscalité, raisonnement long)."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Comment réduire les coûts API ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "1) Utiliser le tier 'fast' pour les analyses simples. 2) Configurer plusieurs providers et laisser le smart router choisir le moins cher pour chaque tâche. 3) Activer Cerebras ou GitHub Models (tier gratuit avec rate-limit). 4) Désactiver le web search pour les modules qui n'en ont pas besoin."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Pourquoi le BYOK est-il moins cher qu'un abonnement SaaS ?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Un SaaS d'analyse IA prend 5-10× le coût brut de l'API pour couvrir son infra, son support, sa marge. Avec BYOK tu paies l'API au prix coûtant chez le provider (Claude, OpenAI, etc.). Économie typique : un utilisateur à 50 analyses/mois paie $5-$15 en BYOK vs $30-$50 en abonnement SaaS équivalent."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;">
+      <span class="logo-mark">ALPHA</span><span class="logo-suffix">TERMINAL</span>
+    </a>
+    <div class="landing-nav-links">
+      <a href="/">Accueil</a>
+      <a href="features.html">Fonctionnalités</a>
+      <a href="pricing.html">Tarif</a>
+      <a href="api-costs.html" style="color:var(--accent-green);">Coûts API</a>
+      <a href="bloomberg-alternative.html">vs Bloomberg</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">💰 Coûts API IA pour analyse financière BYOK</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Guide complet 2026 — combien tu paies vraiment quand tu utilises ALPHA TERMINAL avec ton propre key Claude/OpenAI/Gemini.</p>
+
+    <div style="padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-green);margin:20px 0;border-radius:4px;">
+      <strong>📌 TL;DR</strong> — Avec ton propre clé API (BYOK), tu paies entre <strong>$2 et $150 par mois</strong> selon ton usage. Soit <strong>100 à 200× moins cher</strong> qu'un Bloomberg Terminal ($24 000/an) ou qu'un Koyfin Plus ($468/an), pour un set de 40+ modules d'analyse alimentés par les meilleures IA du marché.
+    </div>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">🤔 Le modèle BYOK, c'est quoi ?</h2>
+    <p>BYOK signifie <strong>Bring Your Own Key</strong>. Au lieu de payer un abonnement SaaS à plusieurs centaines d'euros par an qui inclut "l'IA", tu paies <strong>directement ton fournisseur d'IA</strong> (Anthropic, OpenAI, Google, etc.) au prix coûtant. ALPHA TERMINAL n'est qu'une couche d'orchestration : 40+ modules d'analyse pré-configurés qui appellent l'API du provider de ton choix avec les bons prompts.</p>
+    <p>Tu paies l'app <strong>une seule fois</strong> (€99 lifetime), et l'usage IA <strong>au prix du marché</strong>, sans intermédiaire.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">📊 Tarifs des principaux providers (2026)</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Provider</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Modèle phare</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Input ($/M tokens)</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Output ($/M tokens)</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Recommandé pour</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🤖 <strong>Claude (Anthropic)</strong></td><td style="padding:8px;border:1px solid var(--border);">Opus 4.7</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$15</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$75</td><td style="padding:8px;border:1px solid var(--border);">10-K, fiscalité, raisonnement nuancé</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🤖 Claude Sonnet 4.6</td><td style="padding:8px;border:1px solid var(--border);">Balanced</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$3</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$15</td><td style="padding:8px;border:1px solid var(--border);">Usage quotidien</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🤖 Claude Haiku 4.5</td><td style="padding:8px;border:1px solid var(--border);">Fast</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.80</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$4</td><td style="padding:8px;border:1px solid var(--border);">Quick analyses, chatbot</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🧠 <strong>OpenAI GPT-5</strong></td><td style="padding:8px;border:1px solid var(--border);">Flagship</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$5</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$15</td><td style="padding:8px;border:1px solid var(--border);">Polyvalent</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🧠 GPT-5 Mini</td><td style="padding:8px;border:1px solid var(--border);">Balanced</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$1</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$4</td><td style="padding:8px;border:1px solid var(--border);">Analyses standard</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🧠 GPT-5 Nano</td><td style="padding:8px;border:1px solid var(--border);">Fast</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.20</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.80</td><td style="padding:8px;border:1px solid var(--border);">Le moins cher OpenAI</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">✨ <strong>Google Gemini</strong></td><td style="padding:8px;border:1px solid var(--border);">2.5 Pro</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$1.25</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$10</td><td style="padding:8px;border:1px solid var(--border);">Long contexte, PDF natif</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🐦 <strong>xAI Grok</strong></td><td style="padding:8px;border:1px solid var(--border);">Grok 4</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$3</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$15</td><td style="padding:8px;border:1px solid var(--border);">Sentiment X temps réel</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🇫🇷 <strong>Mistral</strong></td><td style="padding:8px;border:1px solid var(--border);">Large</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$2</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$6</td><td style="padding:8px;border:1px solid var(--border);">Données EU, code</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">⚡ <strong>Cerebras</strong></td><td style="padding:8px;border:1px solid var(--border);">Llama 70B</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.85</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$1.20</td><td style="padding:8px;border:1px solid var(--border);">Inférence ultra-rapide (>2000 tok/s)</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🐙 <strong>GitHub Models</strong></td><td style="padding:8px;border:1px solid var(--border);">Multi</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">Gratuit*</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">Gratuit*</td><td style="padding:8px;border:1px solid var(--border);">Tier gratuit (rate-limit)</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">*Tier gratuit avec rate limits — usage personnel uniquement avec un PAT GitHub.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">🎯 Coût estimé par module ALPHA TERMINAL</h2>
+    <p>Voici les coûts moyens par analyse pour les modules les plus utilisés, basés sur les profils de tokens réels (input + output). Les chiffres affichés utilisent <strong>Claude Sonnet 4.6 (tier balanced)</strong>, le default de l'app.</p>
+
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Module</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Input/Output (tokens)</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Coût/analyse</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">×100 analyses</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid var(--border);">⚡ Quick Analysis</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">1500 / 800</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.017</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$1.70</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">💬 Chatbot (par message)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">1000 / 600</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.012</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$1.20</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🎯 Position Sizing</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">1200 / 800</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.015</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$1.50</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🧮 DCF / Fair Value</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">2500 / 2000</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.038</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$3.75</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🌍 Macro Dashboard</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">3000 / 2500</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.047</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$4.65</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🇫🇷 Tax Optimizer FR</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">3500 / 3500</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.063</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$6.30</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🔥 Frais cachés (synthèse IA)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">4000 / 3500</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.065</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$6.50</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">📊 Portfolio Audit</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">6000 / 4500</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.086</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$8.55</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">🚀 Research Agent</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">8000 / 4000</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$0.084</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$8.40</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>📑 10-K Decoder</strong></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">25 000 / 5000</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);"><strong>$0.150</strong></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$15.00</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>🎙 Earnings Call</strong></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">30 000 / 4000</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);"><strong>$0.150</strong></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$15.00</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>🎙 YouTube + CEO Forensics</strong></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">35 000 / 4000</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);"><strong>$0.165</strong></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);color:var(--text-muted);">$16.50</td></tr>
+      </tbody>
+    </table>
+
+    <p style="background:var(--bg-tertiary);padding:12px;border-radius:4px;font-size:13px;">
+      💡 <strong>Astuce</strong> : Si tu utilises principalement les modules légers (Quick Analysis, Position Sizing, Chatbot), 100 analyses/mois te coûteront <strong>environ $1.50</strong>. C'est moins qu'un café Starbucks. Les analyses lourdes (10-K, Earnings, YouTube) sont à réserver aux décisions importantes — 5 par mois = $0.75. Total : <strong>~$2-3/mois</strong> pour un usage occasionnel.
+    </p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">📈 Budget mensuel selon ton profil</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;">
+      <div style="border:1px solid var(--border);padding:14px;border-radius:6px;">
+        <h3 style="margin:0 0 6px;font-size:16px;">🐢 Occasionnel</h3>
+        <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;">5 analyses / semaine</p>
+        <div style="font-size:24px;font-weight:700;color:var(--accent-green);">$2 – $8/mois</div>
+        <p style="font-size:11.5px;color:var(--text-secondary);margin:6px 0 0;">Quick Analysis quotidienne + 1 DCF par semaine. Idéal pour suivre 5-10 valeurs.</p>
+      </div>
+      <div style="border:1px solid var(--border);padding:14px;border-radius:6px;">
+        <h3 style="margin:0 0 6px;font-size:16px;">⚡ Actif</h3>
+        <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;">3 analyses / jour</p>
+        <div style="font-size:24px;font-weight:700;color:var(--accent-green);">$15 – $40/mois</div>
+        <p style="font-size:11.5px;color:var(--text-secondary);margin:6px 0 0;">Quick Analysis + DCF + Macro + Sentiment quotidiens. Investisseur actif suivant 30+ valeurs.</p>
+      </div>
+      <div style="border:1px solid var(--border);padding:14px;border-radius:6px;">
+        <h3 style="margin:0 0 6px;font-size:16px;">🚀 Power User</h3>
+        <p style="font-size:12px;color:var(--text-muted);margin:0 0 8px;">Recherche pro</p>
+        <div style="font-size:24px;font-weight:700;color:var(--accent-green);">$50 – $150/mois</div>
+        <p style="font-size:11.5px;color:var(--text-secondary);margin:6px 0 0;">Research Agent + 10-K + Earnings + YouTube quotidiens. Hedge-funder amateur, conseiller financier.</p>
+      </div>
+    </div>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">⚖️ Comparaison BYOK vs SaaS</h2>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Solution</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Modèle</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Prix annuel</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">IA incluse ?</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>ALPHA TERMINAL (BYOK)</strong></td><td style="padding:8px;border:1px solid var(--border);">€99 lifetime + API perso</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);"><strong>~€200/an total</strong> (€99 amorti + ~$100 API)</td><td style="padding:8px;border:1px solid var(--border);">✅ Toi-même au prix coûtant</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Bloomberg Terminal</td><td style="padding:8px;border:1px solid var(--border);">SaaS Pro</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$24 000/an</td><td style="padding:8px;border:1px solid var(--border);">❌ Pas d'IA générative intégrée</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Koyfin Plus</td><td style="padding:8px;border:1px solid var(--border);">SaaS particuliers</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$468/an</td><td style="padding:8px;border:1px solid var(--border);">❌ Pas d'IA</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Simply Wall St</td><td style="padding:8px;border:1px solid var(--border);">SaaS</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$288/an</td><td style="padding:8px;border:1px solid var(--border);">⚠️ IA limitée propriétaire</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Stock Rover Premium+</td><td style="padding:8px;border:1px solid var(--border);">SaaS</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$280/an</td><td style="padding:8px;border:1px solid var(--border);">❌ Pas d'IA</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">TradingView Premium</td><td style="padding:8px;border:1px solid var(--border);">SaaS</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$700/an</td><td style="padding:8px;border:1px solid var(--border);">❌ Pas d'IA générative</td></tr>
+      </tbody>
+    </table>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">💡 Comment réduire ses coûts API</h2>
+    <ol style="line-height:1.9;">
+      <li><strong>Privilégie le tier "balanced" par défaut</strong> — Sonnet 4.6 ou GPT-5 Mini sont 5× moins chers que les flagship pour 90% des cas.</li>
+      <li><strong>Configure plusieurs providers</strong> et laisse le smart router de l'app choisir le moins cher pour chaque module.</li>
+      <li><strong>Active GitHub Models ou Cerebras</strong> — tier gratuit (rate-limited) qui couvre l'usage casual.</li>
+      <li><strong>Désactive le web search</strong> sur les modules qui n'en ont pas besoin (cache des réponses récentes).</li>
+      <li><strong>Évite les analyses doublons</strong> — l'app garde l'historique IndexedDB, relis-le avant de relancer.</li>
+      <li><strong>Profite du caching prompt</strong> côté Claude/OpenAI : si tu enchaînes des analyses sur le même actif, le système prompt est cached et facturé 90% moins cher.</li>
+    </ol>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Combien coûte une analyse financière avec une API d'IA ?</summary>
+      <p>Entre <strong>$0,001 et $0,50</strong> selon le module. Une analyse rapide (Quick Analysis, ~2k tokens) coûte ~$0,005. Une analyse approfondie d'un rapport 10-K (~30k tokens d'input) coûte $0,10-$0,50 selon le modèle utilisé (Claude Opus, GPT-5, Gemini 2.5 Pro).</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quel est le budget mensuel réaliste pour utiliser ALPHA TERMINAL en BYOK ?</summary>
+      <p>Selon ton usage : <strong>$2-$8/mois pour un usage occasionnel</strong> (5 analyses/semaine), <strong>$15-$40/mois en usage actif</strong> (3 analyses/jour), <strong>$50-$150/mois en power user</strong> (research-agent + 10-K + youtube quotidien). Soit 100 à 200× moins cher qu'un Bloomberg Terminal.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quelle est la différence entre les tiers fast / balanced / flagship ?</summary>
+      <p><strong>Fast</strong> : modèles légers (Claude Haiku, GPT-5 Nano) — $0,20-$0,80/M tokens — rapides mais moins nuancés. <strong>Balanced</strong> : modèles principaux (Sonnet 4.6, GPT-5 Mini, Gemini 2.5 Pro) — $1-$3/M tokens — meilleur rapport qualité/prix, recommandé par défaut. <strong>Flagship</strong> : modèles top-tier (Opus 4.7, GPT-5, Grok 4) — $5-$15/M tokens — pour les analyses complexes (10-K, fiscalité, raisonnement long).</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Comment réduire les coûts API ?</summary>
+      <p>1) Utiliser le tier "fast" pour les analyses simples. 2) Configurer plusieurs providers et laisser le smart router choisir le moins cher pour chaque tâche. 3) Activer Cerebras ou GitHub Models (tier gratuit avec rate-limit). 4) Désactiver le web search pour les modules qui n'en ont pas besoin. 5) Profiter du prompt caching d'Anthropic (90% de réduction sur les prompts répétés).</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Pourquoi le BYOK est-il moins cher qu'un abonnement SaaS ?</summary>
+      <p>Un SaaS d'analyse IA prend 5 à 10× le coût brut de l'API pour couvrir son infra cloud, son support client, sa marge commerciale. Avec BYOK tu paies l'API <strong>au prix coûtant chez le provider</strong> (Claude, OpenAI, Gemini). Économie typique : un utilisateur à 50 analyses/mois paie $5-$15 en BYOK vs $30-$50 en abonnement SaaS équivalent. Et si tu n'utilises pas l'app pendant 1 mois, tu ne paies rien.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Les clés API sont-elles stockées en sécurité ?</summary>
+      <p>Oui. Les clés sont chiffrées en local sur ton appareil via AES-GCM 256 + PBKDF2 100K iterations. Le mot de passe maître ne quitte jamais ta machine. ALPHA TERMINAL n'a aucun serveur, aucun proxy, aucune télémétrie. Tu peux vérifier avec DevTools → Network : seuls les appels directs vers les APIs des providers sont visibles.</p>
+    </details>
+
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 10px;">🚀 Prêt à essayer ?</h3>
+      <p style="color:var(--text-secondary);margin:0 0 14px;">€99 lifetime, ton API au prix coûtant. <strong>Mode démo gratuit</strong> pour tester sans configurer de clé.</p>
+      <a href="/" class="btn-primary big" style="text-decoration:none;display:inline-block;">Lancer ALPHA TERMINAL →</a>
+    </div>
+
+    <footer class="landing-footer" style="margin-top:60px;">
+      <span>ALPHA TERMINAL · Made in France 🇫🇷 · BYOK 100% privé</span>
+      <span class="footer-legal-links">
+        <a href="/" data-legal="about">À propos</a> ·
+        <a href="pricing.html">Tarif</a> ·
+        <a href="bloomberg-alternative.html">vs Bloomberg</a> ·
+        <a href="features.html">Fonctionnalités</a>
+      </span>
+    </footer>
+  </article>
+</body>
+</html>
