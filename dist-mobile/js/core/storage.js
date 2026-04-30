@@ -2,7 +2,7 @@
 // + helpers localStorage pour settings non-sensibles
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 let _dbPromise = null;
 let _dbAvailable = null; // null = unknown, true = OK, false = unavailable (private mode etc.)

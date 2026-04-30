@@ -121,11 +121,47 @@ function renderWizardStep1() {
     <div style="display:flex;justify-content:flex-end;margin-top:14px;">
       <button id="wiz-next1" class="btn-primary">${t('wiz.next')}</button>
     </div>
+
+    <div style="margin:18px 0 0;padding:14px;border:1px dashed var(--border);border-radius:6px;background:var(--bg-tertiary);">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px;">🔑 Tu as déjà un backup ?</div>
+      <p style="font-size:12px;color:var(--text-secondary);margin:0 0 10px;line-height:1.5;">
+        Importe un fichier <code>.atb</code> ou <code>.json</code> (ou colle le JSON) pour restaurer tes clés API, analyses, patrimoine et paramètres d'un autre appareil. Pas besoin de recréer un mot de passe.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <label class="btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;">
+          📥 Ajouter une clé d'accès (fichier)
+          <input id="wiz-import-file" type="file" accept=".atb,.json,application/json,application/octet-stream" hidden />
+        </label>
+        <button id="wiz-import-paste" class="btn-ghost" style="font-size:12.5px;">📋 Coller un JSON</button>
+      </div>
+      <div id="wiz-import-status" style="margin-top:8px;font-size:12px;color:var(--text-muted);"></div>
+    </div>
   `;
   ['wiz-pwd', 'wiz-pwd2'].forEach(id => {
     $('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') next1(); });
   });
   $('#wiz-next1').addEventListener('click', next1);
+
+  // === Import backup pendant l'onboarding ===
+  $('#wiz-import-file').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const status = $('#wiz-import-status');
+    status.textContent = '⏳ Import en cours…';
+    try {
+      const { importBackupFromFile } = await import('../core/backup.js');
+      const counts = await importBackupFromFile(file, { mode: 'replace' });
+      handleWizardImportSuccess(counts);
+    } catch (err) {
+      status.innerHTML = `<span style="color:var(--accent-red);">❌ ${err.message}</span>`;
+    } finally {
+      e.target.value = '';
+    }
+  });
+
+  $('#wiz-import-paste').addEventListener('click', async () => {
+    showWizardPasteImport();
+  });
 
   function next1() {
     const p = $('#wiz-pwd').value, p2 = $('#wiz-pwd2').value;
@@ -136,6 +172,91 @@ function renderWizardStep1() {
     wizardState.password = p;
     renderWizardStep2();
   }
+}
+
+function handleWizardImportSuccess(counts) {
+  const status = $('#wiz-import-status');
+  const a = counts.added || {};
+  const breakdown = [
+    a.analyses ? `${a.analyses} analyses` : null,
+    a.wealth ? `${a.wealth} holdings` : null,
+    a.wealth_snapshots ? `${a.wealth_snapshots} snapshots` : null,
+    a.knowledge ? `${a.knowledge} KB` : null,
+    a.transcripts ? `${a.transcripts} transcripts` : null,
+    counts.localStorageKeys ? `${counts.localStorageKeys} settings` : null
+  ].filter(Boolean).join(' · ') || 'aucune donnée';
+
+  if (status) {
+    status.innerHTML = `<span style="color:var(--accent-green);">✓ Importé : ${breakdown}</span><br><span style="color:var(--text-muted);font-size:11px;">Rechargement dans 1.5s pour appliquer le vault…</span>`;
+  }
+  // Reload : permet au vault chiffré importé d'être lu par hasVault() et rebascule sur l'écran unlock
+  setTimeout(() => location.reload(), 1500);
+}
+
+function showWizardPasteImport() {
+  const w = document.createElement('div');
+  w.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10001;display:flex;align-items:center;justify-content:center;padding:20px;';
+  w.innerHTML = `
+    <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong>📋 Coller le JSON du backup</strong>
+        <button class="btn-ghost" id="wpi-close">×</button>
+      </div>
+      <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup ALPHA TERMINAL pour restaurer tes données et tes clés API.</p>
+      <textarea id="wpi-textarea" placeholder='{"app":"alpha-terminal", ...}' style="flex:1;min-height:260px;font-family:monospace;font-size:11px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:10px;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;">
+        <button class="btn-ghost" id="wpi-paste-clipboard" style="font-size:12px;">📋 Coller depuis le presse-papier</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-secondary" id="wpi-cancel">Annuler</button>
+          <button class="btn-primary" id="wpi-restore">📥 Restaurer</button>
+        </div>
+      </div>
+      <div id="wpi-status" style="font-size:12px;color:var(--text-muted);"></div>
+    </div>
+  `;
+  document.body.appendChild(w);
+  const ta = w.querySelector('#wpi-textarea');
+  const close = () => { try { document.body.removeChild(w); } catch {} };
+  setTimeout(() => ta.focus(), 50);
+
+  w.querySelector('#wpi-close').addEventListener('click', close);
+  w.querySelector('#wpi-cancel').addEventListener('click', close);
+  w.addEventListener('click', (e) => { if (e.target === w) close(); });
+
+  w.querySelector('#wpi-paste-clipboard').addEventListener('click', async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) ta.value = text;
+    } catch {
+      w.querySelector('#wpi-status').textContent = 'Lecture du presse-papier refusée — colle manuellement (⌘V/Ctrl+V).';
+    }
+  });
+
+  w.querySelector('#wpi-restore').addEventListener('click', async () => {
+    const status = w.querySelector('#wpi-status');
+    const text = ta.value.trim();
+    if (!text) { status.innerHTML = '<span style="color:var(--accent-red);">Colle un JSON avant de restaurer.</span>'; return; }
+    let payload;
+    try { payload = JSON.parse(text); }
+    catch (e) { status.innerHTML = `<span style="color:var(--accent-red);">JSON invalide : ${e.message}</span>`; return; }
+    if (!payload || payload.app !== 'alpha-terminal') {
+      status.innerHTML = '<span style="color:var(--accent-red);">Pas un backup ALPHA TERMINAL (champ "app" manquant).</span>';
+      return;
+    }
+    const btn = w.querySelector('#wpi-restore');
+    btn.disabled = true;
+    btn.textContent = '⏳ Restauration…';
+    try {
+      const { importFullBackup } = await import('../core/backup.js');
+      const counts = await importFullBackup(payload, { mode: 'replace' });
+      close();
+      handleWizardImportSuccess(counts);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '📥 Restaurer';
+      status.innerHTML = `<span style="color:var(--accent-red);">❌ ${err.message}</span>`;
+    }
+  });
 }
 
 function renderWizardStep2() {

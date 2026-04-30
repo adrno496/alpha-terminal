@@ -2,7 +2,7 @@
 // Permet de migrer entre appareils (PC ↔ smartphone, ancien ↔ nouveau, etc.)
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts'];
 
@@ -97,7 +97,9 @@ async function ensureStoresExist(db) {
   if (missing.length === 0) return db;
 
   console.warn('[backup] Stores manquants détectés, version bump pour création :', missing);
-  const newVersion = db.version + 1;
+  // On vise au minimum DB_VERSION ; si la DB est déjà au-delà (autre onglet a déjà bumpé),
+  // on bump encore d'un cran. Évite l'erreur "requested version (X) less than existing (Y)".
+  const newVersion = Math.max(db.version + 1, DB_VERSION);
   try { db.close(); } catch {}
 
   return new Promise((resolve, reject) => {
