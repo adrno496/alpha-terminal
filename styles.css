@@ -1304,8 +1304,18 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   font-style: normal; font-size: 10px; color: var(--accent-green);
   margin-left: 4px; padding: 1px 5px; background: rgba(0,255,136,0.12); border-radius: 4px;
 }
-.free-llms-tip { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.5; }
+.free-llms-tip { font-size: 13px; color: var(--text-secondary); margin: 0 0 12px; line-height: 1.5; }
 .free-llms-tip strong { color: var(--text-primary); }
+.free-llms-cta {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; padding: 8px 14px; border-radius: 8px;
+  background: rgba(0,255,136,0.12); border: 1px solid rgba(0,255,136,0.4);
+  color: var(--text-primary); text-decoration: none;
+  transition: all 0.18s; font-weight: 500;
+}
+.free-llms-cta:hover { background: rgba(0,255,136,0.2); border-color: var(--accent-green); transform: translateX(2px); }
+.free-llms-cta strong { color: var(--accent-green); }
+.free-llms-cta span { color: var(--text-secondary); font-size: 12px; }
 @media (max-width: 600px) {
   .free-llms-banner { padding: 14px; }
   .free-llm-chip { font-size: 11px; }

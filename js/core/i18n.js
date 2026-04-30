@@ -733,7 +733,9 @@ const DICT = {
     'land.free_llms.tag_free_tier': 'tier gratuit',
     'land.free_llms.tag_free_credits': 'crédits offerts',
     'land.free_llms.tag_trial': 'clé d\'essai',
-    'land.free_llms.tip': '👉 <strong>Pour explorer l\'app : ces providers gratuits suffisent.</strong> Pour des analyses de niveau pro (10-K decoder, DCF nuancé, CEO Forensics, fiscal complexe), passe sur <strong>Claude Sonnet, GPT-4o ou Gemini Pro</strong> — comptes ~$0,005-0,10 par analyse, payés direct au provider (BYOK).'
+    'land.free_llms.tip': '👉 <strong>Pour explorer l\'app : ces providers gratuits suffisent.</strong> Pour des analyses de niveau pro (10-K decoder, DCF nuancé, CEO Forensics, fiscal complexe), passe sur <strong>Claude Sonnet, GPT-4o ou Gemini Pro</strong> — comptes ~$0,005-0,10 par analyse, payés direct au provider (BYOK).',
+    'land.free_llms.howto_btn': 'Comment obtenir une clé API',
+    'land.free_llms.howto_sub': '— guide complet, liens directs, étapes (5 min)'
   },
   en: {
     'topbar.api_connected': 'API connected',
@@ -1440,7 +1442,9 @@ const DICT = {
     'land.free_llms.tag_free_tier': 'free tier',
     'land.free_llms.tag_free_credits': 'free credits',
     'land.free_llms.tag_trial': 'trial key',
-    'land.free_llms.tip': '👉 <strong>To explore the app: these free providers are enough.</strong> For pro-grade analyses (10-K decoder, nuanced DCF, CEO Forensics, complex tax), upgrade to <strong>Claude Sonnet, GPT-4o or Gemini Pro</strong> — about $0.005-0.10 per analysis, paid directly to the provider (BYOK).'
+    'land.free_llms.tip': '👉 <strong>To explore the app: these free providers are enough.</strong> For pro-grade analyses (10-K decoder, nuanced DCF, CEO Forensics, complex tax), upgrade to <strong>Claude Sonnet, GPT-4o or Gemini Pro</strong> — about $0.005-0.10 per analysis, paid directly to the provider (BYOK).',
+    'land.free_llms.howto_btn': 'How to get an API key',
+    'land.free_llms.howto_sub': '— full guide, direct links, steps (5 min)'
   }
 };
 
