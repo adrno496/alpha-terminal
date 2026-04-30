@@ -110,14 +110,20 @@ export async function exportFullBackup() {
 
 export function backupFilename() {
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-  return `alpha-terminal-backup-${stamp}.json`;
+  // Extension .atb (Alpha Terminal Backup) au lieu de .json :
+  //   - .json est parfois flaggé par Chrome/Edge SafeBrowsing comme "type rare/dangereux"
+  //   - les antivirus (Norton, McAfee) bloquent les .json sortants par défaut
+  //   - la WebView Android n'ouvre pas toujours les .json comme téléchargement
+  //   - une extension custom contourne tous ces blocages tout en restant du JSON pur
+  return `alpha-terminal-backup-${stamp}.atb`;
 }
 
 // Tente plusieurs stratégies dans l'ordre :
-//   1. Capacitor Filesystem + Share  (Android / iOS)
-//   2. <a download> via Blob URL     (Web, Electron)
-//   3. data: URL ouvert dans une nouvelle fenêtre (dernier recours)
-//   4. Sinon, lève une erreur — l'appelant peut tomber sur le copy-to-clipboard
+//   1. Capacitor Filesystem + Share          (Android / iOS)
+//   2. File System Access API (showSaveFilePicker)  (Chromium récents)
+//   3. <a download> via Blob URL             (Web, Electron, fallback universel)
+//   4. data: URL ouvert dans une nouvelle fenêtre (dernier recours)
+//   5. Sinon, l'appelant peut tomber sur le copy-to-clipboard
 export async function downloadFullBackup() {
   const payload = await exportFullBackup();
   const json = JSON.stringify(payload, null, 2);
@@ -130,34 +136,69 @@ export async function downloadFullBackup() {
       const ok = await saveViaCapacitor(json, filename);
       if (ok) return { payload, json, filename, method: 'capacitor' };
     } catch (e) { console.warn('Capacitor save failed:', e); }
+    // Plugins Capacitor absents/échec : le fallback <a download> ne marche pas dans
+    // la WebView Android/iOS → on bascule directement sur la modale JSON pour copy-paste,
+    // au lieu de simuler un succès de téléchargement qui n'arrivera jamais.
+    return { payload, json, filename, method: 'failed' };
   }
 
-  // 2. Web / Electron — <a download>
+  // 2. File System Access API — Chromium récent, plus fiable que <a download>
+  //    (boîte de dialogue native, pas de blocage par adblocker / PWA standalone)
+  if (typeof window.showSaveFilePicker === 'function') {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{
+          description: 'ALPHA TERMINAL backup',
+          accept: { 'application/octet-stream': ['.atb', '.json'] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      return { payload, json, filename, method: 'fs-access' };
+    } catch (e) {
+      // AbortError = utilisateur a annulé, on remonte ça comme "cancelled" sans fallback
+      if (e && e.name === 'AbortError') {
+        return { payload, json, filename, method: 'cancelled' };
+      }
+      // Sinon on bascule sur le fallback <a download>
+      console.warn('showSaveFilePicker failed:', e);
+    }
+  }
+
+  // 3. Web / Electron — <a download> via Blob URL
+  //    MIME application/octet-stream force le download (au lieu d'ouvrir dans l'onglet),
+  //    et on évite display:none qui bloque le click programmatique sur certains navigateurs.
   try {
-    const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    const blob = new Blob([json], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
-    a.rel = 'noopener';
-    a.style.display = 'none';
+    a.style.position = 'fixed';
+    a.style.left = '-9999px';
+    a.style.top = '0';
     document.body.appendChild(a);
-    a.click();
+    // Click via MouseEvent : plus robuste que a.click() dans certains contextes (popup blockers, PWA standalone)
+    const evt = new MouseEvent('click', { bubbles: true, cancelable: true, view: window });
+    a.dispatchEvent(evt);
+    // Délai plus long avant revoke : certains navigateurs lents (Safari) ont besoin de temps
     setTimeout(() => {
-      try { document.body.removeChild(a); } catch {}
-      URL.revokeObjectURL(url);
-    }, 1500);
+      try { a.remove(); } catch {}
+      try { URL.revokeObjectURL(url); } catch {}
+    }, 5000);
     return { payload, json, filename, method: 'download' };
   } catch (e) { console.warn('Download fallback:', e); }
 
-  // 3. data: URL — fallback si <a download> bloqué (vieux navigateurs / WebView restrictifs)
+  // 4. data: URL — fallback si <a download> bloqué (vieux navigateurs / WebView restrictifs)
   try {
-    const data = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+    const data = 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(json);
     const w = window.open(data, '_blank');
     if (w) return { payload, json, filename, method: 'window' };
   } catch (e) { console.warn('data: URL failed:', e); }
 
-  // 4. Tout a échoué — l'appelant doit afficher le JSON pour copy-paste
+  // 5. Tout a échoué — l'appelant doit afficher le JSON pour copy-paste
   return { payload, json, filename, method: 'failed' };
 }
 

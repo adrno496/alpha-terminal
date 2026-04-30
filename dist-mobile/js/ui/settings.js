@@ -392,8 +392,9 @@ function renderAdvancedTab(c) {
         <button id="set-backup-copy" class="btn-ghost" style="font-size:12.5px;" title="${t('settings.adv.backup_copy_tip')}">📋 ${t('settings.adv.backup_copy')}</button>
         <label class="btn-secondary" style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
           📥 ${t('settings.adv.restore_full')}
-          <input id="set-restore-full" type="file" accept="application/json,.json,application/octet-stream" hidden />
+          <input id="set-restore-full" type="file" accept=".atb,.json,application/json,application/octet-stream" hidden />
         </label>
+        <button id="set-restore-paste" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;" title="Coller un JSON copié pour restaurer">📋 Coller un backup</button>
       </div>
 
       <details style="margin-top:14px;">
@@ -476,6 +477,9 @@ function renderAdvancedTab(c) {
         // Aucune méthode n'a marché — on bascule sur la modale "show JSON" pour copy manuel
         showBackupFallbackModal(json, filename);
         toast(t('settings.adv.backup_failed_show_modal'), 'info');
+      } else if (method === 'cancelled') {
+        // Utilisateur a fermé la dialog system du picker — pas un succès, pas une erreur
+        // (ne rien afficher)
       } else if (method === 'capacitor') {
         toast(t('settings.adv.backup_done_mobile').replace('{n}', n), 'success');
       } else {
@@ -561,6 +565,95 @@ function renderAdvancedTab(c) {
       e.target.value = '';
     }
   });
+
+  // Paste-and-restore : ouvre une modale pour coller un JSON et restaurer directement
+  $('#set-restore-paste').addEventListener('click', () => {
+    showPasteRestoreModal();
+  });
+
+  function showPasteRestoreModal() {
+    const w = document.createElement('div');
+    w.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    w.innerHTML = `
+      <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong>📥 Restaurer depuis un JSON collé</strong>
+          <button class="btn-ghost" id="prm-close">×</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup ALPHA TERMINAL (JSON). Utile si tu as récupéré le backup via copy-paste plutôt que via un fichier <code>.atb</code>.</p>
+        <textarea id="prm-textarea" placeholder='{"app":"alpha-terminal", ...}' style="flex:1;min-height:280px;font-family:monospace;font-size:11px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:10px;resize:vertical;"></textarea>
+        <div style="display:flex;gap:14px;align-items:center;font-size:12px;color:var(--text-secondary);flex-wrap:wrap;">
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;">
+            <input type="radio" name="prm-mode" value="merge" checked />
+            <span><strong>Fusionner</strong></span>
+          </label>
+          <label style="display:flex;gap:6px;align-items:center;cursor:pointer;">
+            <input type="radio" name="prm-mode" value="replace" />
+            <span><strong>Remplacer</strong> (efface le state local)</span>
+          </label>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;">
+          <button class="btn-ghost" id="prm-paste-clipboard" style="font-size:12px;">📋 Coller depuis le presse-papier</button>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-secondary" id="prm-cancel">Annuler</button>
+            <button class="btn-primary" id="prm-restore">📥 Restaurer</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(w);
+    const ta = w.querySelector('#prm-textarea');
+    const close = () => { try { document.body.removeChild(w); } catch {} };
+    setTimeout(() => ta.focus(), 50);
+
+    w.querySelector('#prm-close').addEventListener('click', close);
+    w.querySelector('#prm-cancel').addEventListener('click', close);
+    w.addEventListener('click', (e) => { if (e.target === w) close(); });
+
+    w.querySelector('#prm-paste-clipboard').addEventListener('click', async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) { ta.value = text; toast('Collé depuis le presse-papier', 'success'); }
+        else toast('Presse-papier vide', 'info');
+      } catch (e) {
+        toast('Lecture du presse-papier refusée — colle manuellement (⌘V/Ctrl+V)', 'info');
+      }
+    });
+
+    w.querySelector('#prm-restore').addEventListener('click', async () => {
+      const text = ta.value.trim();
+      if (!text) { toast('Colle un JSON avant de restaurer', 'error'); return; }
+      let payload;
+      try { payload = JSON.parse(text); }
+      catch (e) { toast('JSON invalide : ' + e.message, 'error'); return; }
+      if (!payload || payload.app !== 'alpha-terminal') {
+        toast('Pas un backup ALPHA TERMINAL (champ "app" manquant)', 'error');
+        return;
+      }
+      const mode = w.querySelector('input[name="prm-mode"]:checked')?.value || 'merge';
+      if (mode === 'replace') {
+        if (!confirm(t('settings.adv.restore_replace_confirm'))) return;
+      }
+      const btn = w.querySelector('#prm-restore');
+      btn.disabled = true;
+      btn.textContent = '⏳ Restauration…';
+      try {
+        const { importFullBackup } = await import('../core/backup.js');
+        const counts = await importFullBackup(payload, { mode });
+        const total = Object.values(counts.added || {}).reduce((s, n) => s + n, 0);
+        toast(t('settings.adv.restore_done').replace('{n}', total), 'success');
+        close();
+        await refreshBackupStats();
+        setTimeout(() => {
+          if (confirm(t('settings.adv.restore_reload_prompt'))) location.reload();
+        }, 600);
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = '📥 Restaurer';
+        toast('Import : ' + err.message, 'error');
+      }
+    });
+  }
 
   $('#set-clear-history').addEventListener('click', async () => {
     if (confirm(t('settings.adv.clear_confirm'))) {

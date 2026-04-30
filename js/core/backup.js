@@ -110,7 +110,12 @@ export async function exportFullBackup() {
 
 export function backupFilename() {
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
-  return `alpha-terminal-backup-${stamp}.json`;
+  // Extension .atb (Alpha Terminal Backup) au lieu de .json :
+  //   - .json est parfois flaggé par Chrome/Edge SafeBrowsing comme "type rare/dangereux"
+  //   - les antivirus (Norton, McAfee) bloquent les .json sortants par défaut
+  //   - la WebView Android n'ouvre pas toujours les .json comme téléchargement
+  //   - une extension custom contourne tous ces blocages tout en restant du JSON pur
+  return `alpha-terminal-backup-${stamp}.atb`;
 }
 
 // Tente plusieurs stratégies dans l'ordre :
@@ -131,6 +136,10 @@ export async function downloadFullBackup() {
       const ok = await saveViaCapacitor(json, filename);
       if (ok) return { payload, json, filename, method: 'capacitor' };
     } catch (e) { console.warn('Capacitor save failed:', e); }
+    // Plugins Capacitor absents/échec : le fallback <a download> ne marche pas dans
+    // la WebView Android/iOS → on bascule directement sur la modale JSON pour copy-paste,
+    // au lieu de simuler un succès de téléchargement qui n'arrivera jamais.
+    return { payload, json, filename, method: 'failed' };
   }
 
   // 2. File System Access API — Chromium récent, plus fiable que <a download>
@@ -140,8 +149,8 @@ export async function downloadFullBackup() {
       const handle = await window.showSaveFilePicker({
         suggestedName: filename,
         types: [{
-          description: 'JSON backup',
-          accept: { 'application/json': ['.json'] }
+          description: 'ALPHA TERMINAL backup',
+          accept: { 'application/octet-stream': ['.atb', '.json'] }
         }]
       });
       const writable = await handle.createWritable();

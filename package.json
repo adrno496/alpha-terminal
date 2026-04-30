@@ -1,0 +1,19 @@
+{
+  "name": "alpha-terminal",
+  "version": "2.1.0",
+  "description": "ALPHA TERMINAL — Terminal d'analyse financière IA, 26 modules, BYOK",
+  "private": true,
+  "scripts": {
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android",
+    "cap:run": "cap run android"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.3.1",
+    "@capacitor/core": "8.3.1",
+    "@capacitor/ios": "8.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.3.1"
+  }
+}

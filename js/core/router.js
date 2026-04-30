@@ -11,6 +11,13 @@ export const MODULE_ROUTING = {
     recommendedTier: 'fast',
     reason: 'Local CRUD, pas d\'analyse LLM directe'
   },
+  'knowledge-base': {
+    needsCapabilities: [],
+    optimalProviders: ['openai', 'claude', 'gemini'],
+    fallbackProviders: ['grok', 'openrouter'],
+    recommendedTier: 'fast',
+    reason: 'RAG local — embeddings OpenAI préférés, LLM léger pour synthèse'
+  },
   'quick-analysis': {
     needsCapabilities: ['supportsWebSearch'],
     optimalProviders: ['claude', 'gemini', 'grok', 'perplexity'],
@@ -153,6 +160,20 @@ export const MODULE_ROUTING = {
     fallbackProviders: ['openai', 'openrouter'],
     recommendedTier: 'balanced',
     reason: 'Web search live pour news matinales (Perplexity excellent)'
+  },
+  'portfolio-audit': {
+    needsCapabilities: [],
+    optimalProviders: ['claude', 'openai'],
+    fallbackProviders: ['gemini', 'grok', 'openrouter', 'perplexity'],
+    recommendedTier: 'flagship',
+    reason: 'Audit profond Buffett-style — raisonnement nuancé + critique fondamentale'
+  },
+  'youtube-transcript': {
+    needsCapabilities: ['supportsLongContext'],
+    optimalProviders: ['claude', 'gemini'],
+    fallbackProviders: ['openai', 'grok', 'openrouter'],
+    recommendedTier: 'flagship',
+    reason: 'Transcript long + CEO Forensics — context long requis'
   }
 };
 
