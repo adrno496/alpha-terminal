@@ -9,7 +9,7 @@ const PUBLISHER = {
   name: 'Axel Dreano',
   email: 'savetheworldfr@gmail.com',
   country: 'France',
-  appName: 'ALPHA TERMINAL',
+  appName: 'Alpha',
   version: '2.1.0'
 };
 
@@ -18,9 +18,9 @@ const LAST_UPDATED = '2026-04-29';
 // ============== ABOUT ==============
 
 const ABOUT_FR = `
-<h2>À propos d'ALPHA TERMINAL</h2>
+<h2>À propos d'Alpha</h2>
 
-<p><strong>ALPHA TERMINAL</strong> est un terminal d'analyse financière de niveau institutionnel,
+<p><strong>Alpha</strong> est un terminal d'analyse financière de niveau institutionnel,
 100% client-side, sans abonnement, conçu pour les investisseurs particuliers et professionnels
 qui veulent garder le contrôle de leurs données et de leurs coûts.</p>
 
@@ -49,7 +49,7 @@ sans changer le coût LLM.</p>
 
 <h3>🔒 Privacy by design</h3>
 <ul>
-  <li>100% client-side. Aucun serveur ALPHA TERMINAL.</li>
+  <li>100% client-side. Aucun serveur Alpha.</li>
   <li>Vault chiffré localement (AES-GCM 256 bits + PBKDF2 100K iterations).</li>
   <li>Stockage IndexedDB (analyses, patrimoine, transcripts, KB).</li>
   <li>BYOK (Bring Your Own Key) — tu paies les providers directement.</li>
@@ -65,9 +65,9 @@ sans changer le coût LLM.</p>
 `;
 
 const ABOUT_EN = `
-<h2>About ALPHA TERMINAL</h2>
+<h2>About Alpha</h2>
 
-<p><strong>ALPHA TERMINAL</strong> is an institutional-grade financial analysis terminal,
+<p><strong>Alpha</strong> is an institutional-grade financial analysis terminal,
 100% client-side, no subscription, built for retail and pro investors who want to keep
 control of their data and costs.</p>
 
@@ -94,7 +94,7 @@ DefiLlama, SEC EDGAR, Frankfurter (FX). Optional: enrich analyses without extra 
 
 <h3>🔒 Privacy by design</h3>
 <ul>
-  <li>100% client-side. No ALPHA TERMINAL server.</li>
+  <li>100% client-side. No Alpha server.</li>
   <li>Locally encrypted vault (AES-GCM 256-bit + PBKDF2 100K iterations).</li>
   <li>IndexedDB storage (analyses, wealth, transcripts, KB).</li>
   <li>BYOK (Bring Your Own Key) — you pay providers directly.</li>
@@ -139,7 +139,7 @@ Capacitor (mobile).</p>
 <p>Quand vous utilisez un module, votre prompt et vos documents sont envoyés
 <strong>directement</strong> de votre appareil vers le fournisseur LLM dont vous avez fourni
 la clé (Anthropic, OpenAI, Google, xAI, etc.). Ces flux ne transitent jamais par un
-serveur ALPHA TERMINAL.</p>
+serveur Alpha.</p>
 
 <p>De même, si vous avez fourni des clés pour les fournisseurs de données (FMP, Polygon, etc.),
 des requêtes leur sont envoyées directement pour récupérer prix, fondamentaux, news.</p>
@@ -231,7 +231,7 @@ Electron app (desktop), or Capacitor app (mobile).</p>
 <h4>2.2 Data sent to third parties (with your consent)</h4>
 <p>When you use a module, your prompt and documents are sent <strong>directly</strong>
 from your device to the LLM provider whose key you provided (Anthropic, OpenAI, Google, etc.).
-These flows never go through any ALPHA TERMINAL server.</p>
+These flows never go through any Alpha server.</p>
 
 <p>Likewise, if you provided keys for data providers (FMP, Polygon, etc.), requests are
 sent directly to them for prices, fundamentals, news.</p>
@@ -468,7 +468,7 @@ direct, GitHub Pages, ou store mobile). Aucun serveur backend n'est opéré par 
 
 <h3>Propriété intellectuelle</h3>
 <p>L'ensemble des éléments accessibles dans l'Application (code, design, prompts système,
-textes, marque "ALPHA TERMINAL") sont protégés par le droit d'auteur français et les
+textes, marque "Alpha") sont protégés par le droit d'auteur français et les
 conventions internationales. Toute reproduction, représentation, modification, exploitation
 non autorisée est interdite et constitue une contrefaçon sanctionnée par les articles
 L335-2 et suivants du Code de la propriété intellectuelle.</p>
@@ -537,7 +537,7 @@ platform of the user's choice (direct download, GitHub Pages, or mobile store).
 No backend server is operated by the publisher.</p>
 
 <h3>Intellectual property</h3>
-<p>All elements in the app (code, design, system prompts, texts, "ALPHA TERMINAL" brand)
+<p>All elements in the app (code, design, system prompts, texts, "Alpha" brand)
 are protected by French copyright law and international conventions. Any unauthorized
 reproduction, representation, modification, or exploitation is prohibited.</p>
 

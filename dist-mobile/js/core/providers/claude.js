@@ -65,7 +65,16 @@ export class ClaudeProvider extends BaseProvider {
       temperature: params.temperature ?? 1.0,
       messages
     };
-    if (params.system) body.system = params.system;
+    // === A1 — Prompt caching Anthropic (90% moins cher sur tokens cached) ===
+    // On marque le system prompt comme cacheable (durée 5min default).
+    // Si le même prompt est utilisé pour plusieurs analyses dans la fenêtre, 90% d'économie.
+    if (params.system) {
+      if (params.promptCaching) {
+        body.system = [{ type: 'text', text: params.system, cache_control: { type: 'ephemeral' } }];
+      } else {
+        body.system = params.system;
+      }
+    }
     if (params.useWebSearch) {
       body.tools = [{ type: 'web_search_20250305', name: 'web_search', max_uses: 8 }];
     }

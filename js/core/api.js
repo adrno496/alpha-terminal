@@ -151,6 +151,7 @@ export class APIOrchestrator {
       temperature: params.temperature ?? settings.temperature,
       files,
       useWebSearch: params.useWebSearch || false,
+      promptCaching: params.promptCaching || false,
       signal: controller.signal
     };
 

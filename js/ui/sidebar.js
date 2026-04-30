@@ -89,7 +89,10 @@ const CATEGORIES = [
       { id: 'goals',                 num: '30' },
       { id: 'projection',            num: '31' },
       { id: 'accounts-view',         num: '32' },
-      { id: 'ifi-simulator',         num: '33' }
+      { id: 'ifi-simulator',         num: '33' },
+      { id: 'tax-loss-harvesting',   num: '34' },
+      { id: 'subscriptions-detector',num: '35' },
+      { id: 'envelope-optimizer',    num: '36' }
     ]
   }
 ];

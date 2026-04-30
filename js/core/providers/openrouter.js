@@ -62,7 +62,7 @@ export class OpenRouterProvider extends BaseProvider {
         'content-type': 'application/json',
         'authorization': `Bearer ${this.apiKey}`,
         'http-referer': 'https://alpha-terminal.local',
-        'x-title': 'ALPHA TERMINAL'
+        'x-title': 'Alpha'
       },
       body: JSON.stringify(body),
       signal: withTimeout(signal, body.stream ? 120_000 : 60_000)

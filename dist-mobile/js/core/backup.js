@@ -253,7 +253,7 @@ export async function downloadFullBackup() {
       const handle = await window.showSaveFilePicker({
         suggestedName: filename,
         types: [{
-          description: 'ALPHA TERMINAL backup',
+          description: 'Alpha backup',
           accept: { 'application/octet-stream': ['.atb', '.json'] }
         }]
       });
@@ -341,7 +341,7 @@ async function saveViaCapacitor(json, filename) {
         const uri = await Filesystem.getUri({ path: filename, directory });
         console.log('[backup] Sharing URI:', uri.uri);
         await Share.share({
-          title: 'ALPHA TERMINAL Backup',
+          title: 'Alpha Backup',
           text: 'Backup ' + filename,
           url: uri.uri,
           dialogTitle: 'Sauvegarder le backup'

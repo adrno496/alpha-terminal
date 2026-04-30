@@ -5,7 +5,7 @@ Pour la thèse fournie :
 # MEMO D'INVESTISSEMENT — [TICKER / NOM]
 
 **Date** : [aujourd'hui]
-**Analyste** : ALPHA TERMINAL
+**Analyste** : Alpha
 **Recommandation** : BUY / WATCH / PASS
 **Conviction** : X/10
 **Position size suggérée** : X% portfolio

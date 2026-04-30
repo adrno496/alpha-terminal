@@ -45,7 +45,7 @@ function buildPrintHtml({ title, module, createdAt, html }) {
   return `
     <header style="border-bottom:1px solid #ccc;margin-bottom:18px;padding-bottom:12px;">
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.06em;">
-        ALPHA TERMINAL · ${module}
+        Alpha · ${module}
       </div>
       <h1 style="margin:6px 0 4px;font-size:22px;color:#000;">${escapeHtml(title || 'Analyse')}</h1>
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#888;">
@@ -88,7 +88,7 @@ export async function downloadAnalysisPdf({ title, module, createdAt, markdown, 
   wrapper.innerHTML = `
     <div style="border-bottom:1px solid #ddd;margin-bottom:18px;padding-bottom:12px;">
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.08em;">
-        ALPHA TERMINAL · ${escapeHtml(module || '')}
+        Alpha · ${escapeHtml(module || '')}
       </div>
       <h1 style="margin:6px 0 4px;font-size:22px;color:#111;">${escapeHtml(title || 'Analyse')}</h1>
       <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#888;">
@@ -111,7 +111,7 @@ export async function downloadAnalysisPdf({ title, module, createdAt, markdown, 
     </style>
     <div class="pdf-content">${html}</div>
     <footer style="margin-top:30px;padding-top:10px;border-top:1px solid #eee;font-size:10px;color:#999;text-align:center;">
-      Généré par ALPHA TERMINAL · ${new Date().toLocaleDateString('fr-FR')}
+      Généré par Alpha · ${new Date().toLocaleDateString('fr-FR')}
     </footer>
   `;
   wrapper.style.position = 'fixed';

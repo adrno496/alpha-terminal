@@ -68,6 +68,11 @@ import { renderLiveWatcherView }    from './modules/live-watcher.js';
 import { renderAccountsViewView }   from './modules/accounts-view.js';
 import { renderProjectionView }     from './modules/projection.js';
 
+// V10 — Tax-Loss Harvesting / Subscriptions / Envelope Optimizer
+import { renderTaxLossHarvestingView }      from './modules/tax-loss-harvesting.js';
+import { renderSubscriptionsDetectorView }  from './modules/subscriptions-detector.js';
+import { renderEnvelopeOptimizerView }      from './modules/envelope-optimizer.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -110,6 +115,10 @@ const ROUTES = {
   'live-watcher':          { render: renderLiveWatcherView,          label: '📈 Live Watcher' },
   'accounts-view':         { render: renderAccountsViewView,         label: '🏦 Vue par compte' },
   'projection':            { render: renderProjectionView,           label: '📊 Projection patrimoine' },
+  // V10
+  'tax-loss-harvesting':   { render: renderTaxLossHarvestingView,    label: '🧮 Tax-Loss Harvesting' },
+  'subscriptions-detector':{ render: renderSubscriptionsDetectorView, label: '🔍 Détecteur abonnements' },
+  'envelope-optimizer':    { render: renderEnvelopeOptimizerView,    label: '🇫🇷 Optimiseur enveloppe fiscale' },
 };
 
 const STATE = { currentRoute: null };
@@ -154,7 +163,7 @@ function navigate(route) {
   if (route === 'settings') { titleEl.textContent = 'SETTINGS'; subEl.textContent = ''; renderSettingsView(view); setHash(route); return; }
 
   // Home
-  titleEl.textContent = 'ALPHA TERMINAL';
+  titleEl.textContent = 'Alpha';
   subEl.textContent = 'Multi-LLM · BYOK · 100% client-side';
   renderHome(view);
   setHash('home');

@@ -214,9 +214,42 @@ export async function getTotals(targetCurrency = 'EUR') {
   return { total, byCategory, currency: targetCurrency, count: list.length };
 }
 
+// A6 — Filtre les holdings selon le module pour économiser les tokens.
+// Pour tax-optimizer-fr : seulement holdings FR + AV + PEA.
+// Pour crypto-fundamental : seulement crypto.
+// Pour decoder-10k / dcf / quick-analysis : seulement stocks + ETF.
+// Pour ifi-simulator : seulement real_estate.
+// Pour les autres modules wealth-aware : tout (full context).
+function filterHoldingsForModule(list, moduleId) {
+  if (!moduleId) return list;
+  const isFr = (h) => /\.PA$|FR$/.test((h.ticker || '').toUpperCase()) || (h.currency || 'EUR') === 'EUR';
+  if (moduleId === 'tax-optimizer-fr') {
+    return list.filter(h => isFr(h) || ['retirement', 'real_estate'].includes(h.category) || /AV|PEA|PER|LDDS|Livret/i.test(h.account || ''));
+  }
+  if (moduleId === 'crypto-fundamental' || moduleId === 'whitepaper-reader') {
+    return list.filter(h => h.category === 'crypto');
+  }
+  if (moduleId === 'ifi-simulator' || moduleId === 'fees-analysis-immo') {
+    return list.filter(h => h.category === 'real_estate');
+  }
+  if (moduleId === 'decoder-10k' || moduleId === 'dcf' || moduleId === 'pre-mortem' || moduleId === 'investment-memo') {
+    return list.filter(h => ['stocks', 'etf'].includes(h.category));
+  }
+  if (moduleId === 'dividends-tracker') {
+    return list.filter(h => ['stocks', 'etf'].includes(h.category) && h.ticker);
+  }
+  if (moduleId === 'tax-international') {
+    return list.filter(h => !isFr(h) || h.category !== 'cash');
+  }
+  return list;
+}
+
 // === Format wealth as context block for LLM injection ===
-export async function buildWealthContext(targetCurrency = 'EUR') {
-  const list = await listWealth();
+//   moduleId optionnel : permet de trim le contexte (A6)
+export async function buildWealthContext(targetCurrency = 'EUR', moduleId = null) {
+  const fullList = await listWealth();
+  if (!fullList.length) return '';
+  const list = filterHoldingsForModule(fullList, moduleId);
   if (!list.length) return '';
   const totals = await getTotals(targetCurrency);
   const sym = ({ USD: '$', EUR: '€', GBP: '£', CHF: 'CHF', JPY: '¥' })[targetCurrency] || targetCurrency;

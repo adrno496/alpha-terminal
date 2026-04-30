@@ -211,7 +211,7 @@ function showWizardPasteImport() {
         <strong>📋 Coller le JSON du backup</strong>
         <button class="btn-ghost" id="wpi-close">×</button>
       </div>
-      <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup ALPHA TERMINAL pour restaurer tes données et tes clés API.</p>
+      <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup Alpha pour restaurer tes données et tes clés API.</p>
       <textarea id="wpi-textarea" placeholder='{"app":"alpha-terminal", ...}' style="flex:1;min-height:260px;font-family:monospace;font-size:11px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:10px;resize:vertical;"></textarea>
       <div style="display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;">
         <button class="btn-ghost" id="wpi-paste-clipboard" style="font-size:12px;">📋 Coller depuis le presse-papier</button>
@@ -249,7 +249,7 @@ function showWizardPasteImport() {
     try { payload = JSON.parse(text); }
     catch (e) { status.innerHTML = `<span style="color:var(--accent-red);">JSON invalide : ${e.message}</span>`; return; }
     if (!payload || payload.app !== 'alpha-terminal') {
-      status.innerHTML = '<span style="color:var(--accent-red);">Pas un backup ALPHA TERMINAL (champ "app" manquant).</span>';
+      status.innerHTML = '<span style="color:var(--accent-red);">Pas un backup Alpha (champ "app" manquant).</span>';
       return;
     }
     const btn = w.querySelector('#wpi-restore');
@@ -269,12 +269,34 @@ function showWizardPasteImport() {
 }
 
 function renderWizardStep2() {
+  const isEN = (typeof getLocale === 'function') ? false : false; // fallback
+  let isEnLocal = false;
+  try { isEnLocal = require ? false : false; } catch {}
+  // Détecte locale via lang attribute
+  isEnLocal = document.documentElement.lang === 'en';
   body.innerHTML = `
     ${stepperHtml(2)}
     <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:14px;">
       <strong style="color:var(--accent-green);">Au moins une clé suffit</strong> pour faire tourner les 10 modules.
       Plus tu en mets, plus l'app sélectionne le meilleur modèle pour chaque tâche.
     </p>
+
+    <!-- A5 : Banner free providers -->
+    <div style="background:linear-gradient(135deg,rgba(0,255,136,0.08),rgba(0,255,136,0.02));border:1px solid var(--accent-green);border-radius:6px;padding:12px;margin-bottom:14px;">
+      <div style="font-weight:600;font-size:13px;margin-bottom:6px;">💡 ${isEnLocal ? 'Want to start free?' : 'Tu veux démarrer gratuitement ?'}</div>
+      <p style="font-size:11.5px;color:var(--text-secondary);margin:0 0 8px;line-height:1.5;">
+        ${isEnLocal
+          ? 'These 3 providers offer a free tier (rate-limited but enough for casual usage, ~50 analyses/month):'
+          : 'Ces 3 providers offrent un tier gratuit (rate-limit mais suffisant pour usage casual, ~50 analyses/mois) :'}
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="https://github.com/settings/tokens" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;font-size:11.5px;color:var(--text-primary);">🐙 GitHub Models <span style="color:var(--accent-green);">${isEnLocal ? '(free with PAT)' : '(gratuit avec PAT)'}</span></a>
+        <a href="https://cloud.cerebras.ai/?tab=api-keys" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;font-size:11.5px;color:var(--text-primary);">⚡ Cerebras <span style="color:var(--accent-green);">${isEnLocal ? '(free tier)' : '(tier gratuit)'}</span></a>
+        <a href="https://console.mistral.ai/api-keys/" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;font-size:11.5px;color:var(--text-primary);">🇫🇷 Mistral <span style="color:var(--accent-green);">${isEnLocal ? '(free experimentation)' : '(expérimentation gratuite)'}</span></a>
+      </div>
+      <p style="font-size:10.5px;color:var(--text-muted);margin:6px 0 0;">${isEnLocal ? 'You can always add Claude / OpenAI / Gemini later for premium quality.' : 'Tu pourras toujours ajouter Claude / OpenAI / Gemini plus tard pour la qualité premium.'}</p>
+    </div>
+
     <div id="wiz-keys" class="wiz-keys"></div>
     <div id="wiz-err" class="alert alert-danger hidden"></div>
     <div style="display:flex;justify-content:space-between;margin-top:14px;gap:8px;">

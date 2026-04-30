@@ -1,6 +1,6 @@
 {
   "appId": "com.alphaterminal.app",
-  "appName": "ALPHA TERMINAL",
+  "appName": "Alpha",
   "webDir": "dist-mobile",
   "server": {
     "androidScheme": "https",

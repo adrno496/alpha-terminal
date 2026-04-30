@@ -153,8 +153,22 @@ async function ethAddressContext(address) {
 }
 
 // --- API publique : fetch the right context based on module + input ---
+// A4 — Cache 15 min : si la même requête revient (même module + même ticker), réutilise le résultat.
+// Économie sur les appels API stock/crypto (rate-limits gratuits + accélération UX).
+const _dataCtxCache = new Map();
+const DATA_CTX_TTL_MS = 15 * 60 * 1000;
+
 export async function fetchDataContext({ moduleId, input, type = 'auto' }) {
   if (!input) return null;
+  const cacheKey = `${moduleId}|${input.toLowerCase()}|${type}`;
+  const cached = _dataCtxCache.get(cacheKey);
+  if (cached && (Date.now() - cached.t) < DATA_CTX_TTL_MS) return cached.v;
+  const result = await _fetchDataContextRaw({ moduleId, input, type });
+  if (result) _dataCtxCache.set(cacheKey, { v: result, t: Date.now() });
+  return result;
+}
+
+async function _fetchDataContextRaw({ moduleId, input, type = 'auto' }) {
   const detected = type === 'auto' ? detectAssetType(input) : type;
 
   if (moduleId === 'macro-dashboard' || moduleId === 'stress-test') return macroContext();

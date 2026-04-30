@@ -96,9 +96,9 @@ export async function showShareModal(record) {
       Lien long (~${Math.round(url.length / 1024 * 10) / 10} Ko). Compatible avec Bitly / TinyURL si tu veux raccourcir.
     </p>
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-      <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Mon analyse via ALPHA TERMINAL :')}&url=${encodeURIComponent(url)}" target="_blank" class="btn-secondary">𝕏 Tweet</a>
+      <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Mon analyse via Alpha :')}&url=${encodeURIComponent(url)}" target="_blank" class="btn-secondary">𝕏 Tweet</a>
       <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}" target="_blank" class="btn-secondary">LinkedIn</a>
-      <a href="mailto:?subject=${encodeURIComponent('Analyse ALPHA TERMINAL')}&body=${encodeURIComponent(url)}" class="btn-secondary">Email</a>
+      <a href="mailto:?subject=${encodeURIComponent('Analyse Alpha')}&body=${encodeURIComponent(url)}" class="btn-secondary">Email</a>
     </div>
   `;
   showGenericModal('🔗 Partager cette analyse', html);

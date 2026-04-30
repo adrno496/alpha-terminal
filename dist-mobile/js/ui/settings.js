@@ -271,8 +271,8 @@ function renderRoutingTab(c) {
       <div class="card-title">💰 ${isEN ? 'Estimated API costs' : 'Coûts API estimés'}</div>
       <p style="color:var(--text-secondary);font-size:13px;margin:0 0 14px;">
         ${isEN
-          ? 'Approximate cost per analysis based on the model currently selected for each module. <strong>You pay your AI provider directly</strong> (BYOK) — ALPHA TERMINAL never proxies or stores your usage.'
-          : 'Coût approximatif par analyse selon le modèle actuellement sélectionné pour chaque module. <strong>Tu paies ton provider IA directement</strong> (BYOK) — ALPHA TERMINAL ne stocke ni ne re-route ton usage.'}
+          ? 'Approximate cost per analysis based on the model currently selected for each module. <strong>You pay your AI provider directly</strong> (BYOK) — Alpha never proxies or stores your usage.'
+          : 'Coût approximatif par analyse selon le modèle actuellement sélectionné pour chaque module. <strong>Tu paies ton provider IA directement</strong> (BYOK) — Alpha ne stocke ni ne re-route ton usage.'}
       </p>
 
       <div class="stat-grid" style="margin-bottom:14px;">
@@ -495,6 +495,57 @@ function renderModelsTab(c) {
 function renderAdvancedTab(c) {
   const s = getSettings();
   c.innerHTML = `
+    <div class="card" style="border-left:4px solid var(--accent-green);">
+      <div class="card-title">🪙 ${getLocale() === 'en' ? 'Cost optimization' : 'Optimisation des coûts'}</div>
+      <p style="font-size:12px;color:var(--text-secondary);margin:0 0 12px;line-height:1.5;">
+        ${getLocale() === 'en'
+          ? 'Reduce your API costs by up to 70% without losing quality.'
+          : 'Réduis tes coûts API jusqu\'à 70% sans perte de qualité notable.'}
+      </p>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin:8px 0;cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:6px;background:${s.ecoMode ? 'rgba(0,255,136,0.06)' : 'transparent'};">
+        <input type="checkbox" id="set-eco-mode" ${s.ecoMode ? 'checked' : ''} style="margin-top:3px;" />
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:13px;">🪙 ${getLocale() === 'en' ? 'Eco mode (force balanced tier everywhere)' : 'Mode Éco (force le tier balanced partout)'}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.4;">
+            ${getLocale() === 'en'
+              ? 'Sonnet 4.6 / GPT-5 Mini / Gemini Flash instead of Opus / GPT-5 / Gemini Pro. ~5× cheaper, quality difference rarely noticeable.'
+              : 'Sonnet 4.6 / GPT-5 Mini / Gemini Flash au lieu de Opus / GPT-5 / Gemini Pro. ~5× moins cher, différence de qualité rarement sensible.'}
+          </div>
+        </div>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin:8px 0;cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:6px;background:${s.cacheResults ? 'rgba(0,255,136,0.06)' : 'transparent'};">
+        <input type="checkbox" id="set-cache-results" ${s.cacheResults !== false ? 'checked' : ''} style="margin-top:3px;" />
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:13px;">⚡ ${getLocale() === 'en' ? 'Cache results 24h (skip duplicate analyses)' : 'Cache des résultats 24h (évite les analyses doublons)'}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.4;">
+            ${getLocale() === 'en'
+              ? 'Same input within 24h → reuse the cached result with a "Re-run" button. Saves 30-40% in real usage.'
+              : 'Même input dans les 24h → réutilise le résultat caché avec un bouton "Re-lancer". Économie 30-40% en usage réel.'}
+          </div>
+        </div>
+      </label>
+      <label style="display:flex;gap:10px;align-items:flex-start;margin:8px 0;cursor:pointer;padding:10px;border:1px solid var(--border);border-radius:6px;background:${s.promptCaching !== false ? 'rgba(0,255,136,0.06)' : 'transparent'};">
+        <input type="checkbox" id="set-prompt-caching" ${s.promptCaching !== false ? 'checked' : ''} style="margin-top:3px;" />
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:13px;">💾 ${getLocale() === 'en' ? 'Anthropic prompt caching (-90% on cached tokens)' : 'Prompt caching Anthropic (-90% sur tokens cachés)'}</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:3px;line-height:1.4;">
+            ${getLocale() === 'en'
+              ? 'Caches the system prompt + wealth context on Anthropic. Repeated analyses cost 10× less on Claude.'
+              : 'Cache le system prompt + contexte patrimoine côté Anthropic. Analyses répétées coûtent 10× moins sur Claude.'}
+          </div>
+        </div>
+      </label>
+      <div class="field" style="margin-top:14px;">
+        <label class="field-label">💰 ${getLocale() === 'en' ? 'Budget cap per analysis ($)' : 'Plafond de coût par analyse ($)'}</label>
+        <input id="set-budget-cap" class="input" type="number" step="0.01" min="0" value="${s.budgetCapUSD || ''}" placeholder="${getLocale() === 'en' ? '0 = no cap' : '0 = pas de plafond'}" style="max-width:160px;" />
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">
+          ${getLocale() === 'en'
+            ? 'Aborts an analysis if its cost exceeds this threshold. Recommended: $0.50.'
+            : 'Annule une analyse si son coût dépasse ce seuil. Recommandé : $0,50.'}
+        </div>
+      </div>
+    </div>
+
     <div class="card">
       <div class="card-title">${t('settings.adv.title')}</div>
       <div class="field"><label class="field-label">${t('settings.adv.max_tokens')}</label><input id="set-maxtok" class="input" type="number" min="256" max="16000" step="256" value="${s.maxTokens}" /></div>
@@ -555,12 +606,16 @@ function renderAdvancedTab(c) {
     <div class="card">
       <div class="card-title">${t('settings.adv.about')}</div>
       <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.7;">
-        ALPHA TERMINAL · v2.1.0 · multi-LLM · 100% client-side · BYOK
+        Alpha · v2.1.0 · multi-LLM · 100% client-side · BYOK
       </p>
     </div>
   `;
   $('#set-save').addEventListener('click', () => {
     setSettings({
+      ecoMode: $('#set-eco-mode')?.checked || false,
+      cacheResults: $('#set-cache-results')?.checked !== false,
+      promptCaching: $('#set-prompt-caching')?.checked !== false,
+      budgetCapUSD: parseFloat($('#set-budget-cap')?.value) || 0,
       maxTokens: parseInt($('#set-maxtok').value, 10) || 4096,
       temperature: parseFloat($('#set-temp').value) || 1.0,
       autoFallback: $('#set-fb').checked
@@ -838,7 +893,7 @@ function renderAdvancedTab(c) {
           <strong>📥 Restaurer depuis un JSON collé</strong>
           <button class="btn-ghost" id="prm-close">×</button>
         </div>
-        <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup ALPHA TERMINAL (JSON). Utile si tu as récupéré le backup via copy-paste plutôt que via un fichier <code>.atb</code>.</p>
+        <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup Alpha (JSON). Utile si tu as récupéré le backup via copy-paste plutôt que via un fichier <code>.atb</code>.</p>
         <textarea id="prm-textarea" placeholder='{"app":"alpha-terminal", ...}' style="flex:1;min-height:280px;font-family:monospace;font-size:11px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:10px;resize:vertical;"></textarea>
         <div style="display:flex;gap:14px;align-items:center;font-size:12px;color:var(--text-secondary);flex-wrap:wrap;">
           <label style="display:flex;gap:6px;align-items:center;cursor:pointer;">
@@ -885,7 +940,7 @@ function renderAdvancedTab(c) {
       try { payload = JSON.parse(text); }
       catch (e) { toast('JSON invalide : ' + e.message, 'error'); return; }
       if (!payload || payload.app !== 'alpha-terminal') {
-        toast('Pas un backup ALPHA TERMINAL (champ "app" manquant)', 'error');
+        toast('Pas un backup Alpha (champ "app" manquant)', 'error');
         return;
       }
       const mode = w.querySelector('input[name="prm-mode"]:checked')?.value || 'merge';

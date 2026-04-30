@@ -92,6 +92,21 @@ export function finalizeStream({ container, streamHandle, module, title, markdow
     starred: false
   };
   saveAnalysis(record).catch(err => console.error('Save failed:', err));
+
+  // === A2 : Persiste le résultat dans le cache 24h pour dedup ===
+  try {
+    const settings = getSettings();
+    if (settings.cacheResults !== false && inputForRecord) {
+      const key = makeCacheKey(module, inputForRecord);
+      writeResultCache(key, {
+        markdown: markdown || '',
+        title: record.title,
+        costUSD: usage?.costUSD || 0,
+        provider, model
+      });
+    }
+  } catch (e) { console.warn('[cache] write failed:', e); }
+
   wireToolbar(container, record);
   return record;
 }
@@ -380,11 +395,58 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
     return null;
   }
 
+  // === A2 : Cache résultats 24h ===
+  // Si activé dans settings + même input dans la dernière 24h → renvoie le résultat cached.
+  const settings = getSettings();
+  if (params._bypassCache) settings.cacheResults = false;
+  if (settings.cacheResults !== false && container && params.recordInput) {
+    try {
+      const cacheKey = makeCacheKey(moduleId, params.recordInput);
+      const cached = readResultCache(cacheKey);
+      if (cached && (Date.now() - cached.cachedAt) < 24 * 3600 * 1000) {
+        const isEN = (await import('../core/i18n.js')).getLocale() === 'en';
+        const ageMin = Math.round((Date.now() - cached.cachedAt) / 60000);
+        container.innerHTML = `
+          <div class="card" style="border-left:3px solid var(--accent-green);padding:14px;margin-bottom:10px;background:rgba(0,255,136,0.04);">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+              <div>
+                <strong>⚡ ${isEN ? 'Cached result' : 'Résultat caché'}</strong>
+                <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">
+                  ${isEN ? `from ${ageMin} min ago` : `il y a ${ageMin} min`}
+                  ${cached.costUSD ? ' · ' + isEN ? 'saved' : 'économisé' + ` $${cached.costUSD.toFixed(4)}` : ''}
+                </span>
+              </div>
+              <button id="cache-rerun" class="btn-secondary" style="font-size:11px;">🔄 ${isEN ? 'Re-run anyway' : 'Re-lancer quand même'}</button>
+            </div>
+          </div>
+          <div class="result"><div class="result-body">${(await import('../core/safe-render.js')).safeRender(cached.markdown || '')}</div></div>
+        `;
+        container.querySelector('#cache-rerun')?.addEventListener('click', () => {
+          deleteResultCache(cacheKey);
+          // Re-run sans cache cette fois
+          runAnalysis(moduleId, { ...params, _bypassCache: true }, container, { onTitle, suggestFollowUps });
+        });
+        return cached;
+      }
+    } catch (e) { console.warn('[cache] read failed:', e); }
+  }
+
   const stream = prepareStreamContainer(container, moduleId, '');
   let selection = null;
   let fullText = '';
   const sys = await applyCustomPrompt(moduleId, params.system);
   let messages = params.messages;
+
+  // === A3 : Mode Éco — force le tier balanced ===
+  if (settings.ecoMode && !params.override?.tier) {
+    params.override = { ...(params.override || {}), tier: 'balanced' };
+  }
+
+  // === A1 : Prompt caching Anthropic ===
+  // Forwardé jusqu'au provider Claude qui marque le system prompt avec cache_control.
+  if (settings.promptCaching !== false) {
+    params.promptCaching = true;
+  }
 
   // Auto-inject DATA CONTEXT (Alpha Vantage / FMP / Twelve Data / FRED / CoinGecko)
   // pour économiser sur les web_search LLM. Détection automatique du ticker/asset.
@@ -418,7 +480,7 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
   try {
     const { isWealthContextEnabledFor, buildWealthContext } = await import('../core/wealth.js');
     if (isWealthContextEnabledFor(moduleId)) {
-      const wealthBlock = await buildWealthContext('EUR');
+      const wealthBlock = await buildWealthContext('EUR', moduleId);
       if (wealthBlock) {
         messages = messages.map(m => ({ ...m }));
         const last = messages[messages.length - 1];
@@ -598,4 +660,64 @@ export function markdownToCsv(md) {
   if (cur && cur.length) tables.push(cur);
   if (!tables.length) return '';
   return tables.map(t => t.map(row => row.map(c => `"${c}"`).join(',')).join('\n')).join('\n\n');
+}
+
+// ===== A2 — Cache résultats 24h =====
+const RESULT_CACHE_KEY = 'alpha-terminal:result-cache';
+const RESULT_CACHE_MAX = 60; // 60 résultats cachés max (rotation FIFO)
+
+function readResultCacheAll() {
+  try { return JSON.parse(localStorage.getItem(RESULT_CACHE_KEY) || '{}'); }
+  catch { return {}; }
+}
+function writeResultCacheAll(obj) {
+  try {
+    // Trim si trop d'entries
+    const keys = Object.keys(obj);
+    if (keys.length > RESULT_CACHE_MAX) {
+      const sorted = keys.sort((a, b) => (obj[a].cachedAt || 0) - (obj[b].cachedAt || 0));
+      for (const k of sorted.slice(0, keys.length - RESULT_CACHE_MAX)) delete obj[k];
+    }
+    localStorage.setItem(RESULT_CACHE_KEY, JSON.stringify(obj));
+  } catch {}
+}
+export function makeCacheKey(moduleId, recordInput) {
+  // Hash simple des champs significatifs de l'input
+  const significant = {};
+  if (!recordInput || typeof recordInput !== 'object') return moduleId + ':default';
+  for (const k of Object.keys(recordInput).sort()) {
+    const v = recordInput[k];
+    if (v == null || typeof v === 'function') continue;
+    if (typeof v === 'object') {
+      try { significant[k] = JSON.stringify(v).slice(0, 400); } catch {}
+    } else {
+      significant[k] = String(v).slice(0, 400);
+    }
+  }
+  // SHA-1-like hash via simple sum (suffisant pour dedup, pas crypto)
+  const str = moduleId + ':' + JSON.stringify(significant);
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  return moduleId + ':' + Math.abs(hash).toString(36);
+}
+export function readResultCache(key) {
+  return readResultCacheAll()[key] || null;
+}
+export function writeResultCache(key, data) {
+  const all = readResultCacheAll();
+  all[key] = { ...data, cachedAt: Date.now() };
+  writeResultCacheAll(all);
+}
+export function deleteResultCache(key) {
+  const all = readResultCacheAll();
+  delete all[key];
+  writeResultCacheAll(all);
+}
+
+// ===== A7 — Budget cap par analyse =====
+// Vérifie pendant le streaming si le coût estimé dépasse le plafond. Abort si oui.
+export function checkBudgetCap(currentCostUSD, settings) {
+  const cap = Number(settings?.budgetCapUSD) || 0;
+  if (cap <= 0) return false; // pas de cap
+  return currentCostUSD > cap;
 }
