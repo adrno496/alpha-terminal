@@ -575,8 +575,11 @@ function renderAdvancedTab(c) {
     }
     try {
       const counts = await importBackupFromFile(file, { mode });
-      const total = Object.values(counts.added || {}).reduce((s, n) => s + n, 0);
-      toast(t('settings.adv.restore_done').replace('{n}', total), 'success');
+      const breakdown = formatRestoreBreakdown(counts);
+      toast(`📥 Restauré : ${breakdown}`, 'success');
+      if (counts.missingStores && counts.missingStores.length) {
+        toast(`⚠️ Stores impossibles à créer : ${counts.missingStores.join(', ')} — recharge la page puis réessaie`, 'error');
+      }
       await refreshBackupStats();
       // Reload soft : invite l'utilisateur à recharger pour appliquer
       setTimeout(() => {
@@ -588,6 +591,20 @@ function renderAdvancedTab(c) {
       e.target.value = '';
     }
   });
+
+  function formatRestoreBreakdown(counts) {
+    const a = counts.added || {};
+    const parts = [
+      a.analyses ? `${a.analyses} analyses` : null,
+      a.wealth ? `${a.wealth} holdings` : null,
+      a.wealth_snapshots ? `${a.wealth_snapshots} snapshots` : null,
+      a.knowledge ? `${a.knowledge} KB` : null,
+      a.transcripts ? `${a.transcripts} transcripts` : null,
+      a.writingStyles ? `${a.writingStyles} styles` : null,
+      counts.localStorageKeys ? `${counts.localStorageKeys} settings` : null
+    ].filter(Boolean);
+    return parts.length ? parts.join(' · ') : 'aucune donnée';
+  }
 
   // Diagnostic : montre exactement ce qui est dans la DB (utile pour comprendre si le backup
   // contient bien les holdings, snapshots, etc., ou si ces données ont disparu côté DB)
@@ -755,8 +772,11 @@ function renderAdvancedTab(c) {
       try {
         const { importFullBackup } = await import('../core/backup.js');
         const counts = await importFullBackup(payload, { mode });
-        const total = Object.values(counts.added || {}).reduce((s, n) => s + n, 0);
-        toast(t('settings.adv.restore_done').replace('{n}', total), 'success');
+        const breakdown = formatRestoreBreakdown(counts);
+        toast(`📥 Restauré : ${breakdown}`, 'success');
+        if (counts.missingStores && counts.missingStores.length) {
+          toast(`⚠️ Stores impossibles à créer : ${counts.missingStores.join(', ')} — recharge la page puis réessaie`, 'error');
+        }
         close();
         await refreshBackupStats();
         setTimeout(() => {

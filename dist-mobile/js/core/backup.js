@@ -88,6 +88,46 @@ function loadStore(db, name, records, { mode = 'merge' } = {}) {
   });
 }
 
+// CRITIQUE : si la DB existe déjà à la version courante mais avec des stores manquants
+// (cas où une version antérieure de backup.js a créé une DB v5 vide), `onupgradeneeded`
+// ne fire jamais et les stores manquants restent introuvables. On force ici un version
+// bump pour déclencher la création des stores absents avant l'import.
+async function ensureStoresExist(db) {
+  const missing = STORES.filter(s => !db.objectStoreNames.contains(s));
+  if (missing.length === 0) return db;
+
+  console.warn('[backup] Stores manquants détectés, version bump pour création :', missing);
+  const newVersion = db.version + 1;
+  try { db.close(); } catch {}
+
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, newVersion);
+    req.onupgradeneeded = (e) => {
+      const newDb = e.target.result;
+      if (!newDb.objectStoreNames.contains('analyses')) {
+        const s = newDb.createObjectStore('analyses', { keyPath: 'id' });
+        s.createIndex('module', 'module', { unique: false });
+        s.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+      if (!newDb.objectStoreNames.contains('writingStyles')) newDb.createObjectStore('writingStyles', { keyPath: 'id' });
+      if (!newDb.objectStoreNames.contains('knowledge'))     newDb.createObjectStore('knowledge',     { keyPath: 'id' });
+      if (!newDb.objectStoreNames.contains('wealth'))        newDb.createObjectStore('wealth',        { keyPath: 'id' });
+      if (!newDb.objectStoreNames.contains('wealth_snapshots')) {
+        const ws = newDb.createObjectStore('wealth_snapshots', { keyPath: 'id' });
+        ws.createIndex('date', 'date', { unique: false });
+      }
+      if (!newDb.objectStoreNames.contains('transcripts')) {
+        const ts = newDb.createObjectStore('transcripts', { keyPath: 'id' });
+        ts.createIndex('createdAt', 'createdAt', { unique: false });
+        ts.createIndex('ticker', 'ticker', { unique: false });
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+    req.onblocked = () => reject(new Error('DB bloquée par un autre onglet — ferme les autres onglets puis réessaie'));
+  });
+}
+
 // === EXPORT ===
 
 export async function exportFullBackup() {
@@ -286,17 +326,27 @@ export async function importFullBackup(payload, { mode = 'merge' } = {}) {
   if (!payload || payload.app !== 'alpha-terminal') {
     throw new Error('Format de sauvegarde invalide (app != alpha-terminal)');
   }
-  const counts = { added: {}, skipped: 0 };
-  const db = await openDB();
+  const counts = { added: {}, skipped: 0, missingStores: [] };
+  let db = await openDB();
+
+  // CRITIQUE : si la DB de destination est à la version courante mais avec des stores
+  // manquants (cas réel : précédente version de backup.js qui créait une DB v5 vide),
+  // onupgradeneeded n'a pas fire et les stores absents resteront introuvables. On force
+  // un version bump pour les créer avant l'import, sinon loadStore retourne 0 silencieusement.
+  db = await ensureStoresExist(db);
 
   // 1. IndexedDB stores
   if (payload.indexedDB && typeof payload.indexedDB === 'object') {
     for (const name of STORES) {
       const records = payload.indexedDB[name];
-      if (Array.isArray(records)) {
-        const n = await loadStore(db, name, records, { mode });
-        counts.added[name] = n;
+      if (!Array.isArray(records)) continue;
+      // Garde-fou explicite : si malgré tout le store n'existe toujours pas, on log
+      if (!db.objectStoreNames.contains(name)) {
+        counts.missingStores.push(name);
+        continue;
       }
+      const n = await loadStore(db, name, records, { mode });
+      counts.added[name] = n;
     }
   }
   // Compat ancien format (uniquement analyses array)
