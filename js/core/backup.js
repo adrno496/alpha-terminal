@@ -350,6 +350,90 @@ export async function wipeAllLocalData() {
   }
 }
 
+// Diagnostic complet : ouvre la DB sans imposer de version, liste TOUS les stores
+// réellement présents (pas juste ceux dans STORES), avec compte + échantillon.
+// Permet de détecter les data perdues à cause d'un mismatch de version ou d'un nom de store.
+export async function diagnosticBackup() {
+  const result = {
+    dbName: DB_NAME,
+    requestedVersion: DB_VERSION,
+    actualVersion: null,
+    storesInDb: [],
+    storesExpected: STORES,
+    storesMissing: [],
+    storesUnexpected: [],
+    perStore: {},
+    localStorage: {
+      total: 0,
+      kept: 0,
+      sampleKeys: []
+    },
+    error: null
+  };
+
+  // 1. Ouvre la DB sans forcer de version pour ne PAS déclencher d'upgrade
+  let db;
+  try {
+    db = await new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) {
+    result.error = 'Open DB failed: ' + (e?.message || e);
+    return result;
+  }
+
+  result.actualVersion = db.version;
+  result.storesInDb = Array.from(db.objectStoreNames);
+  result.storesMissing = STORES.filter(s => !result.storesInDb.includes(s));
+  result.storesUnexpected = result.storesInDb.filter(s => !STORES.includes(s));
+
+  // 2. Dump chaque store réellement présent + échantillon
+  for (const name of result.storesInDb) {
+    try {
+      const records = await new Promise((resolve) => {
+        const out = [];
+        const tx = db.transaction(name, 'readonly');
+        const cursor = tx.objectStore(name).openCursor();
+        cursor.onsuccess = (e) => {
+          const c = e.target.result;
+          if (!c) return resolve(out);
+          out.push(c.value);
+          c.continue();
+        };
+        cursor.onerror = () => resolve(out);
+      });
+      result.perStore[name] = {
+        count: records.length,
+        sample: records.slice(0, 2).map(r => {
+          // Tronque les valeurs longues pour rester lisible
+          const trim = (v) => typeof v === 'string' && v.length > 80 ? v.slice(0, 80) + '…' : v;
+          if (typeof r !== 'object' || r === null) return r;
+          const out = {};
+          for (const k of Object.keys(r).slice(0, 8)) out[k] = trim(r[k]);
+          return out;
+        })
+      };
+    } catch (e) {
+      result.perStore[name] = { count: 0, error: e?.message || String(e) };
+    }
+  }
+  try { db.close(); } catch {}
+
+  // 3. localStorage
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    result.localStorage.total++;
+    if (isAppKey(k)) {
+      result.localStorage.kept++;
+      if (result.localStorage.sampleKeys.length < 12) result.localStorage.sampleKeys.push(k);
+    }
+  }
+
+  return result;
+}
+
 // Stats pour l'UI (combien de chaque chose tu as)
 export async function getLocalDataStats() {
   const db = await openDB();

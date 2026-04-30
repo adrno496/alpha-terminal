@@ -8,7 +8,7 @@ import { MODEL_CATALOG } from '../core/models-catalog.js';
 import { t } from '../core/i18n.js';
 import { DATA_PROVIDERS, KEYLESS_DATA_SOURCES, getDataKey, setDataKey, getDataKeyStatus } from '../core/data-keys.js';
 import { resetTour, startTour } from './tour.js';
-import { downloadFullBackup, importBackupFromFile, getLocalDataStats, wipeAllLocalData, copyBackupToClipboard } from '../core/backup.js';
+import { downloadFullBackup, importBackupFromFile, getLocalDataStats, wipeAllLocalData, copyBackupToClipboard, diagnosticBackup } from '../core/backup.js';
 
 let currentTab = 'keys';
 
@@ -395,6 +395,7 @@ function renderAdvancedTab(c) {
           <input id="set-restore-full" type="file" accept=".atb,.json,application/json,application/octet-stream" hidden />
         </label>
         <button id="set-restore-paste" class="btn-secondary" style="display:inline-flex;align-items:center;gap:6px;" title="Coller un JSON copié pour restaurer">📋 Coller un backup</button>
+        <button id="set-backup-diag" class="btn-ghost" style="font-size:12px;" title="Inspecter la DB locale pour vérifier ce qui sera exporté">🔍 Diagnostic</button>
       </div>
 
       <details style="margin-top:14px;">
@@ -587,6 +588,98 @@ function renderAdvancedTab(c) {
       e.target.value = '';
     }
   });
+
+  // Diagnostic : montre exactement ce qui est dans la DB (utile pour comprendre si le backup
+  // contient bien les holdings, snapshots, etc., ou si ces données ont disparu côté DB)
+  $('#set-backup-diag').addEventListener('click', async () => {
+    const btn = $('#set-backup-diag');
+    const old = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳ Inspection…';
+    try {
+      const r = await diagnosticBackup();
+      showDiagnosticModal(r);
+    } catch (e) {
+      toast('Diagnostic : ' + e.message, 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = old;
+    }
+  });
+
+  function showDiagnosticModal(r) {
+    const w = document.createElement('div');
+    w.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+    const storesRows = r.storesInDb.length === 0
+      ? '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:10px;">⚠️ Aucun store dans la DB</td></tr>'
+      : r.storesInDb.map(name => {
+          const info = r.perStore[name] || {};
+          const known = r.storesExpected.includes(name);
+          const sampleStr = info.sample && info.sample.length
+            ? '<details><summary style="cursor:pointer;color:var(--text-muted);font-size:11px;">Voir échantillon</summary><pre style="margin:4px 0 0;padding:6px;background:var(--bg-tertiary);border-radius:3px;font-size:10px;overflow:auto;max-height:200px;">'
+              + JSON.stringify(info.sample, null, 2).replace(/</g,'&lt;') + '</pre></details>'
+            : '';
+          return `<tr>
+            <td style="padding:6px;font-family:monospace;font-size:12px;">${known ? '✅' : '⚠️'} ${name}</td>
+            <td style="padding:6px;font-family:monospace;font-size:12px;text-align:right;color:${info.count > 0 ? 'var(--accent-green)' : 'var(--text-muted)'};">${info.count ?? 0}</td>
+            <td style="padding:6px;font-size:11px;">${sampleStr}</td>
+          </tr>`;
+        }).join('');
+
+    const missingWarn = r.storesMissing.length
+      ? `<div style="background:#7a3a00;color:#ffe;padding:8px 10px;border-radius:4px;font-size:12px;margin:8px 0;">
+          ⚠️ <strong>Stores attendus mais absents :</strong> ${r.storesMissing.join(', ')}.<br>
+          Si la DB existait à une version inférieure, certains stores n'ont pas été créés.
+          <strong>Solution</strong> : ouvre une fois le module concerné (ex. Patrimoine) pour forcer la création, puis relance le backup.
+        </div>` : '';
+    const unexpectedWarn = r.storesUnexpected.length
+      ? `<div style="background:#005577;color:#fff;padding:8px 10px;border-radius:4px;font-size:12px;margin:8px 0;">
+          ℹ️ <strong>Stores trouvés mais non listés dans le backup :</strong> ${r.storesUnexpected.join(', ')}.<br>
+          Ces données ne seront <strong>pas</strong> incluses dans le backup actuel.
+        </div>` : '';
+
+    w.innerHTML = `
+      <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:760px;width:100%;max-height:88vh;overflow:auto;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong>🔍 Diagnostic de la base locale</strong>
+          <button class="btn-ghost" id="diag-close">×</button>
+        </div>
+        <div style="font-size:12px;color:var(--text-secondary);font-family:monospace;background:var(--bg-tertiary);padding:8px 10px;border-radius:4px;">
+          DB : <strong>${r.dbName}</strong>
+          · version réelle : <strong>${r.actualVersion ?? 'erreur'}</strong>
+          · attendue : ${r.requestedVersion}
+          ${r.error ? `<br>❌ ${r.error}` : ''}
+        </div>
+        ${missingWarn}
+        ${unexpectedWarn}
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead><tr style="border-bottom:1px solid var(--border);text-align:left;">
+            <th style="padding:6px;">Store</th>
+            <th style="padding:6px;text-align:right;">Records</th>
+            <th style="padding:6px;">Échantillon</th>
+          </tr></thead>
+          <tbody>${storesRows}</tbody>
+        </table>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-secondary);">
+          📦 <strong>localStorage</strong> : ${r.localStorage.kept} clés app conservées sur ${r.localStorage.total} totales.
+          ${r.localStorage.sampleKeys.length ? `<details><summary style="cursor:pointer;font-size:11px;color:var(--text-muted);">Voir clés</summary><pre style="margin:4px 0 0;padding:6px;background:var(--bg-tertiary);border-radius:3px;font-size:10px;overflow:auto;">${r.localStorage.sampleKeys.join('\n').replace(/</g,'&lt;')}</pre></details>` : ''}
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:8px;">
+          <button class="btn-secondary" id="diag-copy">📋 Copier le rapport</button>
+          <button class="btn-primary" id="diag-close-2">Fermer</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(w);
+    const close = () => { try { document.body.removeChild(w); } catch {} };
+    w.querySelector('#diag-close').addEventListener('click', close);
+    w.querySelector('#diag-close-2').addEventListener('click', close);
+    w.addEventListener('click', (e) => { if (e.target === w) close(); });
+    w.querySelector('#diag-copy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(JSON.stringify(r, null, 2)); toast('Rapport copié', 'success'); }
+      catch { toast('Copy refusé', 'error'); }
+    });
+  }
 
   // Paste-and-restore : ouvre une modale pour coller un JSON et restaurer directement
   $('#set-restore-paste').addEventListener('click', () => {
