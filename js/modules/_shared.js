@@ -207,7 +207,9 @@ function wealthToggleHtml(moduleId) {
     catch { return false; }
   })();
   const on = !disabled;
-  return `<label class="wealth-toggle ${on ? 'on' : ''}" title="${on ? 'Patrimoine complet injecté dans l\\'analyse — clique pour désactiver' : 'Patrimoine non injecté — clique pour activer'}">
+  const titleOn = 'Patrimoine complet injecte dans le prompt — clique pour desactiver';
+  const titleOff = 'Patrimoine non injecte — clique pour activer';
+  return `<label class="wealth-toggle ${on ? 'on' : ''}" title="${on ? titleOn : titleOff}">
     <input type="checkbox" data-wealth-toggle="${moduleId}" ${on ? 'checked' : ''} />
     💼 ${on ? 'Patrimoine ✓' : 'Patrimoine'}
   </label>`;
@@ -370,8 +372,8 @@ if (typeof document !== 'undefined' && !window.__wealthToggleWired) {
     if (label) {
       label.classList.toggle('on', cb.checked);
       label.title = cb.checked
-        ? "Patrimoine complet injecté dans l'analyse — clique pour désactiver"
-        : "Patrimoine non injecté — clique pour activer";
+        ? "Patrimoine complet injecte dans le prompt — clique pour desactiver"
+        : "Patrimoine non injecte — clique pour activer";
       for (const node of label.childNodes) {
         if (node.nodeType === Node.TEXT_NODE) {
           node.textContent = cb.checked ? ' 💼 Patrimoine ✓' : ' 💼 Patrimoine';
