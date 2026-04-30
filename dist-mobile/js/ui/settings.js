@@ -3,6 +3,7 @@ import { $, toast, fmtUSD } from '../core/utils.js';
 import { getSettings, setSettings, clearAnalyses, listAnalyses, saveAnalysis } from '../core/storage.js';
 import { hasVault, vaultProviderNames, setApiKeys, removeProviderKey, forgetVault, unlockVault } from '../core/crypto.js';
 import { isConnected, clearRuntimeKeys, setRuntimeKeys, validateProviderKey, KNOWN_PROVIDERS, getOrchestrator, MODULE_ROUTING } from '../core/api.js';
+import { MODULES as ALL_MODULES } from './sidebar.js';
 import { getCost, resetTotalCost } from '../core/cost-tracker.js';
 import { MODEL_CATALOG } from '../core/models-catalog.js';
 import { t, getLocale } from '../core/i18n.js';
@@ -326,21 +327,34 @@ function renderRoutingTab(c) {
 
     <div class="card">
       <div class="card-title">${t('settings.routing.title')}</div>
-      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">${t('settings.routing.desc')}</p>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">${t('settings.routing.desc')} <strong>L'icône ⭐ = provider optimal recommandé pour ce module.</strong> Les providers grisés ne sont pas encore configurés mais visibles pour info.</p>
       <table class="wiz-routing">
         <thead><tr><th>${t('settings.routing.col_module')}</th><th>${t('settings.routing.col_auto')}</th><th>${t('settings.routing.col_status')}</th><th>${t('settings.routing.col_override')}</th></tr></thead>
         <tbody>
           ${Object.entries(preview).map(([id, sel]) => {
             const ov = overrides[id]?.provider || 'auto';
+            const routing = MODULE_ROUTING[id] || {};
+            const optimalSet = new Set(routing.optimalProviders || []);
+            const fallbackSet = new Set(routing.fallbackProviders || []);
+            const availSet = new Set(avail);
+            // Construit la liste des options : tous les providers connus
+            const opts = KNOWN_PROVIDERS.map(p => {
+              const configured = availSet.has(p.name);
+              const isOptimal = optimalSet.has(p.name);
+              const isFallback = fallbackSet.has(p.name);
+              const star = isOptimal ? ' ⭐' : (isFallback ? ' ·' : '');
+              const status = configured ? '' : ' (clé non configurée)';
+              return `<option value="${p.name}" ${ov===p.name?'selected':''} ${configured?'':'disabled'}>${p.icon} ${p.displayName}${star}${status}</option>`;
+            }).join('');
             return `
               <tr>
                 <td><strong>${moduleLabel(id)}</strong><br><span style="font-size:11px;color:var(--text-muted);">${sel.reason || ''}</span></td>
                 <td>${sel.error ? '<span style="color:var(--accent-red);">' + sel.error + '</span>' : sel.icon + ' ' + sel.providerDisplay + '<br><code style="font-size:10.5px;">' + sel.model + '</code>'}</td>
                 <td>${sel.isOptimal ? `<span style="color:var(--accent-green);">${t('settings.routing.optimal')}</span>` : (sel.error ? '—' : `<span style="color:var(--accent-amber);">${t('settings.routing.fallback')}</span>`)}</td>
                 <td>
-                  <select class="input route-override" data-mod="${id}" style="font-size:11px;padding:4px 8px;max-width:140px;">
-                    <option value="auto" ${ov==='auto'?'selected':''}>🎯 Auto</option>
-                    ${avail.map(n => `<option value="${n}" ${ov===n?'selected':''}>${({claude:'🤖 Claude',openai:'🧠 OpenAI',gemini:'✨ Gemini',grok:'🐦 Grok'})[n]}</option>`).join('')}
+                  <select class="input route-override" data-mod="${id}" style="font-size:11px;padding:4px 6px;min-width:180px;max-width:220px;">
+                    <option value="auto" ${ov==='auto'?'selected':''}>🎯 Auto (smart router)</option>
+                    ${opts}
                   </select>
                 </td>
               </tr>
@@ -348,7 +362,31 @@ function renderRoutingTab(c) {
           }).join('')}
         </tbody>
       </table>
+      <p style="font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.6;">
+        ⭐ <strong>Provider optimal</strong> — recommandé pour ce module (selon caractéristiques : long contexte, web search, raisonnement, etc.).<br>
+        · <strong>Fallback</strong> — fonctionne mais qualité un peu inférieure.<br>
+        🎯 <strong>Auto</strong> — le smart router choisit automatiquement parmi tes clés configurées le meilleur disponible.
+      </p>
     </div>
+
+    ${(() => {
+      // Liste les modules pure-local (pas dans MODULE_ROUTING) pour info
+      const llmModules = new Set(Object.keys(MODULE_ROUTING));
+      const localModules = ALL_MODULES.map(m => m.id).filter(id => !llmModules.has(id));
+      if (!localModules.length) return '';
+      return `
+      <div class="card" style="border-left:4px solid var(--accent-blue);">
+        <div class="card-title">🏠 ${isEN ? 'Pure local modules' : 'Modules 100% locaux'} (${localModules.length}) — ${isEN ? 'no AI provider needed' : 'pas de provider IA requis'}</div>
+        <p style="color:var(--text-secondary);font-size:13px;margin-bottom:10px;">
+          ${isEN
+            ? 'These modules run entirely on your device with deterministic algorithms. No LLM call, no API cost, no data leaves your browser.'
+            : 'Ces modules tournent intégralement sur ton appareil avec des algorithmes déterministes. Zéro appel LLM, zéro coût API, aucune donnée ne quitte ton navigateur.'}
+        </p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:6px;font-size:12px;">
+          ${localModules.map(id => `<div style="padding:6px 10px;background:var(--bg-tertiary);border-radius:4px;">✓ ${moduleLabel(id)}</div>`).join('')}
+        </div>
+      </div>`;
+    })()}
   `;
   c.querySelectorAll('.route-override').forEach(sel => {
     sel.addEventListener('change', () => {

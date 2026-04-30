@@ -12,6 +12,7 @@ import { renderSettingsView } from './ui/settings.js';
 import { initCmdK } from './ui/cmdk.js';
 import { initTooltips } from './ui/tooltips.js';
 import { renderLanding, showLanding, hideLanding } from './ui/landing.js';
+import './ui/trust-details.js'; // global click handler for trust-badges
 import { initTheme, makeThemeToggle } from './ui/theme.js';
 
 import { renderDecoder10kView }         from './modules/decoder-10k.js';

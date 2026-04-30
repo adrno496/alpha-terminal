@@ -551,8 +551,7 @@ const DICT = {
     'trust.byok_short': 'Ta clé, tes données',
     'trust.no_data_stored': 'Aucune donnée stockée sur nos serveurs',
     'trust.no_data_stored_short': 'Stockage local',
-    'trust.no_subscription': 'Paiement unique — aucun abonnement',
-    'trust.no_subscription_short': 'Pas d\'abonnement',
+    'trust.cancel_anytime_short': 'Annulable à tout moment',
 
     // === Advanced mode ===
     'adv.toggle_show': '⚙️ Mode avancé',
@@ -1267,8 +1266,7 @@ const DICT = {
     'trust.byok_short': 'Your key, your data',
     'trust.no_data_stored': 'No data stored on our servers',
     'trust.no_data_stored_short': 'Local storage',
-    'trust.no_subscription': 'One-time payment — no subscription',
-    'trust.no_subscription_short': 'No subscription',
+    'trust.cancel_anytime_short': 'Cancel anytime',
 
     'adv.toggle_show': '⚙️ Advanced mode',
     'adv.toggle_hide': '✓ Simple mode',
