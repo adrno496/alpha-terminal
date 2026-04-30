@@ -233,6 +233,11 @@ export async function checkPriceAlerts({ progressCb = null } = {}) {
         alert.triggeredAt = new Date().toISOString();
         await savePriceAlert(alert);
         result.triggered.push(alert);
+        // Push notification système (Web ou Capacitor) — silencieux si refusé
+        try {
+          const { notifyPriceAlert } = await import('./notifications.js');
+          await notifyPriceAlert(alert);
+        } catch (e) { /* silent */ }
       } else {
         await savePriceAlert(alert);
         result.stillWaiting.push(alert);

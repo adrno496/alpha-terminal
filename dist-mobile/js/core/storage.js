@@ -2,7 +2,7 @@
 // + helpers localStorage pour settings non-sensibles
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 
 let _dbPromise = null;
 let _dbAvailable = null; // null = unknown, true = OK, false = unavailable (private mode etc.)
@@ -78,6 +78,12 @@ function openDB() {
         const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
         pa.createIndex('ticker', 'ticker', { unique: false });
         pa.createIndex('status', 'status', { unique: false });
+      }
+      // v9 — Goals (objectifs financiers : retraite, achat, FIRE, etc.)
+      if (!db.objectStoreNames.contains('goals')) {
+        const g = db.createObjectStore('goals', { keyPath: 'id' });
+        g.createIndex('status', 'status', { unique: false });
+        g.createIndex('targetDate', 'targetDate', { unique: false });
       }
     };
     req.onsuccess = () => { setDbAvailable(true); resolve(req.result); };

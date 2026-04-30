@@ -81,7 +81,12 @@ const CATEGORIES = [
       { id: 'wealth-method',         num: '25' },
       { id: 'csv-import',            num: '26' },
       { id: 'insights-engine',       num: '27' },
-      { id: 'price-alerts',          num: '28' }
+      { id: 'price-alerts',          num: '28' },
+      { id: 'live-watcher',          num: '29' },
+      { id: 'goals',                 num: '30' },
+      { id: 'projection',            num: '31' },
+      { id: 'accounts-view',         num: '32' },
+      { id: 'ifi-simulator',         num: '33' }
     ]
   }
 ];

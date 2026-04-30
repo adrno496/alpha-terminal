@@ -33,6 +33,7 @@ export async function renderWealthView(viewEl) {
         <button id="wl-add" class="btn-primary">+ Add holding</button>
         <button id="wl-import" class="btn-secondary">📥 Import JSON</button>
         <button id="wl-export" class="btn-secondary">📤 Export JSON</button>
+        <button id="wl-export-pdf" class="btn-secondary">📄 Export PDF</button>
         <button id="wl-clear" class="btn-danger">🗑 Clear all</button>
         <input id="wl-import-file" type="file" accept="application/json" hidden />
       </div>
@@ -94,6 +95,24 @@ export async function renderWealthView(viewEl) {
   });
   $('#wl-backfill').addEventListener('click', () => doBackfill());
   $('#wl-export').addEventListener('click', exportData);
+  $('#wl-export-pdf')?.addEventListener('click', async () => {
+    const btn = $('#wl-export-pdf');
+    const old = btn.textContent;
+    btn.disabled = true; btn.textContent = '⏳ PDF…';
+    try {
+      const list = await listWealth();
+      const totals = await getTotals($('#wl-currency').value || 'EUR');
+      const { exportWealthPDF } = await import('../core/pdf-export.js');
+      const { getLocale } = await import('../core/i18n.js');
+      const filename = await exportWealthPDF({ holdings: list, totals, locale: getLocale() });
+      toast(`📄 ${filename}`, 'success');
+    } catch (e) {
+      console.error(e);
+      toast('PDF : ' + e.message, 'error');
+    } finally {
+      btn.disabled = false; btn.textContent = old;
+    }
+  });
   $('#wl-import').addEventListener('click', () => $('#wl-import-file').click());
   $('#wl-import-file').addEventListener('change', importData);
   $('#wl-clear').addEventListener('click', async () => {

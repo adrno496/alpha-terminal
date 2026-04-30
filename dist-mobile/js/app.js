@@ -61,6 +61,13 @@ import { renderInsightsEngineView }        from './modules/insights-engine.js';
 import { renderPriceAlertsView }           from './modules/price-alerts.js';
 import { bootAlertCheck, updateAlertBadge } from './ui/alerts-banner.js';
 
+// V9 — IFI / Goals / Live / Accounts / Projection
+import { renderIfiSimulatorView }   from './modules/ifi-simulator.js';
+import { renderGoalsView }          from './modules/goals.js';
+import { renderLiveWatcherView }    from './modules/live-watcher.js';
+import { renderAccountsViewView }   from './modules/accounts-view.js';
+import { renderProjectionView }     from './modules/projection.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -97,6 +104,12 @@ const ROUTES = {
   'csv-import':            { render: renderCsvImportView,            label: '📥 Import CSV' },
   'insights-engine':       { render: renderInsightsEngineView,       label: '✨ Insights' },
   'price-alerts':          { render: renderPriceAlertsView,          label: '🚨 Alertes prix' },
+  // V9
+  'ifi-simulator':         { render: renderIfiSimulatorView,         label: '🇫🇷 Simulateur IFI' },
+  'goals':                 { render: renderGoalsView,                label: '🎯 Objectifs financiers' },
+  'live-watcher':          { render: renderLiveWatcherView,          label: '📈 Live Watcher' },
+  'accounts-view':         { render: renderAccountsViewView,         label: '🏦 Vue par compte' },
+  'projection':            { render: renderProjectionView,           label: '📊 Projection patrimoine' },
 };
 
 const STATE = { currentRoute: null };

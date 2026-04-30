@@ -39,7 +39,13 @@ const MODULE_DETAILS = {
   get 'wealth-method'()         { return { icon: '📚', flow: 'Patrimoine → Checklist FR' }; },
   get 'csv-import'()            { return { icon: '📥', flow: 'CSV bancaire → Budget' }; },
   get 'insights-engine'()       { return { icon: '✨', flow: 'Patrimoine → Alertes hebdo' }; },
-  get 'price-alerts'()          { return { icon: '🚨', flow: 'YouTube → Niveaux → Voyant rouge' }; }
+  get 'price-alerts'()          { return { icon: '🚨', flow: 'YouTube → Niveaux → Voyant rouge' }; },
+  // V9
+  get 'ifi-simulator'()         { return { icon: '🇫🇷', flow: 'Biens immo → IFI 2024' }; },
+  get 'goals'()                 { return { icon: '🎯', flow: 'Cible + date → Progression' }; },
+  get 'live-watcher'()          { return { icon: '📈', flow: 'Tickers → Chart 30s + Alertes' }; },
+  get 'accounts-view'()         { return { icon: '🏦', flow: 'Patrimoine → Groupé par compte' }; },
+  get 'projection'()            { return { icon: '📊', flow: 'Patrimoine → 30 ans × 3 scénarios' }; }
 };
 
 const FAQ_FR = [

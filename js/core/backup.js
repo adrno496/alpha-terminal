@@ -2,9 +2,9 @@
 // Permet de migrer entre appareils (PC ↔ smartphone, ancien ↔ nouveau, etc.)
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 
-const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts'];
+const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts', 'goals'];
 
 // localStorage keys gérées par l'app (filtre pour ne pas exporter les clés du navigateur d'autres sites)
 const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:'];
@@ -61,6 +61,11 @@ function openDB() {
         const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
         pa.createIndex('ticker', 'ticker', { unique: false });
         pa.createIndex('status', 'status', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('goals')) {
+        const g = db.createObjectStore('goals', { keyPath: 'id' });
+        g.createIndex('status', 'status', { unique: false });
+        g.createIndex('targetDate', 'targetDate', { unique: false });
       }
     };
   });
