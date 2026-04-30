@@ -362,6 +362,24 @@ async function applyCustomPrompt(moduleId, system) {
 
 // Helper canonique : run un module via l'orchestrateur, en streaming
 export async function runAnalysis(moduleId, params, container, { onTitle, suggestFollowUps = true } = {}) {
+  // Garde providers : on vérifie que ce module spécifique a au moins un provider compatible
+  // configuré. Sinon, on affiche un message DÉTAILLÉ avec la liste exacte des providers requis.
+  const { getModuleProviderStatus, renderMissingKeysMessage } = await import('../core/module-providers.js');
+  const status = getModuleProviderStatus(moduleId);
+  if (!status.isLocalOnly && !status.runnable) {
+    const isEN = (await import('../core/i18n.js')).getLocale() === 'en';
+    if (container) {
+      container.innerHTML = `<div class="card">${renderMissingKeysMessage(moduleId, isEN)}</div>`;
+      const btn = container.querySelector('#run-need-keys');
+      if (btn) btn.addEventListener('click', async () => {
+        const { openLockFlow } = await import('../ui/modal.js');
+        localStorage.removeItem('alpha-terminal:browse-mode');
+        openLockFlow();
+      });
+    }
+    return null;
+  }
+
   const stream = prepareStreamContainer(container, moduleId, '');
   let selection = null;
   let fullText = '';

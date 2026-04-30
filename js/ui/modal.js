@@ -118,7 +118,8 @@ function renderWizardStep1() {
       <input id="wiz-pwd2" class="input" type="password" autocomplete="new-password" />
     </div>
     <div id="wiz-err" class="alert alert-danger hidden"></div>
-    <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:8px;">
+      <button id="wiz-browse" class="btn-ghost" style="font-size:12.5px;">👀 ${t('wiz.browse_first')}</button>
       <button id="wiz-next1" class="btn-primary">${t('wiz.next')}</button>
     </div>
 
@@ -141,6 +142,14 @@ function renderWizardStep1() {
     $('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') next1(); });
   });
   $('#wiz-next1').addEventListener('click', next1);
+
+  // Browse-first : permet à l'utilisateur d'explorer les modules sans configurer le vault.
+  // Si plus tard il clique "Run" sur un module → on relance le lock flow.
+  $('#wiz-browse').addEventListener('click', () => {
+    overlay.classList.add('hidden');
+    localStorage.setItem('alpha-terminal:browse-mode', '1');
+    window.dispatchEvent(new CustomEvent('app:browse-mode-enabled'));
+  });
 
   // === Import backup pendant l'onboarding ===
   $('#wiz-import-file').addEventListener('change', async (e) => {

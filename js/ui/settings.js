@@ -5,7 +5,7 @@ import { hasVault, vaultProviderNames, setApiKeys, removeProviderKey, forgetVaul
 import { isConnected, clearRuntimeKeys, setRuntimeKeys, validateProviderKey, KNOWN_PROVIDERS, getOrchestrator, MODULE_ROUTING } from '../core/api.js';
 import { getCost, resetTotalCost } from '../core/cost-tracker.js';
 import { MODEL_CATALOG } from '../core/models-catalog.js';
-import { t } from '../core/i18n.js';
+import { t, getLocale } from '../core/i18n.js';
 import { DATA_PROVIDERS, KEYLESS_DATA_SOURCES, getDataKey, setDataKey, getDataKeyStatus } from '../core/data-keys.js';
 import { resetTour, startTour } from './tour.js';
 import { downloadFullBackup, importBackupFromFile, getLocalDataStats, wipeAllLocalData, copyBackupToClipboard, diagnosticBackup } from '../core/backup.js';
@@ -422,6 +422,7 @@ function renderAdvancedTab(c) {
     <div class="card">
       <div class="card-title">${t('tour.replay')}</div>
       <button id="set-replay-tour" class="btn-secondary">${t('tour.replay')}</button>
+      <button id="set-onboarding-redo" class="btn-secondary" style="margin-left:8px;">⭐ ${getLocale() === 'en' ? 'Redo profile questionnaire' : 'Refaire le questionnaire profil'}</button>
     </div>
     <div class="card">
       <div class="card-title">${t('settings.adv.shortcuts')}</div>
@@ -812,6 +813,13 @@ function renderAdvancedTab(c) {
   });
   const replayBtn = $('#set-replay-tour');
   if (replayBtn) replayBtn.addEventListener('click', () => { resetTour(); startTour(); });
+
+  // Re-do onboarding questionnaire
+  const onbBtn = $('#set-onboarding-redo');
+  if (onbBtn) onbBtn.addEventListener('click', async () => {
+    const { openOnboardingQuestionnaire } = await import('./onboarding-questionnaire.js');
+    openOnboardingQuestionnaire({ onComplete: () => location.hash = '#home' });
+  });
 }
 
 function moduleLabel(id) {

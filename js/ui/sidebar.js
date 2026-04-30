@@ -1,6 +1,9 @@
 // Sidebar v2 — mode simple par défaut + mode avancé avec catégories
 import { $, $$ } from '../core/utils.js';
 import { t } from '../core/i18n.js';
+import { getUserProfile } from '../core/user-profile.js';
+import { recommendedSet } from '../core/module-recommendations.js';
+import { isModuleMissingApiKey } from '../core/module-providers.js';
 
 // Modules toujours visibles (mode simple)
 const ALWAYS_VISIBLE = [
@@ -110,13 +113,25 @@ function setAdvanced(v) { localStorage.setItem(ADV_KEY, v ? '1' : '0'); }
 export function renderSidebar(onNavigate) {
   const nav = $('#sidebar-nav');
   const advanced = getAdvanced();
+  // Set des modules recommandés selon profil utilisateur (vide si pas de profil)
+  const recoSet = recommendedSet(getUserProfile(), 10, 50);
+  const missingKey = (id) => isModuleMissingApiKey(id);
+  const recoBadge = (id) => recoSet.has(id) ? `<span class="reco-star" title="${t('reco.tooltip')}" style="margin-left:auto;color:#ffd700;font-size:13px;line-height:1;" aria-label="recommended">⭐</span>` : '';
+  const missingBadge = (id) => missingKey(id) ? `<span class="missing-key" title="${t('reco.missing_key_tooltip')}" style="margin-left:auto;color:var(--accent-red);font-size:13px;line-height:1;font-weight:700;" aria-label="API key needed">!</span>` : '';
+  // Si reco ET missing : on affiche les deux côté à côté
+  const sideBadges = (id) => {
+    const a = missingBadge(id), b = recoBadge(id);
+    if (!a && !b) return '';
+    return `<span style="margin-left:auto;display:inline-flex;gap:4px;align-items:center;">${a}${b}</span>`;
+  };
 
   let html = '';
   // Always visible
   html += ALWAYS_VISIBLE.map(m => `
-    <button class="sidebar-link primary" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}">
+    <button class="sidebar-link primary${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">
       <span class="num">${m.num}</span>
       <span class="lbl">${t(`mod.${m.id}.label`)}</span>
+      ${sideBadges(m.id)}
       <span class="mod-help-btn" data-mod-help="${m.id}" role="button" tabindex="0" aria-label="Help">?</span>
     </button>
   `).join('');
@@ -143,9 +158,10 @@ export function renderSidebar(onNavigate) {
       <div class="sidebar-cat">
         <div class="sidebar-cat-title">${t(cat.titleKey)}</div>
         ${cat.modules.map(m => `
-          <button class="sidebar-link" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}">
+          <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">
             <span class="num">${m.num}</span>
             <span class="lbl">${t(`mod.${m.id}.label`)}</span>
+            ${sideBadges(m.id)}
             <span class="mod-help-btn" data-mod-help="${m.id}" role="button" tabindex="0" aria-label="Help">?</span>
           </button>
         `).join('')}

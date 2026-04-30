@@ -43,7 +43,7 @@ import { renderYoutubeTranscriptView }  from './modules/youtube-transcript.js';
 
 import { renderExistingResult } from './modules/_shared.js';
 import { safeRender } from './core/safe-render.js';
-import { makeLocaleToggle, t, applyI18nAttributes } from './core/i18n.js';
+import { makeLocaleToggle, t, applyI18nAttributes, getLocale } from './core/i18n.js';
 import { isTourCompleted, startTour } from './ui/tour.js';
 import { initKeyboard } from './ui/keyboard.js';
 import { tryLoadSharedFromHash } from './ui/sharing.js';
@@ -171,6 +171,53 @@ async function renderHome(viewEl) {
   let providers = [];
   try { const { getOrchestrator } = await import('./core/api.js'); providers = getOrchestrator().getProviderNames(); } catch {}
 
+  // V10 — Carte "Recommandés pour toi" basée sur profil utilisateur
+  let recoCard = '';
+  try {
+    const { getUserProfile, isOnboardingCompleted } = await import('./core/user-profile.js');
+    const profile = getUserProfile();
+    if (profile && isOnboardingCompleted()) {
+      const { topRecommendedIds } = await import('./core/module-recommendations.js');
+      const top = topRecommendedIds(profile, 6);
+      const isEN = getLocale() === 'en';
+      const labelOf = (id) => t(`mod.${id}.label`) || id;
+      const descOf = (id) => t(`mod.${id}.desc`) || '';
+      const { isModuleMissingApiKey } = await import('./core/module-providers.js');
+      recoCard = `
+        <div class="card" style="border-left:4px solid #ffd700;">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+            <div class="card-title" style="margin:0;">⭐ ${isEN ? 'Recommended for you' : 'Recommandés pour toi'}</div>
+            <button id="reco-redo" class="btn-ghost" style="font-size:11px;color:var(--text-muted);">↻ ${isEN ? 'Redo questionnaire' : 'Refaire le questionnaire'}</button>
+          </div>
+          <p style="font-size:12px;color:var(--text-muted);margin:4px 0 12px;">${isEN ? 'Based on your profile (' + (profile.experience || 'intermediate') + ' · ' + (profile.country || 'fr') + ')' : 'Selon ton profil (' + (profile.experience || 'intermédiaire') + ' · ' + (profile.country || 'fr') + ')'}</p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+            ${top.map(id => {
+              const needsKey = isModuleMissingApiKey(id);
+              return `
+              <div data-route="${id}" style="cursor:pointer;padding:12px;background:var(--bg-tertiary);border-radius:6px;border-left:3px solid ${needsKey ? 'var(--accent-red)' : '#ffd700'};position:relative;">
+                ${needsKey ? `<span style="position:absolute;top:6px;right:8px;color:var(--accent-red);font-weight:700;" title="${t('reco.missing_key_tooltip')}">!</span>` : ''}
+                <div style="font-size:13px;font-weight:600;margin-bottom:3px;">${labelOf(id)}</div>
+                <div style="font-size:11px;color:var(--text-muted);line-height:1.4;">${descOf(id).slice(0, 100)}</div>
+              </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    } else if (!profile) {
+      // Pas de profil → invitation à faire le questionnaire
+      const isEN = getLocale() === 'en';
+      recoCard = `
+        <div class="card" style="border-left:4px solid #ffd700;text-align:center;padding:18px;">
+          <div style="font-size:28px;margin-bottom:6px;">⭐</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">${isEN ? 'Get personalized recommendations' : 'Obtiens des recommandations personnalisées'}</div>
+          <p style="font-size:12px;color:var(--text-secondary);margin:0 0 10px;">${isEN ? '~2 min questionnaire to highlight the most relevant modules for your profile.' : '~2 min de questionnaire pour identifier les modules les plus utiles pour ton profil.'}</p>
+          <button id="reco-start" class="btn-primary" style="font-size:12.5px;">🎯 ${isEN ? 'Start questionnaire' : 'Démarrer le questionnaire'}</button>
+        </div>
+      `;
+    }
+  } catch (e) { console.warn('Reco card failed:', e); }
+
   // V8 — Bannière alertes prix triggered (en haut, voyant rouge clignotant)
   let alertBanner = '';
   try {
@@ -230,6 +277,8 @@ async function renderHome(viewEl) {
     </div>
 
     ${alertBanner}
+
+    ${recoCard}
 
     ${financesPersoCards}
 
@@ -295,6 +344,16 @@ async function renderHome(viewEl) {
     const rec = all.find(a => a.id === id);
     if (rec) openExistingRecord(rec);
   }));
+
+  // Boutons questionnaire (start / redo)
+  const recoBtnStart = viewEl.querySelector('#reco-start');
+  const recoBtnRedo  = viewEl.querySelector('#reco-redo');
+  const openOnb = async () => {
+    const { openOnboardingQuestionnaire } = await import('./ui/onboarding-questionnaire.js');
+    openOnboardingQuestionnaire({ onComplete: () => { renderSidebar(navigate); navigate('home'); } });
+  };
+  if (recoBtnStart) recoBtnStart.addEventListener('click', openOnb);
+  if (recoBtnRedo) recoBtnRedo.addEventListener('click', openOnb);
 }
 
 function openExistingRecord(record) {
@@ -364,7 +423,11 @@ function boot() {
     });
   });
 
-  onConnectionChange(refreshApiStatus);
+  onConnectionChange(() => {
+    refreshApiStatus();
+    // Re-render la sidebar pour mettre à jour les badges ⚠️ (clés manquantes)
+    try { renderSidebar(navigate); } catch {}
+  });
   onCostChange(refreshCostBadge);
   refreshApiStatus();
 
@@ -439,23 +502,67 @@ function boot() {
 
   renderLanding({ onCtaClick: startLockFlow });
 
-  window.addEventListener('app:unlocked', () => {
+  // Si browse-mode est activé (refresh ou back avec mode actif), on dispatch direct
+  if (localStorage.getItem('alpha-terminal:browse-mode') === '1' && !isConnected()) {
+    setTimeout(() => window.dispatchEvent(new CustomEvent('app:browse-mode-enabled')), 100);
+  }
+
+  window.addEventListener('app:unlocked', async () => {
     refreshApiStatus();
     setSettings({ hasSeenLanding: true });
     hideLanding();
     injectCostBadge();
     applyI18nAttributes();
+    // Clear browse-mode si l'utilisateur a fini par configurer son vault
+    localStorage.removeItem('alpha-terminal:browse-mode');
     const initial = (location.hash || '').slice(1);
     if (ROUTES[initial] || initial === 'history' || initial === 'settings' || initial === 'home') {
       navigate(initial);
     } else {
-      // Default = Quick Analysis (la killer feature)
       navigate('quick-analysis');
     }
-    // Trigger onboarding tour si premier lancement
+
+    // Onboarding questionnaire : déclenche si pas encore fait (et pas skipped)
+    try {
+      const { isOnboardingCompleted } = await import('./core/user-profile.js');
+      if (!isOnboardingCompleted()) {
+        setTimeout(async () => {
+          const { openOnboardingQuestionnaire } = await import('./ui/onboarding-questionnaire.js');
+          openOnboardingQuestionnaire({
+            onComplete: () => { renderSidebar(navigate); navigate('home'); },
+            onSkip: () => { /* ne rien faire */ }
+          });
+        }, 800);
+      }
+    } catch {}
+
+    // Tour onboarding (si jamais fait)
     if (!isTourCompleted()) {
       setTimeout(() => startTour(), 600);
     }
+  });
+
+  // Browse mode : l'utilisateur a cliqué "Browse first" sur le wizard.
+  // On masque la modale + on affiche l'app avec sidebar mais isConnected() = false.
+  // L'access aux modules est libre, mais runAnalysis() redirigera vers le lock flow.
+  window.addEventListener('app:browse-mode-enabled', () => {
+    hideLanding();
+    applyI18nAttributes();
+    // Indicateur visuel discret en topbar
+    let pill = document.getElementById('browse-mode-pill');
+    if (!pill) {
+      pill = document.createElement('button');
+      pill.id = 'browse-mode-pill';
+      pill.style.cssText = 'background:var(--accent-orange);color:#000;padding:5px 12px;border:0;border-radius:14px;font-size:11px;font-weight:600;cursor:pointer;margin-right:8px;';
+      pill.textContent = '👀 ' + (getLocale() === 'en' ? 'Browse mode — Click to set up keys' : 'Mode exploration — Configurer mes clés');
+      pill.addEventListener('click', () => {
+        localStorage.removeItem('alpha-terminal:browse-mode');
+        openLockFlow();
+      });
+      const right = document.querySelector('.topbar-right');
+      if (right) right.insertBefore(pill, right.firstChild);
+    }
+    navigate('home');
   });
 
   window.addEventListener('hashchange', () => {
