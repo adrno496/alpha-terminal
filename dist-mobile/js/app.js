@@ -88,6 +88,9 @@ import { renderEstateDocGeneratorView }     from './modules/estate-doc-generator
 import { renderMacroEventsCalendarView }    from './modules/macro-events-calendar.js';
 import { renderPerformanceAttributionView } from './modules/performance-attribution.js';
 
+// V13 — Analyse géopolitique
+import { renderGeopoliticalAnalysisView }   from './modules/geopolitical-analysis.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -146,6 +149,8 @@ const ROUTES = {
   'estate-doc-generator':  { render: renderEstateDocGeneratorView,   label: '📜 Estate Documents FR' },
   'macro-events-calendar': { render: renderMacroEventsCalendarView,  label: '🏛️ Macro Events' },
   'performance-attribution':{ render: renderPerformanceAttributionView, label: '📈 Performance Attribution' },
+  // V13
+  'geopolitical-analysis': { render: renderGeopoliticalAnalysisView,   label: '🌍 Analyse géopolitique' },
 };
 
 const STATE = { currentRoute: null };

@@ -203,6 +203,13 @@ export const MODULE_ROUTING = {
     fallbackProviders: ['perplexity', 'github', 'nvidia', 'huggingface', 'cloudflare', 'together', 'cohere'],
     recommendedTier: 'balanced',
     reason: 'Assistant chat général — flexible sur tous les providers'
+  },
+  'geopolitical-analysis': {
+    needsCapabilities: ['web_search'],
+    optimalProviders: ['perplexity', 'grok', 'gemini'],
+    fallbackProviders: ['claude', 'openai', 'openrouter'],
+    recommendedTier: 'flagship',
+    reason: 'Actu géopolitique = web search natif requis · raisonnement nuancé sur scénarios probabilistes'
   }
   // budget, dividends-tracker, diversification-score, csv-import : pure local, pas de routing LLM
 };

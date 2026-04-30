@@ -4,7 +4,7 @@ import { getSettings, setSettings, clearAnalyses, listAnalyses, saveAnalysis } f
 import { hasVault, vaultProviderNames, setApiKeys, removeProviderKey, forgetVault, unlockVault } from '../core/crypto.js';
 import { isConnected, clearRuntimeKeys, setRuntimeKeys, validateProviderKey, KNOWN_PROVIDERS, getOrchestrator, MODULE_ROUTING } from '../core/api.js';
 import { MODULES as ALL_MODULES } from './sidebar.js';
-import { getCost, resetTotalCost } from '../core/cost-tracker.js';
+import { getCost, resetTotalCost, getBudgetLimits, setBudgetLimits } from '../core/cost-tracker.js';
 import { MODEL_CATALOG } from '../core/models-catalog.js';
 import { t, getLocale } from '../core/i18n.js';
 import { DATA_PROVIDERS, KEYLESS_DATA_SOURCES, getDataKey, setDataKey, getDataKeyStatus } from '../core/data-keys.js';
@@ -404,12 +404,22 @@ function renderRoutingTab(c) {
 function renderCostsTab(c) {
   const cost = getCost();
   const byP = cost.byProvider || {};
+  const limits = getBudgetLimits();
+  const isEN = getLocale() === 'en';
+  const today = cost.todayUSD || 0;
+  const month = cost.monthUSD || 0;
+  // Pourcentage de barre pour les caps actifs
+  const dailyPct = limits.dailyCapUSD > 0 ? Math.min(100, (today / limits.dailyCapUSD) * 100) : 0;
+  const monthlyPct = limits.monthlyCapUSD > 0 ? Math.min(100, (month / limits.monthlyCapUSD) * 100) : 0;
+  const barColor = (pct) => pct >= 90 ? 'var(--accent-red)' : pct >= 70 ? 'var(--accent-orange)' : 'var(--accent-green)';
+
   c.innerHTML = `
     <div class="card">
       <div class="card-title">${t('settings.costs.title')}</div>
       <div class="stat-grid">
         <div class="stat"><div class="stat-label">${t('home.cost_total')}</div><div class="stat-value green">${fmtUSD(cost.total || 0)}</div></div>
-        <div class="stat"><div class="stat-label">${t('settings.costs.session')}</div><div class="stat-value">${fmtUSD(cost.session?.total || 0)}</div></div>
+        <div class="stat"><div class="stat-label">${isEN ? 'Today' : 'Aujourd\u2019hui'}</div><div class="stat-value">${fmtUSD(today)}</div></div>
+        <div class="stat"><div class="stat-label">${isEN ? 'This month' : 'Ce mois-ci'}</div><div class="stat-value">${fmtUSD(month)}</div></div>
         <div class="stat"><div class="stat-label">${t('home.api_calls')}</div><div class="stat-value">${cost.calls || 0}</div></div>
       </div>
       <table class="wiz-routing" style="margin-top:14px;">
@@ -420,9 +430,98 @@ function renderCostsTab(c) {
       </table>
       <button id="cost-reset" class="btn-ghost" style="margin-top:12px;">${t('settings.costs.reset')}</button>
     </div>
+
+    <div class="card" style="border-left:4px solid var(--accent-orange);">
+      <div class="card-title">💸 ${isEN ? 'Budget control' : 'Contrôle du budget'}</div>
+      <p style="color:var(--text-secondary);font-size:13px;margin:0 0 14px;">
+        ${isEN
+          ? 'Cap your monthly / daily / per-call API spend. Useful when using premium providers (Claude, OpenAI, Gemini Pro) to avoid surprises.'
+          : 'Plafonne ta dépense API par mois / jour / analyse. Utile avec les providers premium (Claude, OpenAI, Gemini Pro) pour éviter les surprises.'}
+      </p>
+
+      <label class="form-row" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:14px;">
+        <input type="checkbox" id="bud-enabled" ${limits.enabled ? 'checked' : ''} />
+        <strong>${isEN ? 'Enable budget control' : 'Activer le contrôle de budget'}</strong>
+      </label>
+
+      <div id="bud-fields" style="${limits.enabled ? '' : 'opacity:0.5;pointer-events:none;'}display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;font-size:13px;">
+        <label>
+          ${isEN ? 'Daily cap (USD)' : 'Plafond journalier (USD)'}
+          <input type="number" id="bud-daily" min="0" step="0.10" value="${limits.dailyCapUSD || ''}" placeholder="${isEN ? '0 = unlimited' : '0 = illimité'}" class="input" />
+          <small style="color:var(--text-muted);">${isEN ? 'Today' : 'Aujourd\u2019hui'} : <strong>${fmtUSD(today)}</strong>${limits.dailyCapUSD > 0 ? ` / ${fmtUSD(limits.dailyCapUSD)}` : ''}</small>
+          ${limits.dailyCapUSD > 0 ? `<div class="bud-bar"><div class="bud-bar-fill" style="width:${dailyPct}%;background:${barColor(dailyPct)};"></div></div>` : ''}
+        </label>
+        <label>
+          ${isEN ? 'Monthly cap (USD)' : 'Plafond mensuel (USD)'}
+          <input type="number" id="bud-monthly" min="0" step="1" value="${limits.monthlyCapUSD || ''}" placeholder="${isEN ? '0 = unlimited' : '0 = illimité'}" class="input" />
+          <small style="color:var(--text-muted);">${isEN ? 'This month' : 'Ce mois'} : <strong>${fmtUSD(month)}</strong>${limits.monthlyCapUSD > 0 ? ` / ${fmtUSD(limits.monthlyCapUSD)}` : ''}</small>
+          ${limits.monthlyCapUSD > 0 ? `<div class="bud-bar"><div class="bud-bar-fill" style="width:${monthlyPct}%;background:${barColor(monthlyPct)};"></div></div>` : ''}
+        </label>
+        <label>
+          ${isEN ? 'Per-call cap (USD)' : 'Plafond par analyse (USD)'}
+          <input type="number" id="bud-percall" min="0" step="0.01" value="${limits.perCallCapUSD || ''}" placeholder="${isEN ? '0 = unlimited' : '0 = illimité'}" class="input" />
+          <small style="color:var(--text-muted);">${isEN ? 'Refuses any single analysis above this amount.' : 'Refuse toute analyse au-dessus de ce montant.'}</small>
+        </label>
+        <label>
+          ${isEN ? 'When limit reached' : 'Quand la limite est atteinte'}
+          <select id="bud-action" class="input">
+            <option value="warn" ${limits.action === 'warn' ? 'selected' : ''}>⚠️ ${isEN ? 'Warn (analysis still runs)' : 'Avertir (analyse lancée)'}</option>
+            <option value="block" ${limits.action === 'block' ? 'selected' : ''}>🚫 ${isEN ? 'Block (refuse analysis)' : 'Bloquer (refuser l\u2019analyse)'}</option>
+          </select>
+        </label>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button id="bud-save" class="btn-primary">${isEN ? 'Save limits' : 'Enregistrer'}</button>
+        <button id="bud-preset-light" class="btn-ghost">${isEN ? 'Preset: light ($5/month)' : 'Préset : light ($5/mois)'}</button>
+        <button id="bud-preset-active" class="btn-ghost">${isEN ? 'Preset: active ($30/month)' : 'Préset : actif ($30/mois)'}</button>
+        <button id="bud-preset-power" class="btn-ghost">${isEN ? 'Preset: power ($100/month)' : 'Préset : intensif ($100/mois)'}</button>
+      </div>
+
+      <div style="margin-top:14px;padding:10px;background:var(--bg-tertiary);border-radius:6px;font-size:12px;line-height:1.7;">
+        💡 ${isEN
+          ? '<strong>Recommended setup</strong>: combine "Block" action + a per-call cap (e.g. $0.50) to prevent runaway 10-K Decoder calls. Set a monthly cap matching your budget.'
+          : '<strong>Recommandé</strong> : combine action "Bloquer" + plafond par analyse (ex: $0,50) pour éviter qu\u2019un 10-K Decoder explose ton budget. Mets un plafond mensuel calé sur ton vrai budget.'}<br><br>
+        ${isEN
+          ? 'These limits run <strong>locally in your browser</strong> — they do not prevent provider-side overages if you have other apps using the same API key. Set a hard limit at your provider too (Anthropic / OpenAI dashboards offer monthly caps).'
+          : 'Ces limites tournent <strong>localement dans ton navigateur</strong> — elles ne bloquent pas les autres apps qui utilisent la même clé. Mets aussi une vraie limite côté provider (Anthropic / OpenAI offrent des plafonds mensuels).'}
+      </div>
+    </div>
   `;
+
   $('#cost-reset').addEventListener('click', () => {
-    if (confirm('Reset le compteur de coût ?')) { resetTotalCost(); toast('Reset', 'success'); renderTab('costs'); }
+    if (confirm(isEN ? 'Reset cost counter?' : 'Reset le compteur de coût ?')) { resetTotalCost(); toast('Reset', 'success'); renderTab('costs'); }
+  });
+
+  // Budget toggles
+  $('#bud-enabled').addEventListener('change', () => {
+    setBudgetLimits({ enabled: $('#bud-enabled').checked });
+    renderTab('costs');
+  });
+  $('#bud-save').addEventListener('click', () => {
+    setBudgetLimits({
+      dailyCapUSD: Number($('#bud-daily').value) || 0,
+      monthlyCapUSD: Number($('#bud-monthly').value) || 0,
+      perCallCapUSD: Number($('#bud-percall').value) || 0,
+      action: $('#bud-action').value
+    });
+    toast(isEN ? 'Budget saved' : 'Budget enregistré', 'success');
+    renderTab('costs');
+  });
+  $('#bud-preset-light').addEventListener('click', () => {
+    setBudgetLimits({ enabled: true, dailyCapUSD: 0.50, monthlyCapUSD: 5, perCallCapUSD: 0.10, action: 'warn' });
+    toast(isEN ? 'Light preset applied' : 'Préset light appliqué', 'success');
+    renderTab('costs');
+  });
+  $('#bud-preset-active').addEventListener('click', () => {
+    setBudgetLimits({ enabled: true, dailyCapUSD: 2, monthlyCapUSD: 30, perCallCapUSD: 0.50, action: 'warn' });
+    toast(isEN ? 'Active preset applied' : 'Préset actif appliqué', 'success');
+    renderTab('costs');
+  });
+  $('#bud-preset-power').addEventListener('click', () => {
+    setBudgetLimits({ enabled: true, dailyCapUSD: 6, monthlyCapUSD: 100, perCallCapUSD: 1.50, action: 'warn' });
+    toast(isEN ? 'Power preset applied' : 'Préset intensif appliqué', 'success');
+    renderTab('costs');
   });
 }
 

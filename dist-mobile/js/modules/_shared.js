@@ -446,6 +446,44 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
     return null;
   }
 
+  // === Budget cap check ===
+  // On vérifie avant de lancer l'analyse que le budget n'est pas dépassé.
+  // Si action='block' on refuse, sinon on warn via toast.
+  try {
+    const { checkBudgetCap, getBudgetLimits } = await import('../core/cost-tracker.js');
+    const limits = getBudgetLimits();
+    if (limits.enabled) {
+      // Estimation grossière : moyenne ~$0.05 par analyse (sera affinée si possible)
+      const estimated = 0.05;
+      const check = checkBudgetCap(estimated);
+      if (!check.ok) {
+        const isEN = (await import('../core/i18n.js')).getLocale() === 'en';
+        const reasonLabel = {
+          'per-call':  isEN ? 'per-call cap' : 'plafond par analyse',
+          'daily':     isEN ? 'daily cap'    : 'plafond journalier',
+          'monthly':   isEN ? 'monthly cap'  : 'plafond mensuel'
+        }[check.reason] || check.reason;
+        const msg = isEN
+          ? `⚠️ Budget ${reasonLabel} reached: $${check.current.toFixed(2)} / $${check.limit.toFixed(2)}.`
+          : `⚠️ Budget atteint (${reasonLabel}) : $${check.current.toFixed(2)} / $${check.limit.toFixed(2)}.`;
+        if (check.action === 'block') {
+          if (container) container.innerHTML = `<div class="card" style="border-left:3px solid var(--accent-red);padding:14px;">
+            <strong style="color:var(--accent-red);">${msg}</strong>
+            <p style="margin:10px 0 0;font-size:13px;color:var(--text-secondary);">
+              ${isEN ? 'Increase your budget in <strong>Settings → Costs → Budget control</strong> or wait for the period to reset.' : 'Augmente ton budget dans <strong>Paramètres → Coûts → Contrôle budget</strong> ou attends la réinitialisation de la période.'}
+            </p>
+          </div>`;
+          const { toast } = await import('../core/utils.js');
+          toast(msg, 'error');
+          return null;
+        } else {
+          const { toast } = await import('../core/utils.js');
+          toast(msg + (isEN ? ' (warn only — analysis runs)' : ' (avertissement — analyse lancée)'), 'warning');
+        }
+      }
+    }
+  } catch (e) { console.warn('[budget] check failed:', e); }
+
   // === A2 : Cache résultats 24h ===
   // Si activé dans settings + même input dans la dernière 24h → renvoie le résultat cached.
   const settings = getSettings();

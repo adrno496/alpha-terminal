@@ -61,7 +61,9 @@ const MODULE_DETAILS = {
   get 'esg-impact'()            { return { icon: '🌍', flow: 'Holdings → Score E/S/G + fossile + controverses' }; },
   get 'estate-doc-generator'()  { return { icon: '📜', flow: 'Infos perso → Testament + mandat + lettre notaire' }; },
   get 'macro-events-calendar'() { return { icon: '🏛️', flow: 'Fed/BCE/CPI → Agenda 90 jours' }; },
-  get 'performance-attribution'(){ return { icon: '📈', flow: 'Perf annuelle → Allocation + sélection (Brinson)' }; }
+  get 'performance-attribution'(){ return { icon: '📈', flow: 'Perf annuelle → Allocation + sélection (Brinson)' }; },
+  // V13
+  get 'geopolitical-analysis'() { return { icon: '🌍', flow: 'Région + sujet → Risques + impact marchés + hedges' }; }
 };
 
 const FAQ_FR = [

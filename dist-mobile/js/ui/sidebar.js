@@ -32,10 +32,11 @@ const CATEGORIES = [
     id: 'macro',
     titleKey: 'cat.macro',
     modules: [
-      { id: 'macro-dashboard', num: '02' },
-      { id: 'stress-test',     num: '17' },
-      { id: 'portfolio-rebalancer', num: '05' },
-      { id: 'battle-mode',     num: '18' }
+      { id: 'macro-dashboard',       num: '02' },
+      { id: 'geopolitical-analysis', num: '47' },
+      { id: 'stress-test',           num: '17' },
+      { id: 'portfolio-rebalancer',  num: '05' },
+      { id: 'battle-mode',           num: '18' }
     ]
   },
   {

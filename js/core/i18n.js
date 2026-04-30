@@ -684,6 +684,13 @@ const DICT = {
     'mod.performance-attribution.desc': 'Attribution Brinson : alpha vs benchmark décomposé en allocation + sélection',
     'mod.performance-attribution.help': '**À quoi ça sert :** sépare ta performance en 2 sources : (1) allocation = bonnes pondérations sectorielles vs MSCI World, (2) sélection = bonnes actions choisies dans chaque secteur.\n\n**Comment :** modèle Brinson appliqué sur perf 12 mois TTM, benchmark = MSCI World standard.\n\n**Quand :** revue annuelle pour comprendre POURQUOI ton portefeuille a fait +X% (chance ou skill ?).',
 
+    // V13 — Analyse géopolitique
+    'mod.geopolitical-analysis.label': '🌍 Analyse géopolitique',
+    'mod.geopolitical-analysis.desc': 'Cartographie risques régionaux + impact marchés + hedges concrets · web search requis',
+    'mod.geopolitical-analysis.help': '**À quoi ça sert :** comprend l\'impact des tensions géopolitiques (Taiwan, Ukraine, Moyen-Orient, élections) sur tes placements. Donne des scenarios probabilistes, l\'impact chiffré par classe d\'actifs, et des hedges concrets (tickers + tailles).\n\n**Comment :** LLM avec web search natif (Perplexity / Grok / Gemini) pour info temps réel + raisonnement nuancé sur scénarios. Wealth-aware : analyse l\'exposition de TON patrimoine.\n\n**Quand :** avant un événement majeur (élection, sommet OPEP, deadline sanctions), ou quand tu veux re-évaluer ton portefeuille face aux risques actuels.',
+    'mod.geopolitical-analysis.example': 'Tensions Moyen-Orient : impact pétrole + industriels EU',
+    'mod.geopolitical-analysis.run': '🌍 Lancer l\'analyse',
+
     // === Onboarding tour ===
     'tour.next': 'Suivant',
     'tour.back': 'Précédent',
@@ -1395,6 +1402,12 @@ const DICT = {
     'mod.performance-attribution.label': '📈 Performance Attribution',
     'mod.performance-attribution.desc': 'Brinson attribution: alpha vs benchmark decomposed into allocation + selection',
     'mod.performance-attribution.help': '**Purpose:** splits your performance into 2 sources: (1) allocation = right sector weights vs MSCI World, (2) selection = right stocks within each sector.\n\n**How:** Brinson model on 12-month TTM, benchmark = standard MSCI World.\n\n**When:** annual review to understand WHY your portfolio did +X% (luck or skill?).',
+
+    'mod.geopolitical-analysis.label': '🌍 Geopolitical Analysis',
+    'mod.geopolitical-analysis.desc': 'Regional risk mapping + market impact + concrete hedges · web search required',
+    'mod.geopolitical-analysis.help': '**Purpose:** understand the impact of geopolitical tensions (Taiwan, Ukraine, Middle East, elections) on your investments. Gives probabilistic scenarios, quantified impact per asset class, and concrete hedges (tickers + sizes).\n\n**How:** LLM with native web search (Perplexity / Grok / Gemini) for real-time info + nuanced reasoning on scenarios. Wealth-aware: analyzes YOUR portfolio exposure.\n\n**When:** before major events (elections, OPEC summits, sanction deadlines), or when reassessing your portfolio against current risks.',
+    'mod.geopolitical-analysis.example': 'Middle East tensions: oil impact + EU industrials',
+    'mod.geopolitical-analysis.run': '🌍 Run analysis',
 
     'tour.next': 'Next',
     'tour.back': 'Back',
