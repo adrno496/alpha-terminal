@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>How to get an AI API key &amp; financial data — BYOK 2026 guide | Alpha</title>
+  <meta name="description" content="Complete guide to get an API key: Claude, OpenAI, Gemini, Grok, Mistral, Cerebras, GitHub Models and 7 other LLMs. Plus 11 financial data providers (FMP, Polygon, Finnhub). Direct links, steps, pricing, free tiers." />
+  <meta name="keywords" content="how to get claude api key, create openai key, gemini api key, byok finance, free ai api key, api stock data, fmp finnhub polygon, api key tutorial" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="application-name" content="Alpha Terminal" />
+  <meta name="news_keywords" content="claude api key, openai api key, free gemini api, byok setup" />
+  <link rel="canonical" href="https://alpha-terminal.app/api-keys-guide-en.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-keys-guide.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-keys-guide-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-keys-guide.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="How to get an AI API key &amp; financial data — BYOK 2026 guide" />
+  <meta property="og:description" content="Direct links and step-by-step to create your API key: 14 LLMs (Claude, GPT, Gemini, Grok, Mistral...) + 11 financial data providers. 7 free providers included." />
+  <meta property="og:url" content="https://alpha-terminal.app/api-keys-guide-en.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Alpha" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="How to get an API key: BYOK 2026 guide" />
+  <meta name="twitter:description" content="Direct links + steps for 14 LLMs and 11 data providers. 7 free." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta name="twitter:site" content="@AlphaTerminal" />
+  <meta name="twitter:creator" content="@AlphaTerminal" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+  <style>
+    :root { --bg-primary: #0a0a0a; --bg-secondary: #111; --accent-green: #00ff88;
+      --text-primary: #fff; --text-secondary: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.08);
+      --font-sans: 'Inter', system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  </style>
+  <link rel="preload" href="styles.css" as="style" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    .api-card { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; margin: 14px 0; }
+    .api-card.free { border-color: rgba(0,255,136,0.4); background: linear-gradient(135deg, rgba(0,255,136,0.05) 0%, transparent 70%); }
+    .api-card h3 { margin: 0 0 6px; font-size: 17px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .api-badge { font-size: 10px; padding: 3px 8px; border-radius: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .api-badge.free { background: var(--accent-green); color: #0a0a0a; }
+    .api-badge.paid { background: rgba(255,255,255,0.08); color: var(--text-secondary); border: 1px solid var(--border); }
+    .api-badge.optional { background: rgba(77,166,255,0.18); color: #4da6ff; }
+    .api-card .api-link { font-family: var(--font-mono); font-size: 12px; color: var(--accent-green); word-break: break-all; }
+    .api-card ol { margin: 8px 0 0 18px; line-height: 1.7; font-size: 14px; }
+    .api-card .api-tldr { font-size: 13px; color: var(--text-secondary); margin: 8px 0 4px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width:760px){ .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "Article",
+    "headline": "How to get an AI API key and financial data — BYOK 2026 guide",
+    "description": "Practical guide to create an API key with the 14 LLMs and 11 financial data providers supported by Alpha. Direct links, steps, free tiers.",
+    "author": { "@type": "Person", "name": "Alpha team", "url": "https://alpha-terminal.app/about.html", "sameAs": ["https://twitter.com/AlphaTerminal"] },
+    "datePublished": "2026-05-01", "dateModified": "2026-05-01",
+    "publisher": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/", "logo": { "@type": "ImageObject", "url": "https://alpha-terminal.app/icons/icon-192.png", "width": 192, "height": 192 } },
+    "image": "https://alpha-terminal.app/og-home.png"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",            "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "API keys guide",  "item": "https://alpha-terminal.app/api-keys-guide-en.html" }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "HowTo",
+    "name": "Get an AI API key for Alpha Terminal",
+    "totalTime": "PT5M",
+    "step": [
+      { "@type": "HowToStep", "name": "Pick a provider", "text": "To start free: GitHub Models (just a GitHub PAT), Cerebras (free signup), Mistral (free experimentation tier). For maximum quality: Anthropic Claude or OpenAI." },
+      { "@type": "HowToStep", "name": "Create an account", "text": "Go to the provider's dev portal (direct link in the guide), sign up with your email." },
+      { "@type": "HowToStep", "name": "Generate the key", "text": "In the API Keys / Tokens section, click 'Create new secret key'. Copy the key immediately (won't be visible again)." },
+      { "@type": "HowToStep", "name": "Paste into Alpha", "text": "Open Alpha → Settings → API Keys. Paste your key. It's encrypted locally (AES-GCM 256). No intermediate server." }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Which API keys are free?", "acceptedAnswer": { "@type": "Answer", "text": "7 LLMs offer a free tier: GitHub Models (GitHub PAT, rate-limited), Cerebras (free signup, 1M tokens/day), Mistral AI (free experimentation tier), NVIDIA NIM (1,000 free credits), Cloudflare Workers AI (100K req/day), HuggingFace (rate-limited), Cohere (trial key). One free key is enough to explore Alpha." }},
+      { "@type": "Question", "name": "Do I need an API key to use Alpha?", "acceptedAnswer": { "@type": "Answer", "text": "For AI analyses: yes, but a free key is enough. For demo mode (pre-generated analyses): no key required. For wealth, watchlist and knowledge base modules: not required (but recommended for auto-refresh prices)." }},
+      { "@type": "Question", "name": "Which key to pick to get started?", "acceptedAnswer": { "@type": "Answer", "text": "To explore for free: GitHub Models with your GitHub PAT (ultra-fast setup). For maximum quality from the start: Anthropic Claude ($5 free credit at signup) or OpenAI (credit card required but pay per token)." }},
+      { "@type": "Question", "name": "Are my API keys safe?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Keys are encrypted locally with AES-GCM 256 + PBKDF2 100K iterations from a master password you choose. No Alpha server — the app calls provider APIs directly from your browser. Verifiable via DevTools > Network." }},
+      { "@type": "Question", "name": "Which financial data providers are supported?", "acceptedAnswer": { "@type": "Answer", "text": "11 providers: Financial Modeling Prep (FMP), Alpha Vantage, Polygon.io, Finnhub, Tiingo, Twelve Data, FRED (St-Louis Fed, macro), Etherscan (on-chain), CoinGecko (crypto, no key), DefiLlama (DeFi, no key), SEC EDGAR (filings, no key). Optional: enrich analyses with live data without changing LLM cost." }}
+    ]
+  }
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;">
+      <img src="icons/logo.png" alt="Alpha" style="width:32px;height:32px;border-radius:8px;" />
+      <span class="logo-mark">Alpha</span>
+    </a>
+    <div class="landing-nav-links">
+      <a href="/">Home</a>
+      <a href="features-en.html">Features</a>
+      <a href="pricing-en.html">Pricing</a>
+      <a href="api-costs-en.html">API costs</a>
+      <a href="api-keys-guide-en.html" style="color:var(--accent-green);">API keys</a>
+      <a href="bloomberg-alternative-en.html">vs Bloomberg</a>
+      <a href="api-keys-guide.html" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="Version française">🇫🇷 FR</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">🔑 How to get an AI API key &amp; financial data</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Practical 2026 guide — all keys supported by Alpha (14 LLMs + 11 data providers). Direct links, steps, free tier flagged.</p>
+
+    <div style="padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-green);margin:20px 0;border-radius:4px;">
+      <strong>📌 TL;DR</strong> — <strong>7 free AI providers</strong> let you use Alpha without spending a cent (GitHub Models, Cerebras, Mistral, NVIDIA, Cloudflare, HuggingFace, Cohere). One key is enough to start. For pro analyses (10-K, DCF, complex tax), upgrade to <strong>Claude / GPT-4o / Gemini Pro</strong> (~$0.005-0.10 per analysis).
+    </div>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">🚀 Get started in 30 seconds</h2>
+    <ol style="font-size:15px;line-height:2;">
+      <li>Pick a free provider below (recommended: <strong>GitHub Models</strong> if you already have a GitHub account).</li>
+      <li>Click the direct link, create an account or generate a token.</li>
+      <li>Copy the key.</li>
+      <li>Open Alpha → <strong>Settings → API Keys</strong> → paste the key. Encrypted locally (AES-GCM 256).</li>
+      <li>Run your first analysis 🎉</li>
+    </ol>
+
+    <h2 style="font-size:28px;margin:40px 0 14px;">🎁 <span style="color:var(--accent-green);">Free</span> AI providers (7)</h2>
+    <p style="font-size:14px;color:var(--text-secondary);">These providers offer a free tier sufficient for casual to intensive usage. Ideal to start without commitment.</p>
+
+    <div class="api-card free">
+      <h3>🐙 GitHub Models <span class="api-badge free">100% free</span></h3>
+      <p class="api-tldr">Easiest if you already have a GitHub account. Reasonable rate-limit. Models available: GPT-4o, Phi-4, Llama 3, DeepSeek, Mistral.</p>
+      <a class="api-link" href="https://github.com/settings/tokens" target="_blank" rel="noopener">https://github.com/settings/tokens</a>
+      <ol>
+        <li>Sign in to your <strong>GitHub</strong> account.</li>
+        <li>Go to <em>Settings → Developer settings → Personal access tokens → Fine-grained tokens</em> (or Classic).</li>
+        <li>Click <strong>Generate new token</strong>. Give it a name (e.g., "Alpha Terminal").</li>
+        <li>No special scope needed for GitHub Models. Create it and copy the token (starts with <code>ghp_</code> or <code>github_pat_</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card free">
+      <h3>⚡ Cerebras <span class="api-badge free">free tier</span></h3>
+      <p class="api-tldr">Ultra-fast inference (Llama 3.3 70B at >2000 tok/s). Generous free tier: 1M tokens/day.</p>
+      <a class="api-link" href="https://cloud.cerebras.ai/?tab=api-keys" target="_blank" rel="noopener">https://cloud.cerebras.ai/?tab=api-keys</a>
+      <ol>
+        <li>Go to <strong>cloud.cerebras.ai</strong>, sign up with your email.</li>
+        <li><em>API Keys</em> tab, click <strong>Create API Key</strong>.</li>
+        <li>Copy the key (starts with <code>csk-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card free">
+      <h3>🇫🇷 Mistral AI <span class="api-badge free">experiment tier</span></h3>
+      <p class="api-tldr">European models. Free experimentation tier for Mistral Small/Medium. Codestral (code) included.</p>
+      <a class="api-link" href="https://console.mistral.ai/api-keys/" target="_blank" rel="noopener">https://console.mistral.ai/api-keys/</a>
+      <ol>
+        <li>Go to <strong>console.mistral.ai</strong>, sign up.</li>
+        <li>Activate the <em>Experiment</em> plan (free, soft rate-limit).</li>
+        <li><em>API Keys → Create new key</em>.</li>
+      </ol>
+    </div>
+
+    <div class="api-card free">
+      <h3>🟢 NVIDIA NIM <span class="api-badge free">1,000 free credits</span></h3>
+      <p class="api-tldr">Catalog of open-source models hosted by NVIDIA (Llama, Nemotron, DeepSeek). 1,000 free credits at signup.</p>
+      <a class="api-link" href="https://build.nvidia.com/explore/discover" target="_blank" rel="noopener">https://build.nvidia.com/explore/discover</a>
+      <ol>
+        <li>Sign up at <strong>build.nvidia.com</strong> with your email.</li>
+        <li>Pick any model, click <em>Get API Key</em>.</li>
+        <li>Copy the key (starts with <code>nvapi-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card free">
+      <h3>☁️ Cloudflare Workers AI <span class="api-badge free">100K req/day</span></h3>
+      <p class="api-tldr">Open-source models hosted on Cloudflare's edge. 100,000 free requests/day.</p>
+      <a class="api-link" href="https://dash.cloudflare.com/profile/api-tokens" target="_blank" rel="noopener">https://dash.cloudflare.com/profile/api-tokens</a>
+      <ol>
+        <li>Create a <strong>Cloudflare</strong> account (free).</li>
+        <li>Note your <em>Account ID</em> from the dashboard (right sidebar).</li>
+        <li>Go to <em>My Profile → API Tokens → Create Token</em>. Choose the <strong>Workers AI</strong> template.</li>
+        <li>Alpha asks for both the token AND the Account ID.</li>
+      </ol>
+    </div>
+
+    <div class="api-card free">
+      <h3>🤗 HuggingFace <span class="api-badge free">free (rate-limited)</span></h3>
+      <p class="api-tldr">Inference Providers: access hundreds of open-source models with a single key.</p>
+      <a class="api-link" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">https://huggingface.co/settings/tokens</a>
+      <ol>
+        <li>Sign up at <strong>huggingface.co</strong>.</li>
+        <li><em>Settings → Access Tokens → New Token</em>. Type: <strong>Read</strong>.</li>
+        <li>Copy the token (starts with <code>hf_</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card free">
+      <h3>🟦 Cohere <span class="api-badge free">trial key</span></h3>
+      <p class="api-tldr">Good at classification, embeddings, and multilingual RAG. Free trial key at signup.</p>
+      <a class="api-link" href="https://dashboard.cohere.com/api-keys" target="_blank" rel="noopener">https://dashboard.cohere.com/api-keys</a>
+      <ol>
+        <li>Sign up at <strong>dashboard.cohere.com</strong>.</li>
+        <li><em>API Keys → Trial Key</em> (the default key created).</li>
+        <li>Copy it.</li>
+      </ol>
+    </div>
+
+    <h2 style="font-size:28px;margin:40px 0 14px;"><span style="color:#ffd166;">💎 Premium</span> AI providers (7) — top quality</h2>
+    <p style="font-size:14px;color:var(--text-secondary);">For serious analyses (10-K Decoder, nuanced DCF, CEO Forensics, complex taxation), one of these 7 models makes the difference. Per-token pricing, ~$0.005-0.10 per Alpha analysis.</p>
+
+    <div class="api-card">
+      <h3>🤖 Anthropic Claude <span class="api-badge paid">$5 free credit</span></h3>
+      <p class="api-tldr">Best for nuanced reasoning, long PDF analysis (10-K), financial writing. Flagship: Claude Sonnet 4.5. $5 free credit at signup.</p>
+      <a class="api-link" href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">https://console.anthropic.com/settings/keys</a>
+      <ol>
+        <li>Go to <strong>console.anthropic.com</strong>, sign up (no credit card required for free credit).</li>
+        <li><em>API Keys → Create Key</em>.</li>
+        <li>Copy the key (starts with <code>sk-ant-api03-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>🧠 OpenAI ChatGPT <span class="api-badge paid">paid (card required)</span></h3>
+      <p class="api-tldr">GPT-4o, GPT-4 Turbo, o1, o3-mini. Excellent generalist, versatile, PDF support.</p>
+      <a class="api-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">https://platform.openai.com/api-keys</a>
+      <ol>
+        <li>Sign up at <strong>platform.openai.com</strong>.</li>
+        <li>Add a credit card in <em>Billing</em> (min $5 credit).</li>
+        <li><em>API Keys → Create new secret key</em>.</li>
+        <li>Copy the key (starts with <code>sk-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>✨ Google Gemini <span class="api-badge paid">free tier + paid</span></h3>
+      <p class="api-tldr">Gemini 2.0 Flash, 1.5 Pro. Ultra-long context (1M tokens), native PDF, video. Generous free tier available.</p>
+      <a class="api-link" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">https://aistudio.google.com/app/apikey</a>
+      <ol>
+        <li>Sign in with your <strong>Google</strong> account.</li>
+        <li>Click <em>Get API Key → Create API Key</em>.</li>
+        <li>Copy the key (starts with <code>AIza</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>🐦 xAI Grok <span class="api-badge paid">paid</span></h3>
+      <p class="api-tldr">The only one with <strong>native real-time X (Twitter) sentiment access</strong>. Essential for the Sentiment Tracker module.</p>
+      <a class="api-link" href="https://console.x.ai" target="_blank" rel="noopener">https://console.x.ai</a>
+      <ol>
+        <li>Sign up at <strong>console.x.ai</strong>.</li>
+        <li>Add a card. <em>API Keys → Create</em>.</li>
+        <li>Copy (starts with <code>xai-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>🌀 OpenRouter <span class="api-badge paid">unified</span></h3>
+      <p class="api-tldr">One key → access to 200+ models (Llama, DeepSeek, Mistral, Qwen, Anthropic, OpenAI...). Ideal if you want to test.</p>
+      <a class="api-link" href="https://openrouter.ai/keys" target="_blank" rel="noopener">https://openrouter.ai/keys</a>
+      <ol>
+        <li>Sign up at <strong>openrouter.ai</strong>.</li>
+        <li>Add credits (from $1).</li>
+        <li><em>Keys → Create Key</em>. Copy (starts with <code>sk-or-v1-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>🔎 Perplexity <span class="api-badge paid">paid</span></h3>
+      <p class="api-tldr">Native augmented web search. Each answer is sourced with URL citations. Excellent for macro and news.</p>
+      <a class="api-link" href="https://www.perplexity.ai/settings/api" target="_blank" rel="noopener">https://www.perplexity.ai/settings/api</a>
+      <ol>
+        <li>Sign up at <strong>perplexity.ai</strong>, enable <em>Pro</em> or add API credits.</li>
+        <li><em>Settings → API → Generate</em>.</li>
+        <li>Copy (starts with <code>pplx-</code>).</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>🟣 Together AI <span class="api-badge paid">paid ($1 free)</span></h3>
+      <p class="api-tldr">Competitive open-source hosting (Llama, DeepSeek, Mixtral, Qwen). $1 free credit at signup.</p>
+      <a class="api-link" href="https://api.together.xyz/settings/api-keys" target="_blank" rel="noopener">https://api.together.xyz/settings/api-keys</a>
+      <ol>
+        <li>Sign up at <strong>together.ai</strong>.</li>
+        <li><em>Settings → API Keys → Generate</em>.</li>
+        <li>Copy the key.</li>
+      </ol>
+    </div>
+
+    <h2 style="font-size:28px;margin:40px 0 14px;">📊 Financial data providers <span style="color:var(--accent-green);">(11)</span></h2>
+    <p style="font-size:14px;color:var(--text-secondary);">Optional but recommended. They enrich modules with real-time prices, fundamentals, news, screeners. No additional LLM cost. <strong>Several don't even need a key.</strong></p>
+
+    <h3 style="font-size:18px;margin-top:24px;color:var(--accent-green);">No key required (always active)</h3>
+    <div class="grid-2">
+      <div class="api-card free">
+        <h3 style="font-size:14px;">🦎 CoinGecko <span class="api-badge free">free</span></h3>
+        <p class="api-tldr">Crypto prices, market cap, top 100, history. <strong>No key needed</strong> for standard usage.</p>
+      </div>
+      <div class="api-card free">
+        <h3 style="font-size:14px;">🦙 DefiLlama <span class="api-badge free">free</span></h3>
+        <p class="api-tldr">DeFi TVL, protocols, chains. No key required.</p>
+      </div>
+      <div class="api-card free">
+        <h3 style="font-size:14px;">📜 SEC EDGAR <span class="api-badge free">free</span></h3>
+        <p class="api-tldr">10-K, 10-Q, 13F, proxy filings. US government public API. No key.</p>
+      </div>
+      <div class="api-card free">
+        <h3 style="font-size:14px;">💱 Frankfurter (FX) <span class="api-badge free">free</span></h3>
+        <p class="api-tldr">USD/EUR/GBP/JPY/CHF... exchange rates. No key.</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:18px;margin-top:24px;color:#4da6ff;">With key (free tier available)</h3>
+
+    <div class="api-card">
+      <h3>📊 Financial Modeling Prep (FMP) <span class="api-badge optional">free tier 250 req/day</span></h3>
+      <p class="api-tldr">Best for US stocks: prices, fundamentals, ratios, dividends, earnings. Ideal for Quick Analysis, DCF, screener.</p>
+      <a class="api-link" href="https://site.financialmodelingprep.com/developer/docs" target="_blank" rel="noopener">https://site.financialmodelingprep.com/developer/docs</a>
+      <ol>
+        <li>Sign up at <strong>financialmodelingprep.com</strong>.</li>
+        <li><em>Dashboard → API Keys</em>.</li>
+        <li>Free tier: 250 requests/day. Paid plans from $14/month.</li>
+      </ol>
+    </div>
+
+    <div class="api-card">
+      <h3>📈 Polygon.io <span class="api-badge optional">free tier 5 req/min</span></h3>
+      <p class="api-tldr">Pro real-time data (stocks, options, forex, crypto). Limited free tier but useful.</p>
+      <a class="api-link" href="https://polygon.io/dashboard/api-keys" target="_blank" rel="noopener">https://polygon.io/dashboard/api-keys</a>
+    </div>
+
+    <div class="api-card">
+      <h3>🎯 Finnhub <span class="api-badge optional">free 60 req/min</span></h3>
+      <p class="api-tldr">Stocks + crypto + forex + earnings calendar + insider trading. Very good free tier.</p>
+      <a class="api-link" href="https://finnhub.io/dashboard" target="_blank" rel="noopener">https://finnhub.io/dashboard</a>
+    </div>
+
+    <div class="api-card">
+      <h3>📡 Tiingo <span class="api-badge optional">free limited</span></h3>
+      <p class="api-tldr">EOD prices, news, fundamentals. Good complement to FMP.</p>
+      <a class="api-link" href="https://api.tiingo.com/account/api/token" target="_blank" rel="noopener">https://api.tiingo.com/account/api/token</a>
+    </div>
+
+    <div class="api-card">
+      <h3>🔢 Twelve Data <span class="api-badge optional">free tier 800 req/day</span></h3>
+      <p class="api-tldr">Stocks, ETF, forex, crypto. Real-time WebSocket available.</p>
+      <a class="api-link" href="https://twelvedata.com/account/api-keys" target="_blank" rel="noopener">https://twelvedata.com/account/api-keys</a>
+    </div>
+
+    <div class="api-card">
+      <h3>📜 Alpha Vantage <span class="api-badge optional">free 25 req/day</span></h3>
+      <p class="api-tldr">Limited free tier (25 req/day) but covers stocks, forex, crypto, technical indicators.</p>
+      <a class="api-link" href="https://www.alphavantage.co/support/#api-key" target="_blank" rel="noopener">https://www.alphavantage.co/support/#api-key</a>
+    </div>
+
+    <div class="api-card">
+      <h3>🏛️ FRED (St-Louis Fed) <span class="api-badge free">free unlimited</span></h3>
+      <p class="api-tldr">US macro data: Fed rates, CPI, GDP, unemployment, M2... Essential for Macro Dashboard module.</p>
+      <a class="api-link" href="https://fredaccount.stlouisfed.org/apikeys" target="_blank" rel="noopener">https://fredaccount.stlouisfed.org/apikeys</a>
+    </div>
+
+    <div class="api-card">
+      <h3>⛓️ Etherscan <span class="api-badge optional">free 5 req/sec</span></h3>
+      <p class="api-tldr">Ethereum on-chain data: addresses, transactions, contracts. For advanced crypto analysis.</p>
+      <a class="api-link" href="https://etherscan.io/myapikey" target="_blank" rel="noopener">https://etherscan.io/myapikey</a>
+    </div>
+
+    <h2 style="font-size:24px;margin:40px 0 12px;">🔒 Key security in Alpha</h2>
+    <ul style="font-size:14px;line-height:1.9;">
+      <li><strong>Local AES-GCM 256-bit encryption</strong> with PBKDF2 derivation (100,000 iterations) from a master password you choose.</li>
+      <li><strong>No Alpha server</strong> — the app calls provider APIs directly from your browser. Verifiable via DevTools → Network.</li>
+      <li><strong>Local IndexedDB storage</strong> — your keys never leave your device.</li>
+      <li><strong>Encrypted exportable backup</strong> (.atb) — for migration or backup.</li>
+    </ul>
+
+    <h2 style="font-size:24px;margin:40px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:14px 0;border:1px solid var(--border);border-radius:6px;padding:14px;">
+      <summary style="cursor:pointer;font-weight:600;">I have only one key — do all modules work?</summary>
+      <p style="margin:10px 0 0;font-size:14px;">Yes. Alpha's smart router automatically picks the best available provider per module. With a single key, all 46 modules run. The more you add, the smarter the routing (e.g., Grok for X sentiment, Claude for 10-Ks, Gemini for long PDFs).</p>
+    </details>
+
+    <details style="margin:14px 0;border:1px solid var(--border);border-radius:6px;padding:14px;">
+      <summary style="cursor:pointer;font-weight:600;">How much does it cost per month?</summary>
+      <p style="margin:10px 0 0;font-size:14px;">With free providers only: €0. With a free + Claude/GPT mix for critical analyses: $2-15/month. Power user (3+ analyses/day, 10-K, research-agent): $15-50/month. Details on the <a href="api-costs-en.html">API costs page</a>.</p>
+    </details>
+
+    <details style="margin:14px 0;border:1px solid var(--border);border-radius:6px;padding:14px;">
+      <summary style="cursor:pointer;font-weight:600;">What if I forget my master password?</summary>
+      <p style="margin:10px 0 0;font-size:14px;">No recovery possible (the price of 100% local security). You can reset the vault → you lose stored keys and need to re-paste them. Tip: export an encrypted backup regularly and keep the password safe (password manager).</p>
+    </details>
+
+    <details style="margin:14px 0;border:1px solid var(--border);border-radius:6px;padding:14px;">
+      <summary style="cursor:pointer;font-weight:600;">Are API keys transmitted to Alpha?</summary>
+      <p style="margin:10px 0 0;font-size:14px;">No. Never. The app runs client-side: your keys live only in your browser's IndexedDB, and AI requests go <em>directly</em> from your browser to the provider. You can put the app offline (airplane mode) after loading and analyses will keep going normally.</p>
+    </details>
+
+    <div style="margin-top:48px;padding:20px;background:linear-gradient(135deg,rgba(0,255,136,0.06) 0%,transparent 70%);border:1px solid rgba(0,255,136,0.3);border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 8px;">Ready to launch your first analysis?</h3>
+      <p style="margin:0 0 14px;color:var(--text-secondary);font-size:14px;">7 free providers are enough to explore Alpha. 30-second setup.</p>
+      <a href="/" class="btn-primary" style="display:inline-block;text-decoration:none;padding:10px 22px;">Launch Alpha →</a>
+    </div>
+  </article>
+
+  <footer class="seo-footer" style="text-align:center;padding:30px 20px;color:var(--text-muted);font-size:13px;border-top:1px solid var(--border);margin-top:40px;">
+    <p>© 2026 Alpha · Made in France 🇫🇷</p>
+    <p><a href="/">Home</a> · <a href="features-en.html">Features</a> · <a href="pricing-en.html">Pricing</a> · <a href="api-costs-en.html">API costs</a> · <a href="bloomberg-alternative-en.html">vs Bloomberg</a> · <a href="ai-stock-analysis-guide-en.html">AI Guide</a></p>
+    <p><a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · <a href="terms.html">Terms</a> · <a href="legal.html">Legal</a></p>
+  </footer>
+</body>
+</html>

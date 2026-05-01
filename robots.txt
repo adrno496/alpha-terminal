@@ -13,6 +13,14 @@ Allow: /bloomberg-alternative.html
 Allow: /ai-stock-analysis-guide.html
 Allow: /api-costs.html
 Allow: /api-keys-guide.html
+# EN versions
+Allow: /features-en.html
+Allow: /pricing-en.html
+Allow: /bloomberg-alternative-en.html
+Allow: /ai-stock-analysis-guide-en.html
+Allow: /api-costs-en.html
+Allow: /api-keys-guide-en.html
+# Legal
 Allow: /about.html
 Allow: /privacy.html
 Allow: /terms.html

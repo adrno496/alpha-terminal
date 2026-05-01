@@ -79,14 +79,15 @@
   </script>
 </head>
 <body>
-  <nav class="static-nav">
+  <nav class="static-nav" id="nav-fr">
     <a class="brand" href="index.html">α Alpha</a>
     <a href="features.html">Fonctionnalités</a>
     <a href="pricing.html">Tarifs</a>
     <a href="about.html">À propos</a>
+    <a href="?lang=en" id="lang-toggle" style="margin-left:auto;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
   </nav>
 
-  <main class="static-page">
+  <main class="static-page" id="main-content">
     <h1>Mentions légales</h1>
     <p style="color:var(--text-primary);"><strong>Dernière mise à jour : 1ᵉʳ mai 2026</strong></p>
 
@@ -129,5 +130,64 @@
     <a href="terms.html">CGU</a> ·
     <a href="legal.html">Mentions légales</a>
   </footer>
+
+  <template id="content-en">
+    <h1>Legal notice</h1>
+    <p style="color:var(--text-primary);"><strong>Last update: May 1, 2026</strong></p>
+
+    <h2>Site publisher</h2>
+    <div class="legal-block">
+      <p style="margin:0;"><strong>Alpha Terminal</strong></p>
+      <p style="margin:4px 0;">Web and mobile app publisher (PWA / Capacitor)</p>
+      <p style="margin:4px 0;">Contact: <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a></p>
+      <p style="margin:4px 0;">Site: <a href="https://alpha-terminal.app/" style="color:var(--accent-green);">https://alpha-terminal.app/</a></p>
+      <p style="margin:4px 0;font-size:12px;color:var(--text-muted);">For full company details (legal name, RCS, VAT number, share capital, postal address), please contact us by email.</p>
+    </div>
+
+    <h2>Hosting</h2>
+    <div class="legal-block">
+      <p style="margin:0;">The site is hosted as a static application. No user-data processing server is operated by the publisher (100% client-side architecture).</p>
+      <p style="margin:8px 0 0;font-size:12px;color:var(--text-muted);">To know the static-files hosting provider (CDN), contact us.</p>
+    </div>
+
+    <h2>Intellectual property</h2>
+    <p>All site elements (text, structure, source code, system prompts, module architecture, "Alpha" brand) are protected by intellectual property law (French Intellectual Property Code). Any reproduction, representation, modification, or exploitation, in whole or in part, without the publisher's written authorization, is prohibited.</p>
+    <p>Third-party brands cited (Bloomberg, Anthropic, OpenAI, Google, etc.) remain the exclusive property of their respective owners. Their mention is for descriptive and comparative purposes, in compliance with trademark law.</p>
+
+    <h2>Personal data</h2>
+    <p>No personal data is collected by Alpha Terminal server-side. All user data (API keys, holdings, analyses) remains stored locally in the browser (AES-GCM-256 encryption + PBKDF2 100,000 iterations for sensitive keys).</p>
+    <p>For full privacy practices, see the <a href="privacy.html?lang=en" style="color:var(--accent-green);">Privacy policy</a>.</p>
+
+    <h2>Cookies and trackers</h2>
+    <p>The site uses no tracking cookies, no advertising pixels, no server analytics tools (Google Analytics, Plausible, Matomo, etc.). Only a Service Worker is registered by your browser to enable offline operation (static asset caching only).</p>
+
+    <h2>Limitation of liability</h2>
+    <p>Alpha Terminal is <strong>not an investment advisor</strong>. AI-generated analyses are decision-support tools. See the <a href="terms.html?lang=en" style="color:var(--accent-green);">Terms of Service</a> for details.</p>
+
+    <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Back to home</a></p>
+  </template>
+
+  <script>
+    (function() {
+      var params = new URLSearchParams(location.search);
+      var lang = params.get('lang') === 'en' ? 'en' : 'fr';
+      var toggle = document.getElementById('lang-toggle');
+      if (lang === 'en') {
+        document.documentElement.lang = 'en';
+        document.title = 'Legal notice — Alpha Terminal';
+        var tpl = document.getElementById('content-en');
+        var main = document.getElementById('main-content');
+        if (tpl && main) main.innerHTML = tpl.innerHTML;
+        var nav = document.getElementById('nav-fr');
+        if (nav) {
+          var map = { 'Fonctionnalités':'Features', 'Tarifs':'Pricing', 'À propos':'About' };
+          nav.querySelectorAll('a').forEach(function(a) { var k = a.textContent.trim(); if (map[k]) a.textContent = map[k]; });
+        }
+        if (toggle) { toggle.textContent = '🇫🇷 FR'; toggle.href = location.pathname; }
+      } else if (toggle) {
+        toggle.href = location.pathname + '?lang=en';
+      }
+    })();
+  </script>
 </body>
 </html>

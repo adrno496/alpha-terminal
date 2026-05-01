@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Complete 2026 guide: AI stock analysis — Claude vs GPT vs Gemini for investing</title>
+  <meta name="description" content="The most complete 2026 guide to using AI for stock analysis. Claude vs GPT-4 vs Gemini compared, prompts for DCF, 10-K, sentiment, taxation. BYOK: ~$0.01/analysis. Method, examples, pitfalls." />
+  <meta name="keywords" content="ai stock analysis, claude vs gpt finance, artificial intelligence stocks, ai investing, prompt engineering finance, ai dcf, ai 10-k analysis, byok finance, fundamental analysis ai" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="application-name" content="Alpha Terminal" />
+  <meta name="news_keywords" content="ai stock analysis, claude vs chatgpt finance, ai investing 2026" />
+  <link rel="canonical" href="https://alpha-terminal.app/ai-stock-analysis-guide-en.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/ai-stock-analysis-guide-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="2026 Guide: AI stock analysis (Claude vs GPT vs Gemini)" />
+  <meta property="og:description" content="How to use Claude, GPT-4, Gemini and 11 other LLMs for stock analysis. Method + examples + pitfalls." />
+  <meta property="og:url" content="https://alpha-terminal.app/ai-stock-analysis-guide-en.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+  <meta property="og:site_name" content="Alpha" />
+  <meta property="article:published_time" content="2026-04-29T00:00:00+02:00" />
+  <meta property="article:modified_time" content="2026-04-29T00:00:00+02:00" />
+  <meta property="article:section" content="Investing" />
+  <meta property="article:tag" content="AI" />
+  <meta property="article:tag" content="Stock Analysis" />
+  <meta property="article:tag" content="LLM" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="2026 Guide: analyzing stocks with AI" />
+  <meta name="twitter:description" content="Claude vs GPT vs Gemini for DCF, 10-K, sentiment. BYOK = $0.01/analysis." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta name="twitter:site" content="@AlphaTerminal" />
+  <meta name="twitter:creator" content="@AlphaTerminal" />
+
+  <meta name="theme-color" content="#00ff88" />
+  <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect width='100' height='100' fill='%230a0a0a' rx='14'/&gt;&lt;text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'&gt;α&lt;/text&gt;&lt;/svg&gt;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+  <style>
+    :root { --bg-primary: #0a0a0a; --bg-secondary: #111; --accent-green: #00ff88;
+      --text-primary: #fff; --text-secondary: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.08);
+      --font-sans: 'Inter', system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace; }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  </style>
+  <link rel="preload" href="styles.css" as="style" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "Article",
+    "headline": "Complete 2026 guide: AI stock analysis",
+    "description": "The 2026 guide to using AI for stock analysis. Claude vs GPT vs Gemini, prompts, method, examples, pitfalls.",
+    "image": "https://alpha-terminal.app/og-guide.png",
+    "datePublished": "2026-04-29", "dateModified": "2026-04-29",
+    "wordCount": 3200, "articleSection": "Investing",
+    "keywords": "AI, stock analysis, Claude, GPT-4, Gemini, DCF, 10-K, BYOK",
+    "author": { "@type": "Person", "name": "Alpha team", "url": "https://alpha-terminal.app/about.html", "sameAs": ["https://twitter.com/AlphaTerminal"] },
+    "publisher": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/", "logo": { "@type": "ImageObject", "url": "https://alpha-terminal.app/icons/icon-192.png", "width": 192, "height": 192 } },
+    "mainEntityOfPage": { "@type": "WebPage", "@id": "https://alpha-terminal.app/ai-stock-analysis-guide-en.html" }
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "HowTo",
+    "name": "How to use AI to analyze a stock in 2026",
+    "description": "5-step method to produce rigorous fundamental analysis via AI",
+    "totalTime": "PT15M",
+    "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0.10" },
+    "step": [
+      { "@type": "HowToStep", "name": "Pick the right LLM", "text": "Claude for nuance and native PDF. Gemini for very long context. Grok for real-time X sentiment. Cerebras for speed." },
+      { "@type": "HowToStep", "name": "Structure the prompt", "text": "Persona + context (ticker, sector, period) + requested response structure + markdown format." },
+      { "@type": "HowToStep", "name": "Inject fresh data", "text": "Live prices via data API (FMP, Polygon), 10-K from SEC EDGAR, sentiment via native web search." },
+      { "@type": "HowToStep", "name": "Cross-check the output", "text": "Verify key figures on Yahoo Finance or Seeking Alpha. AI may hallucinate on recent values." },
+      { "@type": "HowToStep", "name": "Preserve memory", "text": "Store analyses for future reference. Index in personal RAG to cross-reference successive quarters." }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home",     "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "AI Guide", "item": "https://alpha-terminal.app/ai-stock-analysis-guide-en.html" }
+    ]
+  }
+  </script>
+
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    .seo-page { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+    .seo-page h1 { font-size: 40px; line-height: 1.18; margin: 0 0 14px; }
+    .seo-page h2 { font-size: 26px; margin: 44px 0 12px; padding-top: 10px; border-top: 1px solid #222; }
+    .seo-page h3 { font-size: 19px; margin: 26px 0 8px; color: var(--accent-green, #00ff88); }
+    .seo-page h4 { font-size: 15px; margin: 18px 0 4px; color: #ccc; }
+    .seo-page p { line-height: 1.8; font-size: 15.5px; color: var(--text-secondary, #b0b0b0); }
+    .seo-page ul, .seo-page ol { line-height: 1.85; font-size: 15.5px; color: #b0b0b0; padding-left: 22px; }
+    .seo-page li { margin: 4px 0; }
+    .seo-page strong { color: #fff; }
+    .seo-page blockquote { border-left: 3px solid #00ff88; padding: 4px 16px; margin: 16px 0; color: #ccc; background: rgba(0,255,136,0.04); border-radius: 0 4px 4px 0; }
+    .seo-page code { background: #1a1a1a; color: #ffb347; padding: 2px 6px; border-radius: 3px; font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+    .seo-page pre { background: #0a0a0a; border: 1px solid #222; border-radius: 6px; padding: 14px; overflow-x: auto; font-size: 12.5px; line-height: 1.55; color: #ccc; }
+    .seo-page .author-bar { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid #222; margin-bottom: 24px; font-size: 12.5px; color: #777; }
+    .seo-nav { display: flex; gap: 18px; padding: 16px 24px; border-bottom: 1px solid #222; align-items: center; flex-wrap: wrap; }
+    .seo-nav a { color: #a0a0a0; text-decoration: none; font-size: 13px; }
+    .seo-nav a.active, .seo-nav a:hover { color: #00ff88; }
+    .seo-nav .seo-brand { font-weight: 700; color: #fff; margin-right: auto; }
+    .lang-switch { font-size: 12px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 4px; }
+    .toc { background: #0d0d0d; border: 1px solid #222; border-radius: 6px; padding: 16px 22px; margin: 18px 0 30px; }
+    .toc h3 { margin: 0 0 8px; }
+    .toc ol { line-height: 1.85; font-size: 13.5px; padding-left: 18px; margin: 0; }
+    .toc a { color: #ccc; text-decoration: none; }
+    .toc a:hover { color: #00ff88; }
+    .compare-box { width:100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+    .compare-box th, .compare-box td { padding: 8px 10px; border-bottom: 1px solid #222; text-align: left; }
+    .compare-box th { color: #777; background: #0d0d0d; font-size: 11px; text-transform: uppercase; }
+    .cta-banner { text-align: center; margin: 50px 0; padding: 36px 20px; background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,255,136,0.02)); border: 1px solid #00ff88; border-radius: 12px; }
+    .btn-cta { display: inline-block; padding: 12px 28px; background: #00ff88; color: #000; font-weight: 700; text-decoration: none; border-radius: 6px; }
+    .seo-footer { padding: 30px 20px; border-top: 1px solid #222; text-align: center; color: #777; font-size: 12px; }
+    .seo-footer a { color: #777; margin: 0 6px; }
+  </style>
+</head>
+<body>
+
+<header class="seo-nav">
+  <a href="/" class="seo-brand">ALPHA<span style="color:#00ff88;">α</span> TERMINAL</a>
+  <a href="/features-en.html">Features</a>
+  <a href="/pricing-en.html">Pricing</a>
+  <a href="/bloomberg-alternative-en.html">Bloomberg alternative</a>
+  <a href="/ai-stock-analysis-guide-en.html" class="active">AI Guide</a>
+  <a href="/ai-stock-analysis-guide.html" class="lang-switch" title="Version française">🇫🇷 FR</a>
+  <a href="/" style="color:#00ff88;font-weight:600;">Launch app →</a>
+</header>
+
+<main class="seo-page">
+  <nav aria-label="breadcrumb" style="font-size:12px;color:#777;margin-bottom:8px;">
+    <a href="/" style="color:#777;">Home</a> › <span>AI Guide</span>
+  </nav>
+
+  <h1>Complete 2026 guide: how to use AI for stock analysis</h1>
+  <div class="author-bar">
+    <span>By Alpha</span> · <span>April 29, 2026</span> · <span>Reading time: 14 min</span>
+  </div>
+  <p style="font-size:17px;color:#ccc;">
+    In 2026, LLMs (Large Language Models) have caught up with junior equity research analysts on written fundamental analysis. Claude Opus 4.7, GPT-5, and Gemini 2.5 Pro produce in 30 seconds structured notes comparable to 4 hours of human work. But <strong>you still need to know how to use them</strong>. This complete guide covers the method, prompts, pitfalls, and real costs.
+  </p>
+
+  <div class="toc">
+    <h3>Table of contents</h3>
+    <ol>
+      <li><a href="#why">Why AI changes stock analysis in 2026</a></li>
+      <li><a href="#models">Claude vs GPT vs Gemini vs Grok: which for what task</a></li>
+      <li><a href="#byok">The BYOK model and why it's winning</a></li>
+      <li><a href="#prompt">Method: structuring an analysis prompt in 5 steps</a></li>
+      <li><a href="#10k">Case study #1: analyze a 10-K in 30 seconds</a></li>
+      <li><a href="#dcf">Case study #2: accelerated DCF</a></li>
+      <li><a href="#sentiment">Case study #3: decode an earnings call</a></li>
+      <li><a href="#audit">Case study #4: audit a portfolio</a></li>
+      <li><a href="#pitfalls">7 pitfalls to absolutely avoid</a></li>
+      <li><a href="#stack">The ideal stack in 2026</a></li>
+      <li><a href="#future">What's coming in 2026-2027</a></li>
+    </ol>
+  </div>
+
+  <h2 id="why">1. Why AI changes stock analysis in 2026</h2>
+  <p>For 30 years, fundamental analysis was blocked by a simple problem: <strong>it takes 3-5 hours to properly read a 10-K</strong>. Multiply by 50 companies in a watchlist, and you simply don't have the time. Investment funds solved this with teams of 10-50 junior analysts. Retail investors read summaries.</p>
+  <p>In 2026, an LLM reads a complete 10-K in 30 seconds and produces a 2,000-word analysis pointing to the real signals: moat quality, ROIC vs WACC, past capital allocation, accounting red flags, narrative shift vs previous quarter. <strong>The marginal cost dropped from €200/hour for a junior analyst to $0.50 per analysis</strong> (<a href="api-costs-en.html" title="API costs detail per module">see the API costs detail per module</a>). Alpha's <a href="features-en.html#10k-decoder" title="10-K Decoder — Alpha module">10-K Decoder</a> automates all of this.</p>
+  <p>This cost × time compression is <em>the</em> revolution. It opens workflows previously impossible: screen 200 companies per week, full portfolio audit every month, compare 5 sector peers before each decision. It's the shift from <em>artisanal</em> to <em>industrial</em> analysis, accessible to retail.</p>
+
+  <h2 id="models">2. Claude vs GPT vs Gemini vs Grok: which for what task?</h2>
+  <p>Not all LLMs are equal for finance. Here's an updated April 2026 matrix.</p>
+  <table class="compare-box">
+    <thead><tr><th>Task</th><th>Best</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td>10-K analysis (PDF)</td><td>Claude Opus 4.7 / Gemini 2.5 Pro</td><td>Native PDF, nuanced reasoning over 200K tokens</td></tr>
+      <tr><td>DCF / valuation</td><td>Claude / GPT-5</td><td>Reliable math, clean markdown structure</td></tr>
+      <tr><td>Sentiment (Reddit, X)</td><td>Grok 4 / Perplexity Sonar</td><td>Native web search, real-time X access for Grok</td></tr>
+      <tr><td>Multi-country macro</td><td>Claude / Gemini</td><td>Broad knowledge, clean citations</td></tr>
+      <tr><td>Earnings call (long)</td><td>Gemini 2.5 Pro</td><td>2M token context — a transcript = ~30K tokens</td></tr>
+      <tr><td>Code / backtest</td><td>Claude Sonnet / GPT-5</td><td>Clean financial Python code generation</td></tr>
+      <tr><td>Free tier / volume</td><td>GitHub Models / Cerebras</td><td>Near-free (rate-limited)</td></tr>
+      <tr><td>Pure speed</td><td>Cerebras Llama 70B</td><td>&gt;2000 tokens/sec</td></tr>
+    </tbody>
+  </table>
+  <p>The trap: most SaaS tools force <em>one</em> provider on you (often OpenAI). You pay average quality on all tasks while the optimum varies. The right approach: a <strong>smart router</strong> that picks the LLM per task.</p>
+
+  <h2 id="byok">3. The BYOK (Bring Your Own Key) model — why it's winning</h2>
+  <p>BYOK means you connect your API key <strong>directly</strong> to the AI provider in a client app, without going through the editor's servers. Three consequences:</p>
+  <ol>
+    <li><strong>You pay at the official rate.</strong> Anthropic charges Claude Opus at $15/million input tokens. A typical SaaS bills the equivalent at $80/M (5× markup). With BYOK, you pay $15. Typical savings: 60-80%.</li>
+    <li><strong>Your prompts aren't logged by a third party.</strong> With a SaaS, your prompt goes through their server (logs, analytics, fine-tuning). In BYOK, your prompt goes directly to Anthropic/OpenAI/etc.</li>
+    <li><strong>You choose your model</strong>, not a product committee that chooses for you.</li>
+  </ol>
+  <blockquote>BYOK + multi-provider + smart router is the winning combination for 2026. It decouples <em>the app</em> (interface, prompts, structure) from <em>the intelligence</em> (the model). The app stays at €9.99/month or €79/year; the AI evolves on its own.</blockquote>
+
+  <h2 id="prompt">4. Method: structuring an analysis prompt in 5 steps</h2>
+  <p>A bad prompt produces flat, generic analysis. A good prompt produces equity-research-grade analysis. The 5-step method:</p>
+
+  <h4>Step 1 — Persona</h4>
+  <p>Define who the LLM should "embody." Instead of "analyze this stock," write:</p>
+  <pre>You are a senior value analyst at Berkshire Hathaway, trained in the Buffett-Munger
+school. You seek companies with durable moats, ROIC &gt; 15%, and disciplined capital
+allocation. You reject hype and doubt by default.</pre>
+
+  <h4>Step 2 — Context</h4>
+  <p>Provide ticker, sector, analysis period, sector peers. Don't assume the LLM knows the latest quarterly release — provide it.</p>
+
+  <h4>Step 3 — Imposed response structure</h4>
+  <p>The secret of readable analyses: enforce the markdown plan.</p>
+  <pre>MANDATORY response structure:
+## 1. Executive summary (3 bullets max)
+## 2. Moat &amp; durability (qualitative)
+## 3. Quantified metrics (table)
+## 4. Red flags
+## 5. Verdict + 0-100 score</pre>
+
+  <h4>Step 4 — Guardrails</h4>
+  <p>Force the LLM to say "I don't know" rather than invent. Examples:</p>
+  <pre>If a data point isn't provided, write "missing data" rather than invent.
+Cite the source for each number. Avoid "we think" — say "this indicates."</pre>
+
+  <h4>Step 5 — Output format</h4>
+  <p>Clean markdown, tables for lists, ✅⚠️🔴 emojis for quick visuals. Specify expected length (2,000 words, 4,000 output tokens, etc.).</p>
+
+  <h2 id="10k">5. Case study #1: analyze a 10-K in 30 seconds</h2>
+  <p>The 10-K is the SEC-mandated annual report of a US company. Typically 80-200 pages. On Apple, NVIDIA, or Microsoft, the format has become very formatted. Reports are public on <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-K" rel="noopener noreferrer" target="_blank">SEC EDGAR — official 10-K database</a>.</p>
+  <h4>Optimal workflow</h4>
+  <ol>
+    <li>Download the 10-K from SEC EDGAR (free, public).</li>
+    <li>Pick Claude Opus 4.7 or Gemini 2.5 Pro (native PDF, long context).</li>
+    <li>System prompt: Buffett-style value analyst, enforced 7-section structure.</li>
+    <li>Upload PDF + ticker + optional focus ("emphasize capital allocation").</li>
+    <li>Output: 2,000 words, 6-12K tokens, cost ~$0.50-1.00.</li>
+  </ol>
+  <p>You get: moat detection (network effects, switching costs, scale, brand, regulatory), 5-year ROIC trend, FCF quality (recurring vs one-off), past capital allocation (M&A, buybacks, dividends, R&D), accounting red flags (reserves, hidden impairments), guidance vs realized. Equivalent to a Morningstar note — in 30 seconds.</p>
+
+  <h2 id="dcf">6. Case study #2: accelerated DCF</h2>
+  <p>The DCF (Discounted Cash Flow) is the king valuation method. Its formula: value = sum of future FCFs discounted at WACC + terminal value.</p>
+  <p>AI accelerates DCF by both computing AND challenging your assumptions. You provide:</p>
+  <ul>
+    <li>Current FCF (already computed or pulled from 10-K)</li>
+    <li>Y1-5 expected growth (e.g., 15%)</li>
+    <li>Y6-10 growth (steady-state, e.g., 8%)</li>
+    <li>Terminal growth (typically 2-3%, long-term GDP)</li>
+    <li>WACC (8-12% mature, 12-15% growth)</li>
+    <li>Net debt + diluted shares</li>
+  </ul>
+  <p>The AI produces: year-by-year 10-year projection, Gordon terminal value, EV / Equity / per share, 3×3 sensitivity (WACC ± 1% × Growth ± 1%), margin of safety vs current price, UNDERVALUED / FAIR / OVERVALUED verdict. And — bonus — it critiques your 3 most fragile assumptions. <strong>Cost: ~$0.05.</strong></p>
+
+  <h2 id="sentiment">7. Case study #3: decode an earnings call</h2>
+  <p>Quarterly earnings calls contain the real signals. But the language is codified and CEOs have armies of communicators to polish it. Proper reading requires comparing Q-1 vs Q, spotting evasions, measuring the confidence-words vs caution-words ratio.</p>
+  <h4>CEO Forensics: what's quantifiable</h4>
+  <ul>
+    <li><strong>Verbal sentiment</strong>: count "incredible / strong / momentum" vs "headwinds / challenging / pressure". Ratio &gt; 70% = increased confidence; &lt; 50% = caution.</li>
+    <li><strong>Avoided topics</strong>: if the China question gets 15 seconds of answer instead of 45, it's a signal.</li>
+    <li><strong>Repeated narratives</strong>: what the CEO <em>really</em> wants to push through (top bigrams &gt; 3 occurrences).</li>
+    <li><strong>Linguistic hedging</strong>: "we will not / cannot / not planning" = increased caution.</li>
+    <li><strong>Turning points</strong>: moment where the tone shifts in the call (from confident to defensive on Q&A).</li>
+  </ul>
+  <p>AI does this in 60 seconds on a 1.5h transcript. Cost: ~$0.20-0.40 depending on length.</p>
+
+  <h2 id="audit">8. Case study #4: audit a portfolio</h2>
+  <p>Portfolio audit is the most underused module by retail investors. Yet it generates the most alpha — not by generating new ideas, but by <strong>identifying structural mistakes</strong> in what you already own.</p>
+  <p>You provide your 10-30 positions with quantity × price. The AI produces:</p>
+  <ol>
+    <li><strong>Concentration</strong>: positions &gt; 15% (red flag), HHI, top 3 % of portfolio.</li>
+    <li><strong>Weighted average valuation</strong>: P/E vs historical, PEG, dividend yield.</li>
+    <li><strong>Narrative fatigue</strong>: are your positions consensus (priced in) or non-consensus (asymmetric)?</li>
+    <li><strong>Decorrelation</strong>: if you have 60% tech, your portfolio isn't diversified.</li>
+    <li><strong>0-100 score</strong> and 3 actions to take in the next 30 days.</li>
+  </ol>
+  <p>Cost: ~$0.10-0.30. ROI: potentially huge — a well-done audit can reveal a 30-point sector over-concentration.</p>
+
+  <h2 id="pitfalls">9. The 7 pitfalls to absolutely avoid</h2>
+  <ol>
+    <li><strong>Hallucinations on recent numbers.</strong> The LLM may invent a P/E of 28 when the real one is 35. Always cross-check with a live source (Yahoo Finance, FMP).</li>
+    <li><strong>Knowledge cutoff.</strong> Claude Opus 4.7 has a January 2026 cutoff. To analyze Q1 2026, you need either web search or manual injection of figures.</li>
+    <li><strong>Recency bias.</strong> The LLM may give too much weight to recent news (which it has seen) vs long-term structure.</li>
+    <li><strong>Sycophancy.</strong> If you write "I like this stock," the LLM tends to confirm. Force adversarial mode (Pre-Mortem).</li>
+    <li><strong>False numerical precision.</strong> A "P/E = 27.43" answer can seem precise but come from approximated data. Ask for the source.</li>
+    <li><strong>No "I don't know."</strong> By default, LLMs fill in the blanks. Set an explicit guardrail in the prompt.</li>
+    <li><strong>Vendor lock-in.</strong> If you build your whole workflow on GPT, you're stuck when OpenAI raises prices or downgrades a model. Multi-provider = freedom.</li>
+  </ol>
+
+  <h2 id="stack">10. The ideal 2026 stack</h2>
+  <p>Here's the optimal BYOK low-cost multi-LLM private stack:</p>
+  <ul>
+    <li><strong>Analysis app</strong>: Alpha (€9.99/month or €79/year) or open-source alternative.</li>
+    <li><strong>Main LLM</strong>: Claude Opus 4.7 or Sonnet 4.6 (best nuanced reasoning).</li>
+    <li><strong>Long-context LLM</strong>: Gemini 2.5 Pro (2M tokens, free up to a quota).</li>
+    <li><strong>Sentiment LLM</strong>: Grok 4 (real-time X) or Perplexity Sonar (native web search).</li>
+    <li><strong>Volume / speed LLM</strong>: Cerebras Llama 70B or GitHub Models (free rate-limited).</li>
+    <li><strong>Data</strong>: FMP (free tier 250 calls/day), CoinGecko (free), FRED (free, Fed macro).</li>
+    <li><strong>Typical monthly cost</strong>: €5-15 (5 analyses/day × $0.05 average × 30 days).</li>
+  </ul>
+
+  <h2 id="future">11. What's coming in 2026-2027</h2>
+  <ul>
+    <li><strong>Autonomous agents</strong>: already emerging (Research Agent), they will progressively manage the full chain (research → analysis → rebalancing → backtest) without human intervention.</li>
+    <li><strong>10M+ token long context</strong>: Gemini, next-gen Claude — enough to ingest 5 years of 10-Ks + earnings calls + transcripts at once.</li>
+    <li><strong>Specialized financial embeddings</strong>: models fine-tuned only on finance (Voyage, BloombergGPT successors) for more precise RAG.</li>
+    <li><strong>Voice analyst</strong>: voice interaction for analyses dictated on the go or while walking.</li>
+    <li><strong>Privacy convergence</strong>: rise of local LLMs (Llama 70B on Apple Silicon Macs), no more cloud needed for 80% of analyses.</li>
+  </ul>
+
+  <h2>Conclusion: the 2026 opportunity window</h2>
+  <p>Mastery of AI in stock analysis is today a real edge for retail. In 18 months, it'll be a commodity. <strong>2026 is the window.</strong> Pick a BYOK multi-LLM stack, learn the prompts that work, set up wealth memory that personalizes your analyses, and you operate with leverage comparable to an analyst fund — for a few euros per month.</p>
+
+  <div class="cta-banner">
+    <h2 style="margin:0;border:0;padding:0;">Put this guide into practice</h2>
+    <p style="margin:12px 0 0;color:#ccc;">46 ready-to-use AI modules. Free demo mode, BYOK for the full version.</p>
+    <a href="/" class="btn-cta">Launch Alpha →</a>
+  </div>
+
+  <p style="font-size:11.5px;color:#666;margin-top:30px;border-top:1px solid #222;padding-top:14px;">
+    <strong>Disclaimer:</strong> this guide is educational. AI analysis may contain errors, hallucinations, or biases. All investment decisions remain solely your responsibility. For significant amounts, consult a certified financial advisor.
+  </p>
+</main>
+
+<footer class="seo-footer">
+  <p>© 2026 Alpha · Made in France 🇫🇷</p>
+  <p>
+    <a href="/">Home</a> ·
+    <a href="/features-en.html">Features</a> ·
+    <a href="/pricing-en.html">Pricing</a> ·
+    <a href="/bloomberg-alternative-en.html">Bloomberg alternative</a> ·
+    <a href="/ai-stock-analysis-guide-en.html">AI Guide</a>
+  </p>
+  <p>
+    <a href="/about.html">About</a> ·
+    <a href="/privacy.html">Privacy policy</a> ·
+    <a href="/terms.html">Terms</a> ·
+    <a href="/legal.html">Legal notice</a>
+  </p>
+  <p style="margin-top:14px;"><a href="mailto:savetheworldfr@gmail.com">savetheworldfr@gmail.com</a></p>
+</footer>
+
+</body>
+</html>

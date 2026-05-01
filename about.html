@@ -111,16 +111,17 @@
   </script>
 </head>
 <body>
-  <nav class="static-nav">
+  <nav class="static-nav" id="nav-fr">
     <a class="brand" href="index.html">α Alpha</a>
     <a href="features.html">Fonctionnalités</a>
     <a href="pricing.html">Tarifs</a>
     <a href="bloomberg-alternative.html">vs Bloomberg</a>
     <a href="ai-stock-analysis-guide.html">Guide IA</a>
     <a href="api-costs.html">Coûts API</a>
+    <a href="?lang=en" id="lang-toggle" style="margin-left:auto;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
   </nav>
 
-  <main class="static-page">
+  <main class="static-page" id="main-content">
     <h1>À propos d'Alpha Terminal</h1>
     <p style="font-size:18px;color:var(--text-primary);">Le terminal d'analyse financière IA pensé pour les investisseurs particuliers, développé en France.</p>
 
@@ -153,5 +154,56 @@
     <a href="terms.html">CGU</a> ·
     <a href="legal.html">Mentions légales</a>
   </footer>
+
+  <!-- Bilingual swap : si ?lang=en, on remplace le contenu principal par sa version EN -->
+  <template id="content-en">
+    <h1>About Alpha Terminal</h1>
+    <p style="font-size:18px;color:var(--text-primary);">The AI financial analysis terminal designed for retail investors, built in France.</p>
+
+    <h2>Who we are</h2>
+    <p>Alpha Terminal is a web app (with desktop, Android and iOS versions) combining 46 AI financial analysis modules — fundamental analysis, DCF valuation, 10-K and earnings call decoding, multi-country tax optimization, wealth tracking, FIRE projection — powered by 14 LLM providers of your choice (Claude, OpenAI, Google Gemini, xAI Grok, Mistral, Cerebras, etc.).</p>
+    <p>We believe institutional-grade financial analysis, which cost €24,000/year at Bloomberg, should be accessible to every serious investor for €9.99/month — with absolute privacy guarantee: your data never leaves your browser.</p>
+
+    <h2>Our mission</h2>
+    <p><strong>Democratize institutional financial analysis</strong>, without data collection, without single-vendor dependence, at AI cost.</p>
+    <p>Concretely, this means three principles:</p>
+    <ul style="line-height:1.9;color:var(--text-secondary);">
+      <li><strong>BYOK (Bring Your Own Key)</strong> — you bring your own API key. The app calls LLMs directly from your browser. No Alpha intermediary server. You pay AI at the official rate, no markup.</li>
+      <li><strong>100% client-side</strong> — local AES-GCM-256 + PBKDF2 100k iter encryption for your key vault. All analyses, wealth, and notes stored in local IndexedDB. Verifiable in DevTools → Network: you only see calls to provider APIs.</li>
+      <li><strong>Open architecture</strong> — 14 LLMs supported, 11 financial data providers, multi-country (US, UK, BE, CH, ES, DE, IT, PT, FR), bilingual FR/EN.</li>
+    </ul>
+
+    <h2>Contact</h2>
+    <div class="contact-box">
+      <p style="margin:0;"><strong>Support</strong>: <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a></p>
+      <p style="margin:6px 0 0;font-size:13px;color:var(--text-secondary);">Response within 48 business hours. For technical questions, please specify your version (visible at the bottom of the sidebar) and the module involved.</p>
+    </div>
+
+    <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Back to home</a></p>
+  </template>
+
+  <script>
+    (function() {
+      var params = new URLSearchParams(location.search);
+      var lang = params.get('lang') === 'en' ? 'en' : 'fr';
+      var toggle = document.getElementById('lang-toggle');
+      if (lang === 'en') {
+        document.documentElement.lang = 'en';
+        document.title = 'About Alpha Terminal — AI financial analysis terminal | Alpha';
+        var tpl = document.getElementById('content-en');
+        var main = document.getElementById('main-content');
+        if (tpl && main) main.innerHTML = tpl.innerHTML;
+        // Translate nav labels
+        var nav = document.getElementById('nav-fr');
+        if (nav) {
+          var map = { 'Fonctionnalités':'Features', 'Tarifs':'Pricing', 'vs Bloomberg':'vs Bloomberg', 'Guide IA':'AI Guide', 'Coûts API':'API costs' };
+          nav.querySelectorAll('a').forEach(function(a) { var k = a.textContent.trim(); if (map[k]) a.textContent = map[k]; });
+        }
+        if (toggle) { toggle.textContent = '🇫🇷 FR'; toggle.href = location.pathname; }
+      } else if (toggle) {
+        toggle.href = location.pathname + '?lang=en';
+      }
+    })();
+  </script>
 </body>
 </html>
