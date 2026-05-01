@@ -430,6 +430,17 @@ export async function importFullBackup(payload, { mode = 'merge' } = {}) {
     counts.localStorageKeys = Object.keys(payload.localStorage).length - counts.skipped;
   }
 
+  // Si la licence Premium a été restaurée, notifie immédiatement l'app
+  // (paywall + sidebar + Settings) pour que l'UI rebascule avant le reload.
+  // Sinon le user pourrait voir le paywall une fraction de seconde.
+  counts.licenseRestored = !!localStorage.getItem('alpha-license-key');
+  if (counts.licenseRestored) {
+    try {
+      window.dispatchEvent(new CustomEvent('alpha:licenseActivated', { detail: { restored: true } }));
+      window.dispatchEvent(new CustomEvent('alpha:premiumChanged', { detail: { isPremium: true } }));
+    } catch {}
+  }
+
   return counts;
 }
 

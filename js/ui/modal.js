@@ -195,8 +195,11 @@ function handleWizardImportSuccess(counts) {
     counts.localStorageKeys ? `${counts.localStorageKeys} settings` : null
   ].filter(Boolean).join(' · ') || 'aucune donnée';
 
+  const premiumLine = counts.licenseRestored
+    ? `<br><span style="color:var(--accent-green);font-size:11px;">💎 Licence Premium restaurée — accès Pro débloqué après déverrouillage du vault.</span>`
+    : '';
   if (status) {
-    status.innerHTML = `<span style="color:var(--accent-green);">✓ Importé : ${breakdown}</span><br><span style="color:var(--text-muted);font-size:11px;">Rechargement dans 1.5s pour appliquer le vault…</span>`;
+    status.innerHTML = `<span style="color:var(--accent-green);">✓ Importé : ${breakdown}</span>${premiumLine}<br><span style="color:var(--text-muted);font-size:11px;">Rechargement dans 1.5s pour appliquer le vault…</span>`;
   }
   // Reload : permet au vault chiffré importé d'être lu par hasVault() et rebascule sur l'écran unlock
   setTimeout(() => location.reload(), 1500);
