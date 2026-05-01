@@ -293,6 +293,12 @@ function renderWizardStep2() {
       <p style="font-size:10.5px;color:var(--text-muted);margin:6px 0 0;">${isEnLocal ? 'You can always add Claude / OpenAI / Gemini later for premium quality.' : 'Tu pourras toujours ajouter Claude / OpenAI / Gemini plus tard pour la qualité premium.'}</p>
     </div>
 
+    <div style="display:flex;justify-content:center;margin-bottom:14px;">
+      <button id="wiz-skip-keys" type="button" class="btn-ghost" style="font-size:12px;color:var(--text-secondary);">
+        ${isEnLocal ? '👀 Access without API key (explore the app)' : '👀 Accéder sans clé (explorer l\'app)'}
+      </button>
+    </div>
+
     <div id="wiz-keys" class="wiz-keys"></div>
     <div id="wiz-err" class="alert alert-danger hidden"></div>
     <div style="display:flex;justify-content:space-between;margin-top:14px;gap:8px;">
@@ -324,6 +330,8 @@ function renderWizardStep2() {
   $('#wiz-back').addEventListener('click', renderWizardStep1);
   $('#wiz-test').addEventListener('click', testKeys);
   $('#wiz-next2').addEventListener('click', next2);
+  const skipBtn = $('#wiz-skip-keys');
+  if (skipBtn) skipBtn.addEventListener('click', skipKeysAndFinish);
 
   KNOWN_PROVIDERS.forEach(p => {
     $('#key-' + p.name).addEventListener('input', e => { wizardState.keys[p.name] = e.target.value.trim(); });
@@ -390,6 +398,26 @@ function renderWizardStep2() {
     const filled = Object.values(wizardState.keys).filter(v => v && v.trim()).length;
     if (filled === 0) { err.textContent = 'Au moins une clé est nécessaire.'; err.classList.remove('hidden'); return; }
     renderWizardStep3();
+  }
+
+  // "Accéder sans clé" : créé un vault vide pour débloquer l'UI. Les modules
+  // LLM afficheront leur état "missing-key" tant que rien n'est ajouté depuis
+  // Settings. Les modules locaux (budget, watchlist, etc.) restent fonctionnels.
+  async function skipKeysAndFinish() {
+    const err = $('#wiz-err');
+    err.classList.add('hidden');
+    const btn = $('#wiz-skip-keys');
+    if (btn) { btn.disabled = true; btn.textContent = '…'; }
+    try {
+      await setApiKeys({}, wizardState.password);
+      try { setRuntimeKeys({}); } catch {}
+      overlay.classList.add('hidden');
+      window.dispatchEvent(new CustomEvent('app:unlocked'));
+    } catch (e) {
+      if (btn) { btn.disabled = false; btn.textContent = (document.documentElement.lang === 'en' ? '👀 Access without API key (explore the app)' : '👀 Accéder sans clé (explorer l\'app)'); }
+      err.textContent = e.message;
+      err.classList.remove('hidden');
+    }
   }
 }
 
