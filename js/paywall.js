@@ -43,21 +43,15 @@
     }
   }
 
-  // ⚠️ PAYWALL DÉSACTIVÉ TEMPORAIREMENT
-  // Le système de magic link Supabase est mis en pause. Migration en cours
-  // vers Lemonsqueezy License Keys. Tant que le flow license n'est pas
-  // implémenté, l'app reste 100% accessible (pas de blocage modules, pas de
-  // cadenas sidebar, pas de bouton login).
-  const PAYWALL_DISABLED = true;
-
   class PaywallManager {
     constructor() {
       this.isPremium = false;
-      // Refresh dès que l'auth signale un changement
+      // Refresh dès qu'une licence est activée/révoquée
       window.addEventListener('alpha:premiumChanged', (e) => {
         this.isPremium = !!(e?.detail?.isPremium);
       });
-      window.addEventListener('alpha:authChanged', () => this.refresh());
+      window.addEventListener('alpha:licenseActivated', () => { this.isPremium = true; });
+      window.addEventListener('alpha:licenseRevoked', () => { this.isPremium = false; });
     }
 
     isModuleFree(moduleId) {
@@ -65,15 +59,18 @@
     }
 
     canAccess(moduleId) {
-      if (PAYWALL_DISABLED) return true;
       if (!moduleId) return true;
       if (this.isModuleFree(moduleId)) return true;
       return this._readCache();
     }
 
+    // Source de vérité (par ordre) :
+    //   1. License Key Lemonsqueezy active (window.licenseManager.isPremium)
+    //   2. Fallback Supabase magic link (legacy, en cours de dépréciation)
     _readCache() {
-      if (PAYWALL_DISABLED) return true;
-      // Source de vérité = alphaAuth.isPremiumLocal() (cache validé)
+      try {
+        if (window.licenseManager && window.licenseManager.isPremium()) return true;
+      } catch {}
       try {
         return !!(window.alphaAuth && window.alphaAuth.isPremiumLocal());
       } catch {
@@ -91,87 +88,72 @@
       }
     }
 
-    /** Injecte le modal paywall dans le container du module. */
+    /** Bloque l'accès au module et propose à l'utilisateur soit d'acheter,
+     *  soit d'entrer une licence existante. Affiche un placeholder dans le
+     *  container + ouvre le modal de licence Lemonsqueezy. */
     blockUI(container, moduleId) {
-      if (!container) return;
       const en = isEN();
       const t = en
         ? {
-            title: '🔒 Premium feature',
-            sub: `<strong>${moduleId}</strong> requires an active Premium subscription.`,
+            title: '🔒 Premium module',
+            sub: `<strong>${moduleId}</strong> requires an active Premium license.`,
             price: '€9.99 / month',
-            login: '🔑 Sign in with magic link',
-            signup: '🚀 Subscribe €9.99/month',
+            buyBtn: '🚀 Subscribe €9.99/month',
+            keyBtn: '🔑 I have a license key',
             bullets: [
-              '✅ Unlimited access to all 56 Pro modules',
+              '✅ Unlimited access to all Pro modules',
               '✅ Your analyses stay 100% local (BYOK)',
               '✅ Cancel anytime',
             ],
-            already: 'Already subscribed?',
-            refresh: 'Refresh status',
           }
         : {
             title: '🔒 Module Premium',
-            sub: `<strong>${moduleId}</strong> nécessite un abonnement Premium actif.`,
+            sub: `<strong>${moduleId}</strong> nécessite une licence Premium active.`,
             price: '9,99 € / mois',
-            login: '🔑 Se connecter (lien magique)',
-            signup: '🚀 S\'abonner 9,99€/mois',
+            buyBtn: '🚀 S\'abonner 9,99€/mois',
+            keyBtn: '🔑 J\'ai déjà une clé',
             bullets: [
-              '✅ Accès illimité aux 56 modules Pro',
+              '✅ Accès illimité aux modules Pro',
               '✅ Tes analyses restent 100% locales (BYOK)',
               '✅ Annulable à tout moment',
             ],
-            already: 'Déjà abonné ?',
-            refresh: 'Rafraîchir le statut',
           };
 
-      const isAuthed = !!(window.alphaAuth && window.alphaAuth.isAuthenticated());
-
-      container.innerHTML = `
-        <div class="paywall-modal" role="dialog" aria-modal="true" aria-labelledby="paywall-title">
-          <div class="paywall-content">
-            <h3 id="paywall-title">${t.title}</h3>
-            <p class="paywall-sub">${t.sub}</p>
-            <div class="paywall-price">${t.price}</div>
-            <div class="paywall-actions">
-              ${
-                isAuthed
-                  ? `<button type="button" class="paywall-btn" data-paywall-action="checkout">${t.signup}</button>`
-                  : `<button type="button" class="paywall-btn" data-paywall-action="login">${t.login}</button>
-                     <button type="button" class="paywall-btn paywall-btn-secondary" data-paywall-action="checkout">${t.signup}</button>`
-              }
+      // Placeholder dans le container du module
+      if (container) {
+        container.innerHTML = `
+          <div class="paywall-modal" role="dialog" aria-modal="false" aria-labelledby="paywall-title">
+            <div class="paywall-content">
+              <h3 id="paywall-title">${t.title}</h3>
+              <p class="paywall-sub">${t.sub}</p>
+              <div class="paywall-price">${t.price}</div>
+              <div class="paywall-actions">
+                <button type="button" class="paywall-btn" data-paywall-action="checkout">${t.buyBtn}</button>
+                <button type="button" class="paywall-btn paywall-btn-secondary" data-paywall-action="enter-key">${t.keyBtn}</button>
+              </div>
+              <ul class="paywall-info">
+                ${t.bullets.map((b) => `<li>${b}</li>`).join('')}
+              </ul>
             </div>
-            <ul class="paywall-info">
-              ${t.bullets.map((b) => `<li>${b}</li>`).join('')}
-            </ul>
-            <p class="paywall-info-line">
-              ${t.already} <a href="#" data-paywall-action="refresh">${t.refresh}</a>
-            </p>
           </div>
-        </div>
-      `;
-
-      // Wire actions
-      container.querySelectorAll('[data-paywall-action]').forEach((btn) => {
-        btn.addEventListener('click', (ev) => {
-          ev.preventDefault();
-          const action = btn.getAttribute('data-paywall-action');
-          if (action === 'checkout') {
-            if (window.lemonsqueezy) window.lemonsqueezy.open();
-          } else if (action === 'login') {
-            this.promptLogin();
-          } else if (action === 'refresh') {
-            this.refresh().then(() => {
-              if (this._readCache()) {
-                // Recharge la vue pour relancer le module débloqué
-                location.reload();
-              } else {
-                btn.textContent = (en ? 'Still locked' : 'Toujours verrouillé') + ' ✗';
-              }
-            });
-          }
+        `;
+        container.querySelectorAll('[data-paywall-action]').forEach((btn) => {
+          btn.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            const action = btn.getAttribute('data-paywall-action');
+            if (action === 'checkout' && window.lemonsqueezy) {
+              window.lemonsqueezy.open();
+            } else if (action === 'enter-key' && window.licenseManager) {
+              window.licenseManager.showLicenseModal();
+            }
+          });
         });
-      });
+      }
+
+      // Si pas de container (cas Mode avancé), ouvre directement le modal de licence
+      if (!container && window.licenseManager) {
+        window.licenseManager.showLicenseModal();
+      }
     }
 
     /** Petit prompt natif pour saisir l'email du magic link. */
