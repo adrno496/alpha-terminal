@@ -17,6 +17,54 @@
     </image:image>
   </url>
 
+  <!-- ===== Blog index FR/EN ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/blog.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/blog.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/blog-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/blog.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Blog Alpha — Guides d'analyse financière</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://alpha-terminal.app/blog-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/blog.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/blog-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/blog.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Blog — Financial analysis guides</image:title>
+    </image:image>
+  </url>
+
+  <!-- ===== Newsletter ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/newsletter.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/newsletter.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/newsletter-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/newsletter.html" />
+  </url>
+  <url>
+    <loc>https://alpha-terminal.app/newsletter-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/newsletter.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/newsletter-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/newsletter.html" />
+  </url>
+
   <!-- ===== Pages commerciales / guides FR ===== -->
   <url>
     <loc>https://alpha-terminal.app/features.html</loc>

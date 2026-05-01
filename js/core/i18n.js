@@ -1,7 +1,16 @@
 // i18n FR/EN — dictionnaire complet
 const KEY = 'alpha-terminal:locale';
 const listeners = new Set();
-let _locale = (localStorage.getItem(KEY) || (navigator.language || '').slice(0, 2) || 'fr').toLowerCase();
+// Priorité : ?lang=en dans l'URL > localStorage > navigator.language > 'fr'
+let _locale;
+try {
+  const urlLang = new URLSearchParams(location.search).get('lang');
+  if (['fr', 'en'].includes(urlLang)) {
+    _locale = urlLang;
+    localStorage.setItem(KEY, urlLang);
+  }
+} catch {}
+if (!_locale) _locale = (localStorage.getItem(KEY) || (navigator.language || '').slice(0, 2) || 'fr').toLowerCase();
 if (!['fr', 'en'].includes(_locale)) _locale = 'fr';
 
 const DICT = {

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Alpha Blog — Financial analysis guides, valuation, AI investing</title>
+  <meta name="description" content="All Alpha guides for better investing: DCF, 10-K, Buffett method, Bloomberg alternatives, AI investing. In-depth articles, free, by practitioners." />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <link rel="canonical" href="https://alpha-terminal.app/blog-en.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/blog.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/blog-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/blog.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Alpha Blog — Financial analysis guides" />
+  <meta property="og:description" content="DCF, 10-K, Buffett, Bloomberg alternatives, AI investing. In-depth articles." />
+  <meta property="og:url" content="https://alpha-terminal.app/blog-en.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Alpha Blog",
+    "url": "https://alpha-terminal.app/blog-en.html",
+    "description": "In-depth guides on financial analysis, valuation, AI investing.",
+    "publisher": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/" },
+    "inLanguage": "en-US"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://alpha-terminal.app/blog-en.html" }
+    ]
+  }
+  </script>
+
+  <style>
+    body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; line-height:1.6; }
+    .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; flex-wrap:wrap; gap:14px; }
+    .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }
+    .nav a { color:#ccc; text-decoration:none; font-size:14px; }
+    .nav a:hover { color:#00ff88; }
+    .lang-switch { margin-left:auto; padding:4px 8px; border:1px solid #333; border-radius:4px; font-size:12px; }
+    main { max-width:1100px; margin:0 auto; padding:50px 22px 80px; }
+    .breadcrumb { font-size:12px; color:#777; margin-bottom:18px; }
+    .breadcrumb a { color:#777; text-decoration:none; }
+    .blog-hero { margin-bottom:50px; }
+    .blog-hero h1 { font-size:clamp(32px,4vw,48px); margin:0 0 14px; line-height:1.15; }
+    .blog-hero p { font-size:17px; color:#aaa; max-width:720px; }
+    .filters { display:flex; gap:8px; flex-wrap:wrap; margin:30px 0 36px; }
+    .filter { padding:6px 14px; border:1px solid #333; border-radius:20px; font-size:13px; color:#bbb; cursor:pointer; transition:all 0.15s; background:none; font-family:inherit; }
+    .filter:hover { border-color:#00ff88; color:#00ff88; }
+    .filter.active { background:#00ff88; color:#000; border-color:#00ff88; font-weight:600; }
+    .articles { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:24px; }
+    .article-card { background:#111; border:1px solid #222; border-radius:10px; overflow:hidden; transition:transform 0.18s, border-color 0.18s; display:flex; flex-direction:column; }
+    .article-card:hover { transform:translateY(-3px); border-color:#00ff88; }
+    .article-card a.cover { display:block; background:linear-gradient(135deg,#1a1a1a,#0a0a0a); padding:28px 22px; text-align:center; text-decoration:none; }
+    .article-card .emoji { font-size:38px; }
+    .article-card .body { padding:18px 22px 22px; flex:1; display:flex; flex-direction:column; }
+    .article-card .tag { display:inline-block; background:rgba(0,255,136,0.12); color:#00ff88; padding:2px 8px; border-radius:4px; font-size:11px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600; margin-bottom:10px; align-self:flex-start; }
+    .article-card h3 { margin:0 0 8px; font-size:17px; line-height:1.35; }
+    .article-card h3 a { color:#fff; text-decoration:none; }
+    .article-card h3 a:hover { color:#00ff88; }
+    .article-card p { margin:0 0 14px; font-size:13.5px; color:#aaa; flex:1; }
+    .article-card .meta { font-size:11px; color:#666; margin-top:auto; padding-top:10px; border-top:1px solid #1f1f1f; }
+    .featured { grid-column:1 / -1; background:linear-gradient(135deg,#001a0d,#0a0a0a); border:1px solid #00ff88; }
+    .featured a.cover { background:linear-gradient(135deg,#003322,#001a0d); padding:50px 22px; }
+    .featured .emoji { font-size:64px; }
+    .featured h3 { font-size:24px; }
+    .featured p { font-size:15px; }
+    .cta-bottom { margin-top:60px; padding:36px; background:linear-gradient(135deg,#001a0d,#0a0a0a); border:1px solid #00ff88; border-radius:12px; text-align:center; }
+    .cta-bottom h2 { margin:0 0 8px; font-size:24px; }
+    .cta-bottom p { color:#aaa; margin:0 0 18px; font-size:14px; }
+    .cta-bottom a { display:inline-block; background:#00ff88; color:#000; padding:14px 28px; border-radius:8px; font-weight:700; text-decoration:none; font-size:15px; }
+    .cta-bottom .small { font-size:11px; color:#888; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">α Alpha</a>
+  <a href="features-en.html">Features</a>
+  <a href="pricing-en.html">Pricing</a>
+  <a href="bloomberg-alternative-en.html">vs Bloomberg</a>
+  <a href="blog-en.html" style="color:#00ff88;">Blog</a>
+  <a href="newsletter-en.html">Newsletter</a>
+  <a href="blog.html" class="lang-switch" hreflang="fr">🇫🇷 FR</a>
+</nav>
+
+<main>
+  <p class="breadcrumb"><a href="index.html">Home</a> › <span>Blog</span></p>
+
+  <header class="blog-hero">
+    <h1>📚 Alpha Blog — Financial analysis guides</h1>
+    <p>In-depth articles for better investing: valuation, reading annual reports, Buffett method, Bloomberg alternatives, AI investing. Free, written by practitioners, no fluff.</p>
+  </header>
+
+  <div class="filters">
+    <button class="filter active" data-cat="all">All</button>
+    <button class="filter" data-cat="valuation">Valuation</button>
+    <button class="filter" data-cat="analysis">Fundamental analysis</button>
+    <button class="filter" data-cat="ai">AI & investing</button>
+    <button class="filter" data-cat="tools">Tools & comparisons</button>
+  </div>
+
+  <div class="articles">
+
+    <article class="article-card featured" data-cat="ai">
+      <a class="cover" href="ai-stock-analysis-guide-en.html">
+        <span class="emoji">🤖</span>
+      </a>
+      <div class="body">
+        <span class="tag">Pillar guide · AI</span>
+        <h3><a href="ai-stock-analysis-guide-en.html">The complete guide to AI stock analysis in 2026</a></h3>
+        <p>How AI changes fundamental analysis, which models to use for which case, and why multi-LLM beats everything. 2700 words, diagrams, concrete examples.</p>
+        <div class="meta">📖 12 min read · SEO pillar</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="valuation">
+      <a class="cover" href="dcf-calculation-complete-method.html"><span class="emoji">📊</span></a>
+      <div class="body">
+        <span class="tag">Valuation</span>
+        <h3><a href="dcf-calculation-complete-method.html">DCF calculation explained: complete step-by-step method</a></h3>
+        <p>The 5 steps to value a stock. WACC, terminal value, Apple example. Includes a free online DCF calculator.</p>
+        <div class="meta">📖 8 min · + Calculator</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="valuation">
+      <a class="cover" href="dcf-calculator-en.html"><span class="emoji">🧮</span></a>
+      <div class="body">
+        <span class="tag">Free tool</span>
+        <h3><a href="dcf-calculator-en.html">Free online DCF calculator</a></h3>
+        <p>Value any stock in 1 minute. Enter your assumptions (FCF, growth, WACC) and get the intrinsic value per share.</p>
+        <div class="meta">⚡ Interactive tool · No signup</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="analysis">
+      <a class="cover" href="how-to-read-10k-annual-report.html"><span class="emoji">📄</span></a>
+      <div class="body">
+        <span class="tag">Fundamental analysis</span>
+        <h3><a href="how-to-read-10k-annual-report.html">How to read an annual report (10-K) in 10 minutes</a></h3>
+        <p>The 5 key sections, the 7 ratios to extract, the pitfalls to avoid. Pro analysts' method condensed.</p>
+        <div class="meta">📖 9 min · Intermediate</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="analysis">
+      <a class="cover" href="buffett-method-7-criteria.html"><span class="emoji">🎯</span></a>
+      <div class="body">
+        <span class="tag">Strategy</span>
+        <h3><a href="buffett-method-7-criteria.html">The 7 Buffett criteria to buy a stock</a></h3>
+        <p>Durable competitive advantage, ROIC > 15%, stable margins, quality management. Method explained + quantitative criteria.</p>
+        <div class="meta">📖 10 min · All levels</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="ai">
+      <a class="cover" href="chatgpt-stock-analysis-mistakes.html"><span class="emoji">⚠️</span></a>
+      <div class="body">
+        <span class="tag">AI & investing</span>
+        <h3><a href="chatgpt-stock-analysis-mistakes.html">5 mistakes ChatGPT makes on stock analysis</a></h3>
+        <p>Hallucinations on numbers, outdated data, no reproducible DCF. Why a generalist model isn't enough.</p>
+        <div class="meta">📖 7 min · Important</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="tools">
+      <a class="cover" href="bloomberg-price-2026.html"><span class="emoji">💸</span></a>
+      <div class="body">
+        <span class="tag">Comparison</span>
+        <h3><a href="bloomberg-price-2026.html">Bloomberg Terminal: how much does it really cost in 2026?</a></h3>
+        <p>Official price, hidden costs, alternatives by budget. Who it makes sense for (and who it no longer does).</p>
+        <div class="meta">📖 8 min · Detailed comparison</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="tools">
+      <a class="cover" href="alpha-vs-koyfin-en.html"><span class="emoji">⚔️</span></a>
+      <div class="body">
+        <span class="tag">Comparison</span>
+        <h3><a href="alpha-vs-koyfin-en.html">Alpha vs Koyfin — full 2026 comparison</a></h3>
+        <p>Pricing, AI modules, private data, multi-LLM. When to prefer Koyfin, when to prefer Alpha. Honest verdict.</p>
+        <div class="meta">📖 6 min · 1-vs-1</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="tools">
+      <a class="cover" href="alpha-vs-chatgpt-en.html"><span class="emoji">🤖</span></a>
+      <div class="body">
+        <span class="tag">Comparison</span>
+        <h3><a href="alpha-vs-chatgpt-en.html">Alpha vs ChatGPT for stock analysis</a></h3>
+        <p>Dedicated modules, structured data access, reproducible DCF. Where ChatGPT is enough, where Alpha wins.</p>
+        <div class="meta">📖 6 min · 1-vs-1</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="tools">
+      <a class="cover" href="alpha-vs-bloomberg-detailed-en.html"><span class="emoji">🏛️</span></a>
+      <div class="body">
+        <span class="tag">Comparison</span>
+        <h3><a href="alpha-vs-bloomberg-detailed-en.html">Alpha vs Bloomberg Terminal (detailed)</a></h3>
+        <p>€24,000/year vs €9.99/month. AI modules, privacy, data latency, target audience. The full 1-vs-1.</p>
+        <div class="meta">📖 7 min · Reference</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="tools">
+      <a class="cover" href="api-costs-en.html"><span class="emoji">💰</span></a>
+      <div class="body">
+        <span class="tag">Practical guide</span>
+        <h3><a href="api-costs-en.html">LLM API costs explained: how much you'll really pay</a></h3>
+        <p>Real pricing for Claude, GPT-4, Gemini, Mistral, Cerebras. Module-by-module estimation + integrated cost simulator.</p>
+        <div class="meta">📖 8 min · Reference</div>
+      </div>
+    </article>
+
+    <article class="article-card" data-cat="tools">
+      <a class="cover" href="api-keys-guide-en.html"><span class="emoji">🔑</span></a>
+      <div class="body">
+        <span class="tag">Practical guide</span>
+        <h3><a href="api-keys-guide-en.html">How to get an LLM API key in 5 minutes</a></h3>
+        <p>Direct links and step-by-step for the 14 providers (including free options: GitHub Models, Cerebras, Mistral).</p>
+        <div class="meta">📖 6 min · Tutorial</div>
+      </div>
+    </article>
+
+  </div>
+
+  <div class="cta-bottom">
+    <h2>📬 Get 1 article + 1 stock analysis per month</h2>
+    <p>Free newsletter. No spam. Unsubscribe in 1 click.</p>
+    <a href="newsletter-en.html" class="plausible-event-name=Newsletter+CTA">📥 Subscribe to the newsletter</a>
+    <p class="small">+ free PDF guide "10 essential financial ratios" delivered immediately</p>
+  </div>
+
+</main>
+
+<script>
+  document.querySelectorAll('.filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const cat = btn.dataset.cat;
+      document.querySelectorAll('.article-card').forEach(card => {
+        card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
+      });
+    });
+  });
+</script>
+
+</body>
+</html>
+</content>
+</invoke>

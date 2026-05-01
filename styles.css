@@ -2984,23 +2984,22 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   .resource-card { padding: 18px 16px; }
 }
 
-/* Bilingual landing — English translations shown alongside French */
+/* Bilingual landing — EN traductions cachées par défaut.
+   Toujours présentes dans le HTML pour SEO (Googlebot lit le DOM complet).
+   Affichées uniquement quand <html lang="en"> ou body.show-en. */
 .lang-en {
-  display: inline-block;
-  color: var(--text-dim, #8b9bb4);
-  font-style: italic;
-  font-weight: 400;
-  opacity: 0.78;
-  font-size: 0.92em;
+  display: none;
 }
-.dash-list .lang-en,
-.why-card p .lang-en,
-.step p .lang-en,
-.section-sub .lang-en,
-.resource-card p .lang-en {
+html[lang="en"] .lang-en,
+body.show-en .lang-en {
   display: inline-block;
-  margin-top: 2px;
+  color: var(--text-primary, #fff);
 }
+/* Cache aussi les <br> qui précèdent un .lang-en caché (sinon ligne vide visible).
+   :has() est supporté partout depuis 2023. */
+br:has(+ .lang-en) { display: none; }
+html[lang="en"] br:has(+ .lang-en),
+body.show-en br:has(+ .lang-en) { display: inline; }
 
 /* ===========================================================
    Paywall — overlay Premium (BYOK + Lemonsqueezy)
