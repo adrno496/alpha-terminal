@@ -16,6 +16,18 @@ const ALWAYS_VISIBLE = [
 // Modules avancés groupés par catégorie
 const CATEGORIES = [
   {
+    id: 'daily-brief',
+    titleKey: 'cat.daily-brief',
+    modules: [
+      { id: 'daily-briefing',       num: '🌅' },
+      { id: 'market-pulse',         num: '🌐' },
+      { id: 'todays-actions',       num: '🎯' },
+      { id: 'smart-alerts-center',  num: '🔔' },
+      { id: 'fear-greed',           num: '🌡️' },
+      { id: 'watchpoints',          num: '📌' }
+    ]
+  },
+  {
     id: 'fundamentals',
     titleKey: 'cat.fundamentals',
     modules: [
@@ -206,7 +218,8 @@ export function renderSidebar(onNavigate) {
     const openSet = new Set(JSON.parse(localStorage.getItem('alpha-terminal:sidebar-open-cats') || '[]'));
     // Toujours déplier la 1ère catégorie au tout premier affichage
     if (openSet.size === 0 && !localStorage.getItem('alpha-terminal:sidebar-cats-init')) {
-      openSet.add(CATEGORIES[0].id);
+      // Ouvre par défaut la catégorie Daily brief (la plus utilisée au quotidien)
+      openSet.add('daily-brief');
       localStorage.setItem('alpha-terminal:sidebar-cats-init', '1');
     }
     html += `<div class="sidebar-categories">`;

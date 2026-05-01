@@ -2048,6 +2048,7 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
 }
 
 /* Couleurs par catégorie — palette financière distincte (RGBA explicites pour compat. max) */
+.sidebar-cat[data-cat="daily-brief"]       { --cat-color:#ffa726; --cat-bg:rgba(255,167,38,.10); --cat-bg-open:rgba(255,167,38,.18); --cat-bg-hover:rgba(255,167,38,.26); --cat-bg-chip:rgba(255,167,38,.26); }
 .sidebar-cat[data-cat="fundamentals"]      { --cat-color:#00ff88; --cat-bg:rgba(0,255,136,.06);  --cat-bg-open:rgba(0,255,136,.12);  --cat-bg-hover:rgba(0,255,136,.18);  --cat-bg-chip:rgba(0,255,136,.18); }
 .sidebar-cat[data-cat="macro"]             { --cat-color:#4da6ff; --cat-bg:rgba(77,166,255,.06); --cat-bg-open:rgba(77,166,255,.12); --cat-bg-hover:rgba(77,166,255,.18); --cat-bg-chip:rgba(77,166,255,.18); }
 .sidebar-cat[data-cat="crypto"]            { --cat-color:#f7931a; --cat-bg:rgba(247,147,26,.06); --cat-bg-open:rgba(247,147,26,.12); --cat-bg-hover:rgba(247,147,26,.20); --cat-bg-chip:rgba(247,147,26,.20); }

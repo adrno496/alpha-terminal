@@ -63,7 +63,14 @@ const MODULE_DETAILS = {
   get 'macro-events-calendar'() { return { icon: '🏛️', flow: 'Fed/BCE/CPI → Agenda 90 jours' }; },
   get 'performance-attribution'(){ return { icon: '📈', flow: 'Perf annuelle → Allocation + sélection (Brinson)' }; },
   // V13
-  get 'geopolitical-analysis'() { return { icon: '🌍', flow: 'Région + sujet → Risques + impact marchés + hedges' }; }
+  get 'geopolitical-analysis'() { return { icon: '🌍', flow: 'Région + sujet → Risques + impact marchés + hedges' }; },
+  // V14 — Daily brief
+  get 'daily-briefing'()        { return { icon: '🌅', flow: 'Café du matin · pulse + patrimoine + events + insights' }; },
+  get 'market-pulse'()          { return { icon: '🌐', flow: 'Heatmap crypto + FX · auto-refresh 60s · sans clé' }; },
+  get 'todays-actions'()        { return { icon: '🎯', flow: 'To-do investing · classé par urgence' }; },
+  get 'smart-alerts-center'()   { return { icon: '🔔', flow: 'Toutes les alertes · prix · watchpoints · events' }; },
+  get 'fear-greed'()            { return { icon: '🌡️', flow: 'Sentiment marché 0-100 · signal contrarien' }; },
+  get 'watchpoints'()           { return { icon: '📌', flow: 'Notes prix/IPO/event scannées par tous les modules' }; }
 };
 
 const FAQ_FR = [

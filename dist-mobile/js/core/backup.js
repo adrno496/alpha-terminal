@@ -2,9 +2,9 @@
 // Permet de migrer entre appareils (PC ↔ smartphone, ancien ↔ nouveau, etc.)
 
 const DB_NAME = 'alpha-terminal';
-const DB_VERSION = 9;
+const DB_VERSION = 10;
 
-const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts', 'goals'];
+const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts', 'goals', 'watchpoints'];
 
 // localStorage keys gérées par l'app (filtre pour ne pas exporter les clés du navigateur d'autres sites)
 const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:'];

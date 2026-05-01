@@ -10,7 +10,7 @@ const SNAPSHOT_STORE = 'wealth_snapshots';
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 9);
+    const req = indexedDB.open(DB_NAME, 10);
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('analyses')) {
@@ -53,6 +53,13 @@ function openDB() {
         const g = db.createObjectStore('goals', { keyPath: 'id' });
         g.createIndex('status', 'status', { unique: false });
         g.createIndex('targetDate', 'targetDate', { unique: false });
+      }
+      if (!db.objectStoreNames.contains('watchpoints')) {
+        const w = db.createObjectStore('watchpoints', { keyPath: 'id' });
+        w.createIndex('ticker', 'ticker', { unique: false });
+        w.createIndex('type', 'type', { unique: false });
+        w.createIndex('status', 'status', { unique: false });
+        w.createIndex('createdAt', 'createdAt', { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);

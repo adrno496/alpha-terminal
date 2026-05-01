@@ -91,6 +91,14 @@ import { renderPerformanceAttributionView } from './modules/performance-attribut
 // V13 — Analyse géopolitique
 import { renderGeopoliticalAnalysisView }   from './modules/geopolitical-analysis.js';
 
+// V14 — Daily brief category
+import { renderDailyBriefingView }     from './modules/daily-briefing.js';
+import { renderMarketPulseView }       from './modules/market-pulse.js';
+import { renderTodaysActionsView }     from './modules/todays-actions.js';
+import { renderSmartAlertsCenterView } from './modules/smart-alerts-center.js';
+import { renderFearGreedView }         from './modules/fear-greed.js';
+import { renderWatchpointsView }       from './modules/watchpoints.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -151,6 +159,13 @@ const ROUTES = {
   'performance-attribution':{ render: renderPerformanceAttributionView, label: '📈 Performance Attribution' },
   // V13
   'geopolitical-analysis': { render: renderGeopoliticalAnalysisView,   label: '🌍 Analyse géopolitique' },
+  // V14 — Daily brief
+  'daily-briefing':        { render: renderDailyBriefingView,          label: '🌅 Daily Briefing' },
+  'market-pulse':          { render: renderMarketPulseView,            label: '🌐 Market Pulse' },
+  'todays-actions':        { render: renderTodaysActionsView,          label: '🎯 Today’s Actions' },
+  'smart-alerts-center':   { render: renderSmartAlertsCenterView,      label: '🔔 Smart Alerts Center' },
+  'fear-greed':            { render: renderFearGreedView,              label: '🌡️ Fear & Greed' },
+  'watchpoints':           { render: renderWatchpointsView,            label: '📌 Mes points de surveillance' },
 };
 
 const STATE = { currentRoute: null };
