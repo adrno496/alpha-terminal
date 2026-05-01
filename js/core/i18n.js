@@ -572,6 +572,22 @@ const DICT = {
     'cat.tax-advanced': '🇫🇷 Fiscalité avancée & succession',
     'cat.esg': '🌍 ESG & impact',
 
+    // === Nouvelle organisation par parcours utilisateur (v3) ===
+    'cat.daily.title': '🌅 Mon matin',
+    'cat.daily.desc': 'Routine quotidienne : pulse marché, événements du jour, alertes prix et points de surveillance. Ouvre ces modules en premier chaque matin.',
+    'cat.wealth.title': '💼 Mon patrimoine',
+    'cat.wealth.desc': 'Vue complète de tes actifs, suivi des performances, projection long terme, dividendes, frais cachés et rééquilibrage.',
+    'cat.invest.title': '📊 Avant d\'investir',
+    'cat.invest.desc': 'Recherche fondamentale, valorisation DCF, audit Buffett, taille de position et tests de résistance — à utiliser AVANT chaque achat ou vente.',
+    'cat.market.title': '🌍 Comprendre le marché',
+    'cat.market.desc': 'Macro, géopolitique, sentiment retail, earnings calls et calendriers — pour contextualiser tes décisions.',
+    'cat.finance.title': '💰 Mes finances perso',
+    'cat.finance.desc': 'Budget mensuel, import CSV bancaire, abonnements récurrents, FIRE et frais — l\'argent du quotidien hors investissement.',
+    'cat.tax-fr.title': '🇫🇷 Fiscalité française',
+    'cat.tax-fr.desc': 'Optimisation impôts FR : enveloppes (PEA/AV/PER), tax-loss harvesting, IFI, donations, succession et documents notariés.',
+    'cat.specialty.title': '🛠 Spécialisé',
+    'cat.specialty.desc': 'Crypto fondamentale, whitepapers, ESG/impact et journal de trade — usages spécifiques.',
+
     // === Modules finances perso (V7) ===
     'mod.budget.label': '💰 Budget mensuel',
     'mod.budget.desc': 'Saisie revenus/dépenses + taux d\'épargne + projection long terme',
@@ -1313,6 +1329,22 @@ const DICT = {
     'cat.alerts-live': '🚨 Alerts & live',
     'cat.tax-advanced': '🇫🇷 Advanced tax & estate',
     'cat.esg': '🌍 ESG & impact',
+
+    // === Journey-based reorganization (v3) ===
+    'cat.daily.title': '🌅 My morning',
+    'cat.daily.desc': 'Daily routine: market pulse, today\'s events, price alerts and watchpoints. Open these first thing every morning.',
+    'cat.wealth.title': '💼 My wealth',
+    'cat.wealth.desc': 'Full asset overview, performance tracking, long-term projection, dividends, hidden fees and rebalancing.',
+    'cat.invest.title': '📊 Before investing',
+    'cat.invest.desc': 'Fundamental research, DCF valuation, Buffett audit, position sizing and stress tests — use BEFORE every buy or sell.',
+    'cat.market.title': '🌍 Understanding the market',
+    'cat.market.desc': 'Macro, geopolitics, retail sentiment, earnings calls and calendars — context for your decisions.',
+    'cat.finance.title': '💰 My personal finances',
+    'cat.finance.desc': 'Monthly budget, bank CSV import, recurring subscriptions, FIRE and fees — everyday money beyond investing.',
+    'cat.tax-fr.title': '🇫🇷 French taxation',
+    'cat.tax-fr.desc': 'FR tax optimization: tax wrappers (PEA/AV/PER), tax-loss harvesting, wealth tax (IFI), gifts, inheritance and notarial documents.',
+    'cat.specialty.title': '🛠 Specialty',
+    'cat.specialty.desc': 'Crypto fundamentals, whitepapers, ESG/impact and trade journal — specific use cases.',
 
     // === Personal finance modules (V7) ===
     'mod.budget.label': '💰 Monthly budget',

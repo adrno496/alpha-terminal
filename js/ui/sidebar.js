@@ -13,145 +13,112 @@ const ALWAYS_VISIBLE = [
   { id: 'knowledge-base',   num: '📚' }
 ];
 
-// Modules avancés groupés par catégorie
+// Modules avancés groupés par PARCOURS UTILISATEUR (au lieu de 14 silos techniques).
+// Chaque catégorie a une description éducative pour qu'un nouvel utilisateur
+// comprenne POURQUOI s'en servir, pas juste ce qu'elle contient.
 const CATEGORIES = [
   {
-    id: 'daily-brief',
-    titleKey: 'cat.daily-brief',
+    id: 'daily',
+    titleKey: 'cat.daily.title',
+    descKey: 'cat.daily.desc',
     modules: [
       { id: 'daily-briefing',       num: '🌅' },
       { id: 'market-pulse',         num: '🌐' },
       { id: 'todays-actions',       num: '🎯' },
       { id: 'smart-alerts-center',  num: '🔔' },
       { id: 'fear-greed',           num: '🌡️' },
-      { id: 'watchpoints',          num: '📌' }
+      { id: 'watchpoints',          num: '📌' },
+      { id: 'price-alerts',         num: '🚨' },
+      { id: 'live-watcher',         num: '📡' },
+      { id: 'insights-engine',      num: '💡' }
     ]
   },
   {
-    id: 'fundamentals',
-    titleKey: 'cat.fundamentals',
+    id: 'wealth',
+    titleKey: 'cat.wealth.title',
+    descKey: 'cat.wealth.desc',
     modules: [
-      { id: 'research-agent',  num: '00' },
-      { id: 'decoder-10k',     num: '01' },
-      { id: 'dcf',             num: '11' },
-      { id: 'investment-memo', num: '15' },
-      { id: 'pre-mortem',      num: '12' },
-      { id: 'stock-screener',  num: '13' },
-      { id: 'portfolio-audit', num: '19' }
+      { id: 'accounts-view',          num: '🏦' },
+      { id: 'wealth-method',          num: '🧭' },
+      { id: 'projection',             num: '📈' },
+      { id: 'goals',                  num: '🎯' },
+      { id: 'diversification-score',  num: '🎲' },
+      { id: 'performance-attribution',num: '📐' },
+      { id: 'correlation-matrix',     num: '🔗' },
+      { id: 'capital-gains-tracker',  num: '💎' },
+      { id: 'multi-currency-pnl',     num: '💱' },
+      { id: 'dividends-tracker',      num: '💸' },
+      { id: 'portfolio-rebalancer',   num: '⚖️' }
     ]
   },
   {
-    id: 'macro',
-    titleKey: 'cat.macro',
+    id: 'invest',
+    titleKey: 'cat.invest.title',
+    descKey: 'cat.invest.desc',
     modules: [
-      { id: 'macro-dashboard',       num: '02' },
-      { id: 'geopolitical-analysis', num: '47' },
-      { id: 'stress-test',           num: '17' },
-      { id: 'portfolio-rebalancer',  num: '05' },
-      { id: 'battle-mode',           num: '18' }
+      { id: 'research-agent',  num: '🔬' },
+      { id: 'decoder-10k',     num: '📑' },
+      { id: 'dcf',             num: '💹' },
+      { id: 'investment-memo', num: '📝' },
+      { id: 'pre-mortem',      num: '🛑' },
+      { id: 'stock-screener',  num: '🔎' },
+      { id: 'portfolio-audit', num: '🛡️' },
+      { id: 'position-sizing', num: '📏' },
+      { id: 'battle-mode',     num: '⚔️' },
+      { id: 'backtest',        num: '⏪' },
+      { id: 'stress-test',     num: '💥' }
     ]
   },
   {
-    id: 'crypto',
-    titleKey: 'cat.crypto',
+    id: 'market',
+    titleKey: 'cat.market.title',
+    descKey: 'cat.market.desc',
     modules: [
-      { id: 'crypto-fundamental', num: '03' },
-      { id: 'whitepaper-reader',  num: '07' }
+      { id: 'macro-dashboard',         num: '🌍' },
+      { id: 'geopolitical-analysis',   num: '🗺️' },
+      { id: 'macro-events-calendar',   num: '📅' },
+      { id: 'earnings-calendar',       num: '🏛️' },
+      { id: 'sentiment-tracker',       num: '📊' },
+      { id: 'earnings-call',           num: '🎙️' },
+      { id: 'youtube-transcript',      num: '▶️' },
+      { id: 'newsletter-investor',     num: '✉️' }
     ]
   },
   {
-    id: 'sentiment',
-    titleKey: 'cat.sentiment',
+    id: 'finance',
+    titleKey: 'cat.finance.title',
+    descKey: 'cat.finance.desc',
     modules: [
-      { id: 'sentiment-tracker', num: '08' },
-      { id: 'earnings-call',     num: '04' },
-      { id: 'newsletter-investor', num: '09' },
-      { id: 'youtube-transcript', num: '20' }
+      { id: 'budget',                 num: '💳' },
+      { id: 'csv-import',             num: '📥' },
+      { id: 'subscriptions-detector', num: '🔁' },
+      { id: 'fees-analysis',          num: '🔍' },
+      { id: 'fire-calculator',        num: '🔥' }
     ]
   },
   {
-    id: 'tools',
-    titleKey: 'cat.tools',
+    id: 'tax-fr',
+    titleKey: 'cat.tax-fr.title',
+    descKey: 'cat.tax-fr.desc',
     modules: [
-      { id: 'position-sizing', num: '10' },
-      { id: 'trade-journal',   num: '14' },
-      { id: 'fire-calculator', num: '16' }
+      { id: 'tax-optimizer-fr',       num: '🇫🇷' },
+      { id: 'tax-international',      num: '🌐' },
+      { id: 'envelope-optimizer',     num: '📦' },
+      { id: 'tax-loss-harvesting',    num: '✂️' },
+      { id: 'ifi-simulator',          num: '🏰' },
+      { id: 'donations-succession',   num: '🎁' },
+      { id: 'estate-doc-generator',   num: '📜' }
     ]
   },
   {
-    id: 'tax',
-    titleKey: 'cat.tax',
+    id: 'specialty',
+    titleKey: 'cat.specialty.title',
+    descKey: 'cat.specialty.desc',
     modules: [
-      { id: 'tax-optimizer-fr',  num: '06' },
-      { id: 'tax-international', num: '06b' }
-    ]
-  },
-  {
-    id: 'budget-daily',
-    titleKey: 'cat.budget-daily',
-    modules: [
-      { id: 'budget',                 num: '21' },
-      { id: 'csv-import',             num: '26' },
-      { id: 'subscriptions-detector', num: '35' }
-    ]
-  },
-  {
-    id: 'wealth-overview',
-    titleKey: 'cat.wealth-overview',
-    modules: [
-      { id: 'wealth-method',          num: '25' },
-      { id: 'accounts-view',          num: '32' },
-      { id: 'projection',             num: '31' },
-      { id: 'diversification-score',  num: '24' },
-      { id: 'performance-attribution',num: '46' },
-      { id: 'correlation-matrix',     num: '42' }
-    ]
-  },
-  {
-    id: 'income-costs',
-    titleKey: 'cat.income-costs',
-    modules: [
-      { id: 'dividends-tracker',      num: '23' },
-      { id: 'fees-analysis',          num: '22' },
-      { id: 'multi-currency-pnl',     num: '40' }
-    ]
-  },
-  {
-    id: 'planning-goals',
-    titleKey: 'cat.planning-goals',
-    modules: [
-      { id: 'goals',                  num: '30' },
-      { id: 'backtest',               num: '39' },
-      { id: 'capital-gains-tracker',  num: '38' }
-    ]
-  },
-  {
-    id: 'alerts-live',
-    titleKey: 'cat.alerts-live',
-    modules: [
-      { id: 'insights-engine',        num: '27' },
-      { id: 'price-alerts',           num: '28' },
-      { id: 'live-watcher',           num: '29' },
-      { id: 'earnings-calendar',      num: '41' },
-      { id: 'macro-events-calendar',  num: '45' }
-    ]
-  },
-  {
-    id: 'tax-advanced',
-    titleKey: 'cat.tax-advanced',
-    modules: [
-      { id: 'envelope-optimizer',     num: '36' },
-      { id: 'tax-loss-harvesting',    num: '34' },
-      { id: 'ifi-simulator',          num: '33' },
-      { id: 'donations-succession',   num: '37' },
-      { id: 'estate-doc-generator',   num: '44' }
-    ]
-  },
-  {
-    id: 'esg',
-    titleKey: 'cat.esg',
-    modules: [
-      { id: 'esg-impact',             num: '43' }
+      { id: 'crypto-fundamental', num: '🪙' },
+      { id: 'whitepaper-reader',  num: '📄' },
+      { id: 'esg-impact',         num: '🌱' },
+      { id: 'trade-journal',      num: '📓' }
     ]
   }
 ];
@@ -218,14 +185,16 @@ export function renderSidebar(onNavigate) {
     const openSet = new Set(JSON.parse(localStorage.getItem('alpha-terminal:sidebar-open-cats') || '[]'));
     // Toujours déplier la 1ère catégorie au tout premier affichage
     if (openSet.size === 0 && !localStorage.getItem('alpha-terminal:sidebar-cats-init')) {
-      // Ouvre par défaut la catégorie Daily brief (la plus utilisée au quotidien)
-      openSet.add('daily-brief');
+      // Ouvre par défaut la catégorie Daily (la plus utilisée au quotidien)
+      openSet.add('daily');
       localStorage.setItem('alpha-terminal:sidebar-cats-init', '1');
     }
     html += `<div class="sidebar-categories">`;
     html += CATEGORIES.map(cat => {
       const recoCount = cat.modules.filter(m => recoSet.has(m.id)).length;
       const isOpen = openSet.has(cat.id);
+      const desc = cat.descKey ? t(cat.descKey, '') : '';
+      const showDesc = desc && desc !== cat.descKey;
       return `
       <details class="sidebar-cat" data-cat="${cat.id}"${isOpen ? ' open' : ''}>
         <summary class="sidebar-cat-title">
@@ -234,6 +203,7 @@ export function renderSidebar(onNavigate) {
           <span class="sidebar-cat-count">${cat.modules.length}</span>
           ${recoCount > 0 ? `<span class="sidebar-cat-reco" title="${recoCount} recommandé${recoCount>1?'s':''}">⭐${recoCount}</span>` : ''}
         </summary>
+        ${showDesc ? `<div class="sidebar-cat-desc" style="font-size:11px;color:var(--text-muted);padding:4px 10px 8px;line-height:1.45;font-style:italic;">${desc}</div>` : ''}
         <div class="sidebar-cat-modules">
           ${cat.modules.map(m => `
             <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">

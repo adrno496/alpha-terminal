@@ -4,7 +4,7 @@ import { saveUserProfile, getUserProfile, markOnboardingSkipped } from '../core/
 import { getLocale } from '../core/i18n.js';
 import { toast } from '../core/utils.js';
 
-const STEPS = 5;
+const STEPS = 6;
 
 export function openOnboardingQuestionnaire({ onComplete = null, onSkip = null } = {}) {
   const isEN = getLocale() === 'en';
@@ -45,6 +45,9 @@ export function openOnboardingQuestionnaire({ onComplete = null, onSkip = null }
     } else if (step === 5) {
       title = isEN ? '⚙️ Experience & usage' : '⚙️ Expérience & usage';
       body = renderStep5(state, isEN);
+    } else if (step === 6) {
+      title = isEN ? '🚀 Quick start (optional)' : '🚀 Démarrage express (optionnel)';
+      body = renderStep6(state, isEN);
     }
 
     modal.innerHTML = `
@@ -80,14 +83,15 @@ export function openOnboardingQuestionnaire({ onComplete = null, onSkip = null }
         if (onSkip) onSkip();
       }
     });
-    modal.querySelector('#onb-next').addEventListener('click', () => {
+    modal.querySelector('#onb-next').addEventListener('click', async () => {
       // Validation step
       if (step === 1 && !state.country) { toast(isEN ? 'Please pick a country' : 'Choisis un pays', 'error'); return; }
-      if (step === 5) {
-        // Save + complete
+      if (step === 6) {
+        // Sauvegarde du profil + des holdings/watchlist saisis dans le quickstart
         saveUserProfile(state);
+        await persistQuickStart(state);
         close(true);
-        toast(isEN ? '🎉 Profile saved — recommendations ready!' : '🎉 Profil sauvegardé — recommandations prêtes !', 'success');
+        toast(isEN ? '🎉 Profile saved — you\'re all set!' : '🎉 Profil sauvegardé — tu es prêt !', 'success');
         if (onComplete) onComplete(state);
         return;
       }
@@ -133,26 +137,36 @@ function renderStep1(state, isEN) {
 }
 
 function renderStep2(state, isEN) {
+  // Auto-derive bracket category from precise income for backward-compat with le routing
   return `
-    <p style="font-size:12.5px;color:var(--text-muted);margin:0;">${isEN ? 'Approximate ranges — used to tailor suggestions, not stored exactly.' : 'Fourchettes approximatives — pour adapter les suggestions, pas stockées précisément.'}</p>
+    <p style="font-size:12.5px;color:var(--text-muted);margin:0;">${isEN
+      ? 'Precise figures — stored locally only, never sent. The whole app uses these to personalize tax/budget/cashflow analyses.'
+      : 'Chiffres précis — stockés localement, jamais envoyés. Toute l\'app les utilise pour personnaliser les analyses fiscales, budget, cashflow.'}</p>
 
-    <div class="field"><label class="field-label">${isEN ? 'Net monthly income' : 'Revenu mensuel net'}</label>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
-        ${radio('monthlyIncome', 'low',       isEN ? '< €2,000'           : '< 2 000 €',           state.monthlyIncome)}
-        ${radio('monthlyIncome', 'medium',    isEN ? '€2,000 – €5,000'    : '2 000 – 5 000 €',     state.monthlyIncome)}
-        ${radio('monthlyIncome', 'high',      isEN ? '€5,000 – €10,000'   : '5 000 – 10 000 €',    state.monthlyIncome)}
-        ${radio('monthlyIncome', 'very_high', isEN ? '> €10,000'          : '> 10 000 €',          state.monthlyIncome)}
+    <div class="field-row">
+      <div class="field"><label class="field-label">${isEN ? 'Net monthly salary (€)' : 'Salaire mensuel net (€)'}</label>
+        <input id="onb-salary" class="input" type="number" step="50" min="0" value="${state.salaryNet || ''}" placeholder="ex: 3500" />
+      </div>
+      <div class="field"><label class="field-label">${isEN ? 'Other monthly recurring income (€)' : 'Autres revenus mensuels récurrents (€)'}</label>
+        <input id="onb-other-income" class="input" type="number" step="10" min="0" value="${state.otherMonthlyIncome || ''}" placeholder="ex: 600 (loyers, dividendes…)" />
       </div>
     </div>
 
-    <div class="field"><label class="field-label">${isEN ? 'Total wealth (financial + real estate net)' : 'Patrimoine total (financier + immo net)'}</label>
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">
-        ${radio('wealthLevel', 'starting',         isEN ? '< €50K (starting out)'        : '< 50 K€ (en construction)',         state.wealthLevel)}
-        ${radio('wealthLevel', 'building',         isEN ? '€50K – €200K (building)'      : '50 K€ – 200 K€ (en accumulation)', state.wealthLevel)}
-        ${radio('wealthLevel', 'established',      isEN ? '€200K – €500K (established)'  : '200 K€ – 500 K€ (établi)',         state.wealthLevel)}
-        ${radio('wealthLevel', 'high_net_worth',   isEN ? '> €500K (high net worth)'     : '> 500 K€ (patrimoine élevé)',      state.wealthLevel)}
+    <div class="field-row">
+      <div class="field"><label class="field-label">${isEN ? 'Total monthly fixed charges (€)' : 'Charges fixes mensuelles totales (€)'}</label>
+        <input id="onb-charges" class="input" type="number" step="10" min="0" value="${state.monthlyCharges || ''}" placeholder="ex: 1800 (loyer/prêt, énergie, assurances, abonnements…)" />
+      </div>
+      <div class="field"><label class="field-label">${isEN ? 'Estimated variable spending (€/month)' : 'Dépenses variables estimées (€/mois)'}</label>
+        <input id="onb-variable-spending" class="input" type="number" step="10" min="0" value="${state.variableSpending || ''}" placeholder="ex: 800 (courses, loisirs, transport)" />
       </div>
     </div>
+
+    <div class="field"><label class="field-label">${isEN ? 'Total wealth (financial + real estate net of debt) (€)' : 'Patrimoine total (financier + immo net de dette) (€)'}</label>
+      <input id="onb-wealth" class="input" type="number" step="1000" min="0" value="${state.totalWealth || ''}" placeholder="ex: 145000" />
+      <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;">${isEN ? 'Or skip — Patrimoine module computes this from your holdings.' : 'Ou laisse vide — le module Patrimoine calcule ce total depuis tes positions.'}</div>
+    </div>
+
+    <div id="onb-cashflow-preview" style="background:var(--bg-tertiary);padding:10px;border-radius:6px;font-size:12.5px;color:var(--text-secondary);"></div>
 
     <div class="field" id="onb-tmi-row" style="display:${(state.country || 'fr') === 'fr' ? 'block' : 'none'};">
       <label class="field-label">${isEN ? 'Marginal tax bracket (FR — TMI)' : 'Tranche marginale d\'imposition (TMI FR)'}</label>
@@ -162,7 +176,6 @@ function renderStep2(state, isEN) {
         ${radio('tmiPct', '30', '30%', String(state.tmiPct))}
         ${radio('tmiPct', '41', '41%', String(state.tmiPct))}
         ${radio('tmiPct', '45', '45%', String(state.tmiPct))}
-        ${radio('tmiPct', '0',  isEN ? '?' : '?', String(state.tmiPct))}
       </div>
     </div>
   `;
@@ -256,6 +269,78 @@ function renderStep4(state, isEN) {
   `;
 }
 
+function renderStep6(state, isEN) {
+  // Initialise les buffers si absents
+  state._qsHoldings = Array.isArray(state._qsHoldings) ? state._qsHoldings : [
+    { ticker: '', name: '', category: 'etf', quantity: '', unitPrice: '', currency: 'EUR' }
+  ];
+  state._qsWatchCrypto = state._qsWatchCrypto || 'bitcoin,ethereum,solana';
+  state._qsWatchFx = state._qsWatchFx || 'USD,GBP,JPY,CHF';
+
+  const catOptions = [
+    ['stocks',      isEN ? '📈 Stock'         : '📈 Action'],
+    ['etf',         '📊 ETF'],
+    ['crypto',      isEN ? '🪙 Crypto'        : '🪙 Crypto'],
+    ['cash',        isEN ? '💵 Cash'          : '💵 Cash'],
+    ['bonds',       isEN ? '📜 Bond'          : '📜 Obligation'],
+    ['retirement',  isEN ? '🏦 Retirement'    : '🏦 Retraite (PEA/PER…)'],
+    ['real_estate', isEN ? '🏠 Real estate'   : '🏠 Immobilier'],
+    ['commodities', isEN ? '🥇 Commodity'     : '🥇 Or / matières'],
+    ['other',       isEN ? '· Other'          : '· Autre']
+  ];
+
+  const rowHtml = (h, idx) => `
+    <div class="qs-row" data-idx="${idx}" style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 30px;gap:6px;align-items:center;margin-bottom:6px;">
+      <input class="input qs-name" data-field="name" type="text" placeholder="${isEN ? 'Name (Apple, BTC, RP Lyon…)' : 'Nom (Apple, BTC, RP Lyon…)'}" value="${(h.name||'').replace(/"/g,'&quot;')}" style="font-size:12px;" />
+      <select class="input qs-cat" data-field="category" style="font-size:12px;">
+        ${catOptions.map(([id, lbl]) => `<option value="${id}" ${h.category===id?'selected':''}>${lbl}</option>`).join('')}
+      </select>
+      <input class="input qs-ticker" data-field="ticker" type="text" placeholder="AAPL, BTC, CW8.PA…" value="${(h.ticker||'').replace(/"/g,'&quot;')}" style="font-size:12px;text-transform:uppercase;" />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+        <input class="input qs-qty" data-field="quantity" type="number" step="any" min="0" placeholder="${isEN ? 'Qty' : 'Qté'}" value="${h.quantity||''}" style="font-size:12px;" />
+        <input class="input qs-price" data-field="unitPrice" type="number" step="0.01" min="0" placeholder="${isEN ? 'Unit €' : 'PU €'}" value="${h.unitPrice||''}" style="font-size:12px;" />
+      </div>
+      <button type="button" class="btn-ghost qs-del" data-idx="${idx}" title="${isEN ? 'Remove' : 'Retirer'}" style="color:var(--accent-red);font-size:14px;">×</button>
+    </div>
+  `;
+
+  return `
+    <p style="font-size:12.5px;color:var(--text-secondary);margin:0;">
+      ${isEN
+        ? 'Add a few of your current positions and tickers you want to monitor — so you don\'t have to re-enter them later. <strong>All optional</strong>: skip if you prefer to add them in the Patrimoine module.'
+        : 'Saisis quelques positions actuelles et tickers à surveiller — tu n\'auras pas à les ressaisir plus tard. <strong>Tout est optionnel</strong> : passe si tu préfères les ajouter depuis Patrimoine.'}
+    </p>
+
+    <div class="card" style="padding:12px;">
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;">💼 ${isEN ? 'Your first holdings' : 'Tes premières positions'}</div>
+      <div id="qs-holdings-list">
+        ${state._qsHoldings.map(rowHtml).join('')}
+      </div>
+      <button type="button" id="qs-add-holding" class="btn-secondary" style="font-size:12px;">+ ${isEN ? 'Add another' : 'Ajouter une autre'}</button>
+      <div style="font-size:10.5px;color:var(--text-muted);margin-top:6px;">${isEN ? 'Saved to Patrimoine. Auto-refresh prices later if you add Twelve Data / FMP / Finnhub keys in Settings → Data keys.' : 'Sauvegardé dans Patrimoine. Refresh auto des prix plus tard si tu ajoutes une clé Twelve Data / FMP / Finnhub dans Settings → Data keys.'}</div>
+    </div>
+
+    <div class="card" style="padding:12px;">
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;">🌐 ${isEN ? 'Your daily Market Pulse' : 'Ton pulse marché quotidien'}</div>
+      <div class="field">
+        <label class="field-label">${isEN ? 'Crypto IDs to watch (CoinGecko, comma-separated)' : 'IDs crypto à surveiller (CoinGecko, séparés par virgules)'}</label>
+        <input id="qs-watch-crypto" class="input" type="text" value="${state._qsWatchCrypto.replace(/"/g,'&quot;')}" placeholder="bitcoin,ethereum,solana,…" />
+      </div>
+      <div class="field">
+        <label class="field-label">${isEN ? 'FX targets (vs EUR, ISO codes)' : 'Devises FX cibles (vs EUR, codes ISO)'}</label>
+        <input id="qs-watch-fx" class="input" type="text" value="${state._qsWatchFx.replace(/"/g,'&quot;')}" placeholder="USD,GBP,JPY,CHF,…" />
+      </div>
+      <div style="font-size:10.5px;color:var(--text-muted);">${isEN ? 'Visible every morning in Daily Briefing and Market Pulse modules. Editable later via the ⚙️ button on each.' : 'Visible chaque matin dans les modules Daily Briefing et Market Pulse. Modifiable via le bouton ⚙️ sur chaque module.'}</div>
+    </div>
+
+    <div style="padding:10px;background:rgba(0,255,136,0.05);border-left:3px solid var(--accent-green);border-radius:4px;font-size:12px;color:var(--text-secondary);line-height:1.55;">
+      ${isEN
+        ? '<strong>What\'s next:</strong><br>1️⃣ Open <em>🌅 Daily Briefing</em> for your morning routine.<br>2️⃣ Click <em>⚡ Quick Analysis</em> for an instant verdict on any ticker.<br>3️⃣ Browse advanced modules in the sidebar — each has a <em>?</em> help icon.'
+        : '<strong>La suite :</strong><br>1️⃣ Ouvre <em>🌅 Daily Briefing</em> pour ta routine matinale.<br>2️⃣ Clique <em>⚡ Quick Analysis</em> pour un verdict express sur n\'importe quel ticker.<br>3️⃣ Explore les modules avancés dans la sidebar — chacun a une icône <em>?</em> d\'aide.'}
+    </div>
+  `;
+}
+
 function renderStep5(state, isEN) {
   return `
     <div class="field"><label class="field-label">${isEN ? 'Investing experience' : 'Expérience en investissement'}</label>
@@ -319,6 +404,72 @@ function bindStepFields(state, isEN, step) {
     root.querySelector('#onb-age')?.addEventListener('input', (e) => { state.age = parseInt(e.target.value, 10) || null; });
   }
 
+  // Inputs spécifiques step 6 (quick start : holdings + watchlist)
+  if (step === 6) {
+    const list = root.querySelector('#qs-holdings-list');
+    const wireRow = (rowEl) => {
+      const idx = +rowEl.dataset.idx;
+      rowEl.querySelectorAll('[data-field]').forEach(el => {
+        el.addEventListener('input', () => {
+          const f = el.getAttribute('data-field');
+          let v = el.value;
+          if (f === 'quantity' || f === 'unitPrice') v = parseFloat(v) || '';
+          if (f === 'ticker') v = String(v || '').toUpperCase();
+          state._qsHoldings[idx][f] = v;
+        });
+        el.addEventListener('change', () => {
+          const f = el.getAttribute('data-field');
+          state._qsHoldings[idx][f] = el.value;
+        });
+      });
+      rowEl.querySelector('.qs-del')?.addEventListener('click', () => {
+        state._qsHoldings.splice(idx, 1);
+        if (state._qsHoldings.length === 0) {
+          state._qsHoldings.push({ ticker: '', name: '', category: 'etf', quantity: '', unitPrice: '', currency: 'EUR' });
+        }
+        render();
+      });
+    };
+    list.querySelectorAll('.qs-row').forEach(wireRow);
+
+    root.querySelector('#qs-add-holding')?.addEventListener('click', () => {
+      state._qsHoldings.push({ ticker: '', name: '', category: 'etf', quantity: '', unitPrice: '', currency: 'EUR' });
+      render();
+    });
+
+    root.querySelector('#qs-watch-crypto')?.addEventListener('input', e => { state._qsWatchCrypto = e.target.value; });
+    root.querySelector('#qs-watch-fx')?.addEventListener('input', e => { state._qsWatchFx = e.target.value; });
+  }
+
+  // Inputs spécifiques step 2 (situation financière précise)
+  if (step === 2) {
+    const refreshCashflow = () => {
+      const inc = (Number(state.salaryNet) || 0) + (Number(state.otherMonthlyIncome) || 0);
+      const out = (Number(state.monthlyCharges) || 0) + (Number(state.variableSpending) || 0);
+      const cf = inc - out;
+      const el = root.querySelector('#onb-cashflow-preview');
+      if (!el) return;
+      if (!inc && !out) { el.innerHTML = ''; return; }
+      const color = cf >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+      const sign = cf >= 0 ? '+' : '';
+      el.innerHTML = `${isEN ? 'Estimated monthly cashflow' : 'Cashflow mensuel estimé'} : <strong style="color:${color};">${sign}${Math.round(cf).toLocaleString('fr-FR')} €</strong> · ${isEN ? 'savings rate' : 'taux d\'épargne'} : <strong>${inc > 0 ? Math.round((cf / inc) * 100) : 0}%</strong>`;
+    };
+    const bind = (id, field, parse = parseFloat) => {
+      const el = root.querySelector('#' + id);
+      if (!el) return;
+      el.addEventListener('input', (e) => {
+        state[field] = parse(e.target.value) || 0;
+        refreshCashflow();
+      });
+    };
+    bind('onb-salary',             'salaryNet');
+    bind('onb-other-income',       'otherMonthlyIncome');
+    bind('onb-charges',            'monthlyCharges');
+    bind('onb-variable-spending',  'variableSpending');
+    bind('onb-wealth',             'totalWealth');
+    refreshCashflow();
+  }
+
   // Radio (single)
   root.querySelectorAll('input[type="radio"]').forEach(r => {
     r.addEventListener('change', () => {
@@ -348,4 +499,50 @@ function bindStepFields(state, isEN, step) {
       if (lbl) lbl.style.background = c.checked ? 'var(--bg-tertiary)' : 'transparent';
     });
   });
+}
+
+// Persiste les données du Quick Start (étape 6) :
+//   - holdings → IndexedDB store wealth via saveHolding()
+//   - pulse watchlist → localStorage (lue par daily-briefing.js + market-pulse.js)
+// Idempotent : on ne crée pas de doublons si l'utilisateur revient et re-soumet.
+async function persistQuickStart(state) {
+  // 1. Watchlist Pulse — sauvegarde directe en localStorage si renseigné
+  try {
+    const { setPulseWatchlist } = await import('../modules/daily-briefing.js');
+    const crypto = String(state._qsWatchCrypto || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+    const fx = String(state._qsWatchFx || '').split(',').map(s => s.trim().toUpperCase()).filter(Boolean);
+    if (crypto.length || fx.length) {
+      setPulseWatchlist({
+        crypto: crypto.length ? crypto : ['bitcoin', 'ethereum', 'solana'],
+        fx:     fx.length     ? fx     : ['USD', 'GBP', 'JPY', 'CHF']
+      });
+    }
+  } catch (e) { console.warn('[onboarding] pulse watchlist persist skipped:', e); }
+
+  // 2. Holdings — saveHolding() pour chaque ligne avec un nom OU ticker valide
+  try {
+    const { saveHolding } = await import('../core/wealth.js');
+    const { uuid } = await import('../core/utils.js');
+    const rows = Array.isArray(state._qsHoldings) ? state._qsHoldings : [];
+    for (const h of rows) {
+      const name = String(h.name || '').trim();
+      const ticker = String(h.ticker || '').trim().toUpperCase();
+      if (!name && !ticker) continue;
+      const qty = Number(h.quantity) || 0;
+      const unit = Number(h.unitPrice) || 0;
+      await saveHolding({
+        id: uuid(),
+        name: name || ticker,
+        ticker: ticker || null,
+        category: h.category || 'other',
+        quantity: qty,
+        unitPrice: unit,
+        value: +(qty * unit).toFixed(2),
+        currency: h.currency || 'EUR',
+        autoValue: !!ticker, // refresh auto si on a un ticker
+        notes: 'Saisi pendant l\'onboarding',
+        createdAt: new Date().toISOString()
+      });
+    }
+  } catch (e) { console.warn('[onboarding] holdings persist failed:', e); }
 }

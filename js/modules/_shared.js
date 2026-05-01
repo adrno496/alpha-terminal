@@ -572,6 +572,24 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
     } catch (e) { console.warn('Data context injection skipped:', e.message); }
   }
 
+  // FINANCE CONTEXT : profil utilisateur (salaire, charges, TMI, objectifs) — toujours injecté
+  // si rempli dans le questionnaire d'onboarding. Permet à toutes les analyses fiscales,
+  // FIRE, budget, audit patrimoine, etc. d'être personnalisées sans demander à chaque fois.
+  try {
+    const { buildFinanceContext } = await import('../core/user-profile.js');
+    const finBlock = buildFinanceContext();
+    if (finBlock) {
+      messages = messages.map(m => ({ ...m }));
+      const last = messages[messages.length - 1];
+      if (typeof last.content === 'string') last.content = finBlock + last.content;
+      else if (Array.isArray(last.content)) {
+        const txt = last.content.find(b => b.type === 'text');
+        if (txt) txt.text = finBlock + txt.text;
+        else last.content.unshift({ type: 'text', text: finBlock });
+      }
+    }
+  } catch (e) { console.warn('Finance context skipped:', e.message); }
+
   // WEALTH CONTEXT : si l'utilisateur a activé le toggle pour ce module, injecte son patrimoine
   try {
     const { isWealthContextEnabledFor, buildWealthContext } = await import('../core/wealth.js');
