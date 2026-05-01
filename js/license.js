@@ -12,6 +12,13 @@
   class LicenseManager {
     constructor() {
       this.storageKey = 'alpha-license-key';
+      this.instanceKey = 'alpha-license-instance-id';
+    }
+
+    _instanceName() {
+      // Identifiant lisible côté dashboard Lemonsqueezy (1 ligne par device)
+      const ua = (navigator.userAgent || '').slice(0, 60);
+      return `alpha-terminal-web · ${ua}`;
     }
 
     // Valide le format UUID 8-4-4-4-12 hex (case-insensitive)
@@ -50,10 +57,38 @@
       if (!data || data.valid !== true) {
         return { success: false, error: 'Clé inconnue ou invalide. Vérifie l\'email reçu après l\'achat.' };
       }
-      const status = data.license_key?.status;
+      let status = data.license_key?.status;
+
+      // Une clé fraîche est "inactive" tant qu'on ne l'a pas activée sur une
+      // instance. On le fait de manière transparente ici : POST /activate
+      // avec un instance_name lisible (UA tronqué). L'instance_id retourné
+      // est stocké pour pouvoir désactiver plus tard si besoin.
+      if (status === 'inactive') {
+        try {
+          const actRes = await fetch('https://api.lemonsqueezy.com/v1/licenses/activate', {
+            method: 'POST',
+            headers: { 'Accept': 'application/json' },
+            body: new URLSearchParams({
+              license_key: normalized,
+              instance_name: this._instanceName()
+            })
+          });
+          const actData = await actRes.json();
+          if (!actData?.activated) {
+            const errMsg = actData?.error || 'activation refusée';
+            return { success: false, error: `Activation impossible : ${errMsg}. Limite d'appareils atteinte ?` };
+          }
+          if (actData.instance?.id) {
+            try { localStorage.setItem(this.instanceKey, actData.instance.id); } catch {}
+          }
+          status = actData.license_key?.status || 'active';
+        } catch (e) {
+          return { success: false, error: 'Impossible d\'activer la clé chez Lemonsqueezy. Réessaie.' };
+        }
+      }
+
       if (status !== 'active') {
         const map = {
-          inactive: 'Clé inactive — non encore activée chez Lemonsqueezy.',
           expired: 'Clé expirée — l\'abonnement n\'est plus valide.',
           disabled: 'Clé désactivée — abonnement annulé ou remboursé.'
         };
@@ -110,10 +145,13 @@
       const key = this.getLicense();
       if (!key || !this.validateFormat(key)) return false;
       try {
+        const params = new URLSearchParams({ license_key: key });
+        const instanceId = (() => { try { return localStorage.getItem(this.instanceKey); } catch { return null; } })();
+        if (instanceId) params.set('instance_id', instanceId);
         const res = await fetch('https://api.lemonsqueezy.com/v1/licenses/validate', {
           method: 'POST',
           headers: { 'Accept': 'application/json' },
-          body: new URLSearchParams({ license_key: key })
+          body: params
         });
         const data = await res.json();
         const status = data?.license_key?.status;
@@ -144,6 +182,7 @@
         localStorage.removeItem(this.storageKey);
         localStorage.removeItem('isPremium');
         localStorage.removeItem('alpha-license-checked-at');
+        localStorage.removeItem(this.instanceKey);
       } catch {}
       window.dispatchEvent(new CustomEvent('alpha:licenseRevoked'));
       window.dispatchEvent(new CustomEvent('alpha:premiumChanged', {
