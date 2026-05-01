@@ -97,14 +97,16 @@ const CATEGORIES = [
     ]
   },
   {
-    id: 'tax-fr',
-    titleKey: 'cat.tax-fr.title',
-    descKey: 'cat.tax-fr.desc',
+    id: 'taxation',
+    titleKey: 'cat.taxation.title',
+    descKey: 'cat.taxation.desc',
     modules: [
+      // Universaux / multi-pays en premier (l'app est utilisée mondialement)
+      { id: 'tax-international',      num: '🌐' },  // 9 pays : US, UK, BE, CH, ES, DE, IT, PT, FR
+      { id: 'tax-loss-harvesting',    num: '✂️' },  // concept universel (CTO toutes juridictions)
+      // Spécifiques France marqués 🇫🇷 dans leur label
       { id: 'tax-optimizer-fr',       num: '🇫🇷' },
-      { id: 'tax-international',      num: '🌐' },
       { id: 'envelope-optimizer',     num: '📦' },
-      { id: 'tax-loss-harvesting',    num: '✂️' },
       { id: 'ifi-simulator',          num: '🏰' },
       { id: 'donations-succession',   num: '🎁' },
       { id: 'estate-doc-generator',   num: '📜' }

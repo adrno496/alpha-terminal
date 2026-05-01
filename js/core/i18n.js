@@ -583,8 +583,8 @@ const DICT = {
     'cat.market.desc': 'Macro, géopolitique, sentiment retail, earnings calls et calendriers — pour contextualiser tes décisions.',
     'cat.finance.title': '💰 Mes finances perso',
     'cat.finance.desc': 'Budget mensuel, import CSV bancaire, abonnements récurrents, FIRE et frais — l\'argent du quotidien hors investissement.',
-    'cat.tax-fr.title': '🇫🇷 Fiscalité française',
-    'cat.tax-fr.desc': 'Optimisation impôts FR : enveloppes (PEA/AV/PER), tax-loss harvesting, IFI, donations, succession et documents notariés.',
+    'cat.taxation.title': '💰 Fiscalité',
+    'cat.taxation.desc': 'Optimisation fiscale multi-pays : analyse comparée 9 pays (US, UK, BE, CH, ES, DE, IT, PT, FR) + tax-loss harvesting universel. Modules dédiés 🇫🇷 pour la France : PEA/AV/PER, IFI, donations, succession, documents notariés.',
     'cat.specialty.title': '🛠 Spécialisé',
     'cat.specialty.desc': 'Crypto fondamentale, whitepapers, ESG/impact et journal de trade — usages spécifiques.',
 
@@ -1341,8 +1341,8 @@ const DICT = {
     'cat.market.desc': 'Macro, geopolitics, retail sentiment, earnings calls and calendars — context for your decisions.',
     'cat.finance.title': '💰 My personal finances',
     'cat.finance.desc': 'Monthly budget, bank CSV import, recurring subscriptions, FIRE and fees — everyday money beyond investing.',
-    'cat.tax-fr.title': '🇫🇷 French taxation',
-    'cat.tax-fr.desc': 'FR tax optimization: tax wrappers (PEA/AV/PER), tax-loss harvesting, wealth tax (IFI), gifts, inheritance and notarial documents.',
+    'cat.taxation.title': '💰 Taxation',
+    'cat.taxation.desc': 'Multi-country tax optimization: 9-country comparison (US, UK, BE, CH, ES, DE, IT, PT, FR) + universal tax-loss harvesting. France-specific modules 🇫🇷: PEA/AV/PER wrappers, wealth tax (IFI), gifts, inheritance and notarial documents.',
     'cat.specialty.title': '🛠 Specialty',
     'cat.specialty.desc': 'Crypto fundamentals, whitepapers, ESG/impact and trade journal — specific use cases.',
 

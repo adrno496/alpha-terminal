@@ -3,6 +3,7 @@
 
 User-agent: *
 Allow: /
+Crawl-delay: 1
 
 # Crawl-friendly : pages SEO publiques
 Allow: /index.html
@@ -10,8 +11,17 @@ Allow: /features.html
 Allow: /pricing.html
 Allow: /bloomberg-alternative.html
 Allow: /ai-stock-analysis-guide.html
+Allow: /api-costs.html
+Allow: /api-keys-guide.html
+Allow: /about.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /legal.html
 
 # Bloque les ressources non-utiles au SEO
+Disallow: /js/
+Disallow: /icons/
+Disallow: /screenshots/
 Disallow: /android/
 Disallow: /dist/
 Disallow: /dist-mobile/

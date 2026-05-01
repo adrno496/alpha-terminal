@@ -10,6 +10,7 @@
   <meta name="keywords" content="analyse boursière ia, terminal financier ia, bloomberg alternative, ai stock analysis, byok ai finance, dcf calculator ia, 10-k decoder ia, alpha terminal, abonnement ia finance" />
   <meta name="author" content="Alpha" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="application-name" content="Alpha Terminal" />
   <link rel="canonical" href="https://alpha-terminal.app/" />
   <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/" />
   <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/?lang=en" />
@@ -32,6 +33,8 @@
   <meta name="twitter:title" content="Alpha — 46+ modules d'IA financière, 9,99€/mois" />
   <meta name="twitter:description" content="Terminal d'analyse fondamentale IA · BYOK · 100% privé · 14 LLMs au choix." />
   <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta name="twitter:site" content="@AlphaTerminal" />
+  <meta name="twitter:creator" content="@AlphaTerminal" />
 
   <!-- ====== TECH ====== -->
   <meta name="theme-color" content="#00ff88" />
@@ -41,7 +44,26 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #111;
+      --accent-green: #00ff88;
+      --text-primary: #fff;
+      --text-secondary: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.08);
+      --font-sans: 'Inter', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  </style>
+  <link rel="preload" href="styles.css" as="style" />
   <link rel="stylesheet" href="styles.css" />
 
   <!-- ====== JSON-LD : SoftwareApplication + Organization ====== -->
@@ -95,6 +117,10 @@
       "bestRating": "5"
     },
     "softwareVersion": "2.1.0",
+    "screenshot": [
+      { "@type": "ImageObject", "url": "https://alpha-terminal.app/screenshots/dashboard.png", "caption": "Dashboard analyse financière IA — 46 modules" },
+      { "@type": "ImageObject", "url": "https://alpha-terminal.app/screenshots/10k-decoder.png", "caption": "10-K Decoder — analyse rapport annuel en 30 secondes" }
+    ],
     "publisher": {
       "@type": "Organization",
       "name": "Alpha",
@@ -102,6 +128,37 @@
       "email": "savetheworldfr@gmail.com",
       "sameAs": []
     }
+  }
+  </script>
+
+  <!-- ====== VideoObject (placeholder, à activer quand la vidéo est uploadée) ======
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "name": "Alpha Terminal — démonstration analyse 10-K en 30 secondes",
+    "description": "Démonstration complète du terminal Alpha : analyse fondamentale, DCF, CEO Forensics, Tax Optimizer.",
+    "thumbnailUrl": "https://alpha-terminal.app/video-thumb.jpg",
+    "uploadDate": "2026-05-01",
+    "duration": "PT1M30S",
+    "embedUrl": "https://www.youtube.com/embed/XXXX",
+    "publisher": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/" }
+  }
+  </script>
+  -->
+
+  <!-- ====== JSON-LD : Event (lancement v2.1) ====== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": "Alpha v2.1 — 46 modules d'analyse financière IA disponibles",
+    "startDate": "2026-05-01",
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OnlineEventAttendanceMode",
+    "location": { "@type": "VirtualLocation", "url": "https://alpha-terminal.app/" },
+    "organizer": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/" },
+    "description": "Lancement de la version 2.1 d'Alpha Terminal avec 46 modules d'analyse financière IA, BYOK, 14 LLMs."
   }
   </script>
 
@@ -117,13 +174,73 @@
     "publisher": { "@type": "Organization", "name": "Alpha" }
   }
   </script>
+
+  <!-- ====== JSON-LD : FAQPage (statique pour Google — la FAQ est rendue par JS) ====== -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Faut-il être développeur pour utiliser l'app ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Non. Tu télécharges, tu colles ta clé API, et tu utilises les 46 modules comme une app classique. Aucune ligne de code n'est requise." }
+      },
+      {
+        "@type": "Question",
+        "name": "Quels providers d'IA sont supportés ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "14 providers : Anthropic Claude, OpenAI, Google Gemini, xAI Grok, OpenRouter, Perplexity, Mistral, Cerebras, GitHub Models, NVIDIA NIM, Hugging Face, Cloudflare Workers AI, Together AI, Cohere. Une seule clé suffit pour démarrer ; plus tu en mets, plus l'app sélectionne le meilleur modèle pour chaque tâche." }
+      },
+      {
+        "@type": "Question",
+        "name": "Comment créer une clé API ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Liens directs dans le wizard de configuration. Pour démarrer rapidement : Claude (console.anthropic.com), OpenAI (platform.openai.com) ou Gemini (aistudio.google.com). GitHub Models est gratuit (rate-limit) avec un PAT GitHub." }
+      },
+      {
+        "@type": "Question",
+        "name": "Mes données sont-elles vraiment privées ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Oui, 100%. L'app appelle l'API du provider directement depuis ton navigateur. Aucun serveur intermédiaire Alpha. Tes clés API sont chiffrées localement (AES-GCM 256 + PBKDF2 100K iterations). Toutes tes analyses sont stockées dans IndexedDB local." }
+      },
+      {
+        "@type": "Question",
+        "name": "Combien ça coûte par analyse ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Variable selon module et provider. Quick Analysis : ~$0.005-0.02. 10-K Decoder : ~$0.05-1.00. Position Sizing : ~$0.01. Sentiment scan : ~$0.05-0.20 (web search facturé en plus). Cerebras et GitHub Models offrent un tier quasi-gratuit. Tu paies au provider directement." }
+      },
+      {
+        "@type": "Question",
+        "name": "Comment fonctionne la mémoire patrimoine ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Le module Patrimoine stocke localement tes holdings (actions, ETF, crypto, immo, cash). Chaque module peut activer Use my wealth pour injecter ce contexte dans l'analyse — l'IA adapte ses recommandations à TA situation réelle. Auto-refresh des prix via 11 data providers (FMP, Polygon, Finnhub, CoinGecko, etc.)." }
+      },
+      {
+        "@type": "Question",
+        "name": "Qu'est-ce que la Knowledge Base (RAG) ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Tu indexes tes notes, theses, PDFs personnels. L'app utilise les embeddings OpenAI pour la recherche sémantique. Active le toggle KB dans n'importe quel module — tes documents pertinents sont auto-injectés dans le prompt. Sans clé OpenAI : fallback keyword matching." }
+      },
+      {
+        "@type": "Question",
+        "name": "Que se passe-t-il si je n'ai qu'une seule clé API ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Tous les 46 modules tournent. Pour les modules PDF, si ton provider ne supporte pas le PDF natif (OpenAI, Grok, Mistral), l'app extrait le texte côté client. Tout fonctionne." }
+      },
+      {
+        "@type": "Question",
+        "name": "Compatible mobile ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Oui. Build Android natif via Capacitor 8 (Google Play). Sidebar drawer, formulaires single-column, modales plein écran. iOS également supporté (build Xcode requis)." }
+      },
+      {
+        "@type": "Question",
+        "name": "Que se passe-t-il si je perds mon mot de passe ?",
+        "acceptedAnswer": { "@type": "Answer", "text": "Tes clés API sont chiffrées avec ce mot de passe. Sans le mot de passe, tu ne peux pas récupérer le vault. Tu peux le reset (effacer les clés) et recommencer la config — tes analyses passées restent accessibles." }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- Welcome / Lock modal -->
   <div id="lock-modal" class="modal-overlay hidden">
     <div class="modal">
       <div class="modal-header">
-        <img src="icons/logo.png" alt="Alpha" class="modal-logo-img" />
+        <img src="icons/logo.png" alt="Alpha" class="modal-logo-img" loading="lazy" />
         <span class="logo-mark">Alpha</span>
       </div>
       <div id="lock-modal-body"></div>
@@ -149,7 +266,7 @@
 
     <nav class="landing-nav">
       <div class="landing-logo">
-        <img src="icons/logo.png" alt="Alpha" class="landing-logo-img" />
+        <img src="icons/logo.png" alt="Alpha" class="landing-logo-img" loading="lazy" />
         <span class="logo-mark">Alpha</span>
       </div>
       <div class="landing-nav-links">
@@ -168,7 +285,7 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero-inner">
-        <img src="icons/logo.png" alt="Alpha" class="hero-logo" />
+        <img src="icons/logo.png" alt="Alpha" class="hero-logo" fetchpriority="high" />
         <h1 class="hero-title">Alpha<span class="alpha-mark">α</span></h1>
         <p style="font-size:14px;letter-spacing:0.04em;color:var(--text-muted);font-weight:500;text-transform:uppercase;margin:0 0 18px;">AI Investing Terminal • BYOK</p>
         <h2 class="hero-sub" data-i18n-html="land.new.hero_sub"></h2>
@@ -364,10 +481,10 @@
     <footer class="landing-footer">
       <span>Alpha · v2.1 · Made in France 🇫🇷</span>
       <span class="footer-legal-links">
-        <a href="#" data-legal="about">À propos</a> ·
-        <a href="#" data-legal="privacy">Politique de confidentialité</a> ·
-        <a href="#" data-legal="terms">CGU</a> ·
-        <a href="#" data-legal="legal">Mentions légales</a>
+        <a href="about.html">À propos</a> ·
+        <a href="privacy.html">Politique de confidentialité</a> ·
+        <a href="terms.html">CGU</a> ·
+        <a href="legal.html">Mentions légales</a>
       </span>
     </footer>
   </div>
@@ -376,7 +493,7 @@
   <div id="app" class="app hidden">
     <aside class="sidebar">
       <div class="sidebar-logo">
-        <img src="icons/logo.png" alt="Alpha" class="sidebar-logo-img" />
+        <img src="icons/logo.png" alt="Alpha" class="sidebar-logo-img" loading="lazy" />
         <span class="logo-mark">Alpha</span>
       </div>
       <nav id="sidebar-nav" class="sidebar-nav"></nav>
@@ -399,8 +516,8 @@
           <button id="hamburger" class="hamburger-btn" aria-label="Menu">
             <span></span><span></span><span></span>
           </button>
-          <img src="icons/logo.png" alt="Alpha" class="topbar-logo" />
-          <h1 id="active-title" class="active-title">Alpha</h1>
+          <img src="icons/logo.png" alt="Alpha" class="topbar-logo" loading="lazy" />
+          <span id="active-title" class="active-title" role="heading" aria-level="2">Alpha</span>
           <span id="active-subtitle" class="active-subtitle">AI Investing Terminal • BYOK</span>
         </div>
         <div class="topbar-right">

@@ -54,6 +54,7 @@
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-costs.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-costs.html?lang=en" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-costs.html" />
   </url>
 
@@ -63,7 +64,48 @@
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-keys-guide.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-keys-guide.html?lang=en" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-keys-guide.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/about.html</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/about.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/about.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/about.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/legal.html</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/legal.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/legal.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/legal.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/privacy.html</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/privacy.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/privacy.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/terms.html</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/terms.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/terms.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/terms.html" />
   </url>
 
 </urlset>

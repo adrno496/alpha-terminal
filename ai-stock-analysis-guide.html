@@ -10,6 +10,8 @@
   <meta name="keywords" content="ai stock analysis, analyse boursière ia, claude vs gpt finance, intelligence artificielle bourse, ia investissement, prompt engineering finance, ai dcf, ai 10-k analysis, byok finance, analyse fondamentale ia" />
   <meta name="author" content="Alpha" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <meta name="application-name" content="Alpha Terminal" />
+  <meta name="news_keywords" content="analyse boursière IA, claude vs chatgpt finance, ia investissement 2026" />
   <link rel="canonical" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
   <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
   <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
@@ -37,13 +39,30 @@
   <meta name="twitter:title" content="Guide 2026 : analyser la bourse avec l'IA" />
   <meta name="twitter:description" content="Claude vs GPT vs Gemini pour le DCF, 10-K, sentiment. BYOK = $0.01/analyse." />
   <meta name="twitter:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta name="twitter:site" content="@AlphaTerminal" />
+  <meta name="twitter:creator" content="@AlphaTerminal" />
 
   <!-- ====== ICON / FONTS / STYLE ====== -->
   <meta name="theme-color" content="#00ff88" />
   <link rel="icon" href="data:image/svg+xml;utf8,&lt;svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'&gt;&lt;rect width='100' height='100' fill='%230a0a0a' rx='14'/&gt;&lt;text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'&gt;α&lt;/text&gt;&lt;/svg&gt;" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a; --bg-secondary: #111; --accent-green: #00ff88;
+      --text-primary: #fff; --text-secondary: rgba(255,255,255,0.6);
+      --border: rgba(255,255,255,0.08);
+      --font-sans: 'Inter', system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  </style>
+  <link rel="preload" href="styles.css" as="style" />
   <link rel="stylesheet" href="styles.css" />
 
   <!-- ====== JSON-LD : Article (long-form) ====== -->
@@ -59,11 +78,22 @@
     "wordCount": 3200,
     "articleSection": "Investing",
     "keywords": "AI, stock analysis, Claude, GPT-4, Gemini, DCF, 10-K, BYOK",
-    "author": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/" },
+    "author": {
+      "@type": "Person",
+      "name": "Équipe Alpha",
+      "url": "https://alpha-terminal.app/about.html",
+      "sameAs": ["https://twitter.com/AlphaTerminal"]
+    },
     "publisher": {
       "@type": "Organization",
       "name": "Alpha",
-      "logo": { "@type": "ImageObject", "url": "https://alpha-terminal.app/logo.png" }
+      "url": "https://alpha-terminal.app/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://alpha-terminal.app/icons/icon-192.png",
+        "width": 192,
+        "height": 192
+      }
     },
     "mainEntityOfPage": { "@type": "WebPage", "@id": "https://alpha-terminal.app/ai-stock-analysis-guide.html" }
   }
@@ -176,7 +206,7 @@
 
   <h2 id="why">1. Pourquoi l'IA change l'analyse boursière en 2026</h2>
   <p>Pendant 30 ans, l'analyse fondamentale était bloquée par un problème simple : <strong>il faut 3-5 heures pour bien lire un 10-K</strong>. Multiplie par 50 entreprises dans une watchlist, et tu n'as humainement pas le temps. Les fonds d'investissement résolvaient ça avec des équipes de 10-50 analystes juniors. Le particulier, lui, lisait les résumés.</p>
-  <p>En 2026, un LLM lit un 10-K complet en 30 secondes et produit une analyse de 2000 mots qui pointe les vrais signaux : qualité du moat, ROIC vs WACC, capital allocation passée, red flags comptables, narrative shift vs trimestre précédent. <strong>Le coût marginal est passé de 200€/heure d'analyste junior à $0.50 par analyse</strong>.</p>
+  <p>En 2026, un LLM lit un 10-K complet en 30 secondes et produit une analyse de 2000 mots qui pointe les vrais signaux : qualité du moat, ROIC vs WACC, capital allocation passée, red flags comptables, narrative shift vs trimestre précédent. <strong>Le coût marginal est passé de 200€/heure d'analyste junior à $0.50 par analyse</strong> (<a href="api-costs.html" title="Détail des coûts API par module">voir le détail des coûts API par module</a>). Le module <a href="features.html#10k-decoder" title="10-K Decoder — module Alpha">10-K Decoder d'Alpha</a> automatise tout ça.</p>
   <p>Cette compression de coût × temps est <em>la</em> révolution. Elle ouvre des workflows impossibles avant : screen 200 entreprises par semaine, faire un audit complet de portefeuille tous les mois, comparer 5 entreprises sectorielles avant chaque décision. C'est le passage de l'analyse <em>artisanale</em> à l'analyse <em>industrielle</em>, accessible aux particuliers.</p>
 
   <h2 id="models">2. Claude vs GPT vs Gemini vs Grok : lequel pour quelle tâche ?</h2>
@@ -235,7 +265,8 @@ Cite la source pour chaque chiffre. Évite "nous pensons" — dis "ceci indique"
   <p>Markdown clean, tableaux pour les listes, emojis ✅⚠️🔴 pour visuels rapides. Précise la longueur attendue (2000 mots, 4000 tokens output, etc.).</p>
 
   <h2 id="10k">5. Cas pratique #1 : analyser un 10-K en 30 secondes</h2>
-  <p>Le 10-K est le rapport annuel SEC obligatoire d'une entreprise US. Typiquement 80-200 pages. Sur Apple, NVIDIA ou Microsoft, le format est devenu très formaté.</p>
+  <p>Le 10-K est le rapport annuel SEC obligatoire d'une entreprise US. Typiquement 80-200 pages. Sur Apple, NVIDIA ou Microsoft, le format est devenu très formaté. Les rapports sont publics sur <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&type=10-K" rel="noopener noreferrer" target="_blank">SEC EDGAR — base officielle des rapports 10-K</a>.</p>
+  <p style="font-size:13px;color:var(--text-muted);">📚 Pour les particuliers FR, consulter aussi le <a href="https://www.amf-france.org/fr/espace-epargnants/comprendre-les-produits-financiers" rel="noopener noreferrer" target="_blank">Guide AMF pour investisseurs particuliers</a>.</p>
   <h4>Workflow optimal</h4>
   <ol>
     <li>Télécharger le 10-K depuis SEC EDGAR (gratuit, public).</li>
@@ -337,6 +368,12 @@ Cite la source pour chaque chiffre. Évite "nous pensons" — dis "ceci indique"
     <a href="/pricing.html">Tarif</a> ·
     <a href="/bloomberg-alternative.html">Alternative Bloomberg</a> ·
     <a href="/ai-stock-analysis-guide.html">Guide IA</a>
+  </p>
+  <p>
+    <a href="/about.html">À propos</a> ·
+    <a href="/privacy.html">Politique de confidentialité</a> ·
+    <a href="/terms.html">CGU</a> ·
+    <a href="/legal.html">Mentions légales</a>
   </p>
   <p style="margin-top:14px;"><a href="mailto:savetheworldfr@gmail.com">savetheworldfr@gmail.com</a></p>
 </footer>
