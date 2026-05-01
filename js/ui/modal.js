@@ -310,7 +310,10 @@ function renderWizardStep2() {
         <span class="wiz-key-name">${p.displayName}</span>
         <span class="wiz-key-status" id="status-${p.name}"></span>
       </div>
-      <input id="key-${p.name}" class="input" type="password" placeholder="${p.placeholder || 'API key'}" value="${wizardState.keys[p.name] || ''}" />
+      <div style="display:flex;gap:6px;align-items:center;">
+        <input id="key-${p.name}" class="input" type="password" placeholder="${p.placeholder || 'API key'}" value="${wizardState.keys[p.name] || ''}" style="flex:1;" />
+        <button type="button" class="btn-secondary wiz-key-test" data-test-key="${p.name}" title="Tester cette clé" style="font-size:11.5px;padding:6px 10px;white-space:nowrap;">⚡ ${t('common.test')}</button>
+      </div>
       <div class="wiz-key-meta">
         <span style="color:var(--text-muted);font-size:11px;">${p.recommendedFor}</span>
         <a href="${p.linkKey}" target="_blank" rel="noopener" style="font-size:11px;">→ Créer une clé</a>
@@ -324,7 +327,43 @@ function renderWizardStep2() {
 
   KNOWN_PROVIDERS.forEach(p => {
     $('#key-' + p.name).addEventListener('input', e => { wizardState.keys[p.name] = e.target.value.trim(); });
+    // Test individuel par clé : permet de valider rapidement une seule clé sans
+    // attendre le test global de toutes les clés.
+    const testBtn = body.querySelector(`[data-test-key="${p.name}"]`);
+    if (testBtn) testBtn.addEventListener('click', () => testSingleKey(p));
   });
+
+  async function testSingleKey(p) {
+    const btn = body.querySelector(`[data-test-key="${p.name}"]`);
+    const statusEl = $('#status-' + p.name);
+    const k = (wizardState.keys[p.name] || $('#key-' + p.name).value || '').trim();
+    if (!k) {
+      statusEl.innerHTML = '<span style="color:var(--accent-amber);font-size:11px;">⚠ vide</span>';
+      wizardState.validation[p.name] = 'untested';
+      return;
+    }
+    btn.disabled = true;
+    const oldLabel = btn.textContent;
+    btn.textContent = '⏳';
+    statusEl.innerHTML = '<span class="spinner" style="width:10px;height:10px;display:inline-block;"></span>';
+    try {
+      const v = await validateProviderKey(p.name, k);
+      if (v.ok) {
+        statusEl.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
+        wizardState.validation[p.name] = 'ok';
+      } else {
+        const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
+        wizardState.validation[p.name] = 'bad';
+      }
+    } catch (e) {
+      statusEl.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e.message || 'erreur').slice(0,40)}</span>`;
+      wizardState.validation[p.name] = 'bad';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldLabel;
+    }
+  }
 
   async function testKeys() {
     const btn = $('#wiz-test');

@@ -110,8 +110,11 @@ function renderKeysTab(c) {
         <div class="field"><label class="field-label">${t('settings.keys.current_password')}</label><input id="keys-pwd" class="input" type="password" /></div>
         ${KNOWN_PROVIDERS.map(p => `
           <div class="field">
-            <label class="field-label">${p.icon} ${p.displayName}</label>
-            <input id="keys-set-${p.name}" class="input" type="password" placeholder="${present.includes(p.name) ? '••• (' + t('common.optional') + ')' : 'sk-...'}" />
+            <label class="field-label">${p.icon} ${p.displayName} <span class="keys-set-status" data-status-set="${p.name}" style="margin-left:6px;font-size:11px;"></span></label>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <input id="keys-set-${p.name}" class="input" type="password" placeholder="${present.includes(p.name) ? '••• (' + t('common.optional') + ')' : (p.placeholder || 'sk-...')}" style="flex:1;" />
+              <button type="button" class="btn-secondary" data-test-set="${p.name}" title="Tester cette clé sans la sauvegarder" style="font-size:11.5px;padding:6px 10px;white-space:nowrap;">⚡ ${t('common.test')}</button>
+            </div>
             <div class="field-hint">${p.recommendedFor} · <a href="${p.linkKey}" target="_blank">${t('settings.keys.create')}</a></div>
           </div>
         `).join('')}
@@ -167,6 +170,39 @@ function renderKeysTab(c) {
     if (confirm('Effacer le vault chiffré ? Toutes les clés API devront être ressaisies.')) {
       forgetVault(); clearRuntimeKeys(); location.reload();
     }
+  });
+
+  // Test individuel par clé dans le panneau "Ajouter / modifier" — valide une
+  // seule clé à la blanc sans la sauvegarder ni nécessiter le mot de passe.
+  c.querySelectorAll('[data-test-set]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const name = btn.getAttribute('data-test-set');
+      const input = $('#keys-set-' + name);
+      const statusEl = c.querySelector(`[data-status-set="${name}"]`);
+      const k = (input?.value || '').trim();
+      if (!k) {
+        if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent-amber);">⚠ vide</span>';
+        return;
+      }
+      const old = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '⏳';
+      if (statusEl) statusEl.innerHTML = '<span class="spinner" style="width:10px;height:10px;display:inline-block;"></span>';
+      try {
+        const v = await validateProviderKey(name, k);
+        if (v.ok) {
+          if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
+        } else {
+          const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+          if (statusEl) statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
+        }
+      } catch (e) {
+        if (statusEl) statusEl.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e.message || 'erreur').slice(0,40)}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = old;
+      }
+    });
   });
 
   $('#keys-save').addEventListener('click', async () => {
