@@ -639,6 +639,11 @@
           if (e.key === 'Escape') window.licenseManager.hideLicenseModal();
         });
       }
+      // Revalidation serveur au boot : si la clé a été révoquée côté
+      // Lemonsqueezy (annulation/remboursement), logout immédiat.
+      if (window.licenseManager && window.licenseManager.getLicense()) {
+        window.licenseManager.checkLicenseStatus();
+      }
     });
   </script>
 
