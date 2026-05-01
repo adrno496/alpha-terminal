@@ -43,6 +43,13 @@
     }
   }
 
+  // ⚠️ PAYWALL DÉSACTIVÉ TEMPORAIREMENT
+  // Le système de magic link Supabase est mis en pause. Migration en cours
+  // vers Lemonsqueezy License Keys. Tant que le flow license n'est pas
+  // implémenté, l'app reste 100% accessible (pas de blocage modules, pas de
+  // cadenas sidebar, pas de bouton login).
+  const PAYWALL_DISABLED = true;
+
   class PaywallManager {
     constructor() {
       this.isPremium = false;
@@ -58,12 +65,14 @@
     }
 
     canAccess(moduleId) {
+      if (PAYWALL_DISABLED) return true;
       if (!moduleId) return true;
       if (this.isModuleFree(moduleId)) return true;
       return this._readCache();
     }
 
     _readCache() {
+      if (PAYWALL_DISABLED) return true;
       // Source de vérité = alphaAuth.isPremiumLocal() (cache validé)
       try {
         return !!(window.alphaAuth && window.alphaAuth.isPremiumLocal());
