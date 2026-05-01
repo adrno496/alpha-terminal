@@ -502,7 +502,7 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
                 <strong>⚡ ${isEN ? 'Cached result' : 'Résultat caché'}</strong>
                 <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">
                   ${isEN ? `from ${ageMin} min ago` : `il y a ${ageMin} min`}
-                  ${cached.costUSD ? ' · ' + isEN ? 'saved' : 'économisé' + ` $${cached.costUSD.toFixed(4)}` : ''}
+                  ${cached.costUSD ? ` · ${isEN ? 'saved' : 'économisé'} $${cached.costUSD.toFixed(4)}` : ''}
                 </span>
               </div>
               <button id="cache-rerun" class="btn-secondary" style="font-size:11px;">🔄 ${isEN ? 'Re-run anyway' : 'Re-lancer quand même'}</button>
@@ -515,7 +515,9 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
           // Re-run sans cache cette fois
           runAnalysis(moduleId, { ...params, _bypassCache: true }, container, { onTitle, suggestFollowUps });
         });
-        return cached;
+        // Normalise la shape pour les modules qui font `result.text` après runAnalysis :
+        // le cache stocke `markdown`, l'API retourne `text`. On expose les deux.
+        return { ...cached, text: cached.markdown, usage: { input: 0, output: 0, costUSD: 0 } };
       }
     } catch (e) { console.warn('[cache] read failed:', e); }
   }
@@ -526,15 +528,20 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
   const sys = await applyCustomPrompt(moduleId, params.system);
   let messages = params.messages;
 
+  // Clone des params modifiables — ne JAMAIS muter l'objet du caller (évite des
+  // bugs sneaky si le module réutilise le même params à travers plusieurs runs).
+  let runOverride = params.override ? { ...params.override } : undefined;
+  let promptCaching = params.promptCaching;
+
   // === A3 : Mode Éco — force le tier balanced ===
-  if (settings.ecoMode && !params.override?.tier) {
-    params.override = { ...(params.override || {}), tier: 'balanced' };
+  if (settings.ecoMode && !runOverride?.tier) {
+    runOverride = { ...(runOverride || {}), tier: 'balanced' };
   }
 
   // === A1 : Prompt caching Anthropic ===
   // Forwardé jusqu'au provider Claude qui marque le system prompt avec cache_control.
   if (settings.promptCaching !== false) {
-    params.promptCaching = true;
+    promptCaching = true;
   }
 
   // Auto-inject DATA CONTEXT (Alpha Vantage / FMP / Twelve Data / FRED / CoinGecko)
@@ -636,7 +643,8 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
       ...params,
       system: sys,
       messages,
-      override: getModuleOverride(moduleId)
+      override: runOverride || getModuleOverride(moduleId),
+      promptCaching
     }, {
       onSelected: (sel) => { selection = sel; stream.setProvider(sel); stream.setStatus('streaming…'); },
       onFallback: (from, to, err) => { stream.setStatus(`fallback ${from}→${to}…`); },
@@ -658,6 +666,14 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
     if (suggestFollowUps) injectFollowUps(container, moduleId, record);
     return result;
   } catch (e) {
+    // Annulation utilisateur : ne pas afficher "Erreur : AbortError" — l'UI a déjà
+    // remplacé le container avec le message d'annulation côté abort button.
+    if (e?.name === 'AbortError' || /aborted/i.test(e?.message || '')) {
+      if (container && !container.querySelector('.alert-warning')) {
+        container.innerHTML = '<div class="alert alert-warning">Requête annulée.</div>';
+      }
+      return null;
+    }
     showApiError(container, e);
     throw e;
   }

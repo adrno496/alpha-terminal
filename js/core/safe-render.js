@@ -35,9 +35,25 @@ const FORBID_TAGS = [
   'textarea', 'select', 'option', 'meta', 'link', 'base', 'svg', 'math'
 ];
 
+// Hook lazy : installé à la première sanitization une fois que DOMPurify est
+// chargé depuis le CDN. Le hook précédent (au load module) ratait la fenêtre
+// car DOMPurify est chargé via <script> CDN APRÈS l'évaluation des modules ES.
+let _hookInstalled = false;
+function ensureLinkHook(DOMPurify) {
+  if (_hookInstalled || !DOMPurify || typeof DOMPurify.addHook !== 'function') return;
+  DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    if (node.tagName === 'A' && node.hasAttribute('href')) {
+      node.setAttribute('target', '_blank');
+      node.setAttribute('rel', 'noopener noreferrer');
+    }
+  });
+  _hookInstalled = true;
+}
+
 function purifyHtml(html) {
   if (!html) return '';
   const DOMPurify = window.DOMPurify;
+  ensureLinkHook(DOMPurify);
   if (!DOMPurify) {
     // Fallback : strip <script>, on*= attrs, javascript: URLs si Purify pas chargé
     // (cas rare : CDN bloqué). Imparfait mais mieux que rien.
@@ -86,12 +102,8 @@ function escapeHtml(s) {
   }[c]));
 }
 
-// Hook DOMPurify : tous les <a> sortants ouvrent en nouvel onglet sans referrer
+// Best-effort eager install si DOMPurify est déjà chargé au moment où ce module évalue.
+// Sinon ensureLinkHook() le fera au premier appel à purifyHtml().
 if (typeof window !== 'undefined' && window.DOMPurify) {
-  window.DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-    if (node.tagName === 'A' && node.hasAttribute('href')) {
-      node.setAttribute('target', '_blank');
-      node.setAttribute('rel', 'noopener noreferrer');
-    }
-  });
+  ensureLinkHook(window.DOMPurify);
 }

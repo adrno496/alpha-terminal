@@ -1,8 +1,15 @@
 // Lecture d'un fichier PDF côté client (texte + base64)
 import { fileToB64 } from './utils.js';
 
+const MAX_PDF_SIZE = 50 * 1024 * 1024; // 50 Mo : au-delà, base64 ferait crasher l'onglet
+
 // Renvoie { text, base64, name, size, pages }
 export async function parsePdf(file, { withText = true, withBase64 = true, pageLimit = 200, onProgress } = {}) {
+  if (!file) throw new Error('Fichier PDF manquant');
+  if (file.size > MAX_PDF_SIZE) {
+    throw new Error(`PDF trop volumineux (${(file.size/1024/1024).toFixed(1)} Mo). Limite : 50 Mo.`);
+  }
+
   const result = {
     name: file.name,
     size: file.size,
@@ -20,7 +27,19 @@ export async function parsePdf(file, { withText = true, withBase64 = true, pageL
   if (withText && window.pdfjsLib) {
     if (onProgress) onProgress({ stage: 'parsing' });
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let pdf;
+    try {
+      pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    } catch (e) {
+      // PDF.js jette PasswordException pour les PDFs chiffrés ; reword pour l'UI.
+      if (e && (e.name === 'PasswordException' || /password/i.test(e.message || ''))) {
+        throw new Error('PDF protégé par mot de passe — non supporté.');
+      }
+      if (e && /invalid pdf/i.test(e.message || '')) {
+        throw new Error('PDF invalide ou corrompu.');
+      }
+      throw e;
+    }
     result.pages = pdf.numPages;
     const max = Math.min(pdf.numPages, pageLimit);
     const chunks = [];

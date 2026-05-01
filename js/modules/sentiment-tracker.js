@@ -59,8 +59,11 @@ ${ctx ? 'Contexte : ' + ctx + '\n\n' : ''}Génère l'analyse contrarian complèt
       recordInput: { ticker, type, ctx }
     }, out, { onTitle: () => `Sentiment · ${ticker}` });
 
+    if (!result) return; // missing keys / budget block / abort — runAnalysis a déjà géré l'UI
     const score = extractScore(result.text || '');
     if (score !== null) {
+      // Détruit l'ancien gauge avant d'en créer un nouveau (évite la superposition).
+      if (chart) { try { chart.destroy(); } catch {} chart = null; }
       const wrap = document.createElement('div');
       wrap.className = 'chart-wrap gauge';
       wrap.innerHTML = `<canvas id="st-gauge"></canvas><div class="gauge-overlay"><div class="gauge-score" style="color:${score<25?'#ff3355':score<45?'#ffaa00':score<55?'#888':score<75?'#88ee66':'#00ff88'}">${score}</div><div class="gauge-label">${ticker} sentiment</div></div>`;
@@ -68,5 +71,7 @@ ${ctx ? 'Contexte : ' + ctx + '\n\n' : ''}Génère l'analyse contrarian complèt
       chart = gaugeSentiment(document.getElementById('st-gauge'), score);
     }
     toast('Scan terminé', 'success');
-  } catch {}
+  } catch (e) {
+    console.error('[sentiment-tracker] run failed:', e);
+  }
 }

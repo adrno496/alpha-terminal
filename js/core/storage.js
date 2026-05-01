@@ -207,11 +207,28 @@ const DEFAULT_SETTINGS = {
   hasSeenLanding: false // pour skip la landing après premier visit
 };
 
+// Deep-merge limité aux objets simples — nécessaire pour `modelOverrides` et
+// `moduleOverrides` afin que les nouveaux providers (ajoutés dans DEFAULT_SETTINGS)
+// soient hérités par les utilisateurs existants au lieu d'être écrasés par leur snapshot.
+function _mergeSettings(defaults, saved) {
+  const out = { ...defaults };
+  for (const k of Object.keys(saved || {})) {
+    const dv = defaults[k];
+    const sv = saved[k];
+    if (dv && typeof dv === 'object' && !Array.isArray(dv) && sv && typeof sv === 'object' && !Array.isArray(sv)) {
+      out[k] = { ...dv, ...sv };
+    } else if (sv !== undefined) {
+      out[k] = sv;
+    }
+  }
+  return out;
+}
+
 export function getSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) return { ...DEFAULT_SETTINGS };
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    return _mergeSettings(DEFAULT_SETTINGS, JSON.parse(raw));
   } catch {
     return { ...DEFAULT_SETTINGS };
   }

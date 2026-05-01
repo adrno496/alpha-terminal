@@ -269,15 +269,11 @@ function showWizardPasteImport() {
 }
 
 function renderWizardStep2() {
-  const isEN = (typeof getLocale === 'function') ? false : false; // fallback
-  let isEnLocal = false;
-  try { isEnLocal = require ? false : false; } catch {}
-  // Détecte locale via lang attribute
-  isEnLocal = document.documentElement.lang === 'en';
+  const isEnLocal = document.documentElement.lang === 'en';
   body.innerHTML = `
     ${stepperHtml(2)}
     <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:14px;">
-      <strong style="color:var(--accent-green);">Au moins une clé suffit</strong> pour faire tourner les 10 modules.
+      <strong style="color:var(--accent-green);">Au moins une clé suffit</strong> pour faire tourner les 60+ modules.
       Plus tu en mets, plus l'app sélectionne le meilleur modèle pour chaque tâche.
     </p>
 
@@ -340,7 +336,11 @@ function renderWizardStep2() {
       statusEl.innerHTML = '<span class="spinner" style="width:10px;height:10px;display:inline-block;"></span>';
       const v = await validateProviderKey(p.name, k);
       if (v.ok) { statusEl.innerHTML = '<span style="color:var(--accent-green);">✓</span>'; wizardState.validation[p.name] = 'ok'; }
-      else { statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${(v.error||'').replace(/"/g,'&quot;')}">✗</span>`; wizardState.validation[p.name] = 'bad'; }
+      else {
+        const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+        statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗</span>`;
+        wizardState.validation[p.name] = 'bad';
+      }
     }
     btn.disabled = false; btn.textContent = '⚡ Re-tester';
   }
@@ -408,7 +408,14 @@ async function finishWizard() {
       if (v && v.trim()) keys[k] = v.trim();
     }
     await setApiKeys(keys, wizardState.password);
-    setRuntimeKeys(keys);
+    try {
+      setRuntimeKeys(keys);
+    } catch (orchErr) {
+      // Vault sauvé mais l'orchestrateur n'a pas pu démarrer (clé mal formée pour
+      // un provider ?). On ne masque pas l'erreur, l'utilisateur peut réessayer
+      // après avoir corrigé la clé invalide depuis Settings.
+      throw new Error(`Vault sauvé mais init échouée : ${orchErr.message}`);
+    }
     overlay.classList.add('hidden');
     window.dispatchEvent(new CustomEvent('app:unlocked'));
   } catch (e) {
@@ -429,9 +436,29 @@ function computeMissing(available) {
   return Array.from(missing);
 }
 function labelOf(id) {
-  return ({ 'decoder-10k':'10-K Decoder','macro-dashboard':'Macro Dashboard','crypto-fundamental':'Crypto Fundamental','earnings-call':'Earnings Call','portfolio-rebalancer':'Portfolio Rebalancer','tax-optimizer-fr':'Tax FR','whitepaper-reader':'Whitepaper','sentiment-tracker':'Sentiment','newsletter-investor':'Newsletter','position-sizing':'Position Sizing' })[id] || id;
+  // Best-effort : titre depuis MODULE_ROUTING ou conversion kebab → Title Case
+  return ({
+    'decoder-10k':'10-K Decoder','macro-dashboard':'Macro Dashboard','crypto-fundamental':'Crypto Fundamental',
+    'earnings-call':'Earnings Call','portfolio-rebalancer':'Portfolio Rebalancer','tax-optimizer-fr':'Tax FR',
+    'whitepaper-reader':'Whitepaper','sentiment-tracker':'Sentiment','newsletter-investor':'Newsletter',
+    'position-sizing':'Position Sizing','quick-analysis':'Quick Analysis','wealth':'Patrimoine',
+    'knowledge-base':'Knowledge Base','tax-international':'Tax International','dcf':'DCF',
+    'pre-mortem':'Pre-Mortem','stock-screener':'Stock Screener','trade-journal':'Trade Journal',
+    'investment-memo':'Investment Memo','fire-calculator':'FIRE','stress-test':'Stress Test',
+    'battle-mode':'Battle Mode','watchlist':'Watchlist','portfolio-audit':'Portfolio Audit',
+    'youtube-transcript':'YouTube Transcript','fees-analysis':'Fees Analysis','wealth-method':'Wealth Method',
+    'insights-engine':'Insights','chatbot':'Chatbot','geopolitical-analysis':'Geopolitics',
+    'research-agent':'Research Agent'
+  })[id] || id.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
 }
-function nameOf(p) { return ({ claude: 'Claude', openai: 'OpenAI', gemini: 'Gemini', grok: 'Grok' })[p] || p; }
+function nameOf(p) {
+  return ({
+    claude: 'Claude', openai: 'OpenAI', gemini: 'Gemini', grok: 'Grok',
+    openrouter: 'OpenRouter', perplexity: 'Perplexity',
+    mistral: 'Mistral', cerebras: 'Cerebras', github: 'GitHub', nvidia: 'NVIDIA',
+    huggingface: 'HuggingFace', cloudflare: 'Cloudflare', together: 'Together', cohere: 'Cohere'
+  })[p] || p;
+}
 function icon(p) {
   return ({
     claude: '🤖', openai: '🧠', gemini: '✨', grok: '🐦',

@@ -71,15 +71,24 @@ export class GeminiProvider extends BaseProvider {
     return body;
   }
 
-  _url(model, action) {
-    return `${BASE}/models/${encodeURIComponent(model)}:${action}?key=${encodeURIComponent(this.apiKey)}`;
+  _url(model, action, { sse = false } = {}) {
+    // Key passé en HEADER (x-goog-api-key) — JAMAIS en query param.
+    // Garde uniquement le path + flag SSE quand streaming.
+    return `${BASE}/models/${encodeURIComponent(model)}:${action}${sse ? '?alt=sse' : ''}`;
+  }
+
+  _headers() {
+    return {
+      'content-type': 'application/json',
+      'x-goog-api-key': this.apiKey
+    };
   }
 
   async validate() {
     try {
       const res = await fetch(this._url(this.modelOverrides.fast || 'gemini-2.5-flash-lite', 'generateContent'), {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: this._headers(),
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
           generationConfig: { maxOutputTokens: 8 }
@@ -95,7 +104,7 @@ export class GeminiProvider extends BaseProvider {
     const body = this._buildBody(params);
     const res = await fetch(this._url(params.model, 'generateContent'), {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: this._headers(),
       body: JSON.stringify(body),
       signal: withTimeout(params.signal, 60_000)
     });
@@ -118,9 +127,9 @@ export class GeminiProvider extends BaseProvider {
 
   async stream(params, { onDelta } = {}) {
     const body = this._buildBody(params);
-    const res = await fetch(this._url(params.model, 'streamGenerateContent') + '&alt=sse', {
+    const res = await fetch(this._url(params.model, 'streamGenerateContent', { sse: true }), {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: this._headers(),
       body: JSON.stringify(body),
       signal: withTimeout(params.signal, 120_000)
     });

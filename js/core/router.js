@@ -205,7 +205,7 @@ export const MODULE_ROUTING = {
     reason: 'Assistant chat général — flexible sur tous les providers'
   },
   'geopolitical-analysis': {
-    needsCapabilities: ['web_search'],
+    needsCapabilities: ['supportsWebSearch'],
     optimalProviders: ['perplexity', 'grok', 'gemini'],
     fallbackProviders: ['claude', 'openai', 'openrouter'],
     recommendedTier: 'flagship',

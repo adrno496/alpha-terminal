@@ -82,5 +82,7 @@ async function run(state) {
       recordInput: { ticker, notes, fileName: state.parsedPdf.name, pages: state.parsedPdf.pages }
     }, out, { onTitle: () => `10-K · ${ticker || state.parsedPdf.name}` });
     toast('Analyse terminée', 'success');
-  } catch {}
+  } catch (e) {
+    console.error('[decoder-10k] run failed:', e);
+  }
 }
