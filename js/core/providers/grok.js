@@ -1,5 +1,5 @@
 // Provider xAI Grok (API OpenAI-compatible)
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateWithModelFallbacks } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.x.ai/v1/chat/completions';
@@ -73,16 +73,23 @@ export class GrokProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await this._fetch({
-        model: this.modelOverrides.fast || 'grok-4-fast',
+    // xAI fait évoluer son catalogue régulièrement et tous les comptes n'ont
+    // pas accès à grok-4. On essaie une chaîne du plus récent au plus universel.
+    const models = [
+      this.modelOverrides.fast,
+      'grok-4-fast',
+      'grok-3-mini',
+      'grok-3',
+      'grok-2-1212',
+      'grok-beta'
+    ].filter(Boolean);
+    return validateWithModelFallbacks(this.displayName, models, async (model) => {
+      return this._fetch({
+        model,
         messages: [{ role: 'user', content: 'ping' }],
         max_tokens: 8
       });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    });
   }
 
   async call(params) {

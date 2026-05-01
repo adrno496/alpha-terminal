@@ -3,12 +3,13 @@
 // Cloudflare Workers AI (with account_id), Together AI all expose
 // /v1/chat/completions with OpenAI-style request/response and SSE streaming.
 
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateWithModelFallbacks } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 export class OpenAICompatibleProvider extends BaseProvider {
   // Subclasses must set: name, displayName, icon, modelOverrides, BASE_URL,
-  // and may override: extraHeaders, defaultModels, _resolveUrl(apiKey, body)
+  // and may override: extraHeaders, defaultModels, _resolveUrl(apiKey, body),
+  //                  validateModels (array de model IDs à essayer dans validate())
   constructor(apiKey, modelOverrides = {}, opts = {}) {
     super(apiKey);
     this.modelOverrides = modelOverrides;
@@ -20,6 +21,9 @@ export class OpenAICompatibleProvider extends BaseProvider {
     this.useMaxCompletion = !!opts.useMaxCompletion;
     this.extraHeaders = opts.extraHeaders || {};
     this.authPrefix = opts.authPrefix || 'Bearer';
+    // Liste de modèles à essayer pour validate(). Le default fast peut ne pas
+    // exister sur le tier de l'utilisateur ; on a souvent besoin d'un fallback.
+    this.validateModels = opts.validateModels || null;
   }
 
   getCapabilities() {
@@ -85,16 +89,19 @@ export class OpenAICompatibleProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await this._fetch({
-        model: this.modelOverrides.fast || this.defaultModels.fast || this.defaultModels.balanced,
+    // Liste de modèles à essayer en chaîne — la première qui réussit valide la clé.
+    // Permet d'accommoder les providers où le default fast n'est pas dispo pour
+    // tous les tiers (Together free, Grok older accounts, GitHub Models scope variant…).
+    const models = (this.validateModels && this.validateModels.length)
+      ? this.validateModels
+      : [this.modelOverrides.fast || this.defaultModels.fast || this.defaultModels.balanced];
+    return validateWithModelFallbacks(this.displayName, models, async (model) => {
+      return this._fetch({
+        model,
         messages: [{ role: 'user', content: 'ping' }],
         max_tokens: 8
       });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    });
   }
 
   async call(params) {

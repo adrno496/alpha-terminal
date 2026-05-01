@@ -477,6 +477,7 @@ async function openEditor(id) {
       const showAmortMonths = l.type === 'balloon';
       const showFixedPeriod = l.type === 'arm';
       const showOffset = l.type === 'uk_offset';
+      const showPalier = l.type === 'amortizing_modulated';
       const isZeroRate = l.type === 'ptz_fr';
       return `
         <div class="loan-item" data-loan-idx="${idx}" style="border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:8px;background:var(--bg-secondary);">
@@ -501,6 +502,13 @@ async function openEditor(id) {
             ${showFixedPeriod ? `<div class="field"><label class="field-label">Période fixe initiale (mois)</label><input class="input loan-fixed-period" data-idx="${idx}" type="number" min="12" value="${l.fixedPeriodMonths || 60}" /></div>` : ''}
             ${showOffset ? `<div class="field"><label class="field-label">Offset savings (€)</label><input class="input loan-offset" data-idx="${idx}" type="number" min="0" value="${l.offsetSavings || ''}" /></div>` : ''}
           </div>
+          ${showPalier ? `
+            <div class="field-row" style="background:rgba(0,255,136,0.04);border-left:3px solid var(--accent-green);padding:8px;border-radius:4px;margin-top:6px;">
+              <div class="field"><label class="field-label">Palier 1 — durée (mois)</label><input class="input loan-palier1-months" data-idx="${idx}" type="number" min="1" max="${(l.durationMonths || 360) - 1}" value="${l.palier1Months || ''}" placeholder="ex: 60 (5 ans)" /></div>
+              <div class="field"><label class="field-label">Palier 1 — mensualité (€)</label><input class="input loan-palier1-monthly" data-idx="${idx}" type="number" step="0.01" min="0" value="${l.palier1Monthly || ''}" placeholder="ex: 250" /></div>
+              <div class="field" style="display:flex;align-items:flex-end;font-size:10px;color:var(--text-muted);">La mensualité du palier 2 est calculée automatiquement pour solder le capital restant à l'échéance.</div>
+            </div>
+          ` : ''}
           <div class="loan-mini-preview" data-idx="${idx}" style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:6px;"></div>
         </div>
       `;
@@ -532,6 +540,8 @@ async function openEditor(id) {
     container.querySelectorAll('.loan-amort-months').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'amortizationMonths', parseInt(el.value, 10) || 360); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-fixed-period').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'fixedPeriodMonths', parseInt(el.value, 10) || 60); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-offset').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'offsetSavings', parseFloat(el.value) || 0); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-palier1-months').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'palier1Months', parseInt(el.value, 10) || 0); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-palier1-monthly').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'palier1Monthly', parseFloat(el.value) || 0); updateRealEstatePreview(); }));
   }
 
   document.getElementById('he-add-loan').addEventListener('click', () => {

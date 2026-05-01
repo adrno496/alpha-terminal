@@ -13,7 +13,16 @@ export class TogetherProvider extends OpenAICompatibleProvider {
         flagship: 'meta-llama/Llama-3.3-70B-Instruct-Turbo',
         balanced: 'Qwen/Qwen2.5-72B-Instruct-Turbo',
         fast: 'meta-llama/Llama-3.1-8B-Instruct-Turbo'
-      }
+      },
+      // Together free tier ne donne accès qu'aux modèles `-Free`. Si le compte
+      // n'a pas de crédit, seul ces modèles passent. Chaîne de fallback :
+      // -Free → Turbo standard (avec/sans préfixe Meta-).
+      validateModels: [
+        'meta-llama/Llama-3.3-70B-Instruct-Turbo-Free',
+        'meta-llama/Llama-3.1-8B-Instruct-Turbo',
+        'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+        'meta-llama/Llama-3.3-70B-Instruct-Turbo'
+      ]
     });
   }
 }

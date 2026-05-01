@@ -35,4 +35,16 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
     const { token } = this._parseKey();
     return `Bearer ${token}`;
   }
+
+  async validate() {
+    const { accountId, token } = this._parseKey();
+    if (!accountId || !token) {
+      return { ok: false, error: '[Cloudflare] Format attendu : ACCOUNT_ID:API_TOKEN (deux parties séparées par ":").' };
+    }
+    // Cloudflare's REST endpoint at api.cloudflare.com ne renvoie pas Access-Control-Allow-Origin
+    // pour les origines browser arbitraires → CORS fail systématique sans AI Gateway custom.
+    // On laisse le test tenter, mais si c'est un TypeError "Failed to fetch", on retourne
+    // un message explicite plutôt que le générique "[Cloudflare] Failed to fetch".
+    return super.validate();
+  }
 }

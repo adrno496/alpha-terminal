@@ -86,11 +86,18 @@ export const LOAN_TYPES = {
     fields: ['amount', 'rate', 'durationMonths', 'startDate', 'offsetSavings']
   },
   // ====== PRÊT MIXTE / RELAIS ======
+  amortizing_modulated: {
+    label_fr: 'Amortissable modulé / à paliers',
+    label_en: 'Modulated / step-payment loan',
+    region: 'fr',
+    description_fr: 'Prêt amortissable avec deux phases de mensualités différentes (ex: PRIMOLIS PAL, modulation). Saisis la durée + mensualité de la phase 1 ; la phase 2 est calculée pour solder le capital restant à la même date d\'échéance.',
+    fields: ['amount', 'rate', 'durationMonths', 'startDate', 'palier1Months', 'palier1Monthly']
+  },
   mixed_step: {
-    label_fr: 'Prêt à paliers',
+    label_fr: 'Prêt à taux étagés',
     label_en: 'Step-rate loan',
     region: 'global',
-    description_fr: 'Plusieurs périodes de taux différents. Saisis le taux moyen pour une approximation.',
+    description_fr: 'Plusieurs périodes de TAUX différents (pas de mensualité paliée). Saisis le taux moyen pour une approximation. Pour des mensualités paliées, utilise plutôt "Amortissable modulé".',
     fields: ['amount', 'rate', 'durationMonths', 'startDate']
   },
   bridge: {
@@ -218,6 +225,68 @@ export function computeLoanMetrics(loan) {
       interestPaid = interestPaidToDate(principal, annualRate, totalMonths, elapsed);
       totalInt = totalInterest(principal, annualRate, totalMonths);
       principalRepaid = principal - remaining;
+      break;
+    }
+
+    case 'amortizing_modulated': {
+      // Deux phases. Phase 1 : mensualité fixée par l'utilisateur (souvent
+      // basse) sur palier1Months. Phase 2 : mensualité recalculée pour solder
+      // le capital restant à l'échéance globale.
+      // Si palier1Months ou palier1Monthly absent → fallback amortissable normal.
+      const p1Months = Math.min(Math.max(0, Number(loan.palier1Months) || 0), totalMonths);
+      const p1Monthly = Number(loan.palier1Monthly) || 0;
+      if (!p1Months || !p1Monthly || p1Months >= totalMonths) {
+        // Pas de palier configuré → amortissable normal
+        monthly = monthlyPayment(principal, annualRate, totalMonths);
+        remaining = remainingPrincipal(principal, annualRate, totalMonths, elapsed);
+        interestPaid = interestPaidToDate(principal, annualRate, totalMonths, elapsed);
+        totalInt = totalInterest(principal, annualRate, totalMonths);
+        principalRepaid = principal - remaining;
+        break;
+      }
+      const r = annualRate / 12;
+      // Capital restant après la phase 1 (récurrence M = P*r*(1+r)^n / [(1+r)^n - 1])
+      // Capital restant Pn = P*(1+r)^n - p1Monthly * [(1+r)^n - 1]/r
+      const factorP1 = Math.pow(1 + r, p1Months);
+      const remainingAfterP1 = annualRate === 0
+        ? Math.max(0, principal - p1Monthly * p1Months)
+        : Math.max(0, principal * factorP1 - p1Monthly * (factorP1 - 1) / r);
+      const p2Months = totalMonths - p1Months;
+      // Mensualité phase 2 recalculée pour solder ce capital restant sur p2Months au même taux.
+      const p2Monthly = monthlyPayment(remainingAfterP1, annualRate, p2Months);
+
+      // Cumul intérêts payés à date
+      if (elapsed <= p1Months) {
+        // Encore en phase 1
+        const monthsP1Done = elapsed;
+        const factorElapsed = Math.pow(1 + r, monthsP1Done);
+        const remP1 = annualRate === 0
+          ? Math.max(0, principal - p1Monthly * monthsP1Done)
+          : Math.max(0, principal * factorElapsed - p1Monthly * (factorElapsed - 1) / r);
+        const totalPaidP1 = p1Monthly * monthsP1Done;
+        const principalRepaidP1 = principal - remP1;
+        monthly = p1Monthly;
+        remaining = remP1;
+        interestPaid = totalPaidP1 - principalRepaidP1;
+        principalRepaid = principalRepaidP1;
+      } else if (elapsed < totalMonths) {
+        // En phase 2 — on utilise les métriques de remboursement standard à partir de remainingAfterP1
+        const monthsP2Done = elapsed - p1Months;
+        const remP2 = remainingPrincipal(remainingAfterP1, annualRate, p2Months, monthsP2Done);
+        const totalPaid = p1Monthly * p1Months + p2Monthly * monthsP2Done;
+        principalRepaid = principal - remP2;
+        monthly = p2Monthly;
+        remaining = remP2;
+        interestPaid = totalPaid - principalRepaid;
+      } else {
+        // Soldé
+        monthly = p2Monthly;
+        remaining = 0;
+        principalRepaid = principal;
+        interestPaid = p1Monthly * p1Months + p2Monthly * p2Months - principal;
+      }
+      // Coût total intérêts sur la durée complète
+      totalInt = p1Monthly * p1Months + p2Monthly * p2Months - principal;
       break;
     }
 

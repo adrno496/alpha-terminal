@@ -13,8 +13,17 @@ export class GitHubModelsProvider extends OpenAICompatibleProvider {
       defaultModels: {
         flagship: 'openai/gpt-4o',
         balanced: 'openai/gpt-4o-mini',
-        fast: 'meta/Llama-3.2-11B-Vision-Instruct'
-      }
+        fast: 'openai/gpt-4o-mini'
+      },
+      // GitHub Models exige un PAT avec scope `models:read` (classic) ou
+      // permission `Models` (fine-grained). Sans ce scope → 401, peu importe
+      // le modèle. gpt-4o-mini est le plus universellement dispo, on l'essaie
+      // en premier puis fallback Llama (parfois plus accessible en free tier).
+      validateModels: [
+        'openai/gpt-4o-mini',
+        'openai/gpt-4o',
+        'meta/Llama-3.3-70B-Instruct'
+      ]
     });
   }
 }

@@ -121,3 +121,54 @@ export function isTimeoutError(err) {
   }
   return false;
 }
+
+// Détecte les erreurs "Failed to fetch" qui sont presque toujours du CORS
+// (l'API ne renvoie pas Access-Control-Allow-Origin pour notre origine browser).
+// `fetch` jette un TypeError sans status ni body — impossible de distinguer
+// CORS pur d'une vraie erreur réseau, mais le contexte (browser BYOK) rend
+// CORS la cause la plus probable.
+export function isLikelyCORSError(err) {
+  if (!err) return false;
+  const msg = String(err.message || err).toLowerCase();
+  return err.name === 'TypeError' && (
+    msg.includes('failed to fetch') ||
+    msg.includes('networkerror') ||
+    msg.includes('load failed') ||         // Safari
+    msg.includes('network request failed') // Firefox
+  );
+}
+
+// Wrap un message d'erreur de validate() avec hint CORS si applicable.
+export function corsHint(providerName, err) {
+  if (!isLikelyCORSError(err)) return null;
+  return `[${providerName}] L'API a refusé l'appel depuis le navigateur (CORS). Cette plateforme ne permet pas les appels directs depuis un browser — utilise OpenRouter ou Hugging Face Router pour accéder à ces modèles.`;
+}
+
+// Valide une clé en essayant plusieurs modèles (parfois le default n'est pas
+// disponible pour le tier de l'utilisateur). Retourne dès qu'un modèle réussit.
+// Si tous échouent : retourne la dernière erreur (en privilégiant les vraies
+// erreurs d'auth 401/403 sur les 404 model-not-found).
+export async function validateWithModelFallbacks(displayName, models, doFetch) {
+  let lastAuthErr = null;
+  let lastOtherErr = null;
+  for (const model of models) {
+    try {
+      const res = await doFetch(model);
+      if (res.ok) return { ok: true, modelTested: model };
+      const t = await res.text();
+      const status = res.status;
+      const hint = friendlyHttpError(status, t, displayName);
+      if (status === 401 || status === 403) {
+        // Vraie erreur d'auth : la clé est rejetée. Inutile de tester d'autres modèles.
+        return { ok: false, error: hint, status };
+      }
+      // 404 / 400 / autre : peut-être juste un model name pas disponible — on retente.
+      lastOtherErr = { ok: false, error: hint, status };
+    } catch (e) {
+      const cors = corsHint(displayName, e);
+      if (cors) return { ok: false, error: cors, isCors: true };
+      lastOtherErr = { ok: false, error: `[${displayName}] ${e.message}` };
+    }
+  }
+  return lastAuthErr || lastOtherErr || { ok: false, error: `[${displayName}] Validation échouée` };
+}
