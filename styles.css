@@ -2030,6 +2030,14 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   text-align: left;
 }
 .sidebar-adv-toggle:hover { color: var(--text-primary); border-color: var(--border-strong); }
+.sidebar-adv-toggle.locked {
+  border-color: var(--accent-amber, #ffaa00);
+  color: var(--accent-amber, #ffaa00);
+}
+.sidebar-adv-toggle.locked:hover {
+  background: rgba(255, 170, 0, 0.08);
+  color: var(--accent-amber, #ffaa00);
+}
 
 .sidebar-categories { padding: 0 8px; }
 .sidebar-cat {
@@ -2992,4 +3000,94 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
 .resource-card p .lang-en {
   display: inline-block;
   margin-top: 2px;
+}
+
+/* ===========================================================
+   Paywall — overlay Premium (BYOK + Lemonsqueezy)
+   =========================================================== */
+.paywall-modal {
+  background: linear-gradient(135deg, rgba(0,255,136,0.04), rgba(0,0,0,0.92));
+  border: 1px solid var(--accent-green, #00ff88);
+  border-radius: 12px;
+  padding: 32px 28px;
+  margin: 12px 0;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+.paywall-content { max-width: 520px; margin: 0 auto; }
+.paywall-modal h3 {
+  color: var(--accent-green, #00ff88);
+  font-size: 22px;
+  margin: 0 0 12px;
+}
+.paywall-sub {
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+  font-size: 14px;
+  margin: 0 0 18px;
+  line-height: 1.55;
+}
+.paywall-price {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+  margin: 14px 0;
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+.paywall-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 18px 0 16px;
+}
+.paywall-btn {
+  background: var(--accent-green, #00ff88);
+  color: #000;
+  border: 0;
+  padding: 12px 28px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.paywall-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 255, 136, 0.35);
+}
+.paywall-btn-secondary {
+  background: transparent;
+  color: var(--accent-green, #00ff88);
+  border: 1px solid var(--accent-green, #00ff88);
+}
+.paywall-btn-secondary:hover {
+  background: rgba(0, 255, 136, 0.08);
+}
+.paywall-info {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 8px;
+  text-align: left;
+  display: inline-block;
+  font-size: 13px;
+  color: var(--text-secondary, rgba(255,255,255,0.7));
+  line-height: 1.85;
+}
+.paywall-info li { padding: 2px 0; }
+.paywall-info-line {
+  font-size: 12px;
+  color: var(--text-muted, rgba(255,255,255,0.45));
+  margin: 14px 0 0;
+}
+.paywall-info-line a {
+  color: var(--accent-green, #00ff88);
+  text-decoration: none;
+}
+.paywall-info-line a:hover { text-decoration: underline; }
+
+/* Sidebar : badge 🔒 + opacité réduite sur modules pro pour non-premium */
+.sidebar-link .lock-pro {
+  color: var(--accent-amber, #ffaa00);
+  font-size: 13px;
+  line-height: 1;
 }

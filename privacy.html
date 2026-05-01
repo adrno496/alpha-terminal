@@ -119,7 +119,18 @@
     <h2>6. Données envoyées aux fournisseurs LLM (BYOK)</h2>
     <p>Lorsque tu lances une analyse, le contenu (prompt + données du module) est envoyé directement à l'API du fournisseur LLM que tu as choisi (Anthropic, OpenAI, Google, etc.). Chaque fournisseur a sa propre politique de confidentialité — réfère-toi à leur documentation. Alpha n'est pas intermédiaire dans ce flux.</p>
 
-    <h2>7. Contact</h2>
+    <h2>7. Compte Premium (optionnel) — données collectées par Supabase</h2>
+    <p>Si tu actives un abonnement Premium (9,99 €/mois ou 79 €/an), un compte est créé sur notre infrastructure <strong>Supabase</strong> (hébergée dans l'UE — Frankfurt) pour la seule gestion du paiement et de l'accès. Les données collectées sont strictement minimales :</p>
+    <ul>
+      <li><strong>Email</strong> — pour t'envoyer le lien magique de connexion (Supabase Auth, pas de mot de passe).</li>
+      <li><strong>Identifiants Lemonsqueezy</strong> — <code>customer_id</code>, <code>order_id</code>, <code>subscription_id</code> (compliance comptable et gestion des renouvellements).</li>
+      <li><strong>Montant et devise</strong> du paiement (compliance fiscale).</li>
+      <li><strong>Statut Premium</strong> — booléen <code>is_active</code> + date d'expiration.</li>
+    </ul>
+    <p><strong>Ce qui n'est JAMAIS envoyé à Supabase :</strong> tes analyses, tes prompts, ton patrimoine, tes notes, transcripts, knowledge base. Le BYOK et le 100% client-side restent intacts. Vérification ouverte via DevTools → Network : tu observes uniquement des appels vers <code>*.supabase.co</code> au login + à l'activation premium, jamais pendant les analyses.</p>
+    <p>Suppression du compte Premium : envoie un mail à <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a> — suppression sous 30 jours (CASCADE auto sur <code>auth.users</code>, <code>premium_access</code>, <code>payments</code>).</p>
+
+    <h2>8. Contact</h2>
     <p>Pour toute question sur cette politique : <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a>.</p>
 
     <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Retour à l'accueil</a></p>
@@ -165,7 +176,18 @@
     <h2>6. Data sent to LLM providers (BYOK)</h2>
     <p>When you launch an analysis, the content (prompt + module data) is sent directly to the API of the LLM provider you chose (Anthropic, OpenAI, Google, etc.). Each provider has its own privacy policy — refer to their documentation. Alpha is not an intermediary in this flow.</p>
 
-    <h2>7. Contact</h2>
+    <h2>7. Premium account (optional) — data collected by Supabase</h2>
+    <p>If you activate a Premium subscription (€9.99/month or €79/year), an account is created on our <strong>Supabase</strong> infrastructure (EU-hosted — Frankfurt) solely for payment and access management. Strictly minimal data is collected:</p>
+    <ul>
+      <li><strong>Email</strong> — to send the magic sign-in link (Supabase Auth, no password).</li>
+      <li><strong>Lemonsqueezy IDs</strong> — <code>customer_id</code>, <code>order_id</code>, <code>subscription_id</code> (accounting compliance and renewal management).</li>
+      <li><strong>Amount and currency</strong> of the payment (tax compliance).</li>
+      <li><strong>Premium status</strong> — <code>is_active</code> boolean + expiration date.</li>
+    </ul>
+    <p><strong>What is NEVER sent to Supabase:</strong> your analyses, prompts, wealth holdings, notes, transcripts, knowledge base. BYOK and 100% client-side remain intact. Open verification via DevTools → Network: you only observe calls to <code>*.supabase.co</code> at login + premium activation, never during analyses.</p>
+    <p>Premium account deletion: email <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a> — deletion within 30 days (auto CASCADE on <code>auth.users</code>, <code>premium_access</code>, <code>payments</code>).</p>
+
+    <h2>8. Contact</h2>
     <p>For any question on this policy: <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a>.</p>
 
     <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Back to home</a></p>

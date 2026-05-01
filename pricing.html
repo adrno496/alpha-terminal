@@ -58,6 +58,19 @@
   <link rel="preload" href="styles.css" as="style" />
   <link rel="stylesheet" href="styles.css" />
 
+  <!-- ====== Premium auth + checkout ====== -->
+  <script>
+    window.ALPHA_CONFIG = window.ALPHA_CONFIG || {
+      SUPABASE_URL: 'https://bobuovfuxzobhfjcgxlb.supabase.co',
+      SUPABASE_ANON: 'sb_publishable_AcJ08S0oY1DAJYDMwZ6N9A_6IiIH1j0',
+      LEMONSQUEEZY_VARIANT_ID: '1599882',
+      LEMONSQUEEZY_CHECKOUT_URL: 'https://alpha-terminal.lemonsqueezy.com/checkout/buy/fbc1e4ff-47de-4f48-8133-19218019ee06'
+    };
+  </script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2" defer></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/lemonsqueezy.js" defer></script>
+
   <!-- ====== JSON-LD : SoftwareApplication + Offer ====== -->
   <script type="application/ld+json">
   {
@@ -280,7 +293,7 @@
     <strong>Abonnement transparent.</strong> Annulable à tout moment, essai 7 jours gratuit. 46+ modules d'analyse financière propulsés par 14 LLMs, 100% privé, BYOK. <strong>Économie de 33% sur le plan annuel</strong>.
   </p>
 
-  <h2>3 formules</h2>
+  <h2>2 formules</h2>
   <div class="price-grid">
 
     <div class="price-card">
@@ -311,22 +324,7 @@
         <li>100% privé — aucune donnée envoyée à Alpha</li>
         <li>✅ <strong>Essai 7 jours gratuit</strong></li>
       </ul>
-      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;">Démarrer l'essai 7j →</a>
-    </div>
-
-    <div class="price-card" style="border-color:var(--accent-green,#00ff88);position:relative;">
-      <span style="position:absolute;top:-10px;right:16px;background:var(--accent-orange,#ffaa00);color:#000;padding:2px 10px;font-size:10px;font-weight:700;border-radius:3px;">-33% ÉCONOMIE</span>
-      <h3 style="margin-top:0;">Annuel</h3>
-      <div class="price-tag">79€ <span class="small">/ an</span></div>
-      <p style="font-size:13px;">≈ 6,58€/mois. Soit 41€ d'économie/an vs mensuel.</p>
-      <ul class="price-features">
-        <li>Tout le plan mensuel</li>
-        <li>📉 41€ d'économie sur 12 mois</li>
-        <li>Engagement 1 an</li>
-        <li>Annulable au renouvellement</li>
-        <li>Idéal pour usage régulier</li>
-      </ul>
-      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;background:var(--accent-orange,#ffaa00);">Choisir Annuel →</a>
+      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">Démarrer l'essai 7j →</a>
     </div>
 
   </div>
@@ -385,7 +383,7 @@
   <div class="cta-banner">
     <h2 style="margin:0;">Prêt à passer à l'analyse de niveau pro ?</h2>
     <p style="margin:12px 0 0;color:#ccc;">9,99€/mois ou 79€/an · Essai 7 jours gratuit · Annulable à tout moment.</p>
-    <a href="/" class="btn-cta">Démarrer l'essai gratuit →</a>
+    <a href="/" class="btn-cta" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">Démarrer l'essai gratuit →</a>
   </div>
 </main>
 

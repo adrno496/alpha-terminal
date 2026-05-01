@@ -147,13 +147,20 @@ export function renderSidebar(onNavigate) {
   // Set des modules recommandés selon profil utilisateur (vide si pas de profil)
   const recoSet = recommendedSet(getUserProfile(), 10, 50);
   const missingKey = (id) => isModuleMissingApiKey(id);
-  const recoBadge = (id) => recoSet.has(id) ? `<span class="reco-star" title="${t('reco.tooltip')}" style="margin-left:auto;color:#ffd700;font-size:13px;line-height:1;" aria-label="recommended">⭐</span>` : '';
-  const missingBadge = (id) => missingKey(id) ? `<span class="missing-key" title="${t('reco.missing_key_tooltip')}" style="margin-left:auto;color:var(--accent-red);font-size:13px;line-height:1;font-weight:700;" aria-label="API key needed">!</span>` : '';
-  // Si reco ET missing : on affiche les deux côté à côté
+  // Paywall : si paywall.js chargé, marque les modules pro pour les non-premium
+  const lockedPro = (id) => {
+    try {
+      return !!(typeof window !== 'undefined' && window.paywall && !window.paywall.canAccess(id));
+    } catch { return false; }
+  };
+  const recoBadge = (id) => recoSet.has(id) ? `<span class="reco-star" title="${t('reco.tooltip')}" style="color:#ffd700;font-size:13px;line-height:1;" aria-label="recommended">⭐</span>` : '';
+  const missingBadge = (id) => missingKey(id) ? `<span class="missing-key" title="${t('reco.missing_key_tooltip')}" style="color:var(--accent-red);font-size:13px;line-height:1;font-weight:700;" aria-label="API key needed">!</span>` : '';
+  const lockBadge = (id) => lockedPro(id) ? `<span class="lock-pro" title="Module Premium — abonne-toi pour débloquer" style="color:var(--accent-amber);font-size:13px;line-height:1;" aria-label="Premium only">🔒</span>` : '';
+  // Si reco ET missing ET lock : on affiche les badges côté à côté
   const sideBadges = (id) => {
-    const a = missingBadge(id), b = recoBadge(id);
-    if (!a && !b) return '';
-    return `<span style="margin-left:auto;display:inline-flex;gap:4px;align-items:center;">${a}${b}</span>`;
+    const a = missingBadge(id), b = recoBadge(id), c = lockBadge(id);
+    if (!a && !b && !c) return '';
+    return `<span style="margin-left:auto;display:inline-flex;gap:4px;align-items:center;">${a}${b}${c}</span>`;
   };
 
   let html = '';
@@ -175,10 +182,17 @@ export function renderSidebar(onNavigate) {
     </button>
   `;
 
-  // Advanced toggle
+  // Advanced toggle — verrouillé pour les non-premium (le mode avancé révèle
+  // les 56 modules Pro, donc inutile de l'ouvrir si l'utilisateur ne peut pas
+  // les utiliser ; on affiche un cadenas et on ouvre le paywall au clic).
+  const advLocked = (() => {
+    try { return !!(typeof window !== 'undefined' && window.paywall && !window.paywall._readCache()); }
+    catch { return false; }
+  })();
+  const advLabel = advanced ? t('adv.toggle_hide') : t('adv.toggle_show');
   html += `
-    <button class="sidebar-adv-toggle" data-action="toggle-adv">
-      ${advanced ? t('adv.toggle_hide') : t('adv.toggle_show')}
+    <button class="sidebar-adv-toggle${advLocked ? ' locked' : ''}" data-action="toggle-adv"${advLocked ? ' title="Mode avancé réservé aux abonnés Premium"' : ''}>
+      ${advLocked ? '🔒 ' : ''}${advLabel}
     </button>
   `;
 
@@ -251,6 +265,16 @@ export function renderSidebar(onNavigate) {
   // Advanced toggle
   const advBtn = nav.querySelector('[data-action="toggle-adv"]');
   if (advBtn) advBtn.addEventListener('click', () => {
+    // Si non-premium → le bouton est verrouillé : on ouvre le paywall global
+    // au lieu de toggle. Une fois le paiement fait, l'event 'alpha:premiumChanged'
+    // re-render la sidebar et le cadenas disparaît.
+    const locked = advBtn.classList.contains('locked');
+    if (locked && typeof window !== 'undefined' && window.paywall) {
+      // Cherche un container central pour afficher le paywall, sinon prompt direct
+      const view = document.getElementById('view') || document.body;
+      window.paywall.blockUI(view, 'mode-avancé');
+      return;
+    }
     setAdvanced(!getAdvanced());
     renderSidebar(onNavigate);
   });

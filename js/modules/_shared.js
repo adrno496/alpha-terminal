@@ -428,6 +428,18 @@ async function applyCustomPrompt(moduleId, system) {
 
 // Helper canonique : run un module via l'orchestrateur, en streaming
 export async function runAnalysis(moduleId, params, container, { onTitle, suggestFollowUps = true } = {}) {
+  // === Paywall gate ===
+  // Si window.paywall est chargé (script paywall.js inclus) et que le module
+  // n'est pas free + l'user n'a pas premium → on bloque ici avant toute
+  // consommation de tokens LLM. Aucun appel API n'est lancé pour les non-premium.
+  // L'orchestrateur paywall affiche son propre modal d'upsell dans le container.
+  try {
+    if (typeof window !== 'undefined' && window.paywall && container && !window.paywall.canAccess(moduleId)) {
+      window.paywall.blockUI(container, moduleId);
+      return null;
+    }
+  } catch (e) { console.warn('[paywall] gate check failed:', e?.message); }
+
   // Garde providers : on vérifie que ce module spécifique a au moins un provider compatible
   // configuré. Sinon, on affiche un message DÉTAILLÉ avec la liste exacte des providers requis.
   const { getModuleProviderStatus, renderMissingKeysMessage } = await import('../core/module-providers.js');

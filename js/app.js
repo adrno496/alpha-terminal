@@ -484,6 +484,14 @@ function boot() {
     // Re-render la sidebar pour mettre à jour les badges ⚠️ (clés manquantes)
     try { renderSidebar(navigate); } catch {}
   });
+
+  // Paywall : re-render la sidebar quand le statut premium change
+  // (active/désactive les badges 🔒 sur les modules pro)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('alpha:premiumChanged', () => {
+      try { renderSidebar(navigate); } catch {}
+    });
+  }
   onCostChange(refreshCostBadge);
   refreshApiStatus();
 

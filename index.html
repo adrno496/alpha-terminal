@@ -567,6 +567,22 @@
     }
   </script>
 
+  <!-- ====== Premium auth + paywall (BYOK + Lemonsqueezy) ====== -->
+  <!-- ALPHA_CONFIG : valeurs publiques. La clé ANON Supabase est safe à exposer
+       (RLS protège côté DB). Replace-les par tes vraies valeurs avant prod. -->
+  <script>
+    window.ALPHA_CONFIG = window.ALPHA_CONFIG || {
+      SUPABASE_URL: 'https://bobuovfuxzobhfjcgxlb.supabase.co',
+      SUPABASE_ANON: 'sb_publishable_AcJ08S0oY1DAJYDMwZ6N9A_6IiIH1j0',
+      LEMONSQUEEZY_VARIANT_ID: '1599882',
+      LEMONSQUEEZY_CHECKOUT_URL: 'https://alpha-terminal.lemonsqueezy.com/checkout/buy/fbc1e4ff-47de-4f48-8133-19218019ee06'
+    };
+  </script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/paywall.js" defer></script>
+  <script src="js/lemonsqueezy.js" defer></script>
+
   <!-- App -->
   <script type="module" src="js/app.js"></script>
 </body>
