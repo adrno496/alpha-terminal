@@ -10,11 +10,10 @@ export const DATA_PROVIDERS = [
   { id: 'finnhub',        label: 'Finnhub',                    desc: 'Quote, news, earnings · 60 req/min free',              link: 'https://finnhub.io/register' },
   { id: 'polygon',        label: 'Polygon.io',                 desc: 'EOD quotes, news, ticker details · 5 req/min free',    link: 'https://polygon.io/dashboard/api-keys' },
   { id: 'tiingo',         label: 'Tiingo',                     desc: 'IEX quotes, news, crypto · 500 req/hour free',         link: 'https://api.tiingo.com/account/api/token' },
-  { id: 'twelvedata',     label: 'Twelve Data',                desc: 'Real-time prices, forex, ETF · 800 req/day free',      link: 'https://twelvedata.com/pricing' },
+  { id: 'twelvedata',     label: 'Twelve Data',                desc: 'Real-time prices, forex, ETF (★ best for European ETF) · 800 req/day free', link: 'https://twelvedata.com/pricing' },
   { id: 'fred',           label: 'FRED API',                   desc: 'US macro indicators · unlimited free',                 link: 'https://fred.stlouisfed.org/docs/api/api_key.html' },
   { id: 'etherscan',      label: 'Etherscan',                  desc: 'On-chain ETH (balance, contracts) · 100k req/day',     link: 'https://etherscan.io/myapikey' },
-  { id: 'coingecko_pro',  label: 'CoinGecko (Pro)',            desc: 'Higher rate limits crypto · paid tier',                link: 'https://www.coingecko.com/en/api/pricing' },
-  { id: 'newsapi',        label: 'NewsAPI',                    desc: 'News (⚠️ paid plan required for browser/CORS)',         link: 'https://newsapi.org/register' }
+  { id: 'metals_api',     label: 'Metals-API',                 desc: 'Spot Or/Argent/Platine/Palladium · 50 req/mois free',  link: 'https://metals-api.com/register' }
 ];
 
 // Sources gratuites SANS clé requise (intégrées automatiquement dans data-context)

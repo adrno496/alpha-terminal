@@ -301,5 +301,5 @@ export function hasAnyDataKey() {
 }
 
 export function hasAnyKeyedDataProvider() {
-  return ['fmp', 'alphavantage', 'twelvedata', 'fred', 'finnhub', 'polygon', 'tiingo', 'etherscan', 'newsapi'].some(k => !!getDataKey(k));
+  return ['fmp', 'alphavantage', 'twelvedata', 'fred', 'finnhub', 'polygon', 'tiingo', 'etherscan', 'metals_api'].some(k => !!getDataKey(k));
 }

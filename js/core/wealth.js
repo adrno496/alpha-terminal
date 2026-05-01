@@ -157,15 +157,51 @@ export async function refreshPrices(progressCb = null) {
   const { avQuote } = await import('./data-providers/alphavantage.js');
   const { getDataKey } = await import('./data-keys.js');
 
+  // Lazy import spot-prices (commodities) — sans clé Metals-API, fallback sur FRED
+  // (free) si dispo, sinon on saute pour ne pas confondre avec un ticker boursier.
+  let getSpotPriceEUR = null, getSpotPrice = null, getEurUsdRate = null;
+  try {
+    const sp = await import('./spot-prices.js');
+    getSpotPriceEUR = sp.getSpotPriceEUR;
+    getSpotPrice    = sp.getSpotPrice;
+    getEurUsdRate   = sp.getEurUsdRate;
+  } catch {}
+
+  // Tickers spot reconnus pour les commodities — sinon on tombe sur la chaîne stocks
+  // (Barrick Gold Corp NYSE:GOLD ≈ $45 au lieu du spot or à $2700/oz).
+  const SPOT_TICKERS = new Set(['GOLD', 'SILVER', 'PLATINUM', 'PALLADIUM', 'OIL_WTI', 'XAU', 'XAG', 'XPT', 'XPD']);
+  const SPOT_ALIAS = { XAU: 'GOLD', XAG: 'SILVER', XPT: 'PLATINUM', XPD: 'PALLADIUM' };
+
   let updated = 0;
   for (let i = 0; i < refreshable.length; i++) {
     const h = refreshable[i];
     if (progressCb) progressCb({ i: i + 1, total: refreshable.length, ticker: h.ticker });
     let price = null;
+    let priceCurrency = h.currency || 'EUR';
     try {
       if (h.category === 'crypto') {
         const cg = await fetchCoinData(h.ticker);
         if (cg) price = cg.price_usd;
+        priceCurrency = 'USD';
+      } else if (h.category === 'commodities' && getSpotPriceEUR) {
+        // Spot price (Metals-API → FRED). On fait le matching en upper-case.
+        const ticker = (h.ticker || '').toUpperCase();
+        const spotTicker = SPOT_ALIAS[ticker] || ticker;
+        if (SPOT_TICKERS.has(ticker) || SPOT_TICKERS.has(spotTicker)) {
+          // Privilégier la devise du holding pour cohérence d'affichage
+          if (priceCurrency === 'EUR') {
+            const r = await getSpotPriceEUR(spotTicker);
+            if (r && r.priceEUR) price = r.priceEUR;
+          } else {
+            const r = await getSpotPrice(spotTicker);
+            if (r && r.priceUSD) {
+              price = r.priceUSD;
+              priceCurrency = 'USD';
+            }
+          }
+        }
+        // Si aucune source spot configurée → on NE TOMBE PAS sur la chaîne stocks
+        // (sinon "GOLD" → Barrick Gold $45 au lieu du spot or). Le prix reste nul.
       } else {
         // Stocks / ETF — chain de fallback
         if (!price && getDataKey('fmp'))          { try { const q = await fmpQuote(h.ticker);          if (q) price = q.price; } catch {} }
@@ -181,6 +217,7 @@ export async function refreshPrices(progressCb = null) {
       h.priceLastUpdated = new Date().toISOString();
       h.lastPrice = price;
       h.unitPrice = price; // synchronise unit price avec live
+      h.priceCurrency = priceCurrency;
       await saveHolding(h);
       updated++;
     }
