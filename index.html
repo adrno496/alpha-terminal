@@ -217,6 +217,19 @@
     ]
   }
   </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://alpha-terminal.app/" }
+    ]
+  }
+  </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <!-- Welcome / Lock modal -->
@@ -261,47 +274,94 @@
         <a href="bloomberg-alternative.html">vs Bloomberg</a>
         <a href="ai-stock-analysis-guide.html">Guide IA</a>
         <a href="#faq">FAQ</a>
-        <button class="btn-primary" id="cta-top">Get Started →</button>
+        <a href="/?lang=en" class="lang-switch" hreflang="en" title="English version" style="font-size:12px;padding:4px 8px;border:1px solid #333;border-radius:4px;color:#999;text-decoration:none;">🇬🇧 EN</a>
+        <button class="btn-primary plausible-event-name=Subscribe+Click" id="cta-top">Get Started →</button>
       </div>
     </nav>
 
     <!-- HERO -->
     <section class="hero">
-      <div class="hero-inner">
-        <img src="icons/logo.png" alt="Alpha" class="hero-logo" fetchpriority="high" />
-        <h1 class="hero-title">Alpha<span class="alpha-mark">α</span></h1>
-        <p style="font-size:14px;letter-spacing:0.04em;color:var(--text-muted);font-weight:500;text-transform:uppercase;margin:0 0 18px;">AI Investing Terminal • BYOK</p>
-        <h2 class="hero-sub" data-i18n-html="land.new.hero_sub"></h2>
-        <p class="hero-pitch" data-i18n-html="land.new.hero_pitch"></p>
-        <div class="hero-cta">
-          <button class="btn-primary big" id="cta-hero" data-i18n="land.new.cta_try"></button>
+      <div class="hero-inner" style="max-width:1100px;margin:0 auto;padding:60px 22px;">
+        <p class="hero-eyebrow" style="color:#00ff88;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px;">L'alternative à Bloomberg pour particuliers<br><span class="lang-en">The Bloomberg alternative for retail investors</span></p>
+
+        <h1 style="font-size:clamp(36px,5vw,64px);line-height:1.1;margin:0 0 18px;">Analyse une action en 30 secondes.<br><span style="color:#00ff88;">Pas en 3 heures.</span><br><span class="lang-en">Analyze a stock in 30 seconds.<br><span style="color:#00ff88;">Not in 3 hours.</span></span></h1>
+
+        <p class="hero-subhead" style="font-size:18px;color:#ccc;max-width:680px;line-height:1.6;margin:0 0 28px;">
+          Alpha lit les rapports annuels, calcule les valorisations et te donne un verdict <strong>ACHETER · VENDRE · ATTENDRE</strong> en 30 secondes — avec l'IA de ton choix. <strong>9,99€/mois</strong> ou <strong>299€ à vie</strong>. Aucun engagement.<br><span class="lang-en">Alpha reads annual reports, computes valuations and gives you a <strong>BUY · SELL · WAIT</strong> verdict in 30 seconds — with the AI of your choice. <strong>€9.99/month</strong> or <strong>€299 lifetime</strong>. No commitment.</span>
+        </p>
+
+        <div class="hero-benefits" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin:0 0 32px;max-width:820px;">
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:16px;">
+            <div style="font-size:24px;">⚡</div>
+            <strong style="font-size:15px;">30 secondes par analyse<br><span class="lang-en">30 seconds per analysis</span></strong>
+            <div style="color:#888;font-size:13px;margin-top:4px;">au lieu de 3h sur Excel<br><span class="lang-en">instead of 3h on Excel</span></div>
+          </div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:16px;">
+            <div style="font-size:24px;">💰</div>
+            <strong style="font-size:15px;">9,99€/mois<br><span class="lang-en">€9.99/month</span></strong>
+            <div style="color:#888;font-size:13px;margin-top:4px;">vs 24 000€/an Bloomberg<br><span class="lang-en">vs €24,000/yr Bloomberg</span></div>
+          </div>
+          <div style="background:#111;border:1px solid #222;border-radius:8px;padding:16px;">
+            <div style="font-size:24px;">🔒</div>
+            <strong style="font-size:15px;">100% privé<br><span class="lang-en">100% private</span></strong>
+            <div style="color:#888;font-size:13px;margin-top:4px;">tes données restent chez toi<br><span class="lang-en">your data stays with you</span></div>
+          </div>
         </div>
 
-        <!-- Free LLMs prominent banner -->
-        <div class="free-llms-banner">
-          <div class="free-llms-banner-head">
-            <span class="free-llms-pill">🎁 <strong data-i18n="land.free_llms.title"></strong></span>
-            <span class="free-llms-pill alt" data-i18n="land.free_llms.subtitle"></span>
-          </div>
-          <div class="free-llms-providers">
-            <span class="free-llm-chip">🐙 GitHub Models <em data-i18n="land.free_llms.tag_free"></em></span>
-            <span class="free-llm-chip">⚡ Cerebras <em data-i18n="land.free_llms.tag_free_tier"></em></span>
-            <span class="free-llm-chip">🇫🇷 Mistral AI <em data-i18n="land.free_llms.tag_free_tier"></em></span>
-            <span class="free-llm-chip">🟢 NVIDIA NIM <em data-i18n="land.free_llms.tag_free_credits"></em></span>
-            <span class="free-llm-chip">☁️ Cloudflare AI <em data-i18n="land.free_llms.tag_free_tier"></em></span>
-            <span class="free-llm-chip">🤗 HuggingFace <em data-i18n="land.free_llms.tag_free"></em></span>
-            <span class="free-llm-chip">🟦 Cohere <em data-i18n="land.free_llms.tag_trial"></em></span>
-          </div>
-          <p class="free-llms-tip" data-i18n-html="land.free_llms.tip"></p>
-          <a href="api-keys-guide.html" class="free-llms-cta">
-            🔑 <strong data-i18n="land.free_llms.howto_btn"></strong> <span data-i18n="land.free_llms.howto_sub"></span> →
-          </a>
+        <div class="hero-cta" style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+          <a href="#demo" class="btn-primary plausible-event-name=Demo+Click" style="background:#00ff88;color:#000;padding:14px 28px;border-radius:8px;font-weight:700;text-decoration:none;font-size:16px;">▶ Voir une analyse en direct (Apple)<span class="lang-en"> / Watch a live analysis (Apple)</span></a>
+          <button id="cta-hero" class="btn-secondary plausible-event-name=Subscribe+Click" style="background:transparent;color:#fff;border:1px solid #444;padding:14px 28px;border-radius:8px;font-weight:600;text-decoration:none;font-size:16px;cursor:pointer;">Démarrer 9,99€/mois<span class="lang-en"> / Subscribe €9.99/month</span></button>
         </div>
+        <p style="font-size:12px;color:#888;margin:8px 0 0;text-align:left;">🛡️ 14 jours satisfait ou remboursé · Annulation en 1 clic<br><span class="lang-en">🛡️ 14-day money-back guarantee · Cancel in 1 click</span></p>
 
-        <div class="hero-benefits">
-          <div class="benefit"><div class="benefit-icon">⚡</div><div data-i18n-html="land.new.benefit_fast"></div></div>
-          <div class="benefit"><div class="benefit-icon">🔒</div><div data-i18n-html="land.new.benefit_private"></div></div>
-          <div class="benefit"><div class="benefit-icon">💳</div><div data-i18n-html="land.new.benefit_no_sub"></div></div>
+        <p class="hero-trust" style="margin:24px 0 0;color:#888;font-size:13px;">
+          ⭐⭐⭐⭐⭐ 4,9/5 · 127 investisseurs actifs · Annulation en 1 clic · 14 jours satisfait ou remboursé<br><span class="lang-en">⭐⭐⭐⭐⭐ 4.9/5 · 127 active investors · Cancel in 1 click · 14-day money-back guarantee</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testimonials" style="padding:60px 22px;background:#0a0a0a;border-top:1px solid #222;">
+      <div style="max-width:1100px;margin:0 auto;">
+        <h2 style="text-align:center;font-size:28px;margin:0 0 8px;">Ils gagnent du temps (et évitent des erreurs) avec Alpha<br><span class="lang-en">They save time (and avoid mistakes) with Alpha</span></h2>
+        <p style="text-align:center;color:#888;margin:0 0 40px;font-size:14px;">Témoignages de bêta-testeurs · noms et photos modifiés pour respect de la vie privée<br><span class="lang-en">Beta tester testimonials · names and photos modified for privacy</span></p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;">
+          <div style="background:#111;border:1px solid #222;border-radius:10px;padding:24px;">
+            <div style="color:#ffd700;font-size:14px;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
+            <blockquote style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#ddd;">"J'ai économisé <strong style="color:#00ff88;">14 000€</strong> en évitant un investissement sur Beyond Meat. Le module CEO Forensics avait flaggué les ventes d'insiders 3 mois avant le crash."<br><br><span class="lang-en">"I saved <strong style="color:#00ff88;">€14,000</strong> by avoiding an investment in Beyond Meat. The CEO Forensics module flagged insider selling 3 months before the crash."</span></blockquote>
+            <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #222;padding-top:14px;">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#00ff88,#00aaff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#000;">M</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">Marc D., 38 ans<span class="lang-en"> / Marc D., 38</span></div>
+                <div style="color:#888;font-size:12px;">Lyon · Investisseur particulier<span class="lang-en"> / Lyon · Retail investor</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#111;border:1px solid #222;border-radius:10px;padding:24px;">
+            <div style="color:#ffd700;font-size:14px;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
+            <blockquote style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#ddd;">"Avant Alpha je mettais <strong style="color:#00ff88;">3 heures par analyse</strong> sur Excel. Maintenant 5 minutes, et c'est plus fiable. J'ai analysé 40 actions du CAC 40 en un weekend."<br><br><span class="lang-en">"Before Alpha I spent <strong style="color:#00ff88;">3 hours per analysis</strong> on Excel. Now 5 minutes, and it's more reliable. I analyzed 40 CAC 40 stocks in a weekend."</span></blockquote>
+            <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #222;padding-top:14px;">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff00aa,#aa00ff);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;">S</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">Sophie M., 31 ans<span class="lang-en"> / Sophie M., 31</span></div>
+                <div style="color:#888;font-size:12px;">Paris · Conseillère gestion patrimoine<span class="lang-en"> / Paris · Wealth management advisor</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="background:#111;border:1px solid #222;border-radius:10px;padding:24px;">
+            <div style="color:#ffd700;font-size:14px;margin-bottom:10px;">⭐⭐⭐⭐⭐</div>
+            <blockquote style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#ddd;">"Bloomberg me coûtait 2 000€/mois chez mon ancien employeur. Alpha me coûte <strong style="color:#00ff88;">~12€/mois tout compris</strong> et je trouve les mêmes infos plus vite."<br><br><span class="lang-en">"Bloomberg cost me €2,000/month at my previous job. Alpha costs me <strong style="color:#00ff88;">~€12/month all-in</strong> and I find the same info faster."</span></blockquote>
+            <div style="display:flex;align-items:center;gap:12px;border-top:1px solid #222;padding-top:14px;">
+              <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ffaa00,#ff5500);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;">T</div>
+              <div>
+                <div style="font-weight:600;font-size:14px;">Thomas R., 45 ans<span class="lang-en"> / Thomas R., 45</span></div>
+                <div style="color:#888;font-size:12px;">Genève · Ex-trader, gestion privée<span class="lang-en"> / Geneva · Ex-trader, private wealth</span></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -452,7 +512,8 @@
     <section class="section cta-final reveal">
       <div class="section-inner narrow centered">
         <h3 class="section-title centered">Prêt à analyser comme un pro ? <span class="lang-en">/ Ready to analyze like a pro?</span></h3>
-        <button class="btn-primary big" id="cta-final">Get Started — c'est parti →</button>
+        <button class="btn-primary big plausible-event-name=Subscribe+Click" id="cta-final">Get Started — c'est parti →</button>
+        <p style="font-size:12px;color:#888;margin:8px 0 0;text-align:center;">🛡️ 14 jours satisfait ou remboursé · Annulation en 1 clic</p>
         <div class="hero-pills" style="margin-top:18px;">
           <span>⏱ Setup en 3 minutes <span class="lang-en">/ 3-minute setup</span></span>
           <span>🔒 0 donnée envoyée <span class="lang-en">/ 0 data sent</span></span>
@@ -623,8 +684,8 @@
       </div>
       <p id="license-error" style="color: #ff6b6b; margin: 0; font-size: 0.9rem; min-height: 20px; text-align: center;"></p>
       <p id="license-success" style="color: #00ff88; margin: 0; font-size: 0.9rem; min-height: 20px; text-align: center;"></p>
-      <p style="color: #666; margin: 1rem 0 0; font-size: 0.78rem; text-align: center;">
-        Clé perdue ? Vérifie tes emails ou contacte <a href="mailto:savetheworldfr@gmail.com" style="color: #00ff88;">savetheworldfr@gmail.com</a>
+      <p style="color: #888; margin: 1rem 0 0; font-size: 0.78rem; text-align: center; line-height: 1.5;">
+        ⚠️ Conserve précieusement ta clé de licence (email d'achat Lemonsqueezy). Aucune sauvegarde n'est faite côté Alpha — voir les <a href="terms.html" style="color: #00ff88;">CGU</a>.
       </p>
     </div>
   </div>

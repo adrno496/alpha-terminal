@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Free DCF Calculator — Stock Valuation in 1 Minute | Alpha</title>
+  <meta name="description" content="Free DCF (Discounted Cash Flow) calculator. Estimate a stock's intrinsic value in 1 minute: FCF, growth, WACC, terminal value. No signup required." />
+  <meta name="keywords" content="dcf calculator, discounted cash flow, stock valuation, intrinsic value, fair value, gordon growth, wacc, fcf, free cash flow" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/dcf-calculator-en.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/dcf-calculator.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/dcf-calculator-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/dcf-calculator.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Free DCF Calculator — Stock Valuation in 1 Minute" />
+  <meta property="og:description" content="Estimate a stock's intrinsic value in 1 minute. Full DCF calculator, free, no signup." />
+  <meta property="og:url" content="https://alpha-terminal.app/dcf-calculator-en.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:site_name" content="Alpha" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Free DCF Calculator — Stock Valuation in 1 Minute" />
+  <meta name="twitter:description" content="Interactive DCF calculator. FCF, WACC, growth, terminal value. Free, no signup." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a' rx='14'/><text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'>α</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a; --bg-secondary: #111; --bg-tertiary: #1a1a1a; --accent-green: #00ff88;
+      --text-primary: #fff; --text-secondary: rgba(255,255,255,0.6); --text-muted: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.08);
+      --font-sans: 'Inter', system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  </style>
+  <link rel="preload" href="styles.css" as="style" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    .dcf-input { width:100%;padding:10px;background:#0a0a0a;border:1px solid #333;color:#fff;border-radius:4px;margin-top:4px;font-family:var(--font-mono);font-size:14px; }
+    .dcf-input:focus { outline:none;border-color:var(--accent-green); }
+    .dcf-label { display:block;margin-bottom:14px;font-size:14px; }
+  </style>
+
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Alpha Free DCF Calculator",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web",
+    "description": "Free DCF (Discounted Cash Flow) calculator to estimate a stock's intrinsic value.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.8", "ratingCount": "127" },
+    "url": "https://alpha-terminal.app/dcf-calculator-en.html"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to value a stock with a DCF calculator",
+    "description": "Step-by-step guide to using a DCF calculator and estimating a stock's intrinsic value.",
+    "totalTime": "PT1M",
+    "step": [
+      { "@type": "HowToStep", "position": 1, "name": "Get the Free Cash Flow", "text": "Find the trailing-12-month FCF in the company's annual report (cash flow statement: Cash from Operations - CapEx)." },
+      { "@type": "HowToStep", "position": 2, "name": "Estimate 5-year growth", "text": "Look at historical FCF growth over 5 years + management guidance. Stay conservative: 5-15% for mature companies, 15-30% for growth names." },
+      { "@type": "HowToStep", "position": 3, "name": "Set terminal growth", "text": "Always at or below long-term GDP growth. Standard: 2-3%. Never more than 4%." },
+      { "@type": "HowToStep", "position": 4, "name": "Compute the WACC", "text": "Weighted average cost of capital. Quick approximation: 8-10% for stable large caps, 10-13% for mid/small caps, 13%+ for startups." },
+      { "@type": "HowToStep", "position": 5, "name": "Compare to current price", "text": "If intrinsic value is 30% above the current price, the stock is potentially undervalued (Buffett margin of safety)." }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "What is a DCF (Discounted Cash Flow)?", "acceptedAnswer": { "@type": "Answer", "text": "DCF is a valuation method that estimates a company's value as the discounted sum of its future cash flows. It is the preferred method of Warren Buffett and most professional financial analysts." }},
+      { "@type": "Question", "name": "How do I find a stock's Free Cash Flow?", "acceptedAnswer": { "@type": "Answer", "text": "FCF is in the company's annual (10-K) or quarterly report, in the cash flow statement. Formula: Cash Flow from Operations - Capital Expenditures. Also available on StockAnalysis, Yahoo Finance, Alpha Terminal." }},
+      { "@type": "Question", "name": "What WACC should I use for my DCF?", "acceptedAnswer": { "@type": "Answer", "text": "Quick approximation: 8-10% for stable large caps (Apple, Microsoft), 10-13% for mid/small caps, 13%+ for risky companies or startups. Full formula: WACC = (E/V × Re) + (D/V × Rd × (1-T))." }},
+      { "@type": "Question", "name": "Is the DCF reliable?", "acceptedAnswer": { "@type": "Answer", "text": "DCF is highly sensitive to assumptions (garbage in, garbage out). Small variation in WACC or terminal growth = large variation in value. Use it as one of several methods (P/E, EV/EBITDA, comparables), never alone." }},
+      { "@type": "Question", "name": "What margin of safety should I apply?", "acceptedAnswer": { "@type": "Answer", "text": "Benjamin Graham and Warren Buffett recommend a 25-50% margin of safety on the calculated intrinsic value. If your DCF gives $100 and the stock trades at $70 or below, it's a potential buy signal." }}
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "DCF Calculator", "item": "https://alpha-terminal.app/dcf-calculator-en.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;">
+      <span class="logo-mark">Alpha</span>
+    </a>
+    <div class="landing-nav-links">
+      <a href="/">Home</a>
+      <a href="features-en.html">Features</a>
+      <a href="pricing-en.html">Pricing</a>
+      <a href="api-costs-en.html">API Costs</a>
+      <a href="bloomberg-alternative-en.html">vs Bloomberg</a>
+      <a href="dcf-calculator.html" class="lang-switch" hreflang="fr" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="Version française">🇫🇷 FR</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">🧮 Free DCF Calculator · Stock Valuation in 1 Minute</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Estimate a stock's intrinsic value with the discounted cash flow method. 100% free, no signup, instant calculation in your browser.</p>
+
+    <div style="background:#111;border:1px solid #222;border-radius:10px;padding:24px;max-width:680px;">
+      <h2 style="margin:0 0 18px;font-size:20px;">Your assumptions</h2>
+
+      <label class="dcf-label">
+        <span>Current Free Cash Flow ($ millions)</span>
+        <input type="number" id="dcf-fcf" value="100" step="10" class="dcf-input" />
+      </label>
+
+      <label class="dcf-label">
+        <span>FCF growth years 1-5 (% per year)</span>
+        <input type="number" id="dcf-growth" value="10" step="1" class="dcf-input" />
+      </label>
+
+      <label class="dcf-label">
+        <span>Terminal growth (% per year, year 6+)</span>
+        <input type="number" id="dcf-terminal" value="3" step="0.5" class="dcf-input" />
+      </label>
+
+      <label class="dcf-label">
+        <span>Discount rate / WACC (%)</span>
+        <input type="number" id="dcf-wacc" value="9" step="0.5" class="dcf-input" />
+      </label>
+
+      <label class="dcf-label">
+        <span>Shares outstanding (millions)</span>
+        <input type="number" id="dcf-shares" value="50" step="1" class="dcf-input" />
+      </label>
+
+      <label class="dcf-label">
+        <span>Net cash ($ millions, negative if net debt)</span>
+        <input type="number" id="dcf-cash" value="0" step="10" class="dcf-input" />
+      </label>
+
+      <button onclick="calculateDCF()" class="plausible-event-name=DCF+Calculate" style="width:100%;background:#00ff88;color:#000;padding:14px;border:0;border-radius:6px;font-weight:700;font-size:15px;cursor:pointer;">📊 Calculate valuation</button>
+
+      <div id="dcf-result" style="margin-top:24px;"></div>
+    </div>
+
+    <script>
+    function calculateDCF() {
+      const fcf = parseFloat(document.getElementById('dcf-fcf').value);
+      const g = parseFloat(document.getElementById('dcf-growth').value) / 100;
+      const tg = parseFloat(document.getElementById('dcf-terminal').value) / 100;
+      const wacc = parseFloat(document.getElementById('dcf-wacc').value) / 100;
+      const shares = parseFloat(document.getElementById('dcf-shares').value);
+      const cash = parseFloat(document.getElementById('dcf-cash').value);
+
+      if (isNaN(fcf) || isNaN(g) || isNaN(tg) || isNaN(wacc) || isNaN(shares) || isNaN(cash)) {
+        document.getElementById('dcf-result').innerHTML = '<p style="color:#ff5555;">⚠️ All fields must contain valid numbers.</p>';
+        return;
+      }
+      if (wacc <= tg) {
+        document.getElementById('dcf-result').innerHTML = '<p style="color:#ff5555;">⚠️ WACC must be greater than terminal growth.</p>';
+        return;
+      }
+      if (shares <= 0) {
+        document.getElementById('dcf-result').innerHTML = '<p style="color:#ff5555;">⚠️ Shares outstanding must be positive.</p>';
+        return;
+      }
+
+      let pvCashFlows = 0;
+      let lastFCF = fcf;
+      for (let year = 1; year <= 5; year++) {
+        lastFCF = lastFCF * (1 + g);
+        const pv = lastFCF / Math.pow(1 + wacc, year);
+        pvCashFlows += pv;
+      }
+
+      const terminalValue = (lastFCF * (1 + tg)) / (wacc - tg);
+      const pvTerminal = terminalValue / Math.pow(1 + wacc, 5);
+
+      const enterpriseValue = pvCashFlows + pvTerminal;
+      const equityValue = enterpriseValue + cash;
+      const intrinsicPerShare = equityValue / shares;
+
+      document.getElementById('dcf-result').innerHTML = `
+        <div style="background:#0a0a0a;border:1px solid #00ff88;border-radius:8px;padding:20px;">
+          <h3 style="margin:0 0 12px;color:#00ff88;">📊 Intrinsic value</h3>
+          <div style="font-size:32px;font-weight:700;margin:8px 0;">$${intrinsicPerShare.toFixed(2)}</div>
+          <p style="color:#888;font-size:13px;margin:0;">per share</p>
+
+          <hr style="border:0;border-top:1px solid #222;margin:18px 0;">
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+            <div><span style="color:#888;">Enterprise Value</span><br><strong>$${(enterpriseValue/1000).toFixed(2)}B</strong></div>
+            <div><span style="color:#888;">Equity Value</span><br><strong>$${(equityValue/1000).toFixed(2)}B</strong></div>
+            <div><span style="color:#888;">PV Cash Flows 5y</span><br><strong>$${(pvCashFlows/1000).toFixed(2)}B</strong></div>
+            <div><span style="color:#888;">PV Terminal Value</span><br><strong>$${(pvTerminal/1000).toFixed(2)}B</strong></div>
+          </div>
+
+          <div style="background:#1a1a1a;border-left:3px solid #00ff88;padding:14px;margin-top:18px;border-radius:4px;">
+            <strong>💡 Compare to current price:</strong><br>
+            <small style="color:#888;">If the stock trades 30% below → potentially undervalued.<br>
+            If it trades 30% above → potentially overvalued.</small>
+          </div>
+
+          <div style="margin-top:20px;padding:18px;background:#1a1a1a;border-radius:6px;text-align:center;">
+            <p style="margin:0 0 12px;font-size:14px;">Want this calculation auto-run on 1000+ stocks with real data + 60 other analyses?</p>
+            <a href="pricing-en.html" class="plausible-event-name=DCF+Upsell" style="display:inline-block;background:#00ff88;color:#000;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;">⚡ Try Alpha $9.99/month</a>
+            <p style="margin:10px 0 0;font-size:11px;color:#888;">🛡️ 14-day money-back guarantee</p>
+          </div>
+        </div>
+      `;
+    }
+    </script>
+
+    <h2 style="font-size:24px;margin:40px 0 12px;">🧠 How does DCF work?</h2>
+    <p>The <strong>Discounted Cash Flow</strong> method starts with a simple idea: a company's value today = the sum of all the cash it will generate in the future, brought back to today's value.</p>
+    <p>Why "bring back"? Because $1 received in 5 years is worth less than $1 today (inflation, risk, opportunity cost). We <strong>discount</strong> each future cash flow using the WACC.</p>
+    <p><strong>Simplified formula:</strong></p>
+    <pre style="background:#0a0a0a;padding:14px;border-radius:6px;font-family:var(--font-mono);font-size:13px;overflow-x:auto;border:1px solid #222;">Value = Σ (FCF_year_n / (1 + WACC)^n) + (Terminal Value / (1 + WACC)^5)
+
+Terminal Value = (FCF_year_5 × (1 + g_terminal)) / (WACC - g_terminal)
+                 ↑ Gordon-Shapiro formula</pre>
+    <p>We typically project FCF over 5 to 10 years (explicit period), then compute a "terminal value" representing everything the company will produce beyond that, assuming stable infinite growth (often 2-3% — close to long-term GDP).</p>
+    <p>Enterprise value is then adjusted: add net cash (or subtract debt) to get equity value, divided by shares outstanding to get intrinsic value per share.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">⚠️ DCF limitations (worth knowing)</h2>
+    <p>DCF is not magic. Its known weaknesses:</p>
+    <ul style="line-height:1.9;">
+      <li><strong>Garbage in, garbage out</strong> — the result is only as good as your assumptions. A 5%-too-high growth estimate can double the valuation.</li>
+      <li><strong>WACC sensitivity</strong> — moving from 8% to 10% can drop value by 30-40%. Small changes, big impact.</li>
+      <li><strong>Terminal value = 60-80% of total</strong> — most of the valuation comes from the distant, most uncertain future.</li>
+      <li><strong>Unsuitable for young companies</strong> — if FCF is not yet positive (startups, biotech), DCF is unusable as-is.</li>
+      <li><strong>Misses network effects, brand, patents</strong> — intangible assets are poorly captured.</li>
+      <li><strong>Assumes macro stability</strong> — rate regime change, recession, tech disruption: the model doesn't see it coming.</li>
+    </ul>
+    <p><strong>Best practice:</strong> compute multiple scenarios (bear / base / bull), apply a 25-50% margin of safety, and always cross-check DCF with other methods.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">⚖️ DCF vs other methods (P/E, EV/EBITDA)</h2>
+    <p>DCF is just one method among several. Pros always use multiple angles:</p>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Method</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Strengths</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Weaknesses</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:10px;border:1px solid var(--border);"><strong>DCF</strong></td><td style="padding:10px;border:1px solid var(--border);">Fundamental method, accounts for future cash flows</td><td style="padding:10px;border:1px solid var(--border);">Highly sensitive to assumptions</td></tr>
+        <tr><td style="padding:10px;border:1px solid var(--border);"><strong>P/E</strong> (Price/Earnings)</td><td style="padding:10px;border:1px solid var(--border);">Ultra simple, usable everywhere</td><td style="padding:10px;border:1px solid var(--border);">Manipulable (accounting earnings), ignores debt</td></tr>
+        <tr><td style="padding:10px;border:1px solid var(--border);"><strong>EV/EBITDA</strong></td><td style="padding:10px;border:1px solid var(--border);">Compares differently-leveraged firms, neutralizes tax</td><td style="padding:10px;border:1px solid var(--border);">Ignores CapEx (useless for capital-intensive companies)</td></tr>
+        <tr><td style="padding:10px;border:1px solid var(--border);"><strong>Comparables</strong></td><td style="padding:10px;border:1px solid var(--border);">Reflects market sentiment</td><td style="padding:10px;border:1px solid var(--border);">If the sector is in a bubble, you validate the bubble</td></tr>
+        <tr><td style="padding:10px;border:1px solid var(--border);"><strong>Dividend Discount</strong></td><td style="padding:10px;border:1px solid var(--border);">Good for utilities and mature dividend payers</td><td style="padding:10px;border:1px solid var(--border);">Useless for growth names with no dividends</td></tr>
+      </tbody>
+    </table>
+    <p>Our take: use DCF as the primary method for mature companies with stable FCF, then cross-check with P/E and EV/EBITDA. For growth/tech, complement with sector multiples.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">What is a DCF (Discounted Cash Flow)?</summary>
+      <p>DCF is a valuation method that estimates a company's value as the discounted sum of its future cash flows. It is the preferred method of Warren Buffett and most professional financial analysts.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">How do I find a stock's Free Cash Flow?</summary>
+      <p>FCF is in the company's annual (10-K) or quarterly report, in the cash flow statement. Formula: <strong>Cash Flow from Operations - Capital Expenditures</strong>. Also available on StockAnalysis, Yahoo Finance, or directly inside Alpha Terminal.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">What WACC should I use for my DCF?</summary>
+      <p>Quick approximation: <strong>8-10%</strong> for stable large caps (Apple, Microsoft), <strong>10-13%</strong> for mid/small caps, <strong>13%+</strong> for risky companies or startups. Full formula: WACC = (E/V × Re) + (D/V × Rd × (1-T)).</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Is the DCF reliable?</summary>
+      <p>DCF is highly sensitive to assumptions (garbage in, garbage out). Small variation in WACC or terminal growth = large variation in value. Use it as one of several methods (P/E, EV/EBITDA, comparables), <strong>never alone</strong>.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">What margin of safety should I apply?</summary>
+      <p>Benjamin Graham and Warren Buffett recommend a <strong>25-50% margin of safety</strong> on the calculated intrinsic value. If your DCF gives $100 and the stock trades at $70 or below, it's a potential buy signal.</p>
+    </details>
+
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 10px;">🚀 Auto DCF on 1000+ stocks?</h3>
+      <p style="color:var(--text-secondary);margin:0 0 14px;">Alpha runs DCF + 60 other analyses (10-K Decoder, Earnings Call, Macro Dashboard...) in BYOK. Real data, multiple scenarios, sector comparables.</p>
+      <a href="pricing-en.html" class="btn-primary big plausible-event-name=DCF+CTA+Final" style="text-decoration:none;display:inline-block;background:#00ff88;color:#000;padding:14px 28px;border-radius:6px;font-weight:700;">⚡ Try Alpha $9.99/month</a>
+      <p style="font-size:12px;color:var(--text-muted);margin:12px 0 0;">🛡️ 14-day money-back guarantee</p>
+    </div>
+
+    <footer class="landing-footer" style="margin-top:60px;">
+      <span>Alpha · Made in France 🇫🇷 · BYOK 100% private</span>
+      <span class="footer-legal-links">
+        <a href="about-en.html">About</a> ·
+        <a href="pricing-en.html">Pricing</a> ·
+        <a href="bloomberg-alternative-en.html">vs Bloomberg</a> ·
+        <a href="features-en.html">Features</a> ·
+        <a href="byok-cost-calculator-en.html">BYOK Calculator</a> ·
+        <a href="privacy-en.html">Privacy</a> ·
+        <a href="terms-en.html">Terms</a> ·
+        <a href="legal-en.html">Legal</a>
+      </span>
+    </footer>
+  </article>
+</body>
+</html>

@@ -123,6 +123,9 @@
     .seo-footer a { color: #777; margin: 0 6px; }
     @media (max-width: 700px) { .pros-cons { grid-template-columns: 1fr; } }
   </style>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
 
@@ -132,7 +135,7 @@
   <a href="/pricing-en.html">Pricing</a>
   <a href="/bloomberg-alternative-en.html" class="active">Bloomberg alternative</a>
   <a href="/ai-stock-analysis-guide-en.html">AI Guide</a>
-  <a href="/bloomberg-alternative.html" class="lang-switch" title="Version française">🇫🇷 FR</a>
+  <a href="/bloomberg-alternative.html" class="lang-switch" hreflang="fr" title="Version française">🇫🇷 FR</a>
   <a href="/" style="color:#00ff88;font-weight:600;">Launch app →</a>
 </header>
 
@@ -146,7 +149,25 @@
     Bloomberg Terminal costs <strong>€24,000/year</strong> per user. For a retail investor or a fund of less than 10 people, the cost is prohibitive. This article compares the <strong>7 best alternatives</strong> in 2026 — including the new category of AI terminals like Alpha — with pros, cons, and an honest verdict.
   </p>
 
-  <h2>Why look for a Bloomberg alternative?</h2>
+  <nav class="toc" aria-label="Table of contents" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+    <strong style="font-size:13px;color:#00ff88;">Table of contents</strong>
+    <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+      <li><a href="#section-1" style="color:#aaa;">Why look for a Bloomberg alternative?</a></li>
+      <li><a href="#section-2" style="color:#aaa;">Full comparison: 7 alternatives</a></li>
+      <li><a href="#section-3" style="color:#aaa;">1. Alpha — BYOK AI terminal</a></li>
+      <li><a href="#section-4" style="color:#aaa;">2. Bloomberg Terminal</a></li>
+      <li><a href="#section-5" style="color:#aaa;">3. Koyfin Premium</a></li>
+      <li><a href="#section-6" style="color:#aaa;">4. Seeking Alpha Premium</a></li>
+      <li><a href="#section-7" style="color:#aaa;">5. Stock Rover Premium Plus</a></li>
+      <li><a href="#section-8" style="color:#aaa;">6. Atom Finance Pro</a></li>
+      <li><a href="#section-9" style="color:#aaa;">7. TradingView Premium</a></li>
+      <li><a href="#section-10" style="color:#aaa;">Bloomberg vs ChatGPT Plus: false alternative</a></li>
+      <li><a href="#section-11" style="color:#aaa;">Why the real 2026 standard is BYOK</a></li>
+      <li><a href="#section-12" style="color:#aaa;">FAQ</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="section-1">Why look for a Bloomberg alternative?</h2>
   <p>Bloomberg Terminal has been the reference tool for investment banks, hedge funds, and trading desks for 40 years (<a href="https://www.bloomberg.com/professional/products/bloomberg-terminal/" rel="noopener noreferrer" target="_blank">Bloomberg Terminal — official source</a>). But in 2026, three things have changed:</p>
   <ol style="line-height:1.9;color:#ccc;">
     <li><strong>The price stays fixed at ~€24,000/year</strong>, while financial data has become commoditized. FMP, Polygon, Alpha Vantage offer 80% of the data for €50-200/year.</li>
@@ -154,7 +175,7 @@
     <li><strong>Retail demand has exploded</strong>. 30 million brokerage accounts in France, 50% of US trading by retail. The target is no longer purely institutional.</li>
   </ol>
 
-  <h2>Full comparison: 7 Bloomberg alternatives in 2026</h2>
+  <h2 id="section-2">Full comparison: 7 Bloomberg alternatives in 2026</h2>
   <table class="compare-big">
     <thead>
       <tr>
@@ -174,7 +195,7 @@
     </tbody>
   </table>
 
-  <h2>1. Alpha — the new category: BYOK AI terminal</h2>
+  <h2 id="section-3">1. Alpha — the new category: BYOK AI terminal</h2>
   <div class="verdict-box"><strong>Verdict:</strong> best price/quality ratio on the market in 2026. The only solution combining institutional AI analysis and absolute local privacy at a price affordable for individuals.</div>
   <p>Alpha is the most radically different alternative. Instead of being a pure data terminal, it's an <strong>analysis terminal</strong> powered by 14 LLMs (Claude, GPT, Gemini, Grok, Mistral, Cerebras…). You pay the app <a href="pricing-en.html" title="See full Alpha pricing">€9.99/month only</a>, and connect your own API key to the LLM of your choice (BYOK).</p>
   <p>Concretely: drop a 10-K → 30 seconds later you have a Buffett-style value analysis. Paste an earnings call → CEO Forensics with quantified sentiment. Provide your portfolio → full audit with 0-100 score.</p>
@@ -195,7 +216,7 @@
     </ul></div>
   </div>
 
-  <h2>2. Bloomberg Terminal — the institutional standard</h2>
+  <h2 id="section-4">2. Bloomberg Terminal — the institutional standard</h2>
   <div class="verdict-box"><strong>Verdict:</strong> still essential for institutional trading desks, but oversized and overpriced for nearly all retail investors and funds &lt; €50M AUM.</div>
   <div class="pros-cons">
     <div class="pros"><h4>✅ Pros</h4><ul>
@@ -212,23 +233,23 @@
     </ul></div>
   </div>
 
-  <h2>3. Koyfin Premium — the UX challenger</h2>
+  <h2 id="section-5">3. Koyfin Premium — the UX challenger</h2>
   <div class="verdict-box"><strong>Verdict:</strong> best alternative for those who want a modern Bloomberg-style UI without AI. ~50× cheaper than Bloomberg.</div>
   <p>Koyfin offers customizable dashboards, fundamental screening, clean chart analyses. Excellent UX. But it's a <strong>data terminal</strong> — no automated analysis.</p>
 
-  <h2>4. Seeking Alpha Premium — community + ratings</h2>
+  <h2 id="section-6">4. Seeking Alpha Premium — community + ratings</h2>
   <p>Seeking Alpha shines with its community of contributing analysts and algorithmic ratings (Quant Rating). Good for idea sourcing and passive reading. The "Premium AI Insights" remain limited vs a connected Claude/GPT-4.</p>
 
-  <h2>5. Stock Rover Premium Plus — fundamental screening</h2>
+  <h2 id="section-7">5. Stock Rover Premium Plus — fundamental screening</h2>
   <p>Excellent screener (650+ metrics), good for portfolio backtesting. US-centric data. No AI, no native mobile.</p>
 
-  <h2>6. Atom Finance Pro — the cheap minimalist</h2>
+  <h2 id="section-8">6. Atom Finance Pro — the cheap minimalist</h2>
   <p>Beautiful mobile-first interface, low price (€180/year). Sufficient coverage for light fundamental analysis. Limited for those doing deep value or multi-asset.</p>
 
-  <h2>7. TradingView Premium — the king of charting</h2>
+  <h2 id="section-9">7. TradingView Premium — the king of charting</h2>
   <p>Absolute standard for technical analysis, customizable charts, strategies in Pine Script. But zero automated fundamental analysis and no AI.</p>
 
-  <h2>Bloomberg vs ChatGPT Plus: the false alternative</h2>
+  <h2 id="section-10">Bloomberg vs ChatGPT Plus: the false alternative</h2>
   <p>Many think a ChatGPT Plus subscription (€240/year) with web research can replace Bloomberg. Partially true: GPT-4 can summarize a 10-K, compare 2 companies, explain macro. But:</p>
   <ul style="line-height:1.85;color:#ccc;">
     <li>No dedicated prompt structure (each session starts from scratch)</li>
@@ -239,7 +260,7 @@
   </ul>
   <p>Alpha solves exactly these 5 problems: system prompts calibrated per module (10-K, DCF, audit…), wealth memory + RAG, 100% local, smart router 14 LLMs, cost tracking per request.</p>
 
-  <h2>Why the real 2026 standard is BYOK</h2>
+  <h2 id="section-11">Why the real 2026 standard is BYOK</h2>
   <p>The BYOK (Bring Your Own Key) model is becoming the standard for professional AI apps. Why?</p>
   <ul style="line-height:1.85;color:#ccc;">
     <li><strong>Transparent pricing</strong>: you pay AI at the provider's official rate, not an arbitrary 5-10× markup.</li>
@@ -248,7 +269,7 @@
     <li><strong>No "freemium trap"</strong>: zero recurring subscription on the editor side.</li>
   </ul>
 
-  <h2>FAQ</h2>
+  <h2 id="section-12">FAQ</h2>
   <h3>Does Bloomberg Terminal really cost €24,000/year?</h3>
   <p>Yes. The official Bloomberg Terminal price is around $24,000-30,000 per year per user (~€22-28K). Annual contract required, no reduced version for retail.</p>
 

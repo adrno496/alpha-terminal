@@ -165,6 +165,9 @@
     ]
   }
   </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <nav class="landing-nav">
@@ -177,7 +180,7 @@
       <a href="pricing.html">Tarif</a>
       <a href="api-costs.html" style="color:var(--accent-green);">Coûts API</a>
       <a href="bloomberg-alternative.html">vs Bloomberg</a>
-      <a href="api-costs-en.html" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
+      <a href="api-costs-en.html" class="lang-switch" hreflang="en" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
     </div>
   </nav>
 
@@ -189,11 +192,25 @@
       <strong>📌 TL;DR</strong> — Avec ton propre clé API (BYOK), tu paies entre <strong>$2 et $150 par mois</strong> selon ton usage. Soit <strong>100 à 200× moins cher</strong> qu'un Bloomberg Terminal ($24 000/an) ou qu'un Koyfin Plus ($468/an), pour un set de 46+ modules d'analyse alimentés par les meilleures IA du marché.
     </div>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">🤔 Le modèle BYOK, c'est quoi ?</h2>
+    <nav class="toc" aria-label="Table des matières" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table des matières</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">Le modèle BYOK, c'est quoi ?</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Tarifs des principaux providers (2026)</a></li>
+        <li><a href="#section-3" style="color:#aaa;">Coût estimé par module Alpha</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Budget mensuel selon ton profil</a></li>
+        <li><a href="#section-5" style="color:#aaa;">Comparaison BYOK vs SaaS</a></li>
+        <li><a href="#section-6" style="color:#aaa;">Comment réduire ses coûts API</a></li>
+        <li><a href="#section-7" style="color:#aaa;">Optimisations intégrées dans Alpha</a></li>
+        <li><a href="#section-8" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🤔 Le modèle BYOK, c'est quoi ?</h2>
     <p>BYOK signifie <strong>Bring Your Own Key</strong>. Au lieu de payer un abonnement SaaS à plusieurs centaines d'euros par an qui inclut "l'IA", tu paies <strong>directement ton fournisseur d'IA</strong> (Anthropic, OpenAI, Google, etc.) au prix coûtant. Alpha n'est qu'une couche d'orchestration : 46+ modules d'analyse pré-configurés qui appellent l'API du provider de ton choix avec les bons prompts.</p>
     <p>Tu t'abonnes (9,99€/mois), et l'usage IA <strong>au prix du marché</strong>, sans intermédiaire.</p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">📊 Tarifs des principaux providers (2026)</h2>
+    <h2 id="section-2" style="font-size:24px;margin:32px 0 12px;">📊 Tarifs des principaux providers (2026)</h2>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
       <thead><tr style="background:var(--bg-tertiary);">
         <th style="padding:10px;text-align:left;border:1px solid var(--border);">Provider</th>
@@ -218,7 +235,7 @@
     </table>
     <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">*Tier gratuit avec rate limits — usage personnel uniquement avec un PAT GitHub.</p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">🎯 Coût estimé par module Alpha</h2>
+    <h2 id="section-3" style="font-size:24px;margin:32px 0 12px;">🎯 Coût estimé par module Alpha</h2>
     <p>Voici les coûts moyens par analyse pour les modules les plus utilisés, basés sur les profils de tokens réels (input + output). Les chiffres affichés utilisent <strong>Claude Sonnet 4.6 (tier balanced)</strong>, le default de l'app.</p>
 
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
@@ -248,7 +265,7 @@
       💡 <strong>Astuce</strong> : Si tu utilises principalement les modules légers (Quick Analysis, Position Sizing, Chatbot), 100 analyses/mois te coûteront <strong>environ $1.50</strong>. C'est moins qu'un café Starbucks. Les analyses lourdes (10-K, Earnings, YouTube) sont à réserver aux décisions importantes — 5 par mois = $0.75. Total : <strong>~$2-3/mois</strong> pour un usage occasionnel.
     </p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">📈 Budget mensuel selon ton profil</h2>
+    <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">📈 Budget mensuel selon ton profil</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;">
       <div style="border:1px solid var(--border);padding:14px;border-radius:6px;">
         <h3 style="margin:0 0 6px;font-size:16px;">🐢 Occasionnel</h3>
@@ -270,7 +287,7 @@
       </div>
     </div>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">⚖️ Comparaison BYOK vs SaaS</h2>
+    <h2 id="section-5" style="font-size:24px;margin:32px 0 12px;">⚖️ Comparaison BYOK vs SaaS</h2>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
       <thead><tr style="background:var(--bg-tertiary);">
         <th style="padding:10px;text-align:left;border:1px solid var(--border);">Solution</th>
@@ -288,7 +305,7 @@
       </tbody>
     </table>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">💡 Comment réduire ses coûts API</h2>
+    <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">💡 Comment réduire ses coûts API</h2>
     <ol style="line-height:1.9;">
       <li><strong>Privilégie le tier "balanced" par défaut</strong> — Sonnet 4.6 ou GPT-5 Mini sont 5× moins chers que les flagship pour 90% des cas.</li>
       <li><strong>Configure plusieurs providers</strong> et laisse le smart router de l'app choisir le moins cher pour chaque module.</li>
@@ -298,7 +315,7 @@
       <li><strong>Profite du caching prompt</strong> côté Claude/OpenAI : si tu enchaînes des analyses sur le même actif, le système prompt est cached et facturé 90% moins cher.</li>
     </ol>
 
-    <h2 style="font-size:24px;margin:40px 0 12px;">🪙 Optimisations intégrées dans Alpha (économie automatique jusqu'à -70%)</h2>
+    <h2 id="section-7" style="font-size:24px;margin:40px 0 12px;">🪙 Optimisations intégrées dans Alpha (économie automatique jusqu'à -70%)</h2>
     <p>Alpha intègre <strong>7 optimisations de coût activables en un clic</strong> dans Settings → Avancé. Toutes sont désactivables individuellement.</p>
 
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
@@ -342,7 +359,7 @@
     </table>
     <p style="font-size:12.5px;color:var(--text-muted);">Économies cumulables. Activation en 2 clics dans <em>Settings → Avancé</em>.</p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+    <h2 id="section-8" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
 
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Combien coûte une analyse financière avec une API d'IA ?</summary>
@@ -389,7 +406,9 @@
         <a href="features.html">Fonctionnalités</a> ·
         <a href="privacy.html">Confidentialité</a> ·
         <a href="terms.html">CGU</a> ·
-        <a href="legal.html">Mentions légales</a>
+        <a href="legal.html">Mentions légales</a> ·
+        <a href="byok-cost-calculator.html">Simulateur coût BYOK</a> ·
+        <a href="dcf-calculator.html">Calculateur DCF</a>
       </span>
     </footer>
   </article>

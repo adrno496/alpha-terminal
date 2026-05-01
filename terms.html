@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Conditions Générales d'Utilisation — Alpha Terminal</title>
+  <title>Conditions Générales d'Utilisation — Alpha Terminal | CGU & BYOK</title>
   <meta name="description" content="Conditions Générales d'Utilisation d'Alpha Terminal : objet du service, modèle BYOK, limitation de responsabilité (pas de conseil en investissement), résiliation, droit applicable français." />
   <meta name="author" content="Alpha" />
   <meta name="robots" content="index, follow" />
   <meta name="application-name" content="Alpha Terminal" />
   <link rel="canonical" href="https://alpha-terminal.app/terms.html" />
   <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/terms.html" />
-  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/terms.html?lang=en" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/terms-en.html" />
   <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/terms.html" />
 
   <meta property="og:type" content="website" />
@@ -77,6 +77,9 @@
     ]
   }
   </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <nav class="static-nav" id="nav-fr">
@@ -85,7 +88,7 @@
     <a href="pricing.html">Tarifs</a>
     <a href="bloomberg-alternative.html">vs Bloomberg</a>
     <a href="about.html">À propos</a>
-    <a href="?lang=en" id="lang-toggle" style="margin-left:auto;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
+    <a href="terms-en.html" id="lang-toggle" style="margin-left:auto;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
   </nav>
 
   <main class="static-page" id="main-content">
@@ -107,6 +110,20 @@
       <li>du respect des limites de débit (rate limits) imposées par chaque fournisseur.</li>
     </ul>
     <p>Alpha n'intermédie aucun paiement vers les fournisseurs LLM/data — l'utilisateur paie directement le fournisseur au tarif officiel.</p>
+
+    <h2>3 bis. Clé de licence Premium — conservation</h2>
+    <div class="warning-box">
+      <strong>⚠️ IMPORTANT — Conservation de la clé de licence :</strong>
+      <p style="margin:8px 0 0;">L'accès Premium est débloqué via une <strong>clé de licence unique</strong> (format UUID) envoyée par email après paiement par le fournisseur de paiement (Lemonsqueezy). Cette clé est l'unique preuve d'achat et le seul moyen d'activer l'app sur un nouvel appareil.</p>
+    </div>
+    <p>L'utilisateur est <strong>seul responsable</strong> de la conservation de sa clé de licence. <strong>Alpha n'effectue aucune sauvegarde côté serveur</strong> de cette clé : aucun système de récupération par email, mot de passe oublié ou réinitialisation n'est disponible.</p>
+    <p>Recommandations :</p>
+    <ul>
+      <li>conserver l'email d'achat Lemonsqueezy contenant la clé,</li>
+      <li>noter la clé dans un gestionnaire de mots de passe,</li>
+      <li>en cas de perte, contacter Lemonsqueezy directement pour retrouver l'email d'achat associé à la transaction.</li>
+    </ul>
+    <p>En cas de perte définitive de la clé sans possibilité de la récupérer auprès de Lemonsqueezy, l'utilisateur devra souscrire un nouvel abonnement. <strong>Aucun remboursement ne sera accordé</strong> pour ce motif.</p>
 
     <h2>4. Limitation de responsabilité — Pas de conseil en investissement</h2>
     <div class="warning-box">
@@ -137,70 +154,5 @@
     <a href="terms.html">CGU</a> ·
     <a href="legal.html">Mentions légales</a>
   </footer>
-
-  <template id="content-en">
-    <h1>Terms of Service</h1>
-    <p style="color:var(--text-primary);"><strong>Last update: May 1, 2026</strong></p>
-
-    <h2>1. Object of the service</h2>
-    <p>Alpha Terminal (hereinafter "the Service") is a web and mobile app (Android, iOS, desktop) providing 46 financial analysis modules powered by 14 third-party LLM providers (Anthropic, OpenAI, Google, etc.) under the <strong>BYOK (Bring Your Own Key)</strong> model. These Terms govern Service usage.</p>
-
-    <h2>2. Access and signup</h2>
-    <p>The Service requires no server account creation. Access is direct from the browser. Local configuration (encrypted vault, API keys, wealth data) stays on the user's device. The paid subscription (€9.99/month) is handled via a third-party payment provider — no personal data collected by Alpha.</p>
-
-    <h2>3. BYOK model and API key responsibility</h2>
-    <p>The user provides their own API keys for LLM and data providers. <strong>They are solely responsible for</strong>:</p>
-    <ul>
-      <li>key security (vault password, backup, restoration),</li>
-      <li>payment of usage billed directly by providers (Anthropic, OpenAI, etc.),</li>
-      <li>compliance with each third-party provider's terms,</li>
-      <li>compliance with rate limits imposed by each provider.</li>
-    </ul>
-    <p>Alpha intermediates no payment to LLM/data providers — the user pays the provider directly at the official rate.</p>
-
-    <h2>4. Limitation of liability — Not investment advice</h2>
-    <div class="warning-box">
-      <strong>⚠️ IMPORTANT WARNING:</strong>
-      <p style="margin:8px 0 0;">Alpha Terminal is <strong>not an investment advisor</strong>. AI-generated analyses are educational and technical decision-support tools based on statistical models. They <strong>do not constitute personalized advice</strong>, nor a recommendation to buy, sell, or hold financial instruments.</p>
-    </div>
-    <p>No analysis produced by the Service shall be considered financial advice within the meaning of article L. 541-1 of the French Monetary and Financial Code. The user remains solely responsible for their investment decisions and consequences. Investing involves risk of capital loss. Past performance does not guarantee future performance.</p>
-
-    <h2>5. Intellectual property</h2>
-    <p>Source code, prompts, Service architecture, and the Alpha brand are the exclusive property of the publisher. AI-generated analyses belong to the user who produces them. Data usage remains governed by third-party LLM/data provider terms.</p>
-
-    <h2>6. Termination</h2>
-    <p>The subscription is cancelable anytime via the management portal. Cancellation takes effect at the end of the current period. No personal data stored at Alpha needs to be deleted (since none is collected). The user remains responsible for local data wipe via Settings → Wipe.</p>
-
-    <h2>7. Applicable law and jurisdiction</h2>
-    <p>These Terms are governed by <strong>French law</strong>. Any dispute shall fall under the exclusive jurisdiction of the French courts in the publisher's registered office area, subject to mandatory consumer protection provisions.</p>
-
-    <h2>8. Terms changes</h2>
-    <p>The publisher may modify these Terms at any time. The version in force is the one available at <code>https://alpha-terminal.app/terms.html</code>. The last update date appears at the top of the page.</p>
-
-    <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Back to home</a></p>
-  </template>
-
-  <script>
-    (function() {
-      var params = new URLSearchParams(location.search);
-      var lang = params.get('lang') === 'en' ? 'en' : 'fr';
-      var toggle = document.getElementById('lang-toggle');
-      if (lang === 'en') {
-        document.documentElement.lang = 'en';
-        document.title = 'Terms of Service — Alpha Terminal';
-        var tpl = document.getElementById('content-en');
-        var main = document.getElementById('main-content');
-        if (tpl && main) main.innerHTML = tpl.innerHTML;
-        var nav = document.getElementById('nav-fr');
-        if (nav) {
-          var map = { 'Fonctionnalités':'Features', 'Tarifs':'Pricing', 'vs Bloomberg':'vs Bloomberg', 'À propos':'About' };
-          nav.querySelectorAll('a').forEach(function(a) { var k = a.textContent.trim(); if (map[k]) a.textContent = map[k]; });
-        }
-        if (toggle) { toggle.textContent = '🇫🇷 FR'; toggle.href = location.pathname; }
-      } else if (toggle) {
-        toggle.href = location.pathname + '?lang=en';
-      }
-    })();
-  </script>
 </body>
 </html>

@@ -263,6 +263,9 @@
     .seo-footer { padding: 30px 20px; border-top: 1px solid var(--border, #222); text-align: center; color: var(--text-muted, #777); font-size: 12px; }
     .seo-footer a { color: var(--text-muted, #777); margin: 0 6px; }
   </style>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
 
@@ -272,7 +275,7 @@
   <a href="/pricing.html" class="active">Tarif</a>
   <a href="/bloomberg-alternative.html">Alternative Bloomberg</a>
   <a href="/ai-stock-analysis-guide.html">Guide IA</a>
-  <a href="/pricing-en.html" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
+  <a href="/pricing-en.html" class="lang-switch" hreflang="en" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
   <a href="/" style="color:#00ff88;font-weight:600;">Lancer l'app →</a>
 </header>
 
@@ -286,7 +289,18 @@
     <strong>Tarif transparent.</strong> Mensuel annulable à tout moment, ou paiement unique pour un accès à vie. 46+ modules d'analyse financière propulsés par 14 LLMs, 100% privé, BYOK.
   </p>
 
-  <h2>3 formules</h2>
+  <nav class="toc" aria-label="Table des matières" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+    <strong style="font-size:13px;color:#00ff88;">Table des matières</strong>
+    <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+      <li><a href="#section-1" style="color:#aaa;">3 formules</a></li>
+      <li><a href="#section-2" style="color:#aaa;">BYOK : pourquoi c'est l'avenir du SaaS IA</a></li>
+      <li><a href="#section-3" style="color:#aaa;">Comparaison avec la concurrence</a></li>
+      <li><a href="#section-4" style="color:#aaa;">ROI : combien ça te fait économiser sur 5 ans</a></li>
+      <li><a href="#section-5" style="color:#aaa;">Foire aux questions sur le tarif</a></li>
+    </ol>
+  </nav>
+
+  <h2 id="section-1">3 formules</h2>
   <div class="price-grid">
 
     <div class="price-card">
@@ -317,7 +331,8 @@
         <li>100% privé — aucune donnée envoyée à Alpha</li>
         <li>✅ <strong>Annulable à tout moment</strong></li>
       </ul>
-      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">S'abonner 9,99€/mois →</a>
+      <a href="/" class="btn-cta plausible-event-name=Subscribe+Click" style="margin-top:18px;width:100%;text-align:center;" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">S'abonner 9,99€/mois →</a>
+      <p style="font-size:12px;color:#888;margin:8px 0 0;text-align:center;">🛡️ 14 jours satisfait ou remboursé · Annulation en 1 clic</p>
     </div>
 
     <div class="price-card" style="border:2px solid #00ff88;position:relative;">
@@ -332,18 +347,19 @@
         <li>🚫 Aucun frais récurrent à gérer</li>
         <li>💰 Économie : ~90€/an après la 3ème année</li>
       </ul>
-      <a href="https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b" target="_blank" rel="noopener" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;">Acheter à vie 299€ →</a>
+      <a href="https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b" target="_blank" rel="noopener" class="btn-cta plausible-event-name=Lifetime+Click" style="margin-top:18px;width:100%;text-align:center;">Acheter à vie 299€ →</a>
+      <p style="font-size:12px;color:#888;margin:8px 0 0;text-align:center;">🛡️ 14 jours satisfait ou remboursé · Annulation en 1 clic</p>
     </div>
 
   </div>
 
   <p style="font-size:13px;color:#999;text-align:center;margin-top:14px;">💡 <strong>Coûts IA séparés (BYOK)</strong> : tu paies ton provider directement (~$2-$40/mois selon usage). Voir <a href="api-costs.html" style="color:#00ff88;">guide complet des coûts API</a>.</p>
 
-  <h2>BYOK : pourquoi c'est l'avenir du SaaS IA</h2>
+  <h2 id="section-2">BYOK : pourquoi c'est l'avenir du SaaS IA</h2>
   <p>BYOK signifie <strong>Bring Your Own Key</strong>. Au lieu d'inclure les coûts IA dans un abonnement gonflé (que tu paies même quand tu n'utilises pas), Alpha te laisse connecter directement ta clé API auprès du provider de ton choix : Anthropic Claude, OpenAI, Google Gemini, xAI Grok, Mistral, Cerebras, GitHub Models, NVIDIA NIM, Hugging Face, Cloudflare Workers AI, Together AI, Cohere, OpenRouter ou Perplexity.</p>
   <p>Tu paies <strong>au tarif officiel</strong>, <strong>uniquement ce que tu consommes</strong>, <strong>sans marge intermédiaire</strong>. Sur un usage typique (5-10 analyses par jour), le coût mensuel est de <strong>2 à 8 dollars</strong> — à comparer aux 30-200€/mois des SaaS IA classiques qui prennent 5-10× le coût réel.</p>
 
-  <h2>Comparaison avec la concurrence</h2>
+  <h2 id="section-3">Comparaison avec la concurrence</h2>
   <table class="roi-table">
     <thead>
       <tr><th>Solution</th><th>Prix</th><th>Modules IA</th><th>Données privées</th><th>Multi-LLM</th></tr>
@@ -359,11 +375,11 @@
     </tbody>
   </table>
 
-  <h2>ROI : combien ça te fait économiser sur 5 ans</h2>
+  <h2 id="section-4">ROI : combien ça te fait économiser sur 5 ans</h2>
   <p>Hypothèse : un investisseur qui s'abonne à Bloomberg dépense <strong>120 000€ sur 5 ans</strong>. Le même investisseur sur Alpha (plan mensuel) paie <strong>~600€</strong> (60 × 9,99€) + ~600€ d'usage IA cumulé = <strong>~1 200€</strong>.</p>
   <p style="font-size:20px;color:#00ff88;font-weight:700;">Économie : 118 800€ sur 5 ans (-99%).</p>
 
-  <h2>Foire aux questions sur le tarif</h2>
+  <h2 id="section-5">Foire aux questions sur le tarif</h2>
   <h3>Combien coûte Alpha ?</h3>
   <p>9,99€/mois. Tu paies en plus ton usage IA aux providers (~$0,005-0,10/analyse). Annulable à tout moment.</p>
 
@@ -391,8 +407,20 @@
   <div class="cta-banner">
     <h2 style="margin:0;">Prêt à passer à l'analyse de niveau pro ?</h2>
     <p style="margin:12px 0 0;color:#ccc;">9,99€/mois (annulable) ou 299€ paiement unique pour un accès à vie.</p>
-    <a href="/" class="btn-cta" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">S'abonner 9,99€/mois →</a>
+    <a href="/" class="btn-cta plausible-event-name=Subscribe+Click" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">S'abonner 9,99€/mois →</a>
+    <p style="font-size:12px;color:#888;margin:12px 0 0;text-align:center;">🛡️ 14 jours satisfait ou remboursé · Annulation en 1 clic</p>
   </div>
+
+  <section style="max-width:880px;margin:60px auto 0;padding:0 20px;">
+    <h2 style="font-size:22px;color:#fff;margin-bottom:14px;">📚 Guides pour aller plus loin</h2>
+    <ul style="line-height:1.9;color:#ccc;font-size:14px;">
+      <li><a href="comment-lire-rapport-annuel-10k.html" style="color:#00ff88;">Comment lire un rapport annuel (10-K) en 10 minutes</a></li>
+      <li><a href="calcul-dcf-methode-complete.html" style="color:#00ff88;">Calcul DCF expliqué : méthode complète</a></li>
+      <li><a href="methode-buffett-7-criteres.html" style="color:#00ff88;">Les 7 critères Buffett pour acheter une action</a></li>
+      <li><a href="bloomberg-prix-2026.html" style="color:#00ff88;">Bloomberg Terminal : combien ça coûte vraiment en 2026 ?</a></li>
+      <li><a href="erreurs-chatgpt-analyse-boursiere.html" style="color:#00ff88;">5 erreurs que ChatGPT fait sur l'analyse boursière</a></li>
+    </ul>
+  </section>
 </main>
 
 <footer class="seo-footer">
@@ -402,7 +430,9 @@
     <a href="/features.html">Fonctionnalités</a> ·
     <a href="/pricing.html">Tarif</a> ·
     <a href="/bloomberg-alternative.html">Alternative Bloomberg</a> ·
-    <a href="/ai-stock-analysis-guide.html">Guide IA</a>
+    <a href="/ai-stock-analysis-guide.html">Guide IA</a> ·
+    <a href="/byok-cost-calculator.html">Simulateur coût BYOK</a> ·
+    <a href="/dcf-calculator.html">Calculateur DCF</a>
   </p>
   <p>
     <a href="/about.html">À propos</a> ·

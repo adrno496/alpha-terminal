@@ -147,11 +147,14 @@
     ]
   }
   </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <nav class="landing-nav">
     <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;">
-      <img src="icons/logo.png" alt="Alpha" style="width:32px;height:32px;border-radius:8px;" />
+      <img src="icons/logo.png" alt="Alpha" fetchpriority="high" decoding="async" style="width:32px;height:32px;border-radius:8px;" />
       <span class="logo-mark">Alpha</span>
     </a>
     <div class="landing-nav-links">
@@ -161,7 +164,7 @@
       <a href="api-costs.html">Coûts API</a>
       <a href="api-keys-guide.html" style="color:var(--accent-green);">Clés API</a>
       <a href="bloomberg-alternative.html">vs Bloomberg</a>
-      <a href="api-keys-guide-en.html" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
+      <a href="api-keys-guide-en.html" class="lang-switch" hreflang="en" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
     </div>
   </nav>
 
@@ -173,7 +176,19 @@
       <strong>📌 TL;DR</strong> — <strong>7 providers IA gratuits</strong> permettent d'utiliser Alpha sans débourser un centime (GitHub Models, Cerebras, Mistral, NVIDIA, Cloudflare, HuggingFace, Cohere). Une seule clé suffit pour démarrer. Pour des analyses pro (10-K, DCF, fiscal complexe), passe sur <strong>Claude / GPT-4o / Gemini Pro</strong> (~$0,005-0,10 par analyse).
     </div>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">🚀 Démarrer en 30 secondes</h2>
+    <nav class="toc" aria-label="Table des matières" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table des matières</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">Démarrer en 30 secondes</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Providers IA gratuits (7)</a></li>
+        <li><a href="#section-3" style="color:#aaa;">Providers IA premium (7)</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Providers de données financières (11)</a></li>
+        <li><a href="#section-5" style="color:#aaa;">Sécurité des clés dans Alpha</a></li>
+        <li><a href="#section-6" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🚀 Démarrer en 30 secondes</h2>
     <ol style="font-size:15px;line-height:2;">
       <li>Choisis un provider gratuit ci-dessous (recommandé : <strong>GitHub Models</strong> si tu as déjà un compte GitHub).</li>
       <li>Clique sur le lien direct, crée un compte ou génère un token.</li>
@@ -182,7 +197,7 @@
       <li>Lance ta première analyse 🎉</li>
     </ol>
 
-    <h2 style="font-size:28px;margin:40px 0 14px;">🎁 Providers IA <span style="color:var(--accent-green);">gratuits</span> (7)</h2>
+    <h2 id="section-2" style="font-size:28px;margin:40px 0 14px;">🎁 Providers IA <span style="color:var(--accent-green);">gratuits</span> (7)</h2>
     <p style="font-size:14px;color:var(--text-secondary);">Ces providers offrent un tier gratuit suffisant pour l'usage occasionnel à intensif. Idéal pour démarrer sans engagement.</p>
 
     <div class="api-card free">
@@ -264,7 +279,7 @@
       </ol>
     </div>
 
-    <h2 style="font-size:28px;margin:40px 0 14px;">💎 Providers IA <span style="color:#ffd166;">premium</span> (7) — qualité top</h2>
+    <h2 id="section-3" style="font-size:28px;margin:40px 0 14px;">💎 Providers IA <span style="color:#ffd166;">premium</span> (7) — qualité top</h2>
     <p style="font-size:14px;color:var(--text-secondary);">Pour les analyses sérieuses (10-K Decoder, DCF nuancé, CEO Forensics, fiscalité complexe), un de ces 7 modèles fait la différence. Tarification au token, ~$0,005-0,10 par analyse Alpha.</p>
 
     <div class="api-card">
@@ -345,7 +360,7 @@
       </ol>
     </div>
 
-    <h2 style="font-size:28px;margin:40px 0 14px;">📊 Providers de données financières <span style="color:var(--accent-green);">(11)</span></h2>
+    <h2 id="section-4" style="font-size:28px;margin:40px 0 14px;">📊 Providers de données financières <span style="color:var(--accent-green);">(11)</span></h2>
     <p style="font-size:14px;color:var(--text-secondary);">Optionnels mais recommandés. Ils enrichissent les modules avec prix temps réel, fondamentaux, news, screeners. Sans coût LLM additionnel. <strong>Plusieurs ne nécessitent même pas de clé.</strong></p>
 
     <h3 style="font-size:18px;margin-top:24px;color:var(--accent-green);">Sans clé requise (toujours actifs)</h3>
@@ -423,7 +438,7 @@
       <a class="api-link" href="https://etherscan.io/myapikey" target="_blank" rel="noopener">https://etherscan.io/myapikey</a>
     </div>
 
-    <h2 style="font-size:24px;margin:40px 0 12px;">🔒 Sécurité des clés dans Alpha</h2>
+    <h2 id="section-5" style="font-size:24px;margin:40px 0 12px;">🔒 Sécurité des clés dans Alpha</h2>
     <ul style="font-size:14px;line-height:1.9;">
       <li><strong>Chiffrement local AES-GCM 256</strong> bits avec dérivation PBKDF2 (100 000 itérations) à partir d'un mot de passe maître que tu choisis.</li>
       <li><strong>Aucun serveur Alpha</strong> — l'app appelle directement les APIs des providers depuis ton navigateur. Vérifiable via DevTools → Network.</li>
@@ -431,7 +446,7 @@
       <li><strong>Backup chiffré exportable</strong> (.atb) — pour migrer ou sauvegarder.</li>
     </ul>
 
-    <h2 style="font-size:24px;margin:40px 0 12px;">❓ FAQ</h2>
+    <h2 id="section-6" style="font-size:24px;margin:40px 0 12px;">❓ FAQ</h2>
 
     <details style="margin:14px 0;border:1px solid var(--border);border-radius:6px;padding:14px;">
       <summary style="cursor:pointer;font-weight:600;">J'ai une seule clé, est-ce que tous les modules fonctionnent ?</summary>

@@ -1,177 +1,556 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
   <url>
     <loc>https://alpha-terminal.app/</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/?lang=en" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — Accueil</image:title>
+    </image:image>
   </url>
 
   <!-- ===== Pages commerciales / guides FR ===== -->
   <url>
     <loc>https://alpha-terminal.app/features.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/features.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/features-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/features.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-features.png</image:loc>
+      <image:title>Alpha Terminal — Fonctionnalités</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/pricing.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/pricing.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/pricing-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/pricing.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-pricing.png</image:loc>
+      <image:title>Alpha Terminal — Pricing</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/bloomberg-alternative.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/bloomberg-alternative.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/bloomberg-alternative-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/bloomberg-alternative.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alternative Bloomberg</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/ai-stock-analysis-guide.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/ai-stock-analysis-guide-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — Guide analyse boursière IA</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/api-costs.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-costs.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-costs-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-costs.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — Coûts API</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/api-keys-guide.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-keys-guide.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-keys-guide-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-keys-guide.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — Guide clés API</image:title>
+    </image:image>
+  </url>
+
+  <!-- ===== Pages comparatives détaillées FR ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/alpha-vs-koyfin.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/alpha-vs-koyfin.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/alpha-vs-koyfin-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/alpha-vs-koyfin.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alpha vs Koyfin</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/alpha-vs-chatgpt.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/alpha-vs-chatgpt.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/alpha-vs-chatgpt-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/alpha-vs-chatgpt.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alpha vs ChatGPT</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/alpha-vs-bloomberg-detailed.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/alpha-vs-bloomberg-detailed.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/alpha-vs-bloomberg-detailed-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/alpha-vs-bloomberg-detailed.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alpha vs Bloomberg détaillé</image:title>
+    </image:image>
+  </url>
+
+  <!-- ===== Pages comparatives détaillées EN ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/alpha-vs-koyfin-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/alpha-vs-koyfin.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/alpha-vs-koyfin-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/alpha-vs-koyfin.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alpha vs Koyfin</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/alpha-vs-chatgpt-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/alpha-vs-chatgpt.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/alpha-vs-chatgpt-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/alpha-vs-chatgpt.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alpha vs ChatGPT</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/alpha-vs-bloomberg-detailed-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/alpha-vs-bloomberg-detailed.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/alpha-vs-bloomberg-detailed-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/alpha-vs-bloomberg-detailed.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Alpha vs Bloomberg detailed</image:title>
+    </image:image>
   </url>
 
   <!-- ===== Pages commerciales / guides EN (versions traduites) ===== -->
   <url>
     <loc>https://alpha-terminal.app/features-en.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/features.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/features-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/features.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-features.png</image:loc>
+      <image:title>Alpha Terminal — Features</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/pricing-en.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/pricing.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/pricing-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/pricing.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-pricing.png</image:loc>
+      <image:title>Alpha Terminal — Pricing</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/bloomberg-alternative-en.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/bloomberg-alternative.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/bloomberg-alternative-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/bloomberg-alternative.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Bloomberg Alternative</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/ai-stock-analysis-guide-en.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/ai-stock-analysis-guide-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/ai-stock-analysis-guide.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — AI Stock Analysis Guide</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/api-costs-en.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-costs.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-costs-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-costs.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — API Costs</image:title>
+    </image:image>
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/api-keys-guide-en.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.85</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/api-keys-guide.html" />
     <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/api-keys-guide-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/api-keys-guide.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — API Keys Guide</image:title>
+    </image:image>
   </url>
 
-  <!-- ===== Pages légales (bilingues via JS swap ?lang=en) ===== -->
+  <!-- ===== Outils interactifs (lead magnets) ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/dcf-calculator.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/dcf-calculator.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/dcf-calculator-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/dcf-calculator.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — Calculateur DCF</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/dcf-calculator-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/dcf-calculator.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/dcf-calculator-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/dcf-calculator.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — DCF Calculator</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/byok-cost-calculator.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/byok-cost-calculator-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — Simulateur coût BYOK</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/byok-cost-calculator-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/byok-cost-calculator-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-home.png</image:loc>
+      <image:title>Alpha Terminal — BYOK Cost Calculator</image:title>
+    </image:image>
+  </url>
+
+  <!-- ===== Guides SEO long-tail FR ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/how-to-read-10k-annual-report.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — Lire un 10-K en 10 minutes</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/calcul-dcf-methode-complete.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/dcf-calculation-complete-method.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — Calcul DCF méthode complète</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/methode-buffett-7-criteres.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/methode-buffett-7-criteres.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/buffett-method-7-criteria.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/methode-buffett-7-criteres.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — Méthode Buffett 7 critères</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/bloomberg-prix-2026.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/bloomberg-prix-2026.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/bloomberg-price-2026.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/bloomberg-prix-2026.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Prix Bloomberg 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — Erreurs ChatGPT analyse boursière</image:title>
+    </image:image>
+  </url>
+
+  <!-- ===== Guides SEO long-tail EN ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/how-to-read-10k-annual-report.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/how-to-read-10k-annual-report.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — How to Read a 10-K</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/dcf-calculation-complete-method.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/dcf-calculation-complete-method.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — DCF Calculation Complete Method</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/buffett-method-7-criteria.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/methode-buffett-7-criteres.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/buffett-method-7-criteria.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/methode-buffett-7-criteres.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — Buffett Method 7 Criteria</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/bloomberg-price-2026.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/bloomberg-prix-2026.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/bloomberg-price-2026.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/bloomberg-prix-2026.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-bloomberg-alt.png</image:loc>
+      <image:title>Alpha Terminal — Bloomberg Price 2026</image:title>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html" />
+    <image:image>
+      <image:loc>https://alpha-terminal.app/og-guide.png</image:loc>
+      <image:title>Alpha Terminal — ChatGPT Stock Analysis Mistakes</image:title>
+    </image:image>
+  </url>
+
+  <!-- ===== Pages légales FR ===== -->
   <url>
     <loc>https://alpha-terminal.app/about.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/about.html" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/about.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/about-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/about.html" />
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/legal.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/legal.html" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/legal.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/legal-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/legal.html" />
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/privacy.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/privacy.html" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/privacy.html" />
   </url>
 
   <url>
     <loc>https://alpha-terminal.app/terms.html</loc>
-    <lastmod>2026-05-01</lastmod>
+    <lastmod>2026-05-02</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
     <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/terms.html" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/terms.html?lang=en" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/terms-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/terms.html" />
+  </url>
+
+  <!-- ===== Pages légales EN (versions canoniques dédiées) ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/about-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/about.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/about-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/about.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/legal-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/legal.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/legal-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/legal.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/privacy-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/privacy.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/privacy.html" />
+  </url>
+
+  <url>
+    <loc>https://alpha-terminal.app/terms-en.html</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/terms.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/terms-en.html" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/terms.html" />
   </url>
 

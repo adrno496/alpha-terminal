@@ -430,6 +430,13 @@ export async function importFullBackup(payload, { mode = 'merge' } = {}) {
     counts.localStorageKeys = Object.keys(payload.localStorage).length - counts.skipped;
   }
 
+  // Diagnostic : log clair de ce qui a été détecté côté licence
+  const hasLicenseInPayload = !!(payload.localStorage && payload.localStorage['alpha-license-key']);
+  console.info('[backup-import] license key in payload:', hasLicenseInPayload, '| restored to localStorage:', !!localStorage.getItem('alpha-license-key'));
+  if (!hasLicenseInPayload) {
+    console.warn('[backup-import] ⚠️ No license key in this backup — it was probably created before the license-aware fix. Re-export your backup from the source device.');
+  }
+
   // Si la licence Premium a été restaurée, notifie immédiatement l'app
   // (paywall + sidebar + Settings) pour que l'UI rebascule avant le reload.
   // Sinon le user pourrait voir le paywall une fraction de seconde.

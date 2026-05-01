@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Calcul DCF expliqué : méthode complète pas à pas (+ calculateur) | Alpha</title>
+  <meta name="description" content="Méthode DCF en 5 étapes : projection FCF, WACC, valeur terminale, actualisation, marge de sécurité. Exemple chiffré Apple, calculateur gratuit, limites du modèle." />
+  <meta name="keywords" content="calcul DCF, méthode DCF, WACC, valeur terminale, fair value, valorisation action, calculateur DCF gratuit, DCF Apple exemple" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/dcf-calculation-complete-method.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Calcul DCF expliqué : méthode complète pas à pas" />
+  <meta property="og:description" content="5 étapes claires, exemple chiffré Apple, calculateur gratuit. WACC et valeur terminale démystifiés." />
+  <meta property="og:url" content="https://alpha-terminal.app/calcul-dcf-methode-complete.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Calcul DCF : méthode complète pas à pas" />
+  <meta name="twitter:description" content="5 étapes · WACC · valeur terminale · exemple Apple · calculateur." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-guide.png" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a' rx='14'/><text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'>α</text></svg>" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root { --bg-primary:#0a0a0a; --bg-secondary:#111; --bg-tertiary:#1a1a1a; --accent-green:#00ff88; --accent-orange:#ffa500; --text-primary:#fff; --text-secondary:rgba(255,255,255,0.6); --text-muted:rgba(255,255,255,0.45); --border:rgba(255,255,255,0.08); --font-mono:'JetBrains Mono', monospace; }
+    html, body { height:auto !important; overflow:auto !important; }
+  </style>
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article","headline":"Calcul DCF expliqué : méthode complète pas à pas","description":"Méthode DCF en 5 étapes avec WACC, valeur terminale, exemple chiffré Apple.","author":{"@type":"Person","name":"Équipe Alpha","url":"https://alpha-terminal.app/about.html"},"datePublished":"2026-05-02","dateModified":"2026-05-02","publisher":{"@type":"Organization","name":"Alpha","logo":{"@type":"ImageObject","url":"https://alpha-terminal.app/icons/icon-192.png"}},"image":"https://alpha-terminal.app/og-guide.png"}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Accueil","item":"https://alpha-terminal.app/"},
+    {"@type":"ListItem","position":2,"name":"Guides","item":"https://alpha-terminal.app/ai-stock-analysis-guide.html"},
+    {"@type":"ListItem","position":3,"name":"Calcul DCF","item":"https://alpha-terminal.app/calcul-dcf-methode-complete.html"}
+  ]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"HowTo","name":"Calcul DCF en 5 étapes","totalTime":"PT15M","step":[
+    {"@type":"HowToStep","position":1,"name":"Projeter les Free Cash Flows sur 5-10 ans","text":"Partir du FCF actuel, appliquer un taux de croissance dégressif (15% → 4%)."},
+    {"@type":"HowToStep","position":2,"name":"Calculer le WACC","text":"WACC = (E/V × Re) + (D/V × Rd × (1-t)). Re via CAPM, Rd via taux moyen de la dette."},
+    {"@type":"HowToStep","position":3,"name":"Estimer la valeur terminale","text":"Méthode Gordon-Shapiro : VT = FCF(n+1) / (WACC - g), avec g = 2-3% (taux croissance perpétuel)."},
+    {"@type":"HowToStep","position":4,"name":"Actualiser tous les flux","text":"Diviser chaque FCF par (1+WACC)^t. Sommer FCF actualisés + VT actualisée = Enterprise Value."},
+    {"@type":"HowToStep","position":5,"name":"Passer à l'Equity Value et au prix par action","text":"Equity Value = EV - dette nette. Diviser par nombre d'actions. Comparer au prix actuel. Marge de sécurité ≥ 25%."}
+  ]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"À quoi sert un DCF ?","acceptedAnswer":{"@type":"Answer","text":"Un DCF (Discounted Cash Flow) calcule la valeur intrinsèque d'une entreprise à partir des cash-flows futurs qu'elle générera, actualisés au coût du capital. C'est la méthode de référence des analystes pour décider si une action est sous- ou surévaluée."}},
+    {"@type":"Question","name":"C'est quoi le WACC simplement ?","acceptedAnswer":{"@type":"Answer","text":"Le WACC (coût moyen pondéré du capital) est le taux que tu utilises pour actualiser les flux futurs. Il mélange le coût des fonds propres (rendement attendu par les actionnaires) et le coût de la dette (taux d'intérêt après impôt), pondérés par leur poids dans le financement. Pour Apple en 2026 : ~8-9%."}},
+    {"@type":"Question","name":"Pourquoi la valeur terminale représente 70% du DCF ?","acceptedAnswer":{"@type":"Answer","text":"Parce qu'on projette les FCF sur 5-10 ans seulement, mais une entreprise vit en théorie à l'infini. La valeur terminale capture toute la valeur au-delà de la période de projection. Petit changement de taux de croissance perpétuel (g) = énorme impact. C'est la principale faiblesse du DCF."}},
+    {"@type":"Question","name":"Quelles sont les limites du DCF ?","acceptedAnswer":{"@type":"Answer","text":"1) Ultra-sensible au WACC et à g. 2) Inutile pour les entreprises non rentables (FCF négatifs). 3) Mauvais pour les boîtes cycliques (FCF erratique). 4) Ne capture pas l'optionalité (M&A, nouveau produit). 5) Garbage in, garbage out — projections trop optimistes = fair value gonflée."}},
+    {"@type":"Question","name":"Quel taux de croissance perpétuel utiliser ?","acceptedAnswer":{"@type":"Answer","text":"Maximum le taux de croissance du PIB long terme (2-3% pour les économies développées). Au-delà, l'entreprise grandirait plus vite que l'économie à l'infini, ce qui est mathématiquement impossible. Beaucoup d'analystes prennent g = 2.5%."}}
+  ]}
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;"><span class="logo-mark">Alpha</span></a>
+    <div class="landing-nav-links">
+      <a href="/">Accueil</a>
+      <a href="features.html">Fonctionnalités</a>
+      <a href="pricing.html">Tarif</a>
+      <a href="ai-stock-analysis-guide.html">Guides</a>
+      <a href="dcf-calculation-complete-method.html" class="lang-switch" hreflang="en" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+
+    <nav aria-label="Breadcrumb" style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">
+      <a href="/" style="color:var(--text-muted);">Accueil</a> ›
+      <a href="ai-stock-analysis-guide.html" style="color:var(--text-muted);">Guides</a> ›
+      <span style="color:var(--text-secondary);">Calcul DCF</span>
+    </nav>
+
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">🧮 Calcul DCF : méthode complète pas à pas</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Le DCF est la méthode de valorisation utilisée par 95% des analystes Wall Street. En 15 minutes tu sauras le calculer toi-même, comprendre WACC et valeur terminale, et éviter les pièges qui font sortir des fair values délirantes.</p>
+
+    <div style="padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-green);margin:20px 0;border-radius:4px;">
+      <strong>📌 TL;DR</strong> — DCF = somme des Free Cash Flows futurs actualisés à un taux (WACC). 5 étapes : projeter les FCF, calculer le WACC, estimer la valeur terminale, actualiser, comparer au prix marché. Marge de sécurité ≥ 25% avant d'acheter.
+    </div>
+
+    <nav class="toc" aria-label="Table des matières" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table des matières</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">C'est quoi un DCF ?</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Les 5 étapes du calcul</a></li>
+        <li><a href="#section-3" style="color:#aaa;">WACC expliqué simplement</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Valeur terminale (le piège qui tue)</a></li>
+        <li><a href="#section-5" style="color:#aaa;">Exemple chiffré Apple</a></li>
+        <li><a href="#section-6" style="color:#aaa;">Limites du DCF</a></li>
+        <li><a href="#section-7" style="color:#aaa;">Calculateur DCF gratuit</a></li>
+        <li><a href="#section-8" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">📘 C'est quoi un DCF ?</h2>
+    <p>DCF signifie <strong>Discounted Cash Flow</strong> (flux de trésorerie actualisés). L'idée fondamentale : <strong>une entreprise vaut la somme des cash qu'elle va générer dans le futur, ramenés à aujourd'hui</strong>. Pourquoi "ramenés" ? Parce que 1€ dans 10 ans vaut moins qu'1€ aujourd'hui (inflation + risque + coût d'opportunité).</p>
+    <p>Le DCF est utilisé par tous les analystes de Goldman, JP Morgan, Morgan Stanley. Warren Buffett l'a popularisé pour les particuliers (sous le nom <em>"intrinsic value"</em>). C'est <strong>la</strong> méthode pour répondre à la question : <em>"cette action est-elle chère ou pas chère ?"</em></p>
+
+    <h2 id="section-2" style="font-size:24px;margin:32px 0 12px;">🪜 Les 5 étapes du calcul</h2>
+
+    <h3 style="font-size:18px;margin:20px 0 8px;">Étape 1 — Projeter les Free Cash Flows sur 5 à 10 ans</h3>
+    <p>Le Free Cash Flow (FCF) = Cash flow opérationnel − CAPEX. C'est le cash réellement disponible pour les investisseurs après que la société a payé son fonctionnement et son réinvestissement.</p>
+    <p>Tu pars du FCF de l'année dernière. Tu projettes une croissance dégressive sur 5-10 ans : par exemple 15% → 12% → 9% → 6% → 4%. Plus l'entreprise est mature, plus la décroissance est rapide.</p>
+
+    <h3 style="font-size:18px;margin:20px 0 8px;">Étape 2 — Calculer le WACC</h3>
+    <p>Le WACC est le taux d'actualisation. Plus de détails en section 3, mais en pratique c'est entre 6% (mega-cap stable) et 12% (small cap risquée). Pour Apple : ~8-9%. Pour Tesla : ~10-11%. Pour une biotech : 14-18%.</p>
+
+    <h3 style="font-size:18px;margin:20px 0 8px;">Étape 3 — Estimer la valeur terminale</h3>
+    <p>Au-delà de la période de projection, on suppose que l'entreprise génère des FCF à l'infini avec une croissance constante <em>g</em> (typiquement 2-3%). Formule de Gordon-Shapiro :</p>
+    <p style="background:var(--bg-tertiary);padding:12px;border-radius:4px;font-family:var(--font-mono);font-size:14px;text-align:center;">
+      <strong>VT = FCF(n+1) / (WACC − g)</strong>
+    </p>
+
+    <h3 style="font-size:18px;margin:20px 0 8px;">Étape 4 — Actualiser tous les flux</h3>
+    <p>Chaque FCF futur est divisé par <code>(1 + WACC)^t</code>, où <em>t</em> est le nombre d'années. La somme = Enterprise Value (EV).</p>
+
+    <h3 style="font-size:18px;margin:20px 0 8px;">Étape 5 — Passer à l'Equity Value et au prix par action</h3>
+    <p>Equity Value = Enterprise Value − dette nette (dette − cash). Tu divises par le nombre d'actions diluées et tu obtiens la <strong>fair value par action</strong>. Compare au prix marché : marge de sécurité ≥ 25% avant d'acheter (règle de Graham).</p>
+
+    <h2 id="section-3" style="font-size:24px;margin:32px 0 12px;">🎓 WACC expliqué simplement</h2>
+    <p>WACC = <em>Weighted Average Cost of Capital</em>. C'est ce que coûte le capital de l'entreprise quand on mélange dette et fonds propres.</p>
+    <p style="background:var(--bg-tertiary);padding:12px;border-radius:4px;font-family:var(--font-mono);font-size:13px;text-align:center;">
+      WACC = (E/V × Re) + (D/V × Rd × (1 − t))
+    </p>
+    <ul style="line-height:1.9;font-size:14px;">
+      <li><strong>E/V</strong> = part des fonds propres (Equity / Valeur totale)</li>
+      <li><strong>Re</strong> = coût des fonds propres (via CAPM : Re = Rf + β × prime de risque marché)</li>
+      <li><strong>D/V</strong> = part de la dette (Debt / Valeur totale)</li>
+      <li><strong>Rd</strong> = coût de la dette (taux d'intérêt moyen)</li>
+      <li><strong>t</strong> = taux d'imposition (déduction fiscale des intérêts)</li>
+    </ul>
+
+    <p style="background:var(--bg-tertiary);padding:12px;border-radius:4px;font-size:13px;">
+      💡 <strong>Astuce</strong> — Pas envie de calculer le CAPM à la main ? Le module DCF d'Alpha récupère automatiquement le beta (FMP/Finnhub), le taux sans risque (10Y US Treasury en live), et la structure capital. WACC calculé en 1 seconde.
+    </p>
+
+    <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">⚠️ Valeur terminale : le piège qui tue</h2>
+    <div style="padding:14px;background:#2a1a0a;border-left:3px solid var(--accent-orange);margin:14px 0;border-radius:4px;font-size:14px;">
+      <strong>⚠️ Attention</strong> — Dans 90% des DCF, la valeur terminale représente <strong>60 à 80% de la valeur totale</strong>. Un changement de g de 2% à 3% peut faire bondir la fair value de 30%. Ne survalorise jamais g.
+    </div>
+    <p>Règles d'or :</p>
+    <ul style="line-height:1.9;">
+      <li><strong>g ≤ taux de croissance du PIB long terme</strong> (max 3% pour les économies développées). Au-delà, l'entreprise dépasserait l'économie à l'infini.</li>
+      <li><strong>Faire une analyse de sensibilité</strong> : DCF avec g = 2%, 2.5%, 3%. Trois fair values qui te donnent une fourchette.</li>
+      <li><strong>Méthode alternative : exit multiple</strong>. Multiplier l'EBITDA terminal par un multiple raisonnable (12-18×) au lieu de Gordon-Shapiro. Souvent plus prudent.</li>
+    </ul>
+
+    <h2 id="section-5" style="font-size:24px;margin:32px 0 12px;">🍎 Exemple chiffré : DCF Apple (FY2025)</h2>
+    <p>Hypothèses simplifiées (à mai 2026) :</p>
+    <ul style="line-height:1.9;font-size:14px;">
+      <li>FCF FY2024 : $108B</li>
+      <li>Croissance projetée : 8%, 7%, 6%, 5%, 4% sur 5 ans</li>
+      <li>WACC : 8.5%</li>
+      <li>g (perpétuel) : 2.5%</li>
+      <li>Dette nette : -$50B (cash net positif)</li>
+      <li>Actions diluées : 15.0B</li>
+    </ul>
+
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Année</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">FCF projeté ($B)</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Discount factor</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">FCF actualisé ($B)</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Y1 (2025)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">116.6</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">0.922</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">107.5</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Y2 (2026)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">124.8</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">0.849</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">106.0</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Y3 (2027)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">132.3</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">0.783</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">103.6</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Y4 (2028)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">138.9</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">0.722</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">100.3</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Y5 (2029)</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">144.5</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">0.665</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">96.1</td></tr>
+        <tr style="background:#1a1a1a;"><td style="padding:8px;border:1px solid var(--border);"><strong>Σ FCF actualisés</strong></td><td colspan="2" style="padding:8px;border:1px solid var(--border);"></td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);"><strong>513.5</strong></td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Valeur terminale :</strong> VT = 144.5 × 1.025 / (0.085 − 0.025) = 148.1 / 0.06 = <strong>$2 468B</strong>. Actualisée : 2 468 × 0.665 = <strong>$1 641B</strong>.</p>
+    <p><strong>Enterprise Value :</strong> 513.5 + 1 641 = <strong>$2 155B</strong>.</p>
+    <p><strong>Equity Value :</strong> 2 155 − (−50) = <strong>$2 205B</strong>.</p>
+    <p><strong>Fair value par action :</strong> 2 205 / 15.0 = <strong>$147</strong>.</p>
+
+    <p>Si AAPL cote $180, le marché paie une prime ~22% au-dessus de cette estimation conservative. Pour une marge de sécurité de 25%, il faudrait un prix d'entrée ≤ $110. Verdict : pas un bargain à $180, mais zone d'achat sous $130.</p>
+
+    <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">🚫 Limites du DCF</h2>
+    <ol style="line-height:1.9;">
+      <li><strong>Ultra-sensible aux hypothèses.</strong> +1% sur g = +20% sur la fair value. Toujours faire 3 scénarios.</li>
+      <li><strong>Inutile pour les boîtes non rentables.</strong> Tesla 2018, Snowflake 2021, Reddit 2024 — FCF négatifs = DCF impossible. Utilise des multiples (EV/Sales) ou DCF avec FCF positif tardif.</li>
+      <li><strong>Mauvais pour les cycliques.</strong> Acier, auto, oil — FCF erratique. Privilégier la moyenne 10 ans + multiples normalisés.</li>
+      <li><strong>Ne capture pas l'optionalité.</strong> Apple Vision Pro, Microsoft + OpenAI, Tesla robots — la valeur des paris futurs n'est pas dans le DCF.</li>
+      <li><strong>Garbage in, garbage out.</strong> Si tes projections de croissance sont gonflées par le management's narrative, ta fair value l'est aussi.</li>
+    </ol>
+
+    <h2 id="section-7" style="font-size:24px;margin:32px 0 12px;">🧮 Calculateur DCF gratuit (Alpha)</h2>
+    <p>Tu peux faire tout ce calcul à la main dans Excel (template gratuit chez Damodaran), ou utiliser le <a href="dcf-calculator.html">module DCF Calculator d'Alpha</a> qui :</p>
+    <ul style="line-height:1.9;">
+      <li>Récupère automatiquement les FCF historiques 10 ans (FMP)</li>
+      <li>Calcule le WACC en live (beta + 10Y Treasury + structure capital)</li>
+      <li>Propose 3 scénarios (bear / base / bull) avec sensitivity table</li>
+      <li>Génère le reasoning IA (pourquoi ces hypothèses, comparaison consensus analystes)</li>
+      <li>Coût : ~$0.04 par DCF avec Sonnet 4.6 (<a href="api-costs.html">détail des coûts</a>)</li>
+    </ul>
+
+    <h2 id="section-8" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">À quoi sert un DCF ?</summary>
+      <p>À calculer la valeur intrinsèque d'une entreprise à partir des cash-flows futurs, pour décider si une action est sous- ou surévaluée vs son prix marché.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">C'est quoi le WACC simplement ?</summary>
+      <p>Le coût moyen pondéré du capital. C'est le taux d'actualisation utilisé dans le DCF. Mélange coût des fonds propres et coût de la dette. Apple : ~8-9%. Tesla : ~10-11%. Biotech : 14-18%.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Pourquoi la valeur terminale représente 70% du DCF ?</summary>
+      <p>Parce qu'on projette les FCF sur 5-10 ans seulement, mais une entreprise vit en théorie à l'infini. La VT capture toute la valeur au-delà. Petit changement de g = énorme impact. C'est la principale faiblesse du DCF.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quelles sont les limites du DCF ?</summary>
+      <p>Ultra-sensible au WACC et g. Inutile pour boîtes non rentables. Mauvais pour cycliques. Ne capture pas l'optionalité. Garbage in, garbage out.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quel taux de croissance perpétuel utiliser ?</summary>
+      <p>Maximum le taux de croissance du PIB long terme (2-3%). Au-delà, l'entreprise grandirait plus vite que l'économie à l'infini, ce qui est mathématiquement impossible. Beaucoup d'analystes prennent g = 2.5%.</p>
+    </details>
+
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 10px;">🧮 Utilise notre calculateur DCF gratuit</h3>
+      <p style="color:var(--text-secondary);margin:0 0 14px;">FCF auto, WACC en live, 3 scénarios, reasoning IA. 9,99€/mois · 14 jours satisfait ou remboursé.</p>
+      <a href="pricing.html" class="btn-primary big plausible-event-name=Guide+CTA" style="text-decoration:none;display:inline-block;">Lancer Alpha →</a>
+    </div>
+
+    <footer class="landing-footer" style="margin-top:60px;">
+      <span>Alpha · Made in France 🇫🇷 · BYOK 100% privé</span>
+      <span class="footer-legal-links">
+        <a href="about.html">À propos</a> ·
+        <a href="pricing.html">Tarif</a> ·
+        <a href="ai-stock-analysis-guide.html">Guides</a> ·
+        <a href="features.html">Fonctionnalités</a> ·
+        <a href="privacy.html">Confidentialité</a> ·
+        <a href="terms.html">CGU</a> ·
+        <a href="legal.html">Mentions légales</a>
+      </span>
+    </footer>
+  </article>
+</body>
+</html>

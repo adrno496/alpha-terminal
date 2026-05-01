@@ -11,7 +11,7 @@
   <meta name="application-name" content="Alpha Terminal" />
   <link rel="canonical" href="https://alpha-terminal.app/privacy.html" />
   <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/privacy.html" />
-  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy.html?lang=en" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy-en.html" />
   <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/privacy.html" />
 
   <meta property="og:type" content="website" />
@@ -76,6 +76,9 @@
     ]
   }
   </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <nav class="static-nav" id="nav-fr">
@@ -84,7 +87,7 @@
     <a href="pricing.html">Tarifs</a>
     <a href="bloomberg-alternative.html">vs Bloomberg</a>
     <a href="about.html">À propos</a>
-    <a href="?lang=en" id="lang-toggle" style="margin-left:auto;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
+    <a href="privacy-en.html" id="lang-toggle" style="margin-left:auto;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇬🇧 EN</a>
   </nav>
 
   <main class="static-page" id="main-content">
@@ -143,77 +146,5 @@
     <a href="terms.html">CGU</a> ·
     <a href="legal.html">Mentions légales</a>
   </footer>
-
-  <template id="content-en">
-    <h1>Privacy policy</h1>
-    <p style="color:var(--text-primary);"><strong>Last update: May 1, 2026</strong></p>
-
-    <h2>1. Founding principle: 0 data collected by Alpha</h2>
-    <p>Alpha Terminal is a <strong>100% client-side</strong> app. This means <strong>your data (API keys, holdings, analyses, notes, transcripts, budget) never leaves your browser</strong>. We operate no server that receives, stores, or processes your data.</p>
-    <p>Open verification: open your browser's DevTools (F12) → Network tab. During use, you only see calls to LLM provider APIs (api.anthropic.com, api.openai.com, etc.) and financial data providers (FMP, Polygon, etc.). No call to an alpha-terminal.app domain to transfer data.</p>
-
-    <h2>2. BYOK model (Bring Your Own Key)</h2>
-    <p>You bring your own API key for LLM providers. Keys are encrypted locally (<strong>AES-GCM 256-bit + PBKDF2 100,000-iteration SHA-256 derivation</strong>) with a password only you know. The encrypted vault is stored in your browser's <code>localStorage</code>. Without your password, no one can decrypt your keys — not even us.</p>
-
-    <h2>3. Local storage only</h2>
-    <ul>
-      <li><strong>localStorage</strong>: preferences, encrypted API keys vault, user tags (language, theme, watchlist).</li>
-      <li><strong>IndexedDB</strong>: saved analyses, wealth holdings, watchpoints, transcripts, knowledge base, historical snapshots.</li>
-      <li><strong>Service Worker</strong>: cache of static assets (HTML, CSS, JS, images) for offline use. No API call caching.</li>
-    </ul>
-
-    <h2>4. Cookies</h2>
-    <p>No tracking cookies, no ad cookies, no third-party cookies. No server analytics (Google Analytics, Plausible, etc.) — so no consent banner required. The only technical "trace": the Service Worker registered by your browser (essential for offline operation).</p>
-
-    <h2>5. Your GDPR rights</h2>
-    <p>Since we collect or store no personal data about you server-side, classical GDPR rights (access, rectification, erasure, portability) do not apply in the usual sense: <strong>you already have 100% control of your data</strong>, locally.</p>
-    <ul>
-      <li><strong>Erasure</strong>: Settings → "Wipe all local data" + uninstall the PWA app.</li>
-      <li><strong>Portability</strong>: Settings → Full export (JSON) of all your data for re-import on another device.</li>
-      <li><strong>Rectification</strong>: directly from the app, Wealth / Knowledge Base / Settings modules.</li>
-    </ul>
-
-    <h2>6. Data sent to LLM providers (BYOK)</h2>
-    <p>When you launch an analysis, the content (prompt + module data) is sent directly to the API of the LLM provider you chose (Anthropic, OpenAI, Google, etc.). Each provider has its own privacy policy — refer to their documentation. Alpha is not an intermediary in this flow.</p>
-
-    <h2>7. Premium account (optional) — data collected by Supabase</h2>
-    <p>If you activate a Premium subscription (€9.99/month), an account is created on our <strong>Supabase</strong> infrastructure (EU-hosted — Frankfurt) solely for payment and access management. Strictly minimal data is collected:</p>
-    <ul>
-      <li><strong>Email</strong> — to send the magic sign-in link (Supabase Auth, no password).</li>
-      <li><strong>Lemonsqueezy IDs</strong> — <code>customer_id</code>, <code>order_id</code>, <code>subscription_id</code> (accounting compliance and renewal management).</li>
-      <li><strong>Amount and currency</strong> of the payment (tax compliance).</li>
-      <li><strong>Premium status</strong> — <code>is_active</code> boolean + expiration date.</li>
-    </ul>
-    <p><strong>What is NEVER sent to Supabase:</strong> your analyses, prompts, wealth holdings, notes, transcripts, knowledge base. BYOK and 100% client-side remain intact. Open verification via DevTools → Network: you only observe calls to <code>*.supabase.co</code> at login + premium activation, never during analyses.</p>
-    <p>Premium account deletion: email <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a> — deletion within 30 days (auto CASCADE on <code>auth.users</code>, <code>premium_access</code>, <code>payments</code>).</p>
-
-    <h2>8. Contact</h2>
-    <p>For any question on this policy: <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a>.</p>
-
-    <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Back to home</a></p>
-  </template>
-
-  <script>
-    (function() {
-      var params = new URLSearchParams(location.search);
-      var lang = params.get('lang') === 'en' ? 'en' : 'fr';
-      var toggle = document.getElementById('lang-toggle');
-      if (lang === 'en') {
-        document.documentElement.lang = 'en';
-        document.title = 'Privacy policy — Alpha Terminal | 100% client-side, 0 data collected';
-        var tpl = document.getElementById('content-en');
-        var main = document.getElementById('main-content');
-        if (tpl && main) main.innerHTML = tpl.innerHTML;
-        var nav = document.getElementById('nav-fr');
-        if (nav) {
-          var map = { 'Fonctionnalités':'Features', 'Tarifs':'Pricing', 'vs Bloomberg':'vs Bloomberg', 'À propos':'About' };
-          nav.querySelectorAll('a').forEach(function(a) { var k = a.textContent.trim(); if (map[k]) a.textContent = map[k]; });
-        }
-        if (toggle) { toggle.textContent = '🇫🇷 FR'; toggle.href = location.pathname; }
-      } else if (toggle) {
-        toggle.href = location.pathname + '?lang=en';
-      }
-    })();
-  </script>
 </body>
 </html>

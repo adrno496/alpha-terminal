@@ -159,10 +159,14 @@
 
     // Vérification serveur via Lemonsqueezy License API (CORS-friendly).
     // Appelée au boot + toutes les 24h depuis isPremium().
-    // Comportement offline : 7 jours de grâce depuis le dernier check OK.
+    // Politique : ne JAMAIS auto-logout sur erreur réseau / CORS / réponse
+    // ambiguë — on ne logout que si Lemonsqueezy répond explicitement
+    // `valid:false` ou status revoked. Une erreur transitoire ne doit pas
+    // priver l'utilisateur de son accès Premium (clé déjà validée à l'achat).
     async checkLicenseStatus() {
       const key = this.getLicense();
       if (!key || !this.validateFormat(key)) return false;
+      let data;
       try {
         const params = new URLSearchParams({ license_key: key });
         const instanceId = (() => { try { return localStorage.getItem(this.instanceKey); } catch { return null; } })();
@@ -172,28 +176,29 @@
           headers: { 'Accept': 'application/json' },
           body: params
         });
-        const data = await res.json();
-        const status = data?.license_key?.status;
-        const ok = data?.valid === true && status === 'active';
-        if (!ok) {
-          console.warn('[license] revoked/inactive (status=' + status + ') — logging out');
-          this.logout();
-          return false;
-        }
+        data = await res.json();
+      } catch (e) {
+        // Réseau / CORS / DNS — on conserve l'accès, on retentera plus tard
+        console.warn('[license] check failed (network):', e?.message, '— keeping access');
+        return true;
+      }
+
+      // Réponse reçue : on ne logout que si Lemonsqueezy dit explicitement non
+      const status = data?.license_key?.status;
+      if (data?.valid === false && (status === 'expired' || status === 'disabled')) {
+        console.warn('[license] explicitly revoked by Lemonsqueezy (status=' + status + ') — logging out');
+        this.logout();
+        return false;
+      }
+      if (data?.valid === true && status === 'active') {
         localStorage.setItem('alpha-license-checked-at', String(Date.now()));
         this._saveMeta(data?.license_key);
         return true;
-      } catch (e) {
-        // Offline ou API down → grâce 7j depuis le dernier check OK
-        const last = parseInt(localStorage.getItem('alpha-license-checked-at') || '0', 10);
-        const within = last > 0 && (Date.now() - last) < 7 * 24 * 3600 * 1000;
-        if (!within) {
-          console.warn('[license] cannot validate and grace period expired — logging out');
-          this.logout();
-          return false;
-        }
-        return true;
       }
+      // Réponse ambiguë (status inactive, valid manquant, etc.) → on garde l'accès,
+      // on prévient l'utilisateur dans les logs sans le couper.
+      console.warn('[license] ambiguous response, keeping access:', data);
+      return true;
     }
 
     // Logout : supprime la licence

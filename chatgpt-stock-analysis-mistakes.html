@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>5 Mistakes ChatGPT Makes on Stock Analysis (And How to Avoid Them) | Alpha</title>
+  <meta name="description" content="ChatGPT hallucinates numbers, uses outdated data, lacks structured data access, and can't run reproducible DCFs. 5 concrete mistakes + solutions." />
+  <meta name="keywords" content="chatgpt stock analysis mistakes, chatgpt finance hallucinations, chatgpt outdated data, chatgpt unreliable finance, specialized finance AI, AI stock picking" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/erreurs-chatgpt-analyse-boursiere.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="5 Mistakes ChatGPT Makes on Stock Analysis" />
+  <meta property="og:description" content="Hallucinations, outdated data, no structured data access. 5 concrete issues + solutions." />
+  <meta property="og:url" content="https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:locale:alternate" content="fr_FR" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="5 Mistakes ChatGPT Makes on Stock Analysis" />
+  <meta name="twitter:description" content="Hallucinations · stale data · no DCF · concrete fixes." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-guide.png" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a' rx='14'/><text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'>α</text></svg>" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root { --bg-primary:#0a0a0a; --bg-secondary:#111; --bg-tertiary:#1a1a1a; --accent-green:#00ff88; --accent-orange:#ffa500; --text-primary:#fff; --text-secondary:rgba(255,255,255,0.6); --text-muted:rgba(255,255,255,0.45); --border:rgba(255,255,255,0.08); --font-mono:'JetBrains Mono', monospace; }
+    html, body { height:auto !important; overflow:auto !important; }
+  </style>
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Article","headline":"5 Mistakes ChatGPT Makes on Stock Analysis","description":"Why ChatGPT hallucinates in finance and how to use a specialized AI instead.","author":{"@type":"Person","name":"Alpha Team"},"datePublished":"2026-05-02","dateModified":"2026-05-02","publisher":{"@type":"Organization","name":"Alpha","logo":{"@type":"ImageObject","url":"https://alpha-terminal.app/icons/icon-192.png"}},"image":"https://alpha-terminal.app/og-guide.png"}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Home","item":"https://alpha-terminal.app/"},
+    {"@type":"ListItem","position":2,"name":"Guides","item":"https://alpha-terminal.app/ai-stock-analysis-guide-en.html"},
+    {"@type":"ListItem","position":3,"name":"ChatGPT Mistakes","item":"https://alpha-terminal.app/chatgpt-stock-analysis-mistakes.html"}
+  ]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Can ChatGPT analyze a stock?","acceptedAnswer":{"@type":"Answer","text":"For qualitative analysis (business model, sector context), yes. For precise numbers (revenue, margins, ratios): no, without structured data access it hallucinates regularly. Test it: ask for AAPL's PE on March 1, 2026 — it'll output a plausible but often wrong number."}},
+    {"@type":"Question","name":"Why does ChatGPT make up financial numbers?","acceptedAnswer":{"@type":"Answer","text":"Because LLMs are trained to produce the most probable text, not the truest. When you ask 'what's Tesla's ROIC in 2024', it generates a number that looks like a plausible ROIC, without checking a database. That's hallucination."}},
+    {"@type":"Question","name":"Which AI to use for serious stock analysis?","acceptedAnswer":{"@type":"Answer","text":"A specialized AI connected to structured-data APIs (FMP, Finnhub, SEC EDGAR) with finance-calibrated prompts and hallucination guardrails. Alpha uses 14 LLMs (Claude, GPT-5, Gemini, Grok) with this setup, BYOK for €9.99/month."}},
+    {"@type":"Question","name":"Does ChatGPT have access to the latest financial figures?","acceptedAnswer":{"@type":"Answer","text":"Without Browse mode on, its knowledge cutoff is the training date (often months back). With Browse on, it does web searches but without coherence and without access to proprietary financial APIs. Result: often incomplete or stale data."}},
+    {"@type":"Question","name":"Can you trust ChatGPT for a DCF?","acceptedAnswer":{"@type":"Answer","text":"Not for a reproducible DCF. Without 10-year FCF history, live beta, and live risk-free rate, the calculation is approximate. Ask twice and you'll get two different fair values. For a rigorous DCF: use a dedicated module like Alpha's."}}
+  ]}
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;"><span class="logo-mark">Alpha</span></a>
+    <div class="landing-nav-links">
+      <a href="/">Home</a>
+      <a href="features-en.html">Features</a>
+      <a href="pricing-en.html">Pricing</a>
+      <a href="ai-stock-analysis-guide-en.html">Guides</a>
+      <a href="erreurs-chatgpt-analyse-boursiere.html" class="lang-switch" hreflang="fr" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇫🇷 FR</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+
+    <nav aria-label="Breadcrumb" style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">
+      <a href="/" style="color:var(--text-muted);">Home</a> ›
+      <a href="ai-stock-analysis-guide-en.html" style="color:var(--text-muted);">Guides</a> ›
+      <span style="color:var(--text-secondary);">ChatGPT Mistakes</span>
+    </nav>
+
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">⚠️ 5 Mistakes ChatGPT Makes on Stock Analysis</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">ChatGPT in chat mode is great for summarizing an article or explaining a concept. But on serious stock analysis — the kind that drives your investment decisions — it makes 5 systematic mistakes. Here they are, and how to avoid them.</p>
+
+    <div style="padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-green);margin:20px 0;border-radius:4px;">
+      <strong>📌 TL;DR</strong> — ChatGPT hallucinates numbers, uses stale data, has no financial API access, can't run reproducible DCFs and has no memory of your past analyses. Solution: <strong>a specialized AI</strong> wired to structured data with finance-calibrated prompts.
+    </div>
+
+    <nav class="toc" aria-label="Table of contents" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table of contents</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">Mistake 1 — Number hallucinations</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Mistake 2 — Outdated data</a></li>
+        <li><a href="#section-3" style="color:#aaa;">Mistake 3 — No structured data access</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Mistake 4 — No reproducible DCF</a></li>
+        <li><a href="#section-5" style="color:#aaa;">Mistake 5 — No memory across sessions</a></li>
+        <li><a href="#section-6" style="color:#aaa;">The fix: specialized models</a></li>
+        <li><a href="#section-7" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🎲 Mistake 1 — Number hallucinations</h2>
+    <p>Reproducible test: ask ChatGPT (gpt-4o, Browse off) <em>"What was Apple's ROIC in FY2024?"</em>. You get answers like <em>"approximately 30%"</em> or <em>"45%"</em>. Real value is ~58%. Gap can hit 30 percentage points.</p>
+    <p><strong>Why?</strong> LLMs are text probability engines, not databases. When you ask for a number, the model generates <em>a number that looks like a plausible ROIC</em>, not the real one. PE, gross margin, ROE, net debt → same hallucinations.</p>
+
+    <div style="padding:14px;background:#2a1a0a;border-left:3px solid var(--accent-orange);margin:14px 0;border-radius:4px;font-size:14px;">
+      <strong>⚠️ Watch out</strong> — A FinanceBench study (2024) showed GPT-4 without tooling errors on <strong>83% of numerical questions</strong> from real 10-Ks. With document access: 27%. With a dedicated finance agent: &lt; 8%.
+    </div>
+
+    <h2 id="section-2" style="font-size:24px;margin:32px 0 12px;">📅 Mistake 2 — Outdated data</h2>
+    <p>ChatGPT's knowledge cutoff (gpt-4o as of May 2026) is generally several months behind. Ask <em>"Did Apple report Q2 2026 results?"</em> and it'll either say it doesn't know (good) or invent numbers (bad).</p>
+    <p>With Browse on, it can search the web — but without coherence (3 contradictory sources), no hierarchy (a poorly-sourced blog weighs as much as the official 10-K), and no access to premium financial APIs (FMP, Refinitiv).</p>
+
+    <h2 id="section-3" style="font-size:24px;margin:32px 0 12px;">🔌 Mistake 3 — No structured data access</h2>
+    <p>Serious stock analysis relies on 5 structured data sources:</p>
+    <ul style="line-height:1.9;">
+      <li><strong>Fundamentals</strong> (FMP, Finnhub) — 30 years of P&L/balance sheet/cash flow per ticker</li>
+      <li><strong>Live prices</strong> (Polygon, Alpha Vantage) — tick-by-tick</li>
+      <li><strong>SEC EDGAR</strong> — 10-K, 10-Q, 8-K, DEF 14A, 13F filings</li>
+      <li><strong>Macro</strong> (FRED, OECD) — rates, inflation, GDP</li>
+      <li><strong>Sentiment</strong> (X/Reddit/news) — real-time feeds</li>
+    </ul>
+    <p>ChatGPT standalone has access to <strong>none</strong> of these. A specialized AI like <a href="features-en.html">Alpha</a> wires them all via API and feeds the structured data to the LLM in the prompt — yielding traceable, reproducible analyses.</p>
+
+    <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">🧮 Mistake 4 — No reproducible DCF</h2>
+    <p>Ask ChatGPT for an Apple DCF. It outputs a fair value. Ask twice (new session): two different numbers. Why?</p>
+    <ul style="line-height:1.9;">
+      <li>No access to 10-year historical FCF (it makes up the starting point)</li>
+      <li>No live beta (uses a "reasonable" value)</li>
+      <li>No real-time risk-free rate (slaps 4% randomly)</li>
+      <li>No current capital structure (debt/equity weights invented)</li>
+      <li>No deterministic method ("reasoning" differs each call)</li>
+    </ul>
+    <p>See our <a href="dcf-calculation-complete-method.html">complete DCF method</a> for why a proper DCF needs a structured data chain + deterministic computation.</p>
+
+    <h2 id="section-5" style="font-size:24px;margin:32px 0 12px;">🧠 Mistake 5 — No memory across sessions</h2>
+    <p>You analyzed Microsoft yesterday. Today you ask <em>"compare this Microsoft analysis to what you said about Apple last week"</em>. ChatGPT doesn't know. Long-term memory remains limited and imperfect, especially for dense numerical analyses.</p>
+    <p>A serious finance app stores each analysis locally (IndexedDB), allowing comparison, re-runs, versioning. That's what Alpha does with its <strong>IDB history</strong>: every past analysis is reloadable, comparable, exportable in Markdown.</p>
+
+    <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">✅ The fix: specialized models + tooling</h2>
+    <p>A finance-specialized AI combines 4 ingredients:</p>
+    <ol style="line-height:1.9;">
+      <li><strong>Multiple LLMs to choose from</strong> — best model per task (Claude for 10-K, Grok for X sentiment, Gemini for native PDF). Alpha offers 14.</li>
+      <li><strong>Financial API connections</strong> — FMP, Finnhub, SEC EDGAR, FRED, CoinGecko, YouTube transcripts.</li>
+      <li><strong>Finance-calibrated prompts</strong> — each module has a system prompt optimized over dozens of real cases.</li>
+      <li><strong>Anti-hallucination guardrails</strong> — mandatory source citations, refusal if data missing, deterministic validation.</li>
+    </ol>
+
+    <p>Alpha uses <strong>14 LLMs</strong> (Claude Opus/Sonnet/Haiku, GPT-5/Mini/Nano, Gemini Pro/Flash, Grok 4, Mistral, Llama, DeepSeek) with finance-calibrated prompts, wired to 8 data APIs. Typical monthly cost: <a href="api-costs-en.html">$2 to $40/month BYOK</a>, 5 to 10× cheaper than ChatGPT Plus + a pro terminal.</p>
+
+    <h2 id="section-7" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Can ChatGPT analyze a stock?</summary>
+      <p>Qualitative yes. Precise numbers: no, frequent hallucinations. FinanceBench shows 83% errors on numerical 10-K questions without tooling.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Why does ChatGPT make up numbers?</summary>
+      <p>LLMs are text probability engines. Without a structured database, they generate a number that <em>looks</em> like the answer, not the true answer. That's hallucination.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Which AI for stock analysis?</summary>
+      <p>Specialized AI wired to APIs (FMP, Finnhub, SEC) with finance-calibrated prompts. Alpha uses 14 LLMs BYOK for €9.99/month.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Does ChatGPT have the latest figures?</summary>
+      <p>Without Browse: no, cutoff months behind. With Browse: web search without coherence or premium API access.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Can you trust ChatGPT for a DCF?</summary>
+      <p>No. Without 10y FCF history, live beta, live risk-free rate and deterministic computation, DCF is approximate. Two runs = two values.</p>
+    </details>
+
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 10px;">🤖 Alpha uses 14 LLMs with finance-calibrated prompts</h3>
+      <p style="color:var(--text-secondary);margin:0 0 14px;">€9.99/month · BYOK · 14-day money back</p>
+      <a href="pricing-en.html" class="btn-primary big plausible-event-name=Guide+CTA" style="text-decoration:none;display:inline-block;">Launch Alpha →</a>
+    </div>
+
+    <footer class="landing-footer" style="margin-top:60px;">
+      <span>Alpha · Made in France 🇫🇷 · BYOK 100% private</span>
+      <span class="footer-legal-links">
+        <a href="about-en.html">About</a> · <a href="pricing-en.html">Pricing</a> · <a href="ai-stock-analysis-guide-en.html">Guides</a> · <a href="features-en.html">Features</a> · <a href="privacy-en.html">Privacy</a> · <a href="terms-en.html">Terms</a> · <a href="legal-en.html">Legal</a>
+      </span>
+    </footer>
+  </article>
+</body>
+</html>

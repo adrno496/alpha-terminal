@@ -93,29 +93,38 @@
      *  container + ouvre le modal de licence Lemonsqueezy. */
     blockUI(container, moduleId) {
       const en = isEN();
+      const LIFETIME_URL = 'https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b';
       const t = en
         ? {
             title: '🔒 Premium module',
             sub: `<strong>${moduleId}</strong> requires an active Premium license.`,
-            price: '€9.99 / month',
+            monthlyLabel: 'Monthly',
+            monthlyPrice: '€9.99/month',
+            lifetimeLabel: 'Lifetime · best value',
+            lifetimePrice: '€299 once',
             buyBtn: '🚀 Subscribe €9.99/month',
+            lifetimeBtn: '♾️ Get lifetime access €299',
             keyBtn: '🔑 I have a license key',
             bullets: [
               '✅ Unlimited access to all Pro modules',
               '✅ Your analyses stay 100% local (BYOK)',
-              '✅ Cancel anytime',
+              '✅ Cancel anytime · Lifetime breaks even after 30 months',
             ],
           }
         : {
             title: '🔒 Module Premium',
             sub: `<strong>${moduleId}</strong> nécessite une licence Premium active.`,
-            price: '9,99 € / mois',
+            monthlyLabel: 'Mensuel',
+            monthlyPrice: '9,99€/mois',
+            lifetimeLabel: 'À vie · meilleure valeur',
+            lifetimePrice: '299€ paiement unique',
             buyBtn: '🚀 S\'abonner 9,99€/mois',
+            lifetimeBtn: '♾️ Accès à vie 299€',
             keyBtn: '🔑 J\'ai déjà une clé',
             bullets: [
               '✅ Accès illimité aux modules Pro',
               '✅ Tes analyses restent 100% locales (BYOK)',
-              '✅ Annulable à tout moment',
+              '✅ Annulable à tout moment · À vie rentabilisé en 30 mois',
             ],
           };
 
@@ -126,9 +135,19 @@
             <div class="paywall-content">
               <h3 id="paywall-title">${t.title}</h3>
               <p class="paywall-sub">${t.sub}</p>
-              <div class="paywall-price">${t.price}</div>
-              <div class="paywall-actions">
-                <button type="button" class="paywall-btn" data-paywall-action="checkout">${t.buyBtn}</button>
+              <div class="paywall-plans" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin:14px 0;">
+                <div style="border:1px solid var(--border);border-radius:8px;padding:14px 18px;min-width:180px;">
+                  <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${t.monthlyLabel}</div>
+                  <div style="font-size:22px;font-weight:700;margin:4px 0 10px;">${t.monthlyPrice}</div>
+                  <button type="button" class="paywall-btn" data-paywall-action="checkout" style="width:100%;">${t.buyBtn}</button>
+                </div>
+                <div style="border:2px solid var(--accent-green);border-radius:8px;padding:14px 18px;min-width:180px;position:relative;">
+                  <div style="font-size:11px;color:var(--accent-green);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;">${t.lifetimeLabel}</div>
+                  <div style="font-size:22px;font-weight:700;margin:4px 0 10px;">${t.lifetimePrice}</div>
+                  <a href="${LIFETIME_URL}" target="_blank" rel="noopener" class="paywall-btn" style="width:100%;text-decoration:none;display:block;text-align:center;box-sizing:border-box;">${t.lifetimeBtn}</a>
+                </div>
+              </div>
+              <div style="text-align:center;margin:6px 0 14px;">
                 <button type="button" class="paywall-btn paywall-btn-secondary" data-paywall-action="enter-key">${t.keyBtn}</button>
               </div>
               <ul class="paywall-info">

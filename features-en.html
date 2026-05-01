@@ -163,6 +163,9 @@
     .btn-cta { display: inline-block; padding: 12px 28px; background: var(--accent-green, #00ff88); color: #000; font-weight: 700; text-decoration: none; border-radius: 6px; }
     .cta-banner { text-align: center; margin: 60px 0; padding: 40px 20px; background: linear-gradient(135deg, rgba(0,255,136,0.08), rgba(0,255,136,0.02)); border: 1px solid var(--accent-green, #00ff88); border-radius: 12px; }
   </style>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
 
@@ -172,7 +175,7 @@
   <a href="/pricing-en.html">Pricing</a>
   <a href="/bloomberg-alternative-en.html">Bloomberg alternative</a>
   <a href="/ai-stock-analysis-guide-en.html">AI Guide</a>
-  <a href="/features.html" class="lang-switch" title="Version française">🇫🇷 FR</a>
+  <a href="/features.html" class="lang-switch" hreflang="fr" title="Version française">🇫🇷 FR</a>
   <a href="/" style="color:#00ff88;font-weight:600;">Launch app →</a>
 </header>
 
@@ -546,6 +549,28 @@
 
   <h2>11 financial data providers</h2>
   <p>For prices, fundamentals, news, screening: FMP, Alpha Vantage, Polygon, Finnhub, Tiingo, Twelve Data, FRED (Fed macro), Etherscan (on-chain), CoinGecko (crypto), DefiLlama (DeFi), SEC EDGAR (filings), Frankfurter (FX). Optional and configurable — enrich analyses without changing LLM cost.</p>
+
+  <h2 id="faq-features">Frequently asked questions</h2>
+  <div itemscope itemtype="https://schema.org/FAQPage">
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:14px;">
+      <h3 itemprop="name" style="font-size:16px;">How many analysis modules does Alpha offer?</h3>
+      <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+        <p itemprop="text" style="color:#ccc;">Alpha bundles 46+ modules covering quick decisions, fundamental analysis, macro, crypto, sentiment, productivity tools, French taxation, long-term memory and personal finance.</p>
+      </div>
+    </div>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:14px;">
+      <h3 itemprop="name" style="font-size:16px;">Which LLMs can I use inside Alpha?</h3>
+      <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+        <p itemprop="text" style="color:#ccc;">14 AI providers: Claude, ChatGPT, Gemini, Grok, Mistral, Perplexity, Cerebras, GitHub Models, NVIDIA NIM, Hugging Face, Cloudflare AI, Together AI, Cohere and OpenRouter. You pick and pay at the official rate (BYOK).</p>
+      </div>
+    </div>
+    <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" style="margin-bottom:14px;">
+      <h3 itemprop="name" style="font-size:16px;">Is my data kept private?</h3>
+      <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+        <p itemprop="text" style="color:#ccc;">Yes. Alpha is 100% client-side: no server stores your keys or analyses. Everything is encrypted locally and only transits directly to the AI provider you've chosen.</p>
+      </div>
+    </div>
+  </div>
 
   <div class="cta-banner">
     <h2 style="margin:0;border:0;padding:0;">Ready to test all 46 modules?</h2>

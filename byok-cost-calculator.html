@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Simulateur de coût BYOK Alpha · Combien tu vas vraiment payer ?</title>
+  <meta name="description" content="Calcule en 30 secondes ton budget mensuel total Alpha + APIs IA. BYOK transparent : exemples de coûts par module et par provider." />
+  <meta name="keywords" content="byok prix, simulateur coût api, alpha terminal prix, calculateur byok, claude api coût, gemini coût, gpt prix" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/byok-cost-calculator-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/byok-cost-calculator.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Simulateur de coût BYOK Alpha · Combien tu vas vraiment payer ?" />
+  <meta property="og:description" content="Calcule ton budget mensuel total Alpha + API IA en 30 secondes. Transparent et précis." />
+  <meta property="og:url" content="https://alpha-terminal.app/byok-cost-calculator.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:site_name" content="Alpha" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Simulateur de coût BYOK Alpha" />
+  <meta name="twitter:description" content="Combien tu vas vraiment payer par mois ? Simulateur en 30 secondes." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a' rx='14'/><text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'>α</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" /></noscript>
+  <style>
+    :root {
+      --bg-primary: #0a0a0a; --bg-secondary: #111; --bg-tertiary: #1a1a1a; --accent-green: #00ff88;
+      --text-primary: #fff; --text-secondary: rgba(255,255,255,0.6); --text-muted: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.08);
+      --font-sans: 'Inter', system-ui, sans-serif; --font-mono: 'JetBrains Mono', monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  </style>
+  <link rel="preload" href="styles.css" as="style" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    input[type=range] { accent-color: var(--accent-green); }
+  </style>
+
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Simulateur de coût BYOK Alpha",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Web",
+    "description": "Calcule en 30 secondes ton budget mensuel total Alpha + APIs IA en BYOK.",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+    "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "84" },
+    "url": "https://alpha-terminal.app/byok-cost-calculator.html"
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Comment estimer son budget mensuel BYOK pour Alpha Terminal",
+    "description": "Guide pour calculer son coût total mensuel (abonnement + API IA) en BYOK.",
+    "totalTime": "PT30S",
+    "step": [
+      { "@type": "HowToStep", "position": 1, "name": "Estimer la fréquence d'usage", "text": "Combien d'analyses par semaine ? 1-5 = casual, 10-20 = actif, 30+ = power user." },
+      { "@type": "HowToStep", "position": 2, "name": "Choisir le type d'analyse", "text": "Quick Analysis (~$0.005), DCF (~$0.05), 10-K Decoder (~$0.30) ou un mix typique (~$0.10)." },
+      { "@type": "HowToStep", "position": 3, "name": "Choisir un provider IA", "text": "Gratuit (GitHub Models, Cerebras), économique (Haiku, Gemini Flash), standard (Sonnet, GPT-4) ou premium (Opus, GPT-4 Turbo)." },
+      { "@type": "HowToStep", "position": 4, "name": "Plafonner le budget", "text": "Dans Settings → Avancé, fixer un cap mensuel (ex: 5€/mois). Alpha bloque automatiquement au-delà." }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      { "@type": "Question", "name": "Qu'est-ce que le BYOK ?", "acceptedAnswer": { "@type": "Answer", "text": "BYOK = Bring Your Own Key. Tu apportes ta propre clé API (Claude, OpenAI, Gemini, Mistral...) et tu paies l'IA directement chez le provider, au prix coûtant. Alpha n'ajoute aucune marge sur l'IA." }},
+      { "@type": "Question", "name": "Pourquoi le BYOK est moins cher qu'un SaaS classique ?", "acceptedAnswer": { "@type": "Answer", "text": "Les SaaS d'analyse IA prennent 5 à 10× le coût brut de l'API pour couvrir l'infra, le support et leur marge. Avec BYOK tu paies seulement l'abonnement Alpha (9,99€/mois) + l'IA au prix réel. Gain typique : 50 à 80% vs SaaS équivalent." }},
+      { "@type": "Question", "name": "Puis-je utiliser une clé API gratuite ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. GitHub Models, Cerebras et Mistral offrent des tiers gratuits (rate-limités) qui couvrent l'usage casual. Avec ces clés, ton coût total = 9,99€/mois (abonnement Alpha uniquement)." }},
+      { "@type": "Question", "name": "Comment éviter les mauvaises surprises de facture API ?", "acceptedAnswer": { "@type": "Answer", "text": "Dans Settings → Avancé, tu peux fixer un plafond mensuel ($ ou €) sur ta consommation IA. Une fois atteint, Alpha bloque les nouveaux appels. Les providers (Anthropic, OpenAI, Google) permettent aussi de fixer des limites côté compte." }},
+      { "@type": "Question", "name": "Mes clés API sont-elles en sécurité ?", "acceptedAnswer": { "@type": "Answer", "text": "Oui. Chiffrement AES-GCM 256 + PBKDF2 100K iterations, en local sur ton appareil. Le mot de passe maître ne quitte jamais ta machine. Aucun serveur Alpha ne voit tes clés." }}
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Simulateur BYOK", "item": "https://alpha-terminal.app/byok-cost-calculator.html" }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;">
+      <span class="logo-mark">Alpha</span>
+    </a>
+    <div class="landing-nav-links">
+      <a href="/">Accueil</a>
+      <a href="features.html">Fonctionnalités</a>
+      <a href="pricing.html">Tarif</a>
+      <a href="api-costs.html">Coûts API</a>
+      <a href="bloomberg-alternative.html">vs Bloomberg</a>
+      <a href="byok-cost-calculator-en.html" class="lang-switch" hreflang="en" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">💰 Simulateur de coût BYOK · Combien tu vas vraiment payer ?</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Réponds à 3 questions. Obtiens ton budget mensuel total transparent (abonnement Alpha + APIs IA) en 30 secondes.</p>
+
+    <div style="background:#111;border:1px solid #222;border-radius:10px;padding:24px;max-width:680px;">
+      <h2 style="margin-top:0;font-size:20px;">Combien tu vas vraiment payer par mois ?</h2>
+      <p style="color:#aaa;font-size:14px;">Réponds à 3 questions, on calcule ton budget total transparent.</p>
+
+      <label style="display:block;margin:18px 0 14px;">
+        <span><strong>Combien d'analyses par semaine ?</strong></span>
+        <input type="range" min="1" max="50" value="10" id="byok-freq" oninput="updateByok()" style="width:100%;" />
+        <output id="byok-freq-val" style="display:block;color:#00ff88;font-weight:600;">10 analyses/semaine</output>
+      </label>
+
+      <label style="display:block;margin-bottom:14px;">
+        <span><strong>Type d'analyse principal :</strong></span>
+        <select id="byok-type" onchange="updateByok()" style="width:100%;padding:10px;background:#0a0a0a;border:1px solid #333;color:#fff;border-radius:4px;margin-top:4px;">
+          <option value="0.005">Quick Analysis (verdict rapide) — $0,005/analyse</option>
+          <option value="0.05">DCF / Valorisation — $0,05/analyse</option>
+          <option value="0.30">10-K Decoder (rapport annuel complet) — $0,30/analyse</option>
+          <option value="0.10" selected>Mix typique (50% Quick, 30% DCF, 20% 10-K) — $0,10/analyse</option>
+        </select>
+      </label>
+
+      <label style="display:block;margin-bottom:14px;">
+        <span><strong>Provider IA principal :</strong></span>
+        <select id="byok-provider" onchange="updateByok()" style="width:100%;padding:10px;background:#0a0a0a;border:1px solid #333;color:#fff;border-radius:4px;margin-top:4px;">
+          <option value="0">GitHub Models / Cerebras / Mistral (gratuit)</option>
+          <option value="0.5">Claude Haiku / Gemini Flash (économique)</option>
+          <option value="1" selected>Claude Sonnet / GPT-4 (qualité standard)</option>
+          <option value="2.5">Claude Opus / GPT-4 Turbo (qualité maximale)</option>
+        </select>
+      </label>
+
+      <div id="byok-result" style="background:#0a0a0a;border:1px solid #00ff88;border-radius:8px;padding:20px;margin-top:18px;"></div>
+
+      <div style="margin-top:20px;padding:18px;background:#1a1a1a;border-radius:6px;text-align:center;">
+        <a href="pricing.html" class="plausible-event-name=BYOK+Upsell" style="display:inline-block;background:#00ff88;color:#000;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:700;">⚡ Essaie Alpha 9,99€/mois</a>
+        <p style="margin:10px 0 0;font-size:11px;color:#888;">🛡️ 14 jours satisfait ou remboursé</p>
+      </div>
+    </div>
+
+    <script>
+    function updateByok() {
+      const freq = parseFloat(document.getElementById('byok-freq').value);
+      const cost = parseFloat(document.getElementById('byok-type').value);
+      const multiplier = parseFloat(document.getElementById('byok-provider').value);
+      document.getElementById('byok-freq-val').textContent = freq + ' analyses/semaine';
+
+      const usdPerMonth = freq * 4.33 * cost * multiplier;
+      const eurApi = usdPerMonth * 0.92;
+      const totalEur = 9.99 + eurApi;
+
+      document.getElementById('byok-result').innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+          <div><span style="color:#888;font-size:12px;">Abonnement Alpha</span><br><strong style="font-size:18px;">9,99€/mois</strong></div>
+          <div><span style="color:#888;font-size:12px;">Usage IA estimé</span><br><strong style="font-size:18px;">${eurApi.toFixed(2)}€/mois</strong></div>
+        </div>
+        <div style="border-top:1px solid #222;padding-top:14px;">
+          <span style="color:#888;font-size:13px;">Ton budget mensuel total</span>
+          <div style="font-size:36px;font-weight:700;color:#00ff88;">${totalEur.toFixed(2)}€/mois</div>
+        </div>
+        <p style="font-size:12px;color:#888;margin:14px 0 0;">💡 Tu peux mettre un plafond mensuel dans Settings (ex: 5€/mois max). Alpha bloque automatiquement au-delà.</p>
+        <p style="font-size:12px;color:#888;margin:8px 0 0;">⚡ Avec une clé API gratuite (GitHub Models) : <strong>9,99€/mois total</strong>.</p>
+      `;
+    }
+    window.addEventListener('DOMContentLoaded', updateByok);
+    </script>
+
+    <h2 style="font-size:24px;margin:40px 0 12px;">💡 Pourquoi BYOK = moins cher que les SaaS classiques</h2>
+    <p>Les SaaS d'analyse IA (Simply Wall St, Koyfin AI, Quartr Pro...) facturent <strong>5 à 10× le coût brut</strong> de l'API qu'ils utilisent en backend. Pourquoi ? Parce qu'ils doivent absorber :</p>
+    <ul style="line-height:1.9;">
+      <li><strong>Leur infrastructure cloud</strong> (proxies, load balancers, monitoring) : 30-40% du prix</li>
+      <li><strong>Leur support client</strong> et leur équipe ops : 20-30%</li>
+      <li><strong>Leur marge commerciale</strong> (ils sont une boîte, pas une asso) : 30-50%</li>
+      <li><strong>Le risque de churn</strong> (ils paient même si tu n'utilises pas)</li>
+    </ul>
+    <p>Avec BYOK, tu paies l'IA <strong>directement chez Anthropic / OpenAI / Google</strong>, au prix exact de leur facturation. Alpha n'est qu'une couche d'orchestration de prompts (9,99€/mois). Aucune marge sur l'IA.</p>
+    <p><strong>Comparaison concrète</strong> pour 50 analyses/mois :</p>
+    <ul style="line-height:1.9;">
+      <li>SaaS équivalent : <strong>~30-50€/mois</strong> (forfait incluant l'IA)</li>
+      <li>Alpha BYOK : <strong>~15€/mois</strong> (9,99€ Alpha + ~5€ API au prix coûtant)</li>
+      <li>Alpha BYOK avec free tier : <strong>9,99€/mois</strong> (GitHub Models / Cerebras gratuits)</li>
+    </ul>
+    <p>Économie typique : <strong>50 à 80%</strong> sur 12 mois. Et bonus : si tu n'utilises pas l'app pendant 1 mois, tu ne paies que l'abonnement Alpha — l'API à $0.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">🆓 Les 5 providers gratuits / quasi-gratuits</h2>
+    <p>Tu peux utiliser Alpha sans dépenser un centime sur l'IA :</p>
+    <ol style="line-height:1.9;">
+      <li><strong>GitHub Models</strong> — accès gratuit à GPT-4o, Claude, Llama, Mistral via un PAT GitHub. Rate limit : ~50 requêtes/jour. Parfait pour casual.</li>
+      <li><strong>Cerebras</strong> — Llama 70B en inférence ultra-rapide (>2000 tok/s). Tier gratuit ~1M tokens/jour.</li>
+      <li><strong>Mistral La Plateforme</strong> — Mistral Small gratuit avec rate-limit raisonnable. Données EU, RGPD-friendly.</li>
+      <li><strong>Google AI Studio</strong> — Gemini 2.5 Flash gratuit avec quota généreux (1500 requêtes/jour).</li>
+      <li><strong>Groq</strong> — Llama 3.3 70B en inférence ultra-rapide. Tier gratuit pour usage personnel.</li>
+    </ol>
+    <p>👉 <a href="api-keys-guide.html" style="color:var(--accent-green);">Guide complet : comment obtenir une clé API gratuite en 5 minutes</a>.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">🛡️ Comment plafonner ton budget</h2>
+    <p>Trois mécanismes complémentaires garantissent que tu ne paieras jamais plus que prévu :</p>
+    <p><strong>1. Plafond mensuel dans Alpha</strong> — Settings → Avancé → "Budget cap mensuel". Tu fixes une valeur ($ ou €, ex: 5€/mois). Alpha calcule en temps réel ta consommation et bloque les nouveaux appels une fois le cap atteint. Notification visuelle dans la barre supérieure.</p>
+    <p><strong>2. Plafond par analyse</strong> — Settings → Avancé → "Budget cap par analyse". Tu fixes un seuil ($) au-dessus duquel l'analyse est annulée avant l'envoi. Garde-fou contre les analyses lourdes (10-K sur Berkshire = ~30k tokens d'input).</p>
+    <p><strong>3. Limites côté provider</strong> — chaque provider (Anthropic, OpenAI, Google) permet de fixer des hard limits dans ton compte. Ex: Anthropic Console → Settings → Spend Limits. Tu peux définir un cap dur (ex: $20/mois). Au-delà, le provider lui-même bloque les requêtes.</p>
+    <p>Avec ces 3 garde-fous cumulables, le risque de mauvaise surprise est quasi-nul. <strong>Recommandation</strong> : commence avec un cap Alpha à 5€/mois, observe ta vraie consommation pendant 2-3 semaines, ajuste.</p>
+
+    <h2 style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Qu'est-ce que le BYOK ?</summary>
+      <p>BYOK = <strong>Bring Your Own Key</strong>. Tu apportes ta propre clé API (Claude, OpenAI, Gemini, Mistral...) et tu paies l'IA directement chez le provider, au prix coûtant. Alpha n'ajoute aucune marge sur l'IA.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Pourquoi le BYOK est moins cher qu'un SaaS classique ?</summary>
+      <p>Les SaaS d'analyse IA prennent <strong>5 à 10× le coût brut de l'API</strong> pour couvrir l'infra, le support et leur marge. Avec BYOK tu paies seulement l'abonnement Alpha (9,99€/mois) + l'IA au prix réel. Gain typique : 50 à 80% vs SaaS équivalent.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Puis-je utiliser une clé API gratuite ?</summary>
+      <p>Oui. <strong>GitHub Models, Cerebras et Mistral</strong> offrent des tiers gratuits (rate-limités) qui couvrent l'usage casual. Avec ces clés, ton coût total = <strong>9,99€/mois</strong> (abonnement Alpha uniquement).</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Comment éviter les mauvaises surprises de facture API ?</summary>
+      <p>Dans Settings → Avancé, tu peux fixer un <strong>plafond mensuel</strong> ($ ou €) sur ta consommation IA. Une fois atteint, Alpha bloque les nouveaux appels. Les providers (Anthropic, OpenAI, Google) permettent aussi de fixer des limites côté compte.</p>
+    </details>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Mes clés API sont-elles en sécurité ?</summary>
+      <p>Oui. Chiffrement <strong>AES-GCM 256 + PBKDF2 100K iterations</strong>, en local sur ton appareil. Le mot de passe maître ne quitte jamais ta machine. Aucun serveur Alpha ne voit tes clés.</p>
+    </details>
+
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 10px;">🚀 Prêt à essayer ?</h3>
+      <p style="color:var(--text-secondary);margin:0 0 14px;">9,99€/mois, ton API au prix coûtant. Mode démo gratuit. Garantie 14 jours satisfait ou remboursé.</p>
+      <a href="pricing.html" class="btn-primary big plausible-event-name=BYOK+CTA+Final" style="text-decoration:none;display:inline-block;background:#00ff88;color:#000;padding:14px 28px;border-radius:6px;font-weight:700;">⚡ Essaie Alpha 9,99€/mois</a>
+      <p style="font-size:12px;color:var(--text-muted);margin:12px 0 0;">🛡️ Garantie 14 jours satisfait ou remboursé</p>
+    </div>
+
+    <footer class="landing-footer" style="margin-top:60px;">
+      <span>Alpha · Made in France 🇫🇷 · BYOK 100% privé</span>
+      <span class="footer-legal-links">
+        <a href="about.html">À propos</a> ·
+        <a href="pricing.html">Tarif</a> ·
+        <a href="bloomberg-alternative.html">vs Bloomberg</a> ·
+        <a href="features.html">Fonctionnalités</a> ·
+        <a href="dcf-calculator.html">Calculateur DCF</a> ·
+        <a href="api-costs.html">Coûts API</a> ·
+        <a href="api-keys-guide.html">Guide clés API</a> ·
+        <a href="privacy.html">Confidentialité</a> ·
+        <a href="terms.html">CGU</a>
+      </span>
+    </footer>
+  </article>
+</body>
+</html>

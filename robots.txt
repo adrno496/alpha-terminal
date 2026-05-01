@@ -13,6 +13,9 @@ Allow: /bloomberg-alternative.html
 Allow: /ai-stock-analysis-guide.html
 Allow: /api-costs.html
 Allow: /api-keys-guide.html
+Allow: /alpha-vs-koyfin.html
+Allow: /alpha-vs-chatgpt.html
+Allow: /alpha-vs-bloomberg-detailed.html
 # EN versions
 Allow: /features-en.html
 Allow: /pricing-en.html
@@ -20,11 +23,19 @@ Allow: /bloomberg-alternative-en.html
 Allow: /ai-stock-analysis-guide-en.html
 Allow: /api-costs-en.html
 Allow: /api-keys-guide-en.html
+Allow: /alpha-vs-koyfin-en.html
+Allow: /alpha-vs-chatgpt-en.html
+Allow: /alpha-vs-bloomberg-detailed-en.html
 # Legal
 Allow: /about.html
 Allow: /privacy.html
 Allow: /terms.html
 Allow: /legal.html
+# Legal EN
+Allow: /about-en.html
+Allow: /privacy-en.html
+Allow: /terms-en.html
+Allow: /legal-en.html
 
 # Bloque les ressources non-utiles au SEO
 Disallow: /js/

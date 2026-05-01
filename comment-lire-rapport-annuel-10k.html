@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Comment lire un rapport annuel (10-K) en 10 minutes — guide 2026 | Alpha</title>
+  <meta name="description" content="Décortique un 10-K en 10 minutes : les 5 sections clés, les 7 ratios à extraire, les pièges à éviter, et comment automatiser la lecture avec une IA. Exemples Apple et Tesla." />
+  <meta name="keywords" content="lire 10-K, rapport annuel SEC, analyse 10-K, sections 10-K, MD&A, risk factors, ratios financiers, automatiser lecture rapport annuel" />
+  <meta name="author" content="Alpha" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+  <link rel="canonical" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/how-to-read-10k-annual-report.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Comment lire un rapport annuel (10-K) en 10 minutes — guide 2026" />
+  <meta property="og:description" content="Les 5 sections clés, les 7 ratios à extraire, les pièges à éviter. Exemples Apple et Tesla. Automatise avec une IA." />
+  <meta property="og:url" content="https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Alpha" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Comment lire un 10-K en 10 minutes" />
+  <meta name="twitter:description" content="5 sections clés · 7 ratios à extraire · pièges à éviter · automatisation IA." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-guide.png" />
+  <meta name="twitter:site" content="@AlphaTerminal" />
+
+  <link rel="icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%230a0a0a' rx='14'/><text x='50%' y='62%' text-anchor='middle' fill='%2300ff88' font-family='monospace' font-weight='700' font-size='62'>α</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    :root { --bg-primary:#0a0a0a; --bg-secondary:#111; --bg-tertiary:#1a1a1a; --accent-green:#00ff88; --accent-orange:#ffa500; --text-primary:#fff; --text-secondary:rgba(255,255,255,0.6); --text-muted:rgba(255,255,255,0.45); --border:rgba(255,255,255,0.08); --font-mono:'JetBrains Mono', monospace; }
+    html, body { height:auto !important; overflow:auto !important; }
+  </style>
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Comment lire un rapport annuel (10-K) en 10 minutes — guide 2026",
+    "description": "Décortique un 10-K en 10 minutes : 5 sections clés, 7 ratios à extraire, pièges à éviter, automatisation IA.",
+    "author": { "@type":"Person", "name":"Équipe Alpha", "url":"https://alpha-terminal.app/about.html" },
+    "datePublished": "2026-05-02",
+    "dateModified": "2026-05-02",
+    "publisher": { "@type":"Organization", "name":"Alpha", "url":"https://alpha-terminal.app/", "logo":{ "@type":"ImageObject", "url":"https://alpha-terminal.app/icons/icon-192.png" } },
+    "image": "https://alpha-terminal.app/og-guide.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  { "@context":"https://schema.org", "@type":"BreadcrumbList", "itemListElement":[
+    {"@type":"ListItem","position":1,"name":"Accueil","item":"https://alpha-terminal.app/"},
+    {"@type":"ListItem","position":2,"name":"Guides","item":"https://alpha-terminal.app/ai-stock-analysis-guide.html"},
+    {"@type":"ListItem","position":3,"name":"Lire un 10-K","item":"https://alpha-terminal.app/comment-lire-rapport-annuel-10k.html"}
+  ]}
+  </script>
+  <script type="application/ld+json">
+  { "@context":"https://schema.org","@type":"HowTo","name":"Comment lire un rapport annuel 10-K en 10 minutes","totalTime":"PT10M","step":[
+    {"@type":"HowToStep","position":1,"name":"Ouvrir le 10-K sur SEC EDGAR","text":"Va sur sec.gov/edgar, cherche le ticker (ex: AAPL) et ouvre le dernier filing 10-K."},
+    {"@type":"HowToStep","position":2,"name":"Lire Item 1 (Business)","text":"Comprendre l'activité, les segments, la géographie en 2 minutes."},
+    {"@type":"HowToStep","position":3,"name":"Scanner Item 1A (Risk Factors)","text":"Lire seulement les risques nouveaux par rapport à l'année précédente."},
+    {"@type":"HowToStep","position":4,"name":"Lire Item 7 (MD&A)","text":"La narrative du management : les vraies raisons des chiffres."},
+    {"@type":"HowToStep","position":5,"name":"Extraire 7 ratios des Financial Statements","text":"ROIC, marge brute, dette nette / EBITDA, FCF yield, croissance CA, days sales outstanding, gross margin trend."}
+  ]}
+  </script>
+  <script type="application/ld+json">
+  { "@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Combien de temps faut-il vraiment pour lire un 10-K ?","acceptedAnswer":{"@type":"Answer","text":"Une lecture intégrale prend 4 à 8 heures (200-400 pages). Avec la méthode des 5 sections clés, tu en extrais 80% de la valeur en 10-15 minutes. Avec une IA spécialisée (10-K Decoder d'Alpha), 30 secondes."}},
+    {"@type":"Question","name":"Où trouver le 10-K d'une entreprise US ?","acceptedAnswer":{"@type":"Answer","text":"Sur sec.gov/edgar — gratuit et officiel. Tape le ticker, filtre par form 10-K, le dernier en haut. Pour les sociétés européennes, c'est le rapport annuel sur leur site investor relations."}},
+    {"@type":"Question","name":"Quelle différence entre 10-K et 10-Q ?","acceptedAnswer":{"@type":"Answer","text":"10-K = annuel, audité, complet (200-400 pages). 10-Q = trimestriel, non-audité, plus court (50-100 pages). Le 10-K contient les Risk Factors complets et la stratégie long terme — c'est lui qu'il faut lire en priorité."}},
+    {"@type":"Question","name":"Quels sont les pièges à éviter en lisant un 10-K ?","acceptedAnswer":{"@type":"Answer","text":"1) Sauter Item 1A (Risk Factors) — les vrais red flags y sont. 2) Ne lire que la partie chiffres — la narrative MD&A explique le pourquoi. 3) Ne pas comparer avec le 10-K N-1 — 80% du texte est copié-collé, seules les modifications comptent. 4) Ignorer les notes aux états financiers où sont cachées les revenus différés et les leases."}},
+    {"@type":"Question","name":"Une IA peut-elle vraiment lire un 10-K ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Claude Opus, GPT-5 et Gemini 2.5 Pro avalent un 10-K complet (≈200k tokens) en 30 secondes et sortent une synthèse structurée : moat, ROIC vs WACC, allocation capital, 5 risques majeurs, diff vs N-1. Coût : $0.10 à $0.50 par analyse selon le modèle."}}
+  ]}
+  </script>
+</head>
+<body>
+  <nav class="landing-nav">
+    <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;"><span class="logo-mark">Alpha</span></a>
+    <div class="landing-nav-links">
+      <a href="/">Accueil</a>
+      <a href="features.html">Fonctionnalités</a>
+      <a href="pricing.html">Tarif</a>
+      <a href="ai-stock-analysis-guide.html">Guides</a>
+      <a href="how-to-read-10k-annual-report.html" class="lang-switch" hreflang="en" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="English version">🇬🇧 EN</a>
+    </div>
+  </nav>
+
+  <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
+
+    <nav aria-label="Breadcrumb" style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px;">
+      <a href="/" style="color:var(--text-muted);">Accueil</a> ›
+      <a href="ai-stock-analysis-guide.html" style="color:var(--text-muted);">Guides</a> ›
+      <span style="color:var(--text-secondary);">Lire un 10-K en 10 minutes</span>
+    </nav>
+
+    <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">📑 Comment lire un rapport annuel (10-K) en 10 minutes</h1>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Guide 2026 — la méthode des 5 sections clés + 7 ratios pour extraire 80% de la valeur d'un 10-K en 10 minutes au lieu de 6 heures.</p>
+
+    <div style="padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-green);margin:20px 0;border-radius:4px;">
+      <strong>📌 TL;DR</strong> — Un 10-K fait 200 à 400 pages. 80% de l'info utile est concentrée dans <strong>5 sections</strong> (Business, Risk Factors, MD&A, Financial Statements, Notes). Tu extrais ensuite <strong>7 ratios</strong>. Tu compares au 10-K N-1. Verdict en 10 minutes. Avec une IA, 30 secondes.
+    </div>
+
+    <nav class="toc" aria-label="Table des matières" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table des matières</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">C'est quoi un 10-K ?</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Les 5 sections clés à lire</a></li>
+        <li><a href="#section-3" style="color:#aaa;">Les 7 ratios à extraire</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Les 6 pièges à éviter</a></li>
+        <li><a href="#section-5" style="color:#aaa;">Exemple concret : Apple 10-K 2024</a></li>
+        <li><a href="#section-6" style="color:#aaa;">Automatiser la lecture avec une IA</a></li>
+        <li><a href="#section-7" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">📘 C'est quoi un 10-K ?</h2>
+    <p>Le 10-K est le <strong>rapport annuel obligatoire</strong> qu'une société cotée aux US doit déposer auprès de la SEC dans les 60 à 90 jours après la fin de l'exercice fiscal. Il est <strong>audité</strong>, <strong>signé par le CEO et le CFO</strong> sous responsabilité pénale (Sarbanes-Oxley), et il contient tout : business model, comptes, risques, stratégie, contentieux.</p>
+    <p>C'est le document le plus dense et le plus fiable de toute la communication financière d'une entreprise. Plus précis qu'un communiqué presse, plus complet qu'une earnings call, plus honnête qu'un investor day. Pourquoi ? Parce que mentir dans un 10-K = prison.</p>
+    <p><strong>Où le trouver :</strong> <a href="https://www.sec.gov/edgar" target="_blank" rel="noopener" style="color:var(--accent-green);">sec.gov/edgar</a> — gratuit, officiel, recherche par ticker. Pour les sociétés européennes, c'est l'<em>annual report</em> ou <em>document d'enregistrement universel</em> sur leur site IR.</p>
+
+    <h2 id="section-2" style="font-size:24px;margin:32px 0 12px;">🎯 Les 5 sections clés à lire (et celles qu'on saute)</h2>
+
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Item</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Section</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Pourquoi la lire</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">Temps</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>Item 1</strong></td><td style="padding:8px;border:1px solid var(--border);">Business</td><td style="padding:8px;border:1px solid var(--border);">Comprendre comment l'entreprise gagne de l'argent. Segments, géographies, clients clés.</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">2 min</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>Item 1A</strong></td><td style="padding:8px;border:1px solid var(--border);">Risk Factors</td><td style="padding:8px;border:1px solid var(--border);">Les vrais red flags. Lis seulement les <em>nouveaux</em> risques vs N-1.</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">2 min</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>Item 7</strong></td><td style="padding:8px;border:1px solid var(--border);">MD&amp;A</td><td style="padding:8px;border:1px solid var(--border);">La narrative du management. Pourquoi le CA a bougé, où va l'investissement.</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">3 min</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>Item 8</strong></td><td style="padding:8px;border:1px solid var(--border);">Financial Statements</td><td style="padding:8px;border:1px solid var(--border);">Les 3 états (P&amp;L, bilan, cash-flow). Extraction des 7 ratios.</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">2 min</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);"><strong>Item 8 - Notes</strong></td><td style="padding:8px;border:1px solid var(--border);">Notes aux comptes</td><td style="padding:8px;border:1px solid var(--border);">Ce que la direction préfère cacher : SBC, leases, deferred revenue, contentieux.</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">1 min</td></tr>
+      </tbody>
+    </table>
+
+    <p style="background:var(--bg-tertiary);padding:12px;border-radius:4px;font-size:13px;">
+      💡 <strong>Astuce</strong> — Les sections que tu peux sauter sans perdre 1% de valeur : Item 2 (Properties — liste des bureaux), Item 3 (Legal Proceedings sauf si gros litige connu), Item 9 (Changes in Accountants — rare et dangereux quand présent), Items 10-14 (gouvernance — déjà dans le proxy DEF 14A).
+    </p>
+
+    <h2 id="section-3" style="font-size:24px;margin:32px 0 12px;">📊 Les 7 ratios à extraire systématiquement</h2>
+
+    <ol style="line-height:2;">
+      <li><strong>ROIC (Return on Invested Capital)</strong> — Doit être &gt; 15% sur 5 ans. Sous 10%, l'entreprise détruit de la valeur après coût du capital.</li>
+      <li><strong>Marge brute (Gross margin)</strong> — Stable ou croissante = pricing power. En baisse = compétition qui mord.</li>
+      <li><strong>Marge opérationnelle</strong> — Mesure l'efficacité du business modèle. Comparer aux pairs sectoriels.</li>
+      <li><strong>Free Cash Flow / Net Income</strong> — Doit être &gt; 1. Sinon les profits ne sont pas du cash (signal warning).</li>
+      <li><strong>Dette nette / EBITDA</strong> — Sous 2× = sain. Au-dessus de 4× = fragile en cas de récession.</li>
+      <li><strong>Croissance CA organique</strong> — Hors acquisitions et hors effet change. La vraie performance commerciale.</li>
+      <li><strong>Days Sales Outstanding (DSO)</strong> — En hausse rapide = clients qui paient en retard, signal de pression sur la demande.</li>
+    </ol>
+
+    <p>Ces 7 ratios sont précisément ceux que <a href="features.html#quick-analysis">le module Quick Analysis d'Alpha</a> calcule automatiquement à partir des données FMP/Finnhub en 5 secondes.</p>
+
+    <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">⚠️ Les 6 pièges à éviter</h2>
+
+    <div style="padding:14px;background:#2a1a0a;border-left:3px solid var(--accent-orange);margin:14px 0;border-radius:4px;font-size:14px;">
+      <strong>⚠️ Attention</strong> — La direction <em>sait</em> que la plupart des lecteurs scannent. Les pièges sont placés exactement aux endroits qu'on saute.
+    </div>
+
+    <ol style="line-height:2;">
+      <li><strong>Sauter Item 1A.</strong> 80% du texte est boilerplate, mais les 20% nouveaux contiennent les vrais signaux. Compare avec le 10-K N-1.</li>
+      <li><strong>Lire seulement les chiffres.</strong> Sans la narrative MD&A, tu ne sais pas <em>pourquoi</em> le CA a baissé. Mauvaise saison ? Perte d'un gros client ? Devise ?</li>
+      <li><strong>Ne pas diff vs N-1.</strong> 70% d'un 10-K est copié-collé d'une année sur l'autre. Les 30% modifiés sont l'or pur.</li>
+      <li><strong>Ignorer les notes 4-12.</strong> C'est là qu'on trouve : revenu différé (signe de croissance future ou décroissance), stock-based comp (dilution réelle), leases opérationnels (dette cachée), engagements hors-bilan.</li>
+      <li><strong>Confondre profit et cash.</strong> Une boîte peut afficher 1B$ de net income et brûler 500M$ de cash. Le tableau de cash-flow ne ment pas.</li>
+      <li><strong>Lire le 10-K isolément.</strong> Toujours croiser avec : earnings call N et N-1, proxy DEF 14A (compensation), 8-K récents (événements).</li>
+    </ol>
+
+    <h2 id="section-5" style="font-size:24px;margin:32px 0 12px;">🍎 Exemple concret : Apple 10-K FY2024</h2>
+    <p>Apple a déposé son 10-K FY2024 en novembre 2024. 80 pages. Voici ce qu'on en extrait en 10 minutes.</p>
+
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
+      <thead><tr style="background:var(--bg-tertiary);">
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Métrique</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">FY2024</th>
+        <th style="padding:10px;text-align:right;border:1px solid var(--border);">FY2023</th>
+        <th style="padding:10px;text-align:left;border:1px solid var(--border);">Lecture</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Revenue</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$391B</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$383B</td><td style="padding:8px;border:1px solid var(--border);">+2% — atone, dépendance iPhone</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Services</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$96B</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$85B</td><td style="padding:8px;border:1px solid var(--border);">+13% — moteur de marge</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Marge brute</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">46.2%</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">44.1%</td><td style="padding:8px;border:1px solid var(--border);">+210 bps — pricing power intact</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Free Cash Flow</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$108B</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">$99B</td><td style="padding:8px;border:1px solid var(--border);">FCF/NI = 1.15 — qualité top</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">Dette nette</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">-$50B</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">-$57B</td><td style="padding:8px;border:1px solid var(--border);">Net cash positif, capacité buyback</td></tr>
+        <tr><td style="padding:8px;border:1px solid var(--border);">ROIC</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">~58%</td><td style="padding:8px;text-align:right;border:1px solid var(--border);font-family:var(--font-mono);">~52%</td><td style="padding:8px;border:1px solid var(--border);">Hors normes — moat ecosystem confirmé</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Verdict 10 minutes :</strong> moat intact, transition produit→services en cours, ROIC monstrueux, mais croissance hardware atone. Risk Factors 2024 ajoute des mentions sur la régulation antitrust DOJ. Lecture : le bull case repose désormais sur Services + buybacks, pas sur le hardware. À surveiller : marge Services au prochain Q.</p>
+
+    <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">🤖 Automatiser la lecture avec une IA</h2>
+    <p>En 2026, un LLM moderne (Claude Opus 4.7, GPT-5, Gemini 2.5 Pro) avale un 10-K complet (≈200k tokens) en <strong>30 secondes</strong> et produit une synthèse structurée de 2000 mots qui couvre exactement les 5 sections clés + les 7 ratios + le diff N-1.</p>
+
+    <p>Mais attention : <strong>tous les LLMs ne se valent pas</strong> sur cette tâche. ChatGPT en mode chat hallucine régulièrement les chiffres. Une IA spécialisée avec accès aux <strong>données structurées (FMP, Finnhub, SEC EDGAR API)</strong> et un prompt calibré finance évite ce problème.</p>
+
+    <p>C'est exactement ce que fait le module <a href="features.html#10k-decoder">10-K Decoder d'Alpha</a> : ingestion directe du filing SEC, parsing structuré des sections, extraction automatique des 7 ratios, comparaison automatique avec N-1, output Markdown avec sources cliquables. Coût : <a href="api-costs.html">$0.10 à $0.50 par analyse</a> selon le modèle choisi.</p>
+
+    <h2 id="section-7" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Combien de temps faut-il vraiment pour lire un 10-K ?</summary>
+      <p>Lecture intégrale : 4 à 8 heures (200-400 pages). Avec la méthode des 5 sections clés : 10-15 minutes pour 80% de la valeur. Avec une IA spécialisée (10-K Decoder Alpha) : 30 secondes.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Où trouver le 10-K d'une entreprise US ?</summary>
+      <p>Sur <a href="https://www.sec.gov/edgar" target="_blank" rel="noopener">sec.gov/edgar</a> — gratuit et officiel. Tape le ticker, filtre par form 10-K, prends le dernier déposé. Pour les sociétés européennes, c'est le rapport annuel sur leur site investor relations.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quelle différence entre 10-K et 10-Q ?</summary>
+      <p>10-K = annuel, audité, complet (200-400 pages). 10-Q = trimestriel, non-audité, plus court (50-100 pages). Le 10-K contient les Risk Factors complets et la stratégie long terme — c'est lui qu'il faut lire en priorité.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quels sont les pièges à éviter en lisant un 10-K ?</summary>
+      <p>1) Sauter Item 1A. 2) Ne lire que les chiffres sans la narrative. 3) Ne pas comparer avec N-1. 4) Ignorer les notes aux états financiers. 5) Confondre profit et cash. 6) Lire isolément sans croiser avec earnings call et 8-K.</p>
+    </details>
+    <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
+      <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Une IA peut-elle vraiment lire un 10-K ?</summary>
+      <p>Oui. Claude Opus 4.7, GPT-5 et Gemini 2.5 Pro avalent un 10-K complet en 30 secondes et sortent une synthèse structurée. Coût : $0.10 à $0.50 selon le modèle. Voir <a href="api-costs.html">détail des coûts API</a>.</p>
+    </details>
+
+    <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
+      <h3 style="margin:0 0 10px;">📑 Alpha décortique un 10-K complet en 30 secondes</h3>
+      <p style="color:var(--text-secondary);margin:0 0 14px;">9,99€/mois · 14 jours satisfait ou remboursé · Annulation en 1 clic</p>
+      <a href="pricing.html" class="btn-primary big plausible-event-name=Guide+CTA" style="text-decoration:none;display:inline-block;">Essayer Alpha →</a>
+    </div>
+
+    <footer class="landing-footer" style="margin-top:60px;">
+      <span>Alpha · Made in France 🇫🇷 · BYOK 100% privé</span>
+      <span class="footer-legal-links">
+        <a href="about.html">À propos</a> ·
+        <a href="pricing.html">Tarif</a> ·
+        <a href="ai-stock-analysis-guide.html">Guides</a> ·
+        <a href="features.html">Fonctionnalités</a> ·
+        <a href="privacy.html">Confidentialité</a> ·
+        <a href="terms.html">CGU</a> ·
+        <a href="legal.html">Mentions légales</a>
+      </span>
+    </footer>
+  </article>
+</body>
+</html>

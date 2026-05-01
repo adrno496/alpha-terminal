@@ -117,11 +117,14 @@
     ]
   }
   </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <nav class="landing-nav">
     <a href="/" class="landing-logo" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px;">
-      <img src="icons/logo.png" alt="Alpha" style="width:32px;height:32px;border-radius:8px;" />
+      <img src="icons/logo.png" alt="Alpha" fetchpriority="high" decoding="async" style="width:32px;height:32px;border-radius:8px;" />
       <span class="logo-mark">Alpha</span>
     </a>
     <div class="landing-nav-links">
@@ -131,7 +134,7 @@
       <a href="api-costs-en.html">API costs</a>
       <a href="api-keys-guide-en.html" style="color:var(--accent-green);">API keys</a>
       <a href="bloomberg-alternative-en.html">vs Bloomberg</a>
-      <a href="api-keys-guide.html" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="Version française">🇫🇷 FR</a>
+      <a href="api-keys-guide.html" class="lang-switch" hreflang="fr" title="Version française" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;">🇫🇷 FR</a>
     </div>
   </nav>
 
@@ -143,7 +146,19 @@
       <strong>📌 TL;DR</strong> — <strong>7 free AI providers</strong> let you use Alpha without spending a cent (GitHub Models, Cerebras, Mistral, NVIDIA, Cloudflare, HuggingFace, Cohere). One key is enough to start. For pro analyses (10-K, DCF, complex tax), upgrade to <strong>Claude / GPT-4o / Gemini Pro</strong> (~$0.005-0.10 per analysis).
     </div>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">🚀 Get started in 30 seconds</h2>
+    <nav class="toc" aria-label="Table of contents" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table of contents</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">Get started in 30 seconds</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Free AI providers (7)</a></li>
+        <li><a href="#section-3" style="color:#aaa;">Premium AI providers (7)</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Financial data providers (11)</a></li>
+        <li><a href="#section-5" style="color:#aaa;">Key security in Alpha</a></li>
+        <li><a href="#section-6" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🚀 Get started in 30 seconds</h2>
     <ol style="font-size:15px;line-height:2;">
       <li>Pick a free provider below (recommended: <strong>GitHub Models</strong> if you already have a GitHub account).</li>
       <li>Click the direct link, create an account or generate a token.</li>
@@ -152,7 +167,7 @@
       <li>Run your first analysis 🎉</li>
     </ol>
 
-    <h2 style="font-size:28px;margin:40px 0 14px;">🎁 <span style="color:var(--accent-green);">Free</span> AI providers (7)</h2>
+    <h2 id="section-2" style="font-size:28px;margin:40px 0 14px;">🎁 <span style="color:var(--accent-green);">Free</span> AI providers (7)</h2>
     <p style="font-size:14px;color:var(--text-secondary);">These providers offer a free tier sufficient for casual to intensive usage. Ideal to start without commitment.</p>
 
     <div class="api-card free">
@@ -234,7 +249,7 @@
       </ol>
     </div>
 
-    <h2 style="font-size:28px;margin:40px 0 14px;"><span style="color:#ffd166;">💎 Premium</span> AI providers (7) — top quality</h2>
+    <h2 id="section-3" style="font-size:28px;margin:40px 0 14px;"><span style="color:#ffd166;">💎 Premium</span> AI providers (7) — top quality</h2>
     <p style="font-size:14px;color:var(--text-secondary);">For serious analyses (10-K Decoder, nuanced DCF, CEO Forensics, complex taxation), one of these 7 models makes the difference. Per-token pricing, ~$0.005-0.10 per Alpha analysis.</p>
 
     <div class="api-card">
@@ -315,7 +330,7 @@
       </ol>
     </div>
 
-    <h2 style="font-size:28px;margin:40px 0 14px;">📊 Financial data providers <span style="color:var(--accent-green);">(11)</span></h2>
+    <h2 id="section-4" style="font-size:28px;margin:40px 0 14px;">📊 Financial data providers <span style="color:var(--accent-green);">(11)</span></h2>
     <p style="font-size:14px;color:var(--text-secondary);">Optional but recommended. They enrich modules with real-time prices, fundamentals, news, screeners. No additional LLM cost. <strong>Several don't even need a key.</strong></p>
 
     <h3 style="font-size:18px;margin-top:24px;color:var(--accent-green);">No key required (always active)</h3>
@@ -393,7 +408,7 @@
       <a class="api-link" href="https://etherscan.io/myapikey" target="_blank" rel="noopener">https://etherscan.io/myapikey</a>
     </div>
 
-    <h2 style="font-size:24px;margin:40px 0 12px;">🔒 Key security in Alpha</h2>
+    <h2 id="section-5" style="font-size:24px;margin:40px 0 12px;">🔒 Key security in Alpha</h2>
     <ul style="font-size:14px;line-height:1.9;">
       <li><strong>Local AES-GCM 256-bit encryption</strong> with PBKDF2 derivation (100,000 iterations) from a master password you choose.</li>
       <li><strong>No Alpha server</strong> — the app calls provider APIs directly from your browser. Verifiable via DevTools → Network.</li>
@@ -401,7 +416,7 @@
       <li><strong>Encrypted exportable backup</strong> (.atb) — for migration or backup.</li>
     </ul>
 
-    <h2 style="font-size:24px;margin:40px 0 12px;">❓ FAQ</h2>
+    <h2 id="section-6" style="font-size:24px;margin:40px 0 12px;">❓ FAQ</h2>
 
     <details style="margin:14px 0;border:1px solid var(--border);border-radius:6px;padding:14px;">
       <summary style="cursor:pointer;font-weight:600;">I have only one key — do all modules work?</summary>

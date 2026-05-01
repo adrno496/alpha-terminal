@@ -107,6 +107,9 @@
     ]
   }
   </script>
+
+  <!-- Plausible Analytics -->
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
   <nav class="landing-nav">
@@ -119,7 +122,7 @@
       <a href="pricing-en.html">Pricing</a>
       <a href="api-costs-en.html" style="color:var(--accent-green);">API costs</a>
       <a href="bloomberg-alternative-en.html">vs Bloomberg</a>
-      <a href="api-costs.html" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="Version française">🇫🇷 FR</a>
+      <a href="api-costs.html" class="lang-switch" hreflang="fr" style="font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:4px;" title="Version française">🇫🇷 FR</a>
     </div>
   </nav>
 
@@ -131,11 +134,25 @@
       <strong>📌 TL;DR</strong> — With your own API key (BYOK), you pay between <strong>$2 and $150 per month</strong> depending on usage. That's <strong>100 to 200× cheaper</strong> than a Bloomberg Terminal ($24,000/year) or a Koyfin Plus ($468/year), for a set of 46+ analysis modules powered by the best AIs on the market.
     </div>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">🤔 What is the BYOK model?</h2>
+    <nav class="toc" aria-label="Table of contents" style="background:#1a1a1a;border:1px solid #333;border-radius:6px;padding:14px 20px;margin:18px 0;">
+      <strong style="font-size:13px;color:#00ff88;">Table of contents</strong>
+      <ol style="margin:8px 0 0;padding-left:20px;font-size:13px;line-height:1.8;">
+        <li><a href="#section-1" style="color:#aaa;">What is the BYOK model?</a></li>
+        <li><a href="#section-2" style="color:#aaa;">Main provider pricing (2026)</a></li>
+        <li><a href="#section-3" style="color:#aaa;">Estimated cost per Alpha module</a></li>
+        <li><a href="#section-4" style="color:#aaa;">Monthly budget by profile</a></li>
+        <li><a href="#section-5" style="color:#aaa;">BYOK vs SaaS comparison</a></li>
+        <li><a href="#section-6" style="color:#aaa;">How to reduce API costs</a></li>
+        <li><a href="#section-7" style="color:#aaa;">Built-in optimizations in Alpha</a></li>
+        <li><a href="#section-8" style="color:#aaa;">FAQ</a></li>
+      </ol>
+    </nav>
+
+    <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🤔 What is the BYOK model?</h2>
     <p>BYOK means <strong>Bring Your Own Key</strong>. Instead of paying a SaaS subscription several hundreds of euros per year that includes "AI", you pay your <strong>AI provider directly</strong> (Anthropic, OpenAI, Google, etc.) at cost. Alpha is just an orchestration layer: 46+ pre-configured analysis modules that call the API of your provider of choice with the right prompts.</p>
     <p>You subscribe (€9.99/month), and AI usage is <strong>at market price</strong>, no middleman.</p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">📊 Main provider pricing (2026)</h2>
+    <h2 id="section-2" style="font-size:24px;margin:32px 0 12px;">📊 Main provider pricing (2026)</h2>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
       <thead><tr style="background:var(--bg-tertiary);">
         <th style="padding:10px;text-align:left;border:1px solid var(--border);">Provider</th>
@@ -160,7 +177,7 @@
     </table>
     <p style="font-size:12px;color:var(--text-muted);margin-top:-8px;">*Free tier with rate limits — personal use only with a GitHub PAT.</p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">🎯 Estimated cost per Alpha module</h2>
+    <h2 id="section-3" style="font-size:24px;margin:32px 0 12px;">🎯 Estimated cost per Alpha module</h2>
     <p>Here are average costs per analysis for the most-used modules, based on real token profiles (input + output). Numbers shown use <strong>Claude Sonnet 4.6 (balanced tier)</strong>, the app default.</p>
 
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
@@ -190,7 +207,7 @@
       💡 <strong>Tip</strong>: If you mostly use light modules (Quick Analysis, Position Sizing, Chatbot), 100 analyses/month will cost you <strong>about $1.50</strong>. Less than a Starbucks coffee. Heavy analyses (10-K, Earnings, YouTube) should be reserved for important decisions — 5/month = $0.75. Total: <strong>~$2-3/month</strong> for casual usage.
     </p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">📈 Monthly budget by profile</h2>
+    <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">📈 Monthly budget by profile</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0;">
       <div style="border:1px solid var(--border);padding:14px;border-radius:6px;">
         <h3 style="margin:0 0 6px;font-size:16px;">🐢 Casual</h3>
@@ -212,7 +229,7 @@
       </div>
     </div>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">⚖️ BYOK vs SaaS comparison</h2>
+    <h2 id="section-5" style="font-size:24px;margin:32px 0 12px;">⚖️ BYOK vs SaaS comparison</h2>
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
       <thead><tr style="background:var(--bg-tertiary);">
         <th style="padding:10px;text-align:left;border:1px solid var(--border);">Solution</th>
@@ -230,7 +247,7 @@
       </tbody>
     </table>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">💡 How to reduce API costs</h2>
+    <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">💡 How to reduce API costs</h2>
     <ol style="line-height:1.9;">
       <li><strong>Default to "balanced" tier</strong> — Sonnet 4.6 or GPT-5 Mini are 5× cheaper than flagship for 90% of cases.</li>
       <li><strong>Configure several providers</strong> and let the app's smart router pick the cheapest per module.</li>
@@ -240,7 +257,7 @@
       <li><strong>Leverage prompt caching</strong> on Claude/OpenAI: if you chain analyses on the same asset, the system prompt is cached and billed 90% less.</li>
     </ol>
 
-    <h2 style="font-size:24px;margin:40px 0 12px;">🪙 Built-in optimizations in Alpha (automatic savings up to -70%)</h2>
+    <h2 id="section-7" style="font-size:24px;margin:40px 0 12px;">🪙 Built-in optimizations in Alpha (automatic savings up to -70%)</h2>
     <p>Alpha includes <strong>7 cost optimizations toggleable in one click</strong> in Settings → Advanced. All individually disableable.</p>
 
     <table style="width:100%;border-collapse:collapse;font-size:13px;margin:14px 0;">
@@ -284,7 +301,7 @@
     </table>
     <p style="font-size:12.5px;color:var(--text-muted);">Cumulative savings. Enable in 2 clicks via <em>Settings → Advanced</em>.</p>
 
-    <h2 style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
+    <h2 id="section-8" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
 
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">How much does an AI financial analysis cost?</summary>

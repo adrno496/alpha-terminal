@@ -197,7 +197,7 @@ function handleWizardImportSuccess(counts) {
 
   const premiumLine = counts.licenseRestored
     ? `<br><span style="color:var(--accent-green);font-size:11px;">💎 Licence Premium restaurée — accès Pro débloqué après déverrouillage du vault.</span>`
-    : '';
+    : `<br><span style="color:var(--accent-amber);font-size:11px;">⚠️ Pas de licence Premium dans ce backup. Si tu en avais une, ré-exporte un backup depuis l'appareil source (versions récentes uniquement).</span>`;
   if (status) {
     status.innerHTML = `<span style="color:var(--accent-green);">✓ Importé : ${breakdown}</span>${premiumLine}<br><span style="color:var(--text-muted);font-size:11px;">Rechargement dans 1.5s pour appliquer le vault…</span>`;
   }
