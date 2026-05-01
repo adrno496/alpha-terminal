@@ -17,7 +17,7 @@ export function renderSettingsView(viewEl) {
   viewEl.innerHTML = `
     <div class="module-header"><h2>${t('settings.title')}</h2><div class="module-desc">${t('settings.desc')}</div></div>
     <div class="tabs-bar">
-      ${['keys','data_keys','routing','costs','models','advanced'].map(tab => `<button class="tab ${tab===currentTab?'active':''}" data-tab="${tab}">${tabLabel(tab)}</button>`).join('')}
+      ${['keys','data_keys','routing','costs','models','premium','advanced'].map(tab => `<button class="tab ${tab===currentTab?'active':''}" data-tab="${tab}">${tabLabel(tab)}</button>`).join('')}
     </div>
     <div id="settings-content"></div>
   `;
@@ -39,7 +39,126 @@ function renderTab(tab) {
   else if (tab === 'routing') renderRoutingTab(c);
   else if (tab === 'costs') renderCostsTab(c);
   else if (tab === 'models') renderModelsTab(c);
+  else if (tab === 'premium') renderPremiumTab(c);
   else if (tab === 'advanced') renderAdvancedTab(c);
+}
+
+function renderPremiumTab(c) {
+  const en = (document.documentElement.lang || 'fr').toLowerCase().startsWith('en');
+  const lm = window.licenseManager;
+  const hasLicense = !!(lm && lm.getLicense());
+  const meta = lm && lm.getMeta ? lm.getMeta() : null;
+  const status = meta?.status || (hasLicense ? 'active' : null);
+  const expiresAt = meta?.expires_at ? new Date(meta.expires_at) : null;
+  const now = new Date();
+  const isExpiringSoon = expiresAt && (expiresAt - now) > 0 && (expiresAt - now) < 30 * 24 * 3600 * 1000;
+
+  const fmtDate = (d) => d ? d.toLocaleDateString(en ? 'en-US' : 'fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }) : '—';
+  const maskedKey = (() => {
+    const k = lm?.getLicense();
+    if (!k) return '—';
+    return k.slice(0, 8) + '-XXXX-XXXX-XXXX-' + k.slice(-4);
+  })();
+
+  // Statut human-readable
+  let statusBadge, statusDesc;
+  if (!hasLicense) {
+    statusBadge = `<span style="color:var(--text-muted);">${en ? '○ No license' : '○ Aucune licence'}</span>`;
+    statusDesc = en
+      ? 'You don\'t have an active Premium license on this device. Subscribe or paste an existing key.'
+      : 'Aucune licence Premium active sur cet appareil. Abonne-toi ou colle une clé existante.';
+  } else if (status === 'active') {
+    statusBadge = `<span style="color:var(--accent-green);">● ${en ? 'Active' : 'Actif'}</span>`;
+    statusDesc = expiresAt
+      ? (en ? `Renews on ${fmtDate(expiresAt)}.` : `Renouvellement le ${fmtDate(expiresAt)}.`)
+      : (en ? 'Subscription active.' : 'Abonnement actif.');
+  } else if (status === 'expired') {
+    statusBadge = `<span style="color:var(--accent-red);">● ${en ? 'Expired' : 'Expirée'}</span>`;
+    statusDesc = en ? 'License has expired. Renew to regain Premium access.' : 'La licence a expiré. Renouvelle pour récupérer l\'accès Premium.';
+  } else if (status === 'disabled') {
+    statusBadge = `<span style="color:var(--accent-amber);">● ${en ? 'Cancelled' : 'Annulée'}</span>`;
+    statusDesc = expiresAt && expiresAt > now
+      ? (en ? `Cancelled — Premium access until ${fmtDate(expiresAt)}.` : `Annulée — accès Premium jusqu'au ${fmtDate(expiresAt)}.`)
+      : (en ? 'Subscription cancelled — Premium access lost.' : 'Abonnement annulé — accès Premium perdu.');
+  } else {
+    statusBadge = `<span style="color:var(--text-muted);">● ${status || '—'}</span>`;
+    statusDesc = '';
+  }
+
+  const portalUrl = lm?.portalUrl || 'https://alpha-terminal.lemonsqueezy.com/billing';
+  const checkoutUrl = (window.ALPHA_CONFIG && window.ALPHA_CONFIG.LEMONSQUEEZY_CHECKOUT_URL)
+    || 'https://alpha-terminal.lemonsqueezy.com/checkout/buy/7b4016cb-9be7-4db8-b304-268722544f06';
+
+  c.innerHTML = `
+    <div class="card">
+      <div class="card-title">${en ? '💎 Premium subscription' : '💎 Abonnement Premium'}</div>
+
+      <div style="display:grid;grid-template-columns:max-content 1fr;gap:8px 18px;font-size:13px;margin:8px 0 16px;">
+        <div style="color:var(--text-muted);">${en ? 'Status' : 'Statut'}</div>
+        <div>${statusBadge}</div>
+
+        <div style="color:var(--text-muted);">${en ? 'License key' : 'Clé de licence'}</div>
+        <div style="font-family:monospace;font-size:12px;">${maskedKey}</div>
+
+        ${meta?.customer_email ? `
+        <div style="color:var(--text-muted);">${en ? 'Email' : 'Email'}</div>
+        <div>${meta.customer_email}</div>` : ''}
+
+        ${expiresAt ? `
+        <div style="color:var(--text-muted);">${status === 'disabled' ? (en ? 'Access until' : 'Accès jusqu\'au') : (en ? 'Next renewal' : 'Prochain renouvellement')}</div>
+        <div>${fmtDate(expiresAt)}</div>` : ''}
+      </div>
+
+      <p style="font-size:12.5px;color:var(--text-secondary);margin:0 0 14px;line-height:1.5;">${statusDesc}</p>
+
+      ${isExpiringSoon && status === 'active' ? `
+      <div class="alert alert-warning" style="margin-bottom:14px;">
+        ⚠️ ${en ? 'Your subscription renews soon. No action needed unless you want to cancel.' : 'Ton abonnement se renouvelle bientôt. Rien à faire sauf si tu veux annuler.'}
+      </div>` : ''}
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${hasLicense ? `
+        <a href="${portalUrl}" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;display:inline-block;">
+          ${en ? '⚙️ Manage subscription' : '⚙️ Gérer mon abonnement'}
+        </a>
+        <button id="prem-recheck" class="btn-secondary">${en ? '🔄 Refresh status' : '🔄 Rafraîchir le statut'}</button>
+        <button id="prem-logout" class="btn-ghost" style="color:var(--accent-red);">${en ? '🚪 Remove license from this device' : '🚪 Retirer la licence de cet appareil'}</button>
+        ` : `
+        <a href="${checkoutUrl}" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;display:inline-block;">
+          ${en ? '🚀 Subscribe €9.99/month' : '🚀 S\'abonner 9,99€/mois'}
+        </a>
+        <button id="prem-enter-key" class="btn-secondary">${en ? '🔑 I have a license key' : '🔑 J\'ai déjà une clé'}</button>
+        `}
+      </div>
+
+      <p style="font-size:11px;color:var(--text-muted);margin:14px 0 0;line-height:1.5;">
+        ${en
+          ? 'Cancelling on Lemonsqueezy keeps your access until the end of the paid period. You can also "Remove license from this device" to free a slot for another machine.'
+          : 'Annuler sur Lemonsqueezy te garde l\'accès jusqu\'à la fin de la période payée. Tu peux aussi "Retirer la licence de cet appareil" pour libérer un slot pour une autre machine.'}
+      </p>
+    </div>
+  `;
+
+  const recheckBtn = c.querySelector('#prem-recheck');
+  if (recheckBtn) recheckBtn.addEventListener('click', async () => {
+    recheckBtn.disabled = true;
+    recheckBtn.textContent = en ? '⏳ Checking…' : '⏳ Vérification…';
+    await lm.checkLicenseStatus();
+    renderPremiumTab(c);
+  });
+
+  const logoutBtn = c.querySelector('#prem-logout');
+  if (logoutBtn) logoutBtn.addEventListener('click', () => {
+    const ok = window.confirm(en
+      ? 'Remove the license from this device? You\'ll need to paste your key again to regain Premium access here. Your subscription is NOT cancelled.'
+      : 'Retirer la licence de cet appareil ? Tu devras recoller ta clé pour récupérer l\'accès Premium ici. L\'abonnement n\'est PAS annulé.');
+    if (!ok) return;
+    lm.logout();
+    renderPremiumTab(c);
+  });
+
+  const enterKeyBtn = c.querySelector('#prem-enter-key');
+  if (enterKeyBtn) enterKeyBtn.addEventListener('click', () => lm && lm.showLicenseModal());
 }
 
 function renderDataKeysTab(c) {

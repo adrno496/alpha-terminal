@@ -95,7 +95,10 @@
     "brand": { "@type": "Brand", "name": "Alpha" },
     "url": "https://alpha-terminal.app/pricing-en.html",
     "image": "https://alpha-terminal.app/og-pricing.png",
-    "offers": { "@type": "Offer", "price": "9.99", "priceCurrency": "EUR", "priceValidUntil": "2026-12-31", "availability": "https://schema.org/InStock", "url": "https://alpha-terminal.app/pricing-en.html" },
+    "offers": [
+      { "@type": "Offer", "name": "Monthly", "price": "9.99", "priceCurrency": "EUR", "priceValidUntil": "2026-12-31", "availability": "https://schema.org/InStock", "url": "https://alpha-terminal.app/pricing-en.html" },
+      { "@type": "Offer", "name": "Lifetime access", "price": "299.00", "priceCurrency": "EUR", "priceValidUntil": "2026-12-31", "availability": "https://schema.org/InStock", "url": "https://alpha-terminal.app/pricing-en.html" }
+    ],
     "aggregateRating": { "@type": "AggregateRating", "ratingValue": "4.9", "ratingCount": "127", "bestRating": "5", "worstRating": "1" },
     "review": {
       "@type": "Review",
@@ -114,7 +117,7 @@
     "@type": "FAQPage",
     "mainEntity": [
       { "@type": "Question", "name": "How much does Alpha cost?", "acceptedAnswer": { "@type": "Answer", "text": "€9.99/month. You also pay AI providers directly for your usage (Claude, OpenAI, Gemini, etc.), typically $0.005 to $0.10 per analysis. Cancel anytime." } },
-      { "@type": "Question", "name": "Is there a free trial?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Demo mode lets you explore all 46+ modules with pre-generated analyses, no API key or payment required. 7-day free trial on the subscription, cancel anytime." } },
+      { "@type": "Question", "name": "Can I try the app for free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Demo mode lets you explore all 46+ modules with pre-generated analyses, no API key or payment required. The Free plan also gives unlimited access to 4 essential modules with a free LLM key (GitHub Models, Cerebras, Mistral)." } },
       { "@type": "Question", "name": "How much do AI analyses cost?", "acceptedAnswer": { "@type": "Answer", "text": "Quick Analysis: ~$0.005 to $0.02. 10-K Decoder: ~$0.05 to $1. Position Sizing: ~$0.01. Sentiment Tracker (with web search): ~$0.05 to $0.20. You pay each AI provider's official rate. Cerebras and GitHub Models offer near-free tiers. With Eco Mode, save up to 70%." } },
       { "@type": "Question", "name": "What's the difference with Bloomberg?", "acceptedAnswer": { "@type": "Answer", "text": "Bloomberg costs €24,000/year and has no AI analysis. Alpha costs €9.99/month, adds 46+ AI modules powered by 14 LLMs, and keeps your data 100% local (Bloomberg sends everything to the cloud)." } },
       { "@type": "Question", "name": "Can I cancel anytime?", "acceptedAnswer": { "@type": "Answer", "text": "Yes, cancel anytime from your account or the app Settings. No minimum commitment. Your data remains accessible locally even after cancellation (read-only)." } },
@@ -188,10 +191,10 @@
 
   <h1>Alpha pricing: €9.99/month</h1>
   <p style="font-size:18px;color:#ccc;max-width:780px;">
-    <strong>Transparent subscription.</strong> Cancel anytime, 7-day free trial. 46+ financial analysis modules powered by 14 LLMs, 100% private, BYOK.
+    <strong>Transparent pricing.</strong> Monthly cancellable anytime, or one-time payment for lifetime access. 46+ financial analysis modules powered by 14 LLMs, 100% private, BYOK.
   </p>
 
-  <h2>2 plans</h2>
+  <h2>3 plans</h2>
   <div class="price-grid">
 
     <div class="price-card">
@@ -220,9 +223,25 @@
         <li>Web · Mobile (Android/iOS)</li>
         <li>All updates included</li>
         <li>100% private — no data sent to Alpha</li>
-        <li>✅ <strong>7-day free trial</strong></li>
+        <li>✅ <strong>Cancel anytime</strong></li>
       </ul>
-      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;">Start 7-day trial →</a>
+      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">Subscribe €9.99/month →</a>
+    </div>
+
+    <div class="price-card" style="border:2px solid #00ff88;position:relative;">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#00ff88;color:#000;font-weight:700;font-size:11px;padding:4px 10px;border-radius:4px;letter-spacing:0.5px;">BEST VALUE</div>
+      <h3 style="margin-top:0;">Lifetime access</h3>
+      <div class="price-tag">€299 <span class="small">/ one-time</span></div>
+      <p style="font-size:13px;">Pay once, use Alpha forever. Breaks even after 30 months vs monthly.</p>
+      <ul class="price-features">
+        <li>✅ <strong>Everything in Monthly</strong></li>
+        <li>♾️ <strong>Lifetime access</strong> — no renewal</li>
+        <li>🆕 All future updates included</li>
+        <li>🚫 No recurring charges to manage</li>
+        <li>💰 Save ~€90/year after year 3</li>
+        <li>🔐 License key activation via Lemonsqueezy</li>
+      </ul>
+      <a href="https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b" target="_blank" rel="noopener" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;">Buy lifetime €299 →</a>
     </div>
 
   </div>
@@ -257,8 +276,11 @@
   <h3>How much does Alpha cost?</h3>
   <p>€9.99/month. You also pay AI providers for your usage (~$0.005-0.10/analysis). Cancel anytime.</p>
 
-  <h3>Is there a free trial?</h3>
-  <p>Yes — 7-day free trial on the monthly plan. Plus, demo mode lets you explore all modules with pre-generated analyses without paying or connecting an API key.</p>
+  <h3>Can I try the app for free?</h3>
+  <p>Yes. Demo mode lets you explore all modules with pre-generated analyses without paying or connecting an API key. The Free plan also gives unlimited access to 4 essential modules with a free LLM key (GitHub Models, Cerebras, Mistral).</p>
+
+  <h3>Monthly or lifetime: which to pick?</h3>
+  <p>Monthly at €9.99 is ideal for testing without commitment. Lifetime at €299 breaks even after 30 months (~2.5 years) and includes all future updates. If you plan to use Alpha for more than 3 years, lifetime is clearly the better deal.</p>
 
   <h3>Can I cancel anytime?</h3>
   <p>Yes, in 1 click from the app (Settings) or your App Store / Play Store account. No minimum commitment. Your data remains accessible locally even after cancellation.</p>
@@ -277,8 +299,8 @@
 
   <div class="cta-banner">
     <h2 style="margin:0;">Ready for pro-level analysis?</h2>
-    <p style="margin:12px 0 0;color:#ccc;">€9.99/month · 7-day free trial · Cancel anytime.</p>
-    <a href="/" class="btn-cta">Start free trial →</a>
+    <p style="margin:12px 0 0;color:#ccc;">€9.99/month (cancel anytime) or €299 one-time for lifetime access.</p>
+    <a href="/" class="btn-cta" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">Subscribe €9.99/month →</a>
   </div>
 </main>
 

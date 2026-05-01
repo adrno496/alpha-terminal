@@ -84,8 +84,8 @@ const CONTENT = {
         </ul>
         <h3>Remboursements</h3>
         <p>Apple et Google gèrent les demandes de remboursement directement sur leur plateforme (politiques standard 14j sous condition). Pour Stripe, contacte <a href="mailto:savetheworldfr@gmail.com">savetheworldfr@gmail.com</a> dans les 14 jours suivant le paiement initial.</p>
-        <h3>Essai gratuit</h3>
-        <p>L'essai 7 jours est <strong>auto-converti en abonnement payant</strong> à la fin si tu n'annules pas avant. Tu reçois un email de rappel 24h avant la fin de l'essai.</p>
+        <h3>Essayer sans payer</h3>
+        <p>Le mode démo permet d'explorer tous les modules avec des analyses pré-générées sans clé API ni paiement. Le plan Gratuit donne aussi accès à 4 modules essentiels en illimité avec une clé LLM gratuite (GitHub Models, Cerebras, Mistral).</p>
       `
     }
   },
@@ -170,8 +170,8 @@ const CONTENT = {
         </ul>
         <h3>Refunds</h3>
         <p>Apple and Google handle refund requests on their platforms (standard 14-day policies). For Stripe, email <a href="mailto:savetheworldfr@gmail.com">savetheworldfr@gmail.com</a> within 14 days of the initial payment.</p>
-        <h3>Free trial</h3>
-        <p>The 7-day trial <strong>auto-converts to a paid subscription</strong> at the end if you don't cancel before. You get a reminder email 24h before the trial ends.</p>
+        <h3>Try without paying</h3>
+        <p>Demo mode lets you explore all modules with pre-generated analyses without any API key or payment. The Free plan also gives unlimited access to 4 essential modules with a free LLM key (GitHub Models, Cerebras, Mistral).</p>
       `
     }
   }

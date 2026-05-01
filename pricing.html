@@ -123,14 +123,26 @@
     "brand": { "@type": "Brand", "name": "Alpha" },
     "url": "https://alpha-terminal.app/pricing.html",
     "image": "https://alpha-terminal.app/og-pricing.png",
-    "offers": {
-      "@type": "Offer",
-      "price": "9.99",
-      "priceCurrency": "EUR",
-      "priceValidUntil": "2026-12-31",
-      "availability": "https://schema.org/InStock",
-      "url": "https://alpha-terminal.app/pricing.html"
-    },
+    "offers": [
+      {
+        "@type": "Offer",
+        "name": "Mensuel",
+        "price": "9.99",
+        "priceCurrency": "EUR",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "url": "https://alpha-terminal.app/pricing.html"
+      },
+      {
+        "@type": "Offer",
+        "name": "Accès à vie",
+        "price": "299.00",
+        "priceCurrency": "EUR",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "url": "https://alpha-terminal.app/pricing.html"
+      }
+    ],
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
@@ -164,10 +176,10 @@
       },
       {
         "@type": "Question",
-        "name": "Y a-t-il un essai gratuit ?",
+        "name": "Puis-je essayer l'app gratuitement ?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Oui. Le mode démo permet d'explorer les 46+ modules avec des analyses pré-générées, sans clé API ni paiement. Essai gratuit 7 jours sur l'abonnement, puis annulation possible à tout moment."
+          "text": "Oui. Le mode démo permet d'explorer les 46+ modules avec des analyses pré-générées, sans clé API ni paiement. Tu peux aussi accéder à 4 modules essentiels gratuitement avec une clé LLM gratuite (GitHub Models, Cerebras, Mistral)."
         }
       },
       {
@@ -271,10 +283,10 @@
 
   <h1>Tarif d'Alpha : 9,99€/mois</h1>
   <p style="font-size:18px;color:#ccc;max-width:780px;">
-    <strong>Abonnement transparent.</strong> Annulable à tout moment, essai 7 jours gratuit. 46+ modules d'analyse financière propulsés par 14 LLMs, 100% privé, BYOK.
+    <strong>Tarif transparent.</strong> Mensuel annulable à tout moment, ou paiement unique pour un accès à vie. 46+ modules d'analyse financière propulsés par 14 LLMs, 100% privé, BYOK.
   </p>
 
-  <h2>2 formules</h2>
+  <h2>3 formules</h2>
   <div class="price-grid">
 
     <div class="price-card">
@@ -303,9 +315,25 @@
         <li>Web · Mobile (Android/iOS)</li>
         <li>Toutes les mises à jour incluses</li>
         <li>100% privé — aucune donnée envoyée à Alpha</li>
-        <li>✅ <strong>Essai 7 jours gratuit</strong></li>
+        <li>✅ <strong>Annulable à tout moment</strong></li>
       </ul>
-      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">Démarrer l'essai 7j →</a>
+      <a href="/" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">S'abonner 9,99€/mois →</a>
+    </div>
+
+    <div class="price-card" style="border:2px solid #00ff88;position:relative;">
+      <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#00ff88;color:#000;font-weight:700;font-size:11px;padding:4px 10px;border-radius:4px;letter-spacing:0.5px;">MEILLEURE VALEUR</div>
+      <h3 style="margin-top:0;">Accès à vie</h3>
+      <div class="price-tag">299€ <span class="small">/ paiement unique</span></div>
+      <p style="font-size:13px;">Tu paies une fois, tu utilises Alpha pour toujours. Rentabilisé en 30 mois vs mensuel.</p>
+      <ul class="price-features">
+        <li>✅ <strong>Tout le plan Mensuel inclus</strong></li>
+        <li>♾️ <strong>Accès à vie</strong> — aucun renouvellement</li>
+        <li>🆕 Toutes les futures mises à jour incluses</li>
+        <li>🚫 Aucun frais récurrent à gérer</li>
+        <li>💰 Économie : ~90€/an après la 3ème année</li>
+        <li>🔐 Activation par clé de licence Lemonsqueezy</li>
+      </ul>
+      <a href="https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b" target="_blank" rel="noopener" class="btn-cta" style="margin-top:18px;width:100%;text-align:center;">Acheter à vie 299€ →</a>
     </div>
 
   </div>
@@ -340,8 +368,11 @@
   <h3>Combien coûte Alpha ?</h3>
   <p>9,99€/mois. Tu paies en plus ton usage IA aux providers (~$0,005-0,10/analyse). Annulable à tout moment.</p>
 
-  <h3>Y a-t-il un essai gratuit ?</h3>
-  <p>Oui — essai 7 jours gratuit sur le plan mensuel. En plus, le mode démo permet d'explorer tous les modules avec des analyses pré-générées sans payer ni connecter de clé API.</p>
+  <h3>Puis-je essayer l'app gratuitement ?</h3>
+  <p>Oui. Le mode démo permet d'explorer tous les modules avec des analyses pré-générées sans payer ni connecter de clé API. En plus, le plan Gratuit donne accès à 4 modules essentiels en illimité avec une clé LLM gratuite (GitHub Models, Cerebras, Mistral).</p>
+
+  <h3>Mensuel ou à vie : que choisir ?</h3>
+  <p>Le mensuel à 9,99€ est idéal pour tester sans engagement. L'accès à vie à 299€ est rentabilisé après 30 mois (~2,5 ans) et inclut toutes les futures mises à jour. Si tu comptes utiliser Alpha plus de 3 ans, le lifetime est largement gagnant.</p>
 
   <h3>Puis-je annuler à tout moment ?</h3>
   <p>Oui, en 1 clic depuis l'app (Settings) ou ton compte App Store / Play Store. Aucun engagement minimum. Tes données restent accessibles en local même après annulation.</p>
@@ -360,8 +391,8 @@
 
   <div class="cta-banner">
     <h2 style="margin:0;">Prêt à passer à l'analyse de niveau pro ?</h2>
-    <p style="margin:12px 0 0;color:#ccc;">9,99€/mois · Essai 7 jours gratuit · Annulable à tout moment.</p>
-    <a href="/" class="btn-cta" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">Démarrer l'essai gratuit →</a>
+    <p style="margin:12px 0 0;color:#ccc;">9,99€/mois (annulable) ou 299€ paiement unique pour un accès à vie.</p>
+    <a href="/" class="btn-cta" onclick="if(window.lemonsqueezy){event.preventDefault();window.lemonsqueezy.open();}">S'abonner 9,99€/mois →</a>
   </div>
 </main>
 

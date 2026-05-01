@@ -13,6 +13,24 @@
     constructor() {
       this.storageKey = 'alpha-license-key';
       this.instanceKey = 'alpha-license-instance-id';
+      this.metaKey = 'alpha-license-meta'; // { expires_at, status, customer_email }
+      this.portalUrl = 'https://alpha-terminal.lemonsqueezy.com/billing';
+    }
+
+    // Lit les métadonnées stockées de la dernière validation (status, expires_at, email)
+    getMeta() {
+      try { return JSON.parse(localStorage.getItem(this.metaKey) || 'null'); }
+      catch { return null; }
+    }
+    _saveMeta(licenseObj) {
+      if (!licenseObj) return;
+      try {
+        localStorage.setItem(this.metaKey, JSON.stringify({
+          status: licenseObj.status || null,
+          expires_at: licenseObj.expires_at || null,
+          customer_email: licenseObj.customer_email || licenseObj.email || null,
+        }));
+      } catch {}
     }
 
     _instanceName() {
@@ -99,6 +117,7 @@
         localStorage.setItem(this.storageKey, normalized);
         localStorage.setItem('isPremium', 'true');
         localStorage.setItem('alpha-license-checked-at', String(Date.now()));
+        this._saveMeta(data?.license_key);
       } catch (e) {
         return { success: false, error: 'Impossible d\'enregistrer la clé localement.' };
       }
@@ -162,6 +181,7 @@
           return false;
         }
         localStorage.setItem('alpha-license-checked-at', String(Date.now()));
+        this._saveMeta(data?.license_key);
         return true;
       } catch (e) {
         // Offline ou API down → grâce 7j depuis le dernier check OK
@@ -183,6 +203,7 @@
         localStorage.removeItem('isPremium');
         localStorage.removeItem('alpha-license-checked-at');
         localStorage.removeItem(this.instanceKey);
+        localStorage.removeItem(this.metaKey);
       } catch {}
       window.dispatchEvent(new CustomEvent('alpha:licenseRevoked'));
       window.dispatchEvent(new CustomEvent('alpha:premiumChanged', {

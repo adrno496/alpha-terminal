@@ -7,8 +7,10 @@ const DB_VERSION = 10;
 const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts', 'goals', 'watchpoints'];
 
 // localStorage keys gérées par l'app (filtre pour ne pas exporter les clés du navigateur d'autres sites)
-const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:'];
-const LS_EXACT = ['alpha-terminal:vault']; // vault exact
+const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:', 'alpha-license-'];
+// Clés exactes (sans préfixe Alpha) à inclure : vault chiffré + statut/clé de
+// licence Lemonsqueezy (pour migrer Premium d'un appareil à l'autre via backup).
+const LS_EXACT = ['alpha-terminal:vault', 'isPremium'];
 
 function isAppKey(k) {
   if (!k) return false;
