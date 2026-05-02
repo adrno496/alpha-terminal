@@ -135,7 +135,7 @@
       // Placeholder dans le container du module
       if (container) {
         container.innerHTML = `
-          <div class="paywall-modal" role="dialog" aria-modal="false" aria-labelledby="paywall-title">
+          <div class="paywall-modal" role="dialog" aria-modal="true" aria-labelledby="paywall-title">
             <div class="paywall-content">
               <h3 id="paywall-title">${t.title}</h3>
               <p class="paywall-sub">${t.sub}</p>

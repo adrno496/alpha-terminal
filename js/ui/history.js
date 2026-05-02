@@ -66,7 +66,7 @@ export async function renderHistoryView(viewEl, { onOpen }) {
             <button class="btn-ghost" data-act="open">${t('history.open')}</button>
             <button class="btn-ghost" data-act="md">.md</button>
             <button class="btn-ghost" data-act="copy">${t('common.copy')}</button>
-            <button class="btn-ghost" data-act="del">×</button>
+            <button class="btn-ghost" data-act="del" aria-label="Supprimer">×</button>
           </div>
         </div>`;
     }).join('');

@@ -140,7 +140,7 @@ function openAlertEditor(viewEl) {
     <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <strong>+ ${isEN ? 'Manual price alert' : 'Alerte prix manuelle'}</strong>
-        <button class="btn-ghost" data-close>×</button>
+        <button class="btn-ghost" data-close aria-label="${isEN ? 'Close' : 'Fermer'}">×</button>
       </div>
       <div class="field"><label class="field-label">Ticker</label><input id="ne-ticker" class="input" placeholder="AAPL, BTC, MC.PA…" /></div>
       <div class="field-row">

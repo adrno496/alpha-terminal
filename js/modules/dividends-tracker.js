@@ -256,7 +256,7 @@ async function refresh(viewEl, holdings) {
       const calc = calculateNetDividend(h.gross, h.isPEA);
       return `<div style="padding:8px;border-bottom:1px solid var(--border);font-size:12.5px;display:flex;justify-content:space-between;align-items:center;">
         <span>${h.date} · <strong>${escape(h.ticker)}</strong> ${h.isPEA ? '🟢 PEA' : '🟡 CTO'} · ${isEN ? 'Gross' : 'Brut'} : ${fmt(h.gross)} € → ${isEN ? 'Net' : 'Net'} : ${fmt(calc.net)} €</span>
-        <button class="btn-ghost div-del" data-id="${h.id}" style="padding:2px 6px;font-size:11px;color:var(--text-muted);">×</button>
+        <button class="btn-ghost div-del" data-id="${h.id}" aria-label="${isEN ? 'Delete' : 'Supprimer'}" style="padding:2px 6px;font-size:11px;color:var(--text-muted);">×</button>
       </div>`;
     }).join('') : `<p style="color:var(--text-muted);font-size:12px;text-align:center;padding:14px;">${isEN ? 'No tagged dividends yet.' : 'Aucun dividende taggé.'}</p>`}
   `;
@@ -280,7 +280,7 @@ function openDivEntryModal(viewEl) {
     <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <strong>+ ${isEN ? 'Tag a received dividend' : 'Tagger un dividende reçu'}</strong>
-        <button class="btn-ghost" data-close>×</button>
+        <button class="btn-ghost" data-close aria-label="${isEN ? 'Close' : 'Fermer'}">×</button>
       </div>
       <div class="field"><label class="field-label">${isEN ? 'Date' : 'Date'}</label><input id="dh-date" class="input" type="date" value="${(new Date()).toISOString().slice(0,10)}" /></div>
       <div class="field"><label class="field-label">Ticker</label><input id="dh-ticker" class="input" placeholder="MC.PA" /></div>

@@ -65,7 +65,7 @@ function drawGrid(state) {
         <td><input data-i="${i}" data-f="amount" type="number" min="0" step="100" value="${p.amount}" /></td>
         <td><select data-i="${i}" data-f="currency">${CURRENCIES.map(c => `<option ${c===p.currency?'selected':''}>${c}</option>`).join('')}</select></td>
         <td><input data-i="${i}" data-f="conviction" type="number" min="1" max="10" value="${p.conviction}" /></td>
-        <td><button class="row-del" data-i="${i}">×</button></td>
+        <td><button class="row-del" data-i="${i}" aria-label="Supprimer la ligne">×</button></td>
       </tr>`).join('')}
     </tbody>
   `;

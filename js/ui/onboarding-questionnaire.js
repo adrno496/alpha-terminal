@@ -56,7 +56,7 @@ export function openOnboardingQuestionnaire({ onComplete = null, onSkip = null }
           ${stepperHtml}
           <h2 style="margin:0;font-size:18px;">${title}</h2>
         </div>
-        <button id="onb-close" class="btn-ghost" style="font-size:18px;">×</button>
+        <button id="onb-close" class="btn-ghost" aria-label="${isEN ? 'Close' : 'Fermer'}" style="font-size:18px;">×</button>
       </div>
       <div id="onb-body" style="display:flex;flex-direction:column;gap:12px;">${body}</div>
       <div style="display:flex;justify-content:space-between;gap:8px;margin-top:6px;">
@@ -300,7 +300,7 @@ function renderStep6(state, isEN) {
         <input class="input qs-qty" data-field="quantity" type="number" step="any" min="0" placeholder="${isEN ? 'Qty' : 'Qté'}" value="${h.quantity||''}" style="font-size:12px;" />
         <input class="input qs-price" data-field="unitPrice" type="number" step="0.01" min="0" placeholder="${isEN ? 'Unit €' : 'PU €'}" value="${h.unitPrice||''}" style="font-size:12px;" />
       </div>
-      <button type="button" class="btn-ghost qs-del" data-idx="${idx}" title="${isEN ? 'Remove' : 'Retirer'}" style="color:var(--accent-red);font-size:14px;">×</button>
+      <button type="button" class="btn-ghost qs-del" data-idx="${idx}" title="${isEN ? 'Remove' : 'Retirer'}" aria-label="${isEN ? 'Remove' : 'Retirer'}" style="color:var(--accent-red);font-size:14px;">×</button>
     </div>
   `;
 

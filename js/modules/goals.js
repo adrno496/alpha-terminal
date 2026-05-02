@@ -214,7 +214,7 @@ function openGoalEditor(viewEl, existing = null) {
     <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:540px;width:100%;display:flex;flex-direction:column;gap:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <strong>${existing ? (isEN ? 'Edit goal' : 'Modifier objectif') : (isEN ? 'New goal' : 'Nouvel objectif')}</strong>
-        <button class="btn-ghost" data-close>×</button>
+        <button class="btn-ghost" data-close aria-label="${isEN ? 'Close' : 'Fermer'}">×</button>
       </div>
       <div class="field"><label class="field-label">${isEN ? 'Type' : 'Type'}</label>
         <select id="ge-type" class="input">

@@ -317,7 +317,7 @@ function openPulseCustomizer(refreshPulse, isEN) {
     <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:520px;width:100%;display:flex;flex-direction:column;gap:12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <strong>⚙️ ${isEN ? 'Customize Market Pulse' : 'Personnaliser le Pulse marché'}</strong>
-        <button class="btn-ghost" id="pc-close">×</button>
+        <button class="btn-ghost" id="pc-close" aria-label="${isEN ? 'Close' : 'Fermer'}">×</button>
       </div>
       <div class="field">
         <label class="field-label">${isEN ? 'Crypto IDs (CoinGecko, comma-separated)' : 'IDs crypto (CoinGecko, séparés par virgules)'}</label>

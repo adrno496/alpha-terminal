@@ -475,7 +475,7 @@ function renderKeysTab(c) {
         <span style="font-size:18px;">${p?.icon || '🔑'}</span>
         <span style="flex:1;">${p?.displayName || name} <span style="color:var(--text-muted);font-size:11px;">· ${t('settings.keys.encrypted')}</span>${browserBadge}</span>
         <button class="btn-ghost" data-test="${name}">${t('common.test')}</button>
-        <button class="btn-danger" data-rm="${name}">×</button>
+        <button class="btn-danger" data-rm="${name}" aria-label="Supprimer">×</button>
       </div>
     `;
   }).join('');
@@ -1458,7 +1458,7 @@ function renderAdvancedTab(c) {
       <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:680px;width:100%;max-height:80vh;display:flex;flex-direction:column;gap:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <strong>${t('settings.adv.backup_fallback_title')}</strong>
-          <button class="btn-ghost" id="bfm-close">×</button>
+          <button class="btn-ghost" id="bfm-close" aria-label="Fermer">×</button>
         </div>
         <p style="font-size:12px;color:var(--text-secondary);margin:0;">${t('settings.adv.backup_fallback_desc')}${filename ? '<br>📄 <code>' + filename + '</code>' : ''}</p>
         <textarea readonly style="flex:1;min-height:300px;font-family:monospace;font-size:11px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:10px;">${json.replace(/</g,'&lt;')}</textarea>
@@ -1576,7 +1576,7 @@ function renderAdvancedTab(c) {
       <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:760px;width:100%;max-height:88vh;overflow:auto;display:flex;flex-direction:column;gap:8px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <strong>🔍 Diagnostic de la base locale</strong>
-          <button class="btn-ghost" id="diag-close">×</button>
+          <button class="btn-ghost" id="diag-close" aria-label="Fermer">×</button>
         </div>
         <div style="font-size:12px;color:var(--text-secondary);font-family:monospace;background:var(--bg-tertiary);padding:8px 10px;border-radius:4px;">
           DB : <strong>${r.dbName}</strong>
@@ -1627,7 +1627,7 @@ function renderAdvancedTab(c) {
       <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:680px;width:100%;max-height:85vh;display:flex;flex-direction:column;gap:10px;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <strong>📥 Restaurer depuis un JSON collé</strong>
-          <button class="btn-ghost" id="prm-close">×</button>
+          <button class="btn-ghost" id="prm-close" aria-label="Fermer">×</button>
         </div>
         <p style="font-size:12px;color:var(--text-secondary);margin:0;">Colle ici le contenu d'un backup Alpha (JSON). Utile si tu as récupéré le backup via copy-paste plutôt que via un fichier <code>.atb</code>.</p>
         <textarea id="prm-textarea" placeholder='{"app":"alpha-terminal", ...}' style="flex:1;min-height:280px;font-family:monospace;font-size:11px;background:var(--bg-tertiary);color:var(--text-primary);border:1px solid var(--border);border-radius:4px;padding:10px;resize:vertical;"></textarea>

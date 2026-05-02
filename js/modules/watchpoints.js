@@ -90,7 +90,7 @@ export function renderWatchpointsView(viewEl) {
             </div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;">
               ${w.status === 'active' ? `<button class="btn-ghost btn-xs" data-dismiss="${w.id}">${isEN ? 'Dismiss' : 'Ignorer'}</button>` : ''}
-              <button class="btn-ghost btn-xs" data-del="${w.id}">×</button>
+              <button class="btn-ghost btn-xs" data-del="${w.id}" aria-label="${isEN ? 'Delete' : 'Supprimer'}">×</button>
             </div>
           </div>
         </div>`;

@@ -92,7 +92,7 @@ function drawList() {
   const list = loadList();
   const html = list.length === 0
     ? `<div class="alert alert-info">${t('mod.watchlist.empty')}</div>`
-    : `<div style="display:flex;flex-wrap:wrap;gap:6px;">${list.map(tk => `<span class="watch-pill">${tk} <button data-rm="${tk}">×</button></span>`).join('')}</div>`;
+    : `<div style="display:flex;flex-wrap:wrap;gap:6px;">${list.map(tk => `<span class="watch-pill">${tk} <button data-rm="${tk}" aria-label="Retirer ${tk}">×</button></span>`).join('')}</div>`;
   $('#wl-list').innerHTML = html;
   $('#wl-list').querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
     saveList(loadList().filter(t => t !== b.getAttribute('data-rm')));

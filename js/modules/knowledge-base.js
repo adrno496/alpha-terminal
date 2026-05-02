@@ -139,7 +139,7 @@ async function renderList() {
         <div class="kb-title">${escHtml(d.title)}</div>
         <div class="kb-meta">${d.chunkCount} chunks · ${fmtRelative(d.createdAt)}${d.tags?.length ? ' · ' + d.tags.map(tg => '#' + tg).join(' ') : ''}</div>
       </div>
-      <button class="btn-danger" data-rm="${d.id}">×</button>
+      <button class="btn-danger" data-rm="${d.id}" aria-label="Supprimer">×</button>
     </div>
   `).join('');
   container.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', async () => {

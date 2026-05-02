@@ -225,7 +225,7 @@ async function refreshUI() {
                   <td>${h.autoValue ? '⚡' : '✋'}</td>
                   <td>
                     <button class="btn-ghost wl-edit" data-id="${h.id}">✎</button>
-                    <button class="btn-ghost wl-del" data-id="${h.id}">×</button>
+                    <button class="btn-ghost wl-del" data-id="${h.id}" aria-label="Supprimer">×</button>
                   </td>
                 </tr>
                 ${immoRow}
@@ -484,7 +484,7 @@ async function openEditor(id) {
         <div class="loan-item" data-loan-idx="${idx}" style="border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:8px;background:var(--bg-secondary);">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
             <input class="input loan-label" data-idx="${idx}" type="text" value="${escHtml(l.label || 'Prêt ' + (idx + 1))}" placeholder="Nom du prêt (ex: Principal, Travaux, PTZ)" style="flex:1;margin-right:8px;font-size:12px;" />
-            <button type="button" class="btn-ghost loan-del" data-idx="${idx}" style="color:var(--accent-red);font-size:14px;">×</button>
+            <button type="button" class="btn-ghost loan-del" data-idx="${idx}" aria-label="Supprimer le prêt" style="color:var(--accent-red);font-size:14px;">×</button>
           </div>
           <div class="field" style="margin:6px 0;">
             <label class="field-label">Type de prêt</label>

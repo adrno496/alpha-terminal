@@ -138,7 +138,7 @@ export async function renderCapitalGainsTrackerView(viewEl) {
             <thead><tr style="color:var(--text-muted);text-align:left;"><th>Date</th><th>${isEN ? 'Qty' : 'Qté'}</th><th>${isEN ? 'Cost/u' : 'Coût/u'}</th><th>${isEN ? 'Account' : 'Compte'}</th><th></th></tr></thead>
             <tbody>
               ${g.lots.sort((a, b) => new Date(a.date) - new Date(b.date)).map(l => `
-                <tr><td>${l.date}</td><td>${l.quantity}</td><td>${fmtEUR(l.costPerUnit)}</td><td>${l.account || '—'}</td><td><button class="btn-ghost btn-xs" data-del="${l.id}">×</button></td></tr>`).join('')}
+                <tr><td>${l.date}</td><td>${l.quantity}</td><td>${fmtEUR(l.costPerUnit)}</td><td>${l.account || '—'}</td><td><button class="btn-ghost btn-xs" data-del="${l.id}" aria-label="Supprimer">×</button></td></tr>`).join('')}
             </tbody>
           </table>
         </div>`;

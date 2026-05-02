@@ -266,7 +266,7 @@ function renderEntriesList(entries, isEN) {
           <span>${e.icon || '·'} <strong>${escape(e.category)}</strong>${e.description ? ' · <span style="color:var(--text-muted);">' + escape(e.description) + '</span>' : ''}</span>
           <span style="display:flex;gap:10px;align-items:center;">
             <span style="font-family:var(--font-mono);">${fmt(e.amount)} €</span>
-            <button class="btn-ghost budget-del" data-id="${e.id}" style="padding:2px 6px;font-size:11px;color:var(--text-muted);">×</button>
+            <button class="btn-ghost budget-del" data-id="${e.id}" aria-label="Supprimer" style="padding:2px 6px;font-size:11px;color:var(--text-muted);">×</button>
           </span>
         </div>
       `).join('')}
@@ -285,7 +285,7 @@ function openEntryModal(viewEl, type) {
     <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:480px;width:100%;display:flex;flex-direction:column;gap:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <strong>+ ${isEN ? 'Add' : 'Ajouter'} ${type}</strong>
-        <button class="btn-ghost" data-close>×</button>
+        <button class="btn-ghost" data-close aria-label="${isEN ? 'Close' : 'Fermer'}">×</button>
       </div>
       <div class="field"><label class="field-label">${isEN ? 'Category' : 'Catégorie'}</label>
         <select id="entry-cat" class="input">${cats.map(c => `<option value="${c.id}" data-icon="${c.icon}" data-label="${c.label}">${c.icon} ${c.label}</option>`).join('')}<option value="custom">✏️ ${isEN ? 'Custom…' : 'Personnalisée…'}</option></select>
