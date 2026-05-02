@@ -180,24 +180,12 @@ export function mountChatbotWidget() {
   injectStyles();
   buildBubble();
   buildPanel();
-  injectTopbarButton();
   if (isOpen()) togglePanel(true);
 }
 
-// Injecte un bouton 💬 dans la topbar (à gauche du status API).
-// Permet d'ouvrir le chat directement depuis le header de chaque module.
-export function injectTopbarButton() {
-  const right = document.querySelector('.topbar-right');
-  if (!right) return;
-  if (right.querySelector('#cbw-topbar-btn')) return;
-  const btn = document.createElement('button');
-  btn.id = 'cbw-topbar-btn';
-  btn.className = 'cbw-topbar-btn';
-  btn.title = getLocale() === 'en' ? 'Open assistant chat' : 'Ouvrir le chat assistant';
-  btn.innerHTML = '💬 <span class="cbw-topbar-label">' + (getLocale() === 'en' ? 'Ask AI' : 'Demander') + '</span>';
-  btn.addEventListener('click', () => togglePanel());
-  right.insertBefore(btn, right.firstChild);
-}
+// Bouton topbar supprimé sur demande utilisateur — le chat reste accessible
+// via la bulle flottante en bas à droite.
+export function injectTopbarButton() { /* no-op */ }
 
 function injectStyles() {
   if (document.getElementById('chatbot-widget-styles')) return;

@@ -67,12 +67,30 @@
   function pillHTML(label, value, sub, color) {
     const display = (value == null || isNaN(value)) ? '—' : value;
     return `
-      <div class="mp-pill" title="${label}: ${display}${sub ? ' (' + sub + ')' : ''}">
+      <a href="#fear-greed" class="mp-pill mp-pill-link" data-route="fear-greed" title="${label}: ${display}${sub ? ' (' + sub + ')' : ''} — clic pour voir le détail">
         <span class="mp-pill-label">${label}</span>
         <span class="mp-pill-value" style="color:${color};">${display}</span>
         ${sub ? `<span class="mp-pill-sub" style="color:${color};">${sub}</span>` : ''}
-      </div>
+      </a>
     `;
+  }
+
+  function wireNav(container) {
+    container.querySelectorAll('.mp-pill-link').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Si app SPA présente, route vers le module fear-greed
+        if (typeof window.routeTo === 'function') {
+          try { window.routeTo('fear-greed'); return; } catch {}
+        }
+        // Fallback : changer le hash, l'app SPA réagit dessus
+        location.hash = '#fear-greed';
+        // Si on est sur la landing (pas de hash router), redirige
+        if (!document.querySelector('[data-route="fear-greed"]')) {
+          location.href = 'index.html#fear-greed';
+        }
+      });
+    });
   }
 
   function render(container, data) {
@@ -91,12 +109,14 @@
       </div>
     `;
     const btn = container.querySelector('.mp-refresh');
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
       btn.classList.add('spinning');
       btn.disabled = true;
       const fresh = await loadAll(true);
       render(container, fresh);
     });
+    wireNav(container);
   }
 
   function injectStyles() {
@@ -108,7 +128,9 @@
         display:inline-flex; flex-direction:column; align-items:center; line-height:1.05;
         padding:4px 9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10);
         border-radius:8px; font-size:10px; min-width:52px;
+        text-decoration:none; cursor:pointer; transition: border-color 0.15s, background 0.15s;
       }
+      .mp-pill-link:hover { border-color:#00ff88; background:rgba(0,255,136,0.08); }
       .mp-pill-label { color:#888; font-size:9.5px; text-transform:uppercase; letter-spacing:0.4px; font-weight:600; }
       .mp-pill-value { font-size:14px; font-weight:700; line-height:1.1; }
       .mp-pill-sub { font-size:11px; line-height:1.05; }
