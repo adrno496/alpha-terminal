@@ -311,6 +311,20 @@
       </div>
     </section>
 
+    <!-- MARKET PULSE — temps réel, gratuit, refresh -->
+    <section class="section reveal" style="padding:24px 22px;background:#0a0a0a;border-top:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a;">
+      <div style="max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:13px;color:#888;text-align:center;">
+          📊 <strong style="color:#fff;">Pouls du marché</strong> — temps réel
+          <span class="lang-en"><br>📊 <strong style="color:#fff;">Market pulse</strong> — live</span>
+        </div>
+        <div id="landing-market-pulse" style="display:inline-flex;"></div>
+      </div>
+      <p style="text-align:center;color:#666;font-size:11px;margin:8px 0 0;">
+        Sources : Alternative.me (crypto), CNN (stocks), Stooq (VIX) · Cache 30 min
+      </p>
+    </section>
+
     <!-- PROBLEM / SOLUTION -->
     <section class="section reveal">
       <div class="section-inner two-col">
@@ -510,6 +524,7 @@
           <span id="active-subtitle" class="active-subtitle">AI Investing Terminal • BYOK</span>
         </div>
         <div class="topbar-right">
+          <div id="market-pulse-mount" style="display:inline-flex;margin-right:10px;"></div>
           <span id="api-status" class="api-status">
             <span class="status-dot"></span>
             <span class="status-text">API disconnected</span>
@@ -572,6 +587,21 @@
   <script src="js/license.js" defer></script>
   <script src="js/paywall.js" defer></script>
   <script src="js/lemonsqueezy.js" defer></script>
+  <script src="js/ui/market-pulse.js" defer></script>
+  <script src="js/ui/install-prompt.js" defer></script>
+  <script defer>
+    // Mount Market Pulse en topbar + dans la landing si présent
+    document.addEventListener('DOMContentLoaded', () => {
+      const tryMount = () => {
+        if (!window.AlphaMarketPulse) { setTimeout(tryMount, 100); return; }
+        const tb = document.getElementById('market-pulse-mount');
+        if (tb) window.AlphaMarketPulse.mount(tb);
+        const land = document.getElementById('landing-market-pulse');
+        if (land) window.AlphaMarketPulse.mount(land);
+      };
+      tryMount();
+    });
+  </script>
 
   <!-- ====== License Key Modal ====== -->
   <div id="license-modal" style="
