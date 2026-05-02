@@ -286,23 +286,52 @@ function renderWizardStep1() {
 function handleWizardImportSuccess(counts) {
   const status = $('#wiz-import-status');
   const a = counts.added || {};
-  const breakdown = [
-    a.analyses ? `${a.analyses} analyses` : null,
-    a.wealth ? `${a.wealth} holdings` : null,
-    a.wealth_snapshots ? `${a.wealth_snapshots} snapshots` : null,
-    a.knowledge ? `${a.knowledge} KB` : null,
-    a.transcripts ? `${a.transcripts} transcripts` : null,
-    counts.localStorageKeys ? `${counts.localStorageKeys} settings` : null
-  ].filter(Boolean).join(' · ') || 'aucune donnée';
+  const r = counts.restored || {};
+
+  // Liste granulaire de TOUT ce qui a été restauré
+  const dataLines = [];
+  if (a.analyses) dataLines.push(`📜 ${a.analyses} analyses`);
+  if (a.wealth) dataLines.push(`💼 ${a.wealth} positions patrimoine`);
+  if (a.wealth_snapshots) dataLines.push(`📸 ${a.wealth_snapshots} snapshots`);
+  if (a.knowledge) dataLines.push(`📚 ${a.knowledge} docs Knowledge Base`);
+  if (a.transcripts) dataLines.push(`🎙️ ${a.transcripts} transcripts`);
+  if (a.budget_entries) dataLines.push(`💰 ${a.budget_entries} entrées budget`);
+  if (a.dividends_history) dataLines.push(`💸 ${a.dividends_history} dividendes`);
+  if (a.price_alerts) dataLines.push(`🔔 ${a.price_alerts} alertes prix`);
+  if (a.goals) dataLines.push(`🎯 ${a.goals} goals`);
+
+  const settingsLines = [];
+  if (r.apiKeys) settingsLines.push('🔑 Clés API LLM (vault)');
+  if (r.dataKeys) settingsLines.push('📊 Clés API data');
+  if (r.settings) settingsLines.push('⚙️ Settings + routing');
+  if (r.profile) settingsLines.push('👤 Profil utilisateur');
+  if (r.watchlist) settingsLines.push('👁️ Watchlist');
+  if (r.preferences) settingsLines.push('🎨 Thème + langue');
+  if (r.costs) settingsLines.push('💵 Historique coûts');
 
   const premiumLine = counts.licenseRestored
-    ? `<br><span style="color:var(--accent-green);font-size:11px;">💎 Licence Premium restaurée — accès Pro débloqué après déverrouillage du vault.</span>`
-    : `<br><span style="color:var(--accent-amber);font-size:11px;">⚠️ Pas de licence Premium dans ce backup. Si tu en avais une, ré-exporte un backup depuis l'appareil source (versions récentes uniquement).</span>`;
-  if (status) {
-    status.innerHTML = `<span style="color:var(--accent-green);">✓ Importé : ${breakdown}</span>${premiumLine}<br><span style="color:var(--text-muted);font-size:11px;">Rechargement dans 1.5s pour appliquer le vault…</span>`;
-  }
+    ? `<div style="color:var(--accent-green);background:rgba(0,255,136,0.08);padding:8px 10px;border-radius:4px;margin:8px 0;font-size:12px;border-left:3px solid var(--accent-green);">💎 <strong>Licence Premium restaurée</strong> — accès Pro débloqué après déverrouillage du vault.</div>`
+    : `<div style="color:var(--accent-amber);background:rgba(255,170,0,0.08);padding:8px 10px;border-radius:4px;margin:8px 0;font-size:12px;border-left:3px solid var(--accent-amber);">⚠️ <strong>Pas de licence Premium</strong> dans ce backup. Si tu en avais une, ré-exporte un backup récent depuis l'appareil source.</div>`;
+
+  const html = `
+    <div style="color:var(--accent-green);font-weight:600;margin-bottom:8px;">✅ Backup restauré avec succès</div>
+    ${premiumLine}
+    ${dataLines.length ? `
+    <div style="margin:8px 0;font-size:12px;">
+      <div style="color:var(--text-muted);text-transform:uppercase;font-size:10px;letter-spacing:0.5px;margin-bottom:4px;">Données</div>
+      <div style="color:var(--text-primary);line-height:1.7;">${dataLines.join(' · ')}</div>
+    </div>` : ''}
+    ${settingsLines.length ? `
+    <div style="margin:8px 0;font-size:12px;">
+      <div style="color:var(--text-muted);text-transform:uppercase;font-size:10px;letter-spacing:0.5px;margin-bottom:4px;">Paramètres</div>
+      <div style="color:var(--text-primary);line-height:1.7;">${settingsLines.join(' · ')}</div>
+    </div>` : ''}
+    <div style="color:var(--text-muted);font-size:11px;margin-top:10px;">⏳ Rechargement dans 2s pour appliquer le vault chiffré…</div>
+  `;
+  if (status) status.innerHTML = html;
+
   // Reload : permet au vault chiffré importé d'être lu par hasVault() et rebascule sur l'écran unlock
-  setTimeout(() => location.reload(), 1500);
+  setTimeout(() => location.reload(), 2000);
 }
 
 function showWizardPasteImport() {

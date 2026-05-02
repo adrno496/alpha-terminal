@@ -201,10 +201,12 @@ export async function validateDataKey(id, key) {
           return { ok: false, error: 'Format inattendu' };
         };
         break;
-      case 'fred':
-        // /fred/series (metadata) est plus léger que /observations et plus tolérant.
-        // FRED API supporte CORS depuis 2023 sur les endpoints GET.
-        url = `https://api.stlouisfed.org/fred/series?series_id=DGS10&api_key=${encodeURIComponent(k)}&file_type=json`;
+      case 'fred': {
+        // FRED bloque CORS depuis le browser → routé via le proxy CORS Alpha.
+        const proxyBase = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+        const fredTarget = `https://api.stlouisfed.org/fred/series?series_id=DGS10&api_key=${encodeURIComponent(k)}&file_type=json`;
+        url = `${proxyBase}?url=${encodeURIComponent(fredTarget)}`;
+      }
         parser = async (r) => {
           if (r.status === 400) {
             const text = await r.text();
@@ -263,8 +265,12 @@ export async function validateDataKey(id, key) {
           }
         };
         break;
-      case 'metals_api':
-        url = `https://metals-api.com/api/latest?access_key=${encodeURIComponent(k)}&base=USD&symbols=XAU`;
+      case 'metals_api': {
+        // Metals-API bloque CORS depuis le browser → routé via le proxy.
+        const proxyBase = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+        const metalsTarget = `https://metals-api.com/api/latest?access_key=${encodeURIComponent(k)}&base=USD&symbols=XAU`;
+        url = `${proxyBase}?url=${encodeURIComponent(metalsTarget)}`;
+      }
         parser = async (r) => {
           if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
           if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
@@ -297,7 +303,10 @@ export async function validateDataKey(id, key) {
     // connus pour ne pas supporter CORS du tout, et un warning générique sinon.
     if (/failed to fetch|networkerror|cors/i.test(msg)) {
       // Providers data dont l'API a un CORS strict (validation impossible browser)
-      const browserIncompatibleData = ['fred', 'metals_api'];
+      // FRED + Metals-API sont maintenant routés via /api/llm-proxy → ils ne devraient
+      // PLUS arriver ici (le fetch via le proxy ne fail pas CORS). Si on tombe quand même
+      // ici pour eux, c'est que le proxy lui-même est down → message clair.
+      const browserIncompatibleData = []; // tous routés via proxy maintenant
       if (browserIncompatibleData.includes(id)) {
         return { ok: false, error: `BROWSER_INCOMPATIBLE:${id}`, status: 0 };
       }

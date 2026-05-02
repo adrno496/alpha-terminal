@@ -1,16 +1,18 @@
-// Vercel Edge Function — proxy CORS pour les 4 providers LLM CORS-incompatibles.
-// La clé API du user passe en header Authorization, on la forwarde tel quel.
-// Aucune clé n'est stockée serveur-side. Le proxy ne fait que rajouter les
-// headers CORS pour autoriser le browser à recevoir la réponse.
+// Vercel Edge Function — proxy CORS pour les providers (LLM + data) qui ne supportent pas
+// les browser direct calls. Whitelist stricte. Aucune clé stockée serveur — pass-through.
 
 export const config = { runtime: 'edge' };
 
 const ALLOWED_HOSTS = [
+  // LLM providers CORS-incompatibles
   'models.github.ai',                  // GitHub Models
   'integrate.api.nvidia.com',          // NVIDIA NIM
   'router.huggingface.co',             // HuggingFace router
   'huggingface.co',                    // HF whoami-v2
-  'api.cloudflare.com'                 // Cloudflare Workers AI
+  'api.cloudflare.com',                // Cloudflare Workers AI
+  // Data providers CORS-blocked depuis le browser
+  'api.stlouisfed.org',                // FRED API (Federal Reserve)
+  'metals-api.com'                     // Metals-API (or/argent/platine)
 ];
 
 const CORS_HEADERS = {

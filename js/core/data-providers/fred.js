@@ -1,15 +1,21 @@
 // FRED API — indicateurs macro US (Federal Reserve Economic Data)
-// Free, illimité avec clé. CORS-enabled.
+// Free, illimité avec clé. CORS bloqué depuis browser → routé via /api/llm-proxy.
 // Doc : https://fred.stlouisfed.org/docs/api/fred/
 import { getDataKey } from '../data-keys.js';
 
 const BASE = 'https://api.stlouisfed.org/fred';
 
+// Proxy CORS — FRED ne supporte pas les browser direct calls de manière fiable.
+function viaProxy(url) {
+  const base = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+  return `${base}?url=${encodeURIComponent(url)}`;
+}
+
 async function call(path, params = {}) {
   const key = getDataKey('fred');
   if (!key) throw new Error('FRED key not configured');
-  const url = BASE + path + '?' + new URLSearchParams({ ...params, api_key: key, file_type: 'json' });
-  const res = await fetch(url);
+  const targetUrl = BASE + path + '?' + new URLSearchParams({ ...params, api_key: key, file_type: 'json' });
+  const res = await fetch(viaProxy(targetUrl));
   if (!res.ok) throw new Error(`FRED ${res.status}`);
   return res.json();
 }

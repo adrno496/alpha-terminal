@@ -7,15 +7,39 @@ const DB_VERSION = 10;
 const STORES = ['analyses', 'writingStyles', 'knowledge', 'wealth', 'wealth_snapshots', 'transcripts', 'budget_entries', 'dividends_history', 'insights_state', 'price_alerts', 'goals', 'watchpoints'];
 
 // localStorage keys gérées par l'app (filtre pour ne pas exporter les clés du navigateur d'autres sites)
-const LS_PREFIXES = ['alpha-terminal:', 'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:', 'alpha-license-'];
-// Clés exactes (sans préfixe Alpha) à inclure : vault chiffré + statut/clé de
-// licence Lemonsqueezy (pour migrer Premium d'un appareil à l'autre via backup).
+const LS_PREFIXES = [
+  'alpha-terminal:',     // tout l'état app (settings, watchlist, theme, locale, drafts, RAG, costs, etc.)
+  'alpha-license-',      // license Lemonsqueezy (key, instance_id, meta, checked-at)
+  'alpha-install-',      // install prompt PWA dismissed state
+  'alphavantage:', 'fmp:', 'polygon:', 'finnhub:', 'tiingo:', 'twelvedata:', 'fred:', 'etherscan:', 'data-keys:'
+];
+// Clés exactes (sans préfixe Alpha) à inclure : vault chiffré + flag premium legacy
 const LS_EXACT = ['alpha-terminal:vault', 'isPremium'];
+// Clés à EXCLURE explicitement (cache temporaire, n'a pas besoin d'être backup)
+const LS_EXCLUDE = ['alpha-market-pulse'];
 
 function isAppKey(k) {
   if (!k) return false;
+  if (LS_EXCLUDE.includes(k)) return false;
   if (LS_EXACT.includes(k)) return true;
   return LS_PREFIXES.some(p => k.startsWith(p));
+}
+
+// Catégorise une clé localStorage en fonction de son contenu pour le manifest.
+// Utilisé pour donner un breakdown clair "ce qui sera restauré" à l'utilisateur.
+function categorizeKey(k) {
+  if (k === 'alpha-terminal:vault') return 'apiKeys';        // Clés API LLM chiffrées
+  if (k === 'alpha-terminal:data-keys') return 'dataKeys';   // Clés API data providers
+  if (k === 'alpha-terminal:settings') return 'settings';    // Routing overrides + budgets + theme + etc.
+  if (k.startsWith('alpha-license-') || k === 'isPremium') return 'license';
+  if (k === 'alpha-terminal:user-profile') return 'profile';
+  if (k === 'alpha-terminal:costs') return 'costs';
+  if (k === 'alpha-terminal:watchlist') return 'watchlist';
+  if (k === 'alpha-terminal:drafts') return 'drafts';
+  if (k === 'alpha-terminal:tutorials-seen') return 'tutorialsSeen';
+  if (k === 'alpha-terminal:locale' || k === 'alpha-terminal:theme') return 'preferences';
+  if (k === 'alpha-terminal:result-cache' || k === 'alpha-terminal:rag-enabled') return 'cache';
+  return 'other';
 }
 
 function openDB() {
@@ -186,16 +210,54 @@ export async function exportFullBackup() {
     }
   }
 
+  // Manifest : catégorise les clés localStorage pour breakdown clair UX
+  const manifest = {
+    apiKeys: false,         // Vault LLM chiffré présent ?
+    dataKeys: false,        // Clés data providers (FMP, Polygon, etc.) ?
+    license: false,         // License Lemonsqueezy ?
+    settings: false,        // Routing overrides + paramètres ?
+    profile: false,         // User profile (persona, prefs) ?
+    costs: false,           // Historique de coûts ?
+    watchlist: false,       // Tickers surveillés ?
+    drafts: false,          // Brouillons d'analyses ?
+    tutorialsSeen: false,   // Tutos déjà vus ?
+    preferences: false,     // Theme + locale ?
+  };
+  for (const k of Object.keys(localStorageDump)) {
+    const cat = categorizeKey(k);
+    if (cat in manifest) manifest[cat] = true;
+  }
+
   const payload = {
     app: 'alpha-terminal',
     version: '2.1.0',
-    schemaVersion: 2,
+    schemaVersion: 3, // bumpé : ajout manifest + nouvelles clés (alpha-install-)
     exportedAt: new Date().toISOString(),
     device: {
       userAgent: (navigator.userAgent || '').slice(0, 200),
       platform: navigator.platform || '',
       language: navigator.language || ''
     },
+    // Breakdown lisible pour l'UI d'import — montre à l'user CE QU'IL VA RESTAURER
+    manifest: {
+      ...manifest,
+      counts: {
+        analyses: indexedDBDump.analyses?.length || 0,
+        knowledge: indexedDBDump.knowledge?.length || 0,
+        wealth: indexedDBDump.wealth?.length || 0,
+        wealthSnapshots: indexedDBDump.wealth_snapshots?.length || 0,
+        transcripts: indexedDBDump.transcripts?.length || 0,
+        budgetEntries: indexedDBDump.budget_entries?.length || 0,
+        dividendsHistory: indexedDBDump.dividends_history?.length || 0,
+        priceAlerts: indexedDBDump.price_alerts?.length || 0,
+        goals: indexedDBDump.goals?.length || 0,
+        watchpoints: indexedDBDump.watchpoints?.length || 0,
+        writingStyles: indexedDBDump.writingStyles?.length || 0,
+        insightsState: indexedDBDump.insights_state?.length || 0,
+        localStorageKeys: Object.keys(localStorageDump).length
+      }
+    },
+    // Compat ancien format : counts à plat (lu par certains imports legacy)
     counts: {
       analyses: indexedDBDump.analyses?.length || 0,
       writingStyles: indexedDBDump.writingStyles?.length || 0,
@@ -212,6 +274,32 @@ export async function exportFullBackup() {
     localStorage: localStorageDump
   };
   return payload;
+}
+
+// Helper : résumé human-readable d'un payload pour affichage UI
+export function describeBackup(payload) {
+  if (!payload || !payload.manifest) return null;
+  const m = payload.manifest;
+  const c = m.counts || {};
+  const FR = (window.AlphaLocale === 'en') ? null : true;
+  const items = [];
+  if (m.apiKeys) items.push(FR ? '🔑 Clés API LLM (vault chiffré)' : '🔑 LLM API keys (encrypted vault)');
+  if (m.dataKeys) items.push(FR ? '📊 Clés data (FMP, FRED, etc.)' : '📊 Data keys (FMP, FRED, etc.)');
+  if (m.license) items.push(FR ? '💎 Licence Premium Lemonsqueezy' : '💎 Premium license (Lemonsqueezy)');
+  if (m.settings) items.push(FR ? '⚙️ Settings + routing overrides' : '⚙️ Settings + routing overrides');
+  if (c.analyses > 0) items.push(FR ? `📜 Historique analyses (${c.analyses})` : `📜 Analyses history (${c.analyses})`);
+  if (c.wealth > 0) items.push(FR ? `💼 Patrimoine (${c.wealth} positions)` : `💼 Wealth (${c.wealth} positions)`);
+  if (c.wealthSnapshots > 0) items.push(FR ? `📸 Snapshots patrimoine (${c.wealthSnapshots})` : `📸 Wealth snapshots (${c.wealthSnapshots})`);
+  if (c.knowledge > 0) items.push(FR ? `📚 Knowledge Base (${c.knowledge} docs)` : `📚 Knowledge Base (${c.knowledge} docs)`);
+  if (c.transcripts > 0) items.push(FR ? `🎙️ Transcripts (${c.transcripts})` : `🎙️ Transcripts (${c.transcripts})`);
+  if (c.budgetEntries > 0) items.push(FR ? `💰 Budget (${c.budgetEntries} entrées)` : `💰 Budget (${c.budgetEntries} entries)`);
+  if (c.dividendsHistory > 0) items.push(FR ? `💸 Dividendes (${c.dividendsHistory})` : `💸 Dividends (${c.dividendsHistory})`);
+  if (c.priceAlerts > 0) items.push(FR ? `🔔 Alertes prix (${c.priceAlerts})` : `🔔 Price alerts (${c.priceAlerts})`);
+  if (c.goals > 0) items.push(FR ? `🎯 Goals (${c.goals})` : `🎯 Goals (${c.goals})`);
+  if (m.watchlist) items.push(FR ? '👁️ Watchlist tickers' : '👁️ Watchlist tickers');
+  if (m.profile) items.push(FR ? '👤 Profil utilisateur' : '👤 User profile');
+  if (m.preferences) items.push(FR ? '🎨 Thème + langue' : '🎨 Theme + language');
+  return items;
 }
 
 export function backupFilename() {
@@ -420,27 +508,35 @@ export async function importFullBackup(payload, { mode = 'merge' } = {}) {
     counts.added.analyses = n;
   }
 
-  // 2. localStorage
+  // 2. localStorage — restaure et tracke par catégorie pour feedback détaillé
+  counts.restored = {
+    apiKeys: false, dataKeys: false, license: false, settings: false,
+    profile: false, costs: false, watchlist: false, drafts: false,
+    tutorialsSeen: false, preferences: false
+  };
   if (payload.localStorage && typeof payload.localStorage === 'object') {
     for (const [k, v] of Object.entries(payload.localStorage)) {
       if (!isAppKey(k)) { counts.skipped++; continue; }
       if (typeof v !== 'string') { counts.skipped++; continue; }
-      try { localStorage.setItem(k, v); } catch { counts.skipped++; }
+      try {
+        localStorage.setItem(k, v);
+        const cat = categorizeKey(k);
+        if (cat in counts.restored) counts.restored[cat] = true;
+      } catch { counts.skipped++; }
     }
     counts.localStorageKeys = Object.keys(payload.localStorage).length - counts.skipped;
   }
 
-  // Diagnostic : log clair de ce qui a été détecté côté licence
-  const hasLicenseInPayload = !!(payload.localStorage && payload.localStorage['alpha-license-key']);
-  console.info('[backup-import] license key in payload:', hasLicenseInPayload, '| restored to localStorage:', !!localStorage.getItem('alpha-license-key'));
-  if (!hasLicenseInPayload) {
-    console.warn('[backup-import] ⚠️ No license key in this backup — it was probably created before the license-aware fix. Re-export your backup from the source device.');
-  }
+  // Diagnostic console : log clair par catégorie
+  console.info('[backup-import] Restauré :', {
+    indexedDB_stores: Object.keys(counts.added).length,
+    localStorage_keys: counts.localStorageKeys,
+    categories: Object.entries(counts.restored).filter(([_, v]) => v).map(([k]) => k).join(', ') || 'aucune',
+    skipped: counts.skipped
+  });
 
   // Si la licence Premium a été restaurée, notifie immédiatement l'app
-  // (paywall + sidebar + Settings) pour que l'UI rebascule avant le reload.
-  // Sinon le user pourrait voir le paywall une fraction de seconde.
-  counts.licenseRestored = !!localStorage.getItem('alpha-license-key');
+  counts.licenseRestored = counts.restored.license;
   if (counts.licenseRestored) {
     try {
       window.dispatchEvent(new CustomEvent('alpha:licenseActivated', { detail: { restored: true } }));
