@@ -219,9 +219,9 @@ export function renderSidebar(onNavigate) {
           <span style="margin-left:auto;font-weight:400;color:var(--text-muted);">${favEntries.length}</span>
         </div>
         ${favEntries.map(m => `
-          <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(\`mod.${m.id}.desc\`)}">
+          <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t('mod.' + m.id + '.desc')}">
             <span class="num">${m.num}</span>
-            <span class="lbl">${t(\`mod.${m.id}.label\`)}</span>
+            <span class="lbl">${t('mod.' + m.id + '.label')}</span>
             ${sideBadges(m.id)}
           </button>
         `).join('')}
