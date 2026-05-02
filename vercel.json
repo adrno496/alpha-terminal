@@ -1,7 +1,3 @@
 {
-  "functions": {
-    "api/llm-proxy.js": {
-      "runtime": "edge"
-    }
-  }
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }
