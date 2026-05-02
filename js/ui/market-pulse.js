@@ -1,7 +1,6 @@
-// Market Pulse widget — Fear & Greed (Crypto + Stocks) + VIX
-// Sources gratuites CORS-friendly :
-//   - Crypto F&G : https://api.alternative.me/fng/
-//   - VIX : Stooq CSV (https://stooq.com/q/l/?s=^vix&f=sd2t2c&h&e=csv)
+// Market Pulse widget — Fear & Greed (Crypto + Stocks)
+// Sources gratuites :
+//   - Crypto F&G : https://api.alternative.me/fng/  (CORS OK)
 //   - Stocks F&G : CNN endpoint, fallback gracieux si CORS bloque
 //
 // Cache localStorage 30 min pour limiter les appels.
@@ -25,33 +24,12 @@
     return { label: 'Extreme Greed', emoji: '🤑', color: '#00ff88' };
   }
 
-  function classifyVix(v) {
-    if (v == null) return { label: '—', color: '#888' };
-    if (v < 12) return { label: 'Très calme', color: '#00ff88' };
-    if (v < 20) return { label: 'Calme', color: '#88dd00' };
-    if (v < 30) return { label: 'Tendu', color: '#ff8c00' };
-    return { label: 'Panique', color: '#ff3030' };
-  }
-
   async function fetchCryptoFG() {
     try {
       const r = await fetch('https://api.alternative.me/fng/?limit=1', { cache: 'no-store' });
       const j = await r.json();
       const d = j?.data?.[0];
       return { value: parseInt(d?.value, 10), label: d?.value_classification };
-    } catch { return null; }
-  }
-
-  async function fetchVix() {
-    try {
-      const r = await fetch('https://stooq.com/q/l/?s=^vix&f=sd2t2c&h&e=csv', { cache: 'no-store' });
-      const txt = await r.text();
-      // Format: Symbol,Date,Time,Close
-      const lines = txt.trim().split('\n');
-      if (lines.length < 2) return null;
-      const cols = lines[1].split(',');
-      const close = parseFloat(cols[3]);
-      return isFinite(close) ? close : null;
     } catch { return null; }
   }
 
@@ -77,12 +55,11 @@
         if (cached && (Date.now() - cached.ts) < CACHE_TTL_MS) return cached.data;
       } catch {}
     }
-    const [crypto, vix, stocks] = await Promise.all([
+    const [crypto, stocks] = await Promise.all([
       fetchCryptoFG(),
-      fetchVix(),
       fetchStocksFG()
     ]);
-    const data = { crypto, vix, stocks, ts: Date.now() };
+    const data = { crypto, stocks, ts: Date.now() };
     try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), data })); } catch {}
     return data;
   }
@@ -101,18 +78,14 @@
   function render(container, data) {
     const c = data.crypto;
     const s = data.stocks;
-    const v = data.vix;
     const cClass = c ? classifyValue(c.value) : classifyValue(null);
     const sClass = s != null ? classifyValue(s) : classifyValue(null);
-    const vClass = classifyVix(v);
-    const vDisplay = (v != null && isFinite(v)) ? v.toFixed(2) : null;
 
     container.innerHTML = `
       <div class="mp-wrap">
         <div class="mp-pills">
           ${pillHTML('Crypto', c?.value ?? null, cClass.emoji, cClass.color)}
           ${s != null ? pillHTML('Stocks', s, sClass.emoji, sClass.color) : ''}
-          ${pillHTML('VIX', vDisplay, vClass.label, vClass.color)}
         </div>
         <button class="mp-refresh" type="button" title="Refresh" aria-label="Refresh">↻</button>
       </div>
@@ -129,27 +102,39 @@
   function injectStyles() {
     if (document.getElementById('mp-styles')) return;
     const css = `
-      .mp-wrap { display:inline-flex; align-items:center; gap:8px; }
-      .mp-pills { display:inline-flex; gap:6px; flex-wrap:nowrap; }
+      .mp-wrap { display:inline-flex; align-items:center; gap:6px; }
+      .mp-pills { display:inline-flex; gap:5px; flex-wrap:nowrap; }
       .mp-pill {
         display:inline-flex; flex-direction:column; align-items:center; line-height:1.05;
         padding:4px 9px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.10);
-        border-radius:8px; font-size:10px; min-width:54px;
+        border-radius:8px; font-size:10px; min-width:52px;
       }
       .mp-pill-label { color:#888; font-size:9.5px; text-transform:uppercase; letter-spacing:0.4px; font-weight:600; }
       .mp-pill-value { font-size:14px; font-weight:700; line-height:1.1; }
-      .mp-pill-sub { font-size:9px; opacity:0.85; line-height:1.05; }
+      .mp-pill-sub { font-size:11px; line-height:1.05; }
       .mp-refresh {
         background:transparent; border:1px solid rgba(255,255,255,0.12); color:#aaa;
         width:26px; height:26px; border-radius:6px; cursor:pointer; font-size:14px;
         display:inline-flex; align-items:center; justify-content:center; padding:0;
-        transition: transform 0.2s, color 0.2s;
+        transition: transform 0.2s, color 0.2s; flex-shrink:0;
       }
       .mp-refresh:hover { color:#00ff88; border-color:#00ff88; }
       .mp-refresh:disabled { opacity:0.5; cursor:wait; }
       .mp-refresh.spinning { animation: mp-spin 0.6s linear infinite; }
       @keyframes mp-spin { to { transform: rotate(360deg); } }
-      @media (max-width: 720px) { .mp-pill { min-width:46px; } .mp-pill-label { font-size:9px; } .mp-pill-value { font-size:12px; } }
+      /* Mobile : compact, juste l'emoji + valeur, pas de label */
+      @media (max-width: 768px) {
+        .mp-wrap { gap:4px; }
+        .mp-pill { min-width:auto; padding:3px 7px; flex-direction:row; gap:4px; }
+        .mp-pill-label { display:none; }
+        .mp-pill-value { font-size:12px; }
+        .mp-pill-sub { font-size:13px; }
+        .mp-refresh { width:24px; height:24px; font-size:13px; }
+      }
+      @media (max-width: 380px) {
+        .mp-pill-value { font-size:11px; }
+        .mp-pill-sub { font-size:12px; }
+      }
     `;
     const s = document.createElement('style');
     s.id = 'mp-styles';

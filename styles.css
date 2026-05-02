@@ -2514,9 +2514,11 @@ body:has(#landing:not(.hidden)) { overflow: auto; }
   .topbar-left { gap: 8px; min-width: 0; flex: 1; }
   .active-title { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .active-subtitle { display: none; }
-  .topbar-right { gap: 6px; }
+  .topbar-right { gap: 6px; flex-wrap: nowrap; min-width: 0; }
+  #market-pulse-mount { margin-right: 4px !important; }
   .api-status .status-text { display: none; }
   .api-status { padding: 0; }
+  .topbar-left .active-title { max-width: 90px; }
   .cost-badge { padding: 4px 8px; font-size: 10.5px; }
   .cost-badge .cost-label { display: none; }
   .theme-toggle { width: 28px; height: 28px; font-size: 12px; }
