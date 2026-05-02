@@ -260,6 +260,7 @@ function renderDataKeysTab(c) {
           <div class="data-key-info">
             <strong>${p.label}</strong>
             <span class="data-key-desc">${p.desc}</span>
+            <span class="data-key-quota" data-quota-id="${p.id}" style="font-size:10.5px;color:var(--text-muted);margin-left:8px;"></span>
           </div>
           <input type="password" class="input data-key-input" data-id="${p.id}" placeholder="${status === 'set' ? '••• (' + t('common.optional') + ')' : 'API key…'}" />
           <span class="data-key-status" data-status-id="${p.id}">${status === 'set' ? '✅' : '⏳'}</span>
@@ -280,6 +281,25 @@ function renderDataKeysTab(c) {
     toast(t('common.save'), 'success');
     setTimeout(() => renderTab('data_keys'), 400);
   });
+
+  // Quota usage par provider (lazy import data-quota)
+  (async () => {
+    try {
+      const { getQuotaStatus, QUOTA_LIMITS } = await import('../core/data-quota.js');
+      c.querySelectorAll('[data-quota-id]').forEach(el => {
+        const id = el.getAttribute('data-quota-id');
+        const limits = QUOTA_LIMITS[id];
+        const s = getQuotaStatus(id);
+        if (s.limit) {
+          el.innerHTML = `· <span style="color:${s.color};font-weight:600;">📊 ${s.label} aujourd'hui</span>`;
+        } else if (s.used > 0) {
+          el.innerHTML = `· <span style="color:var(--text-muted);">${s.used} req aujourd'hui (${s.label})</span>`;
+        } else if (limits) {
+          el.innerHTML = `· <span style="color:var(--text-muted);">${s.label}</span>`;
+        }
+      });
+    } catch (e) { /* silencieux */ }
+  })();
 
   // Test individuel par clé : prend la valeur de l'input si présente, sinon la clé sauvée.
   c.querySelectorAll('.data-key-test').forEach(btn => {

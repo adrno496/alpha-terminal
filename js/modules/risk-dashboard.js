@@ -79,6 +79,10 @@ export async function renderRiskDashboardView(viewEl) {
   viewEl.innerHTML = `
     ${moduleHeader('📊 Risk Dashboard', isEN ? 'Unified data view : FRED + crypto + gold + news + geopolitics + derived signals.' : 'Vue données unifiée : FRED + crypto + or + actualités + géopolitique + signaux dérivés.', { moduleId: MODULE_ID })}
 
+    <div class="card" style="border-left:3px solid var(--accent-blue);font-size:12px;color:var(--text-secondary);">
+      ℹ️ ${isEN ? 'This view aggregates raw data + static signals. For an LLM-driven analysis with web search, see' : 'Cette vue agrège des données brutes + signaux statiques. Pour une analyse LLM avec web search, voir'} <a href="#macro-dashboard" style="color:var(--accent-green);">📊 Macro Dashboard (LLM)</a>.
+    </div>
+
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div style="font-size:13px;color:var(--text-secondary);">

@@ -135,11 +135,15 @@ async function refreshUI() {
   // Summary
   const summary = $('#wealth-summary');
   if (summary) {
+    const debtNote = totals.realEstateDebt > 0
+      ? `<div class="wealth-total-meta" style="color:var(--text-muted);font-size:11.5px;margin-top:2px;">Net immobilier — reste à payer : <strong>${sym}${fmtMoney(totals.realEstateDebt)}</strong> (exclu du total)</div>`
+      : '';
     summary.innerHTML = `
       <div class="wealth-card">
         <div class="wealth-total-label">Patrimoine total (${target})</div>
         <div class="wealth-total-num">${sym}${fmtMoney(totals.total)}</div>
         <div class="wealth-total-meta">${totals.count} holdings · ${Object.keys(totals.byCategory).length} catégories</div>
+        ${debtNote}
       </div>
       <div class="wealth-breakdown">
         ${WEALTH_CATEGORIES.filter(c => totals.byCategory[c.id]).map(c => {

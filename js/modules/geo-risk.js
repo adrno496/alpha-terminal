@@ -20,6 +20,10 @@ export async function renderGeoRiskView(viewEl) {
   viewEl.innerHTML = `
     ${moduleHeader('🌍 Risque géopolitique', isEN ? 'Conflict tracking by strategic region (ACLED data, weekly updates).' : 'Suivi des conflits par région stratégique (données ACLED, mise à jour hebdomadaire).', { moduleId: MODULE_ID })}
 
+    <div class="card" style="border-left:3px solid var(--accent-blue);font-size:12px;color:var(--text-secondary);">
+      ℹ️ ${isEN ? 'Raw ACLED data view. For an LLM-driven geopolitical analysis with thesis & impact, see' : 'Vue données ACLED brutes. Pour une analyse géopolitique LLM avec thèse & impact, voir'} <a href="#geopolitical-analysis" style="color:var(--accent-green);">🗺️ Analyse géopolitique (LLM)</a>.
+    </div>
+
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <div style="font-size:13px;color:var(--text-secondary);">

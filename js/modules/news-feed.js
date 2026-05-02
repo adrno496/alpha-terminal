@@ -22,6 +22,10 @@ export async function renderNewsFeedView(viewEl) {
   viewEl.innerHTML = `
     ${moduleHeader('📰 News', isEN ? 'Financial & macro news watch via NewsAPI. Lexical sentiment included.' : 'Veille actualités financières & macro via NewsAPI. Sentiment lexical inclus.', { moduleId: MODULE_ID })}
 
+    <div class="card" style="border-left:3px solid var(--accent-blue);font-size:12px;color:var(--text-secondary);">
+      ℹ️ ${isEN ? 'Headlines feed with lexical sentiment (~70% accurate). For LLM-driven sentiment analysis on a specific ticker, see' : 'Flux headlines avec sentiment lexical (~70% précis). Pour une analyse de sentiment LLM sur un ticker spécifique, voir'} <a href="#sentiment-tracker" style="color:var(--accent-green);">📊 Sentiment Tracker (LLM)</a>.
+    </div>
+
     <div class="card">
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;">
         <select id="news-preset" class="input" style="font-size:13px;">

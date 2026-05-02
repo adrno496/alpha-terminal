@@ -7,6 +7,7 @@
 // Routé via /api/llm-proxy pour CORS.
 
 import { getDataKey } from '../data-keys.js';
+import { bumpQuota } from '../data-quota.js';
 
 const BASE = 'https://api.acleddata.com/acled/read';
 
@@ -30,6 +31,7 @@ async function call(params = {}) {
     const t = await res.text().catch(() => '');
     throw new Error(`ACLED ${res.status}: ${t.slice(0, 120)}`);
   }
+  bumpQuota('acled');
   return res.json();
 }
 

@@ -5,6 +5,7 @@ import { getUserProfile } from '../core/user-profile.js';
 import { recommendedSet } from '../core/module-recommendations.js';
 import { isModuleMissingApiKey } from '../core/module-providers.js';
 import { getFavorites } from '../core/favorites.js';
+import { getRecentModules } from '../core/module-usage.js';
 
 // Modules toujours visibles (mode simple)
 const ALWAYS_VISIBLE = [
@@ -146,10 +147,13 @@ function getAdvanced() { return localStorage.getItem(ADV_KEY) === '1'; }
 function setAdvanced(v) { localStorage.setItem(ADV_KEY, v ? '1' : '0'); }
 
 export function renderSidebar(onNavigate) {
-  // Wire-once : re-render la sidebar dès qu'un favori est ajouté/retiré
+  // Wire-once : re-render la sidebar dès qu'un favori ou usage change
   if (typeof window !== 'undefined' && !window.__alphaFavSidebarWired) {
     window.__alphaFavSidebarWired = true;
     window.addEventListener('alpha:favorites-changed', () => {
+      try { renderSidebar(onNavigate); } catch {}
+    });
+    window.addEventListener('alpha:module-usage-changed', () => {
       try { renderSidebar(onNavigate); } catch {}
     });
   }
@@ -204,6 +208,28 @@ export function renderSidebar(onNavigate) {
       <span class="lbl">${t('demo.title')}</span>
     </button>
   `;
+
+  // === 🕐 RÉCEMMENT UTILISÉS — top 5 derniers modules ouverts ===
+  const recent = getRecentModules(5)
+    .map(r => ALL_IDS.find(m => m.id === r.id))
+    .filter(Boolean);
+  if (recent.length > 0) {
+    html += `
+      <div class="sidebar-recent" style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text-muted);padding:4px 12px;text-transform:uppercase;letter-spacing:0.6px;display:flex;align-items:center;gap:6px;">
+          <span>🕐</span><span>${isEN ? 'Recently used' : 'Récents'}</span>
+          <span style="margin-left:auto;font-weight:400;color:var(--text-muted);">${recent.length}</span>
+        </div>
+        ${recent.map(m => `
+          <button class="sidebar-link" data-route="${m.id}" data-num="${m.num}" title="${t('mod.' + m.id + '.desc')}">
+            <span class="num">${m.num}</span>
+            <span class="lbl">${t('mod.' + m.id + '.label')}</span>
+            ${sideBadges(m.id)}
+          </button>
+        `).join('')}
+      </div>
+    `;
+  }
 
   // === ⭐ FAVORIS — section dédiée toujours visible si au moins 1 favori ===
   // Lookup label/emoji depuis ALL_IDS pour ne pas dupliquer la metadata

@@ -2,6 +2,7 @@
 // Free tier (Developer plan) : ~100 req/jour, browser direct calls BLOQUÉS.
 // → Routé via /api/llm-proxy.
 import { getDataKey } from '../data-keys.js';
+import { bumpQuota } from '../data-quota.js';
 
 const BASE = 'https://newsapi.org/v2';
 
@@ -19,6 +20,7 @@ async function call(path, params = {}) {
     const t = await res.text().catch(() => '');
     throw new Error(`NewsAPI ${res.status}: ${t.slice(0, 120)}`);
   }
+  bumpQuota('newsapi');
   return res.json();
 }
 

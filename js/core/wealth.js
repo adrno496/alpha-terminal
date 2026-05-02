@@ -243,15 +243,34 @@ export async function getTotals(targetCurrency = 'EUR') {
     for (const c of currencies) ratesByPair[c] = 1;
   }
 
+  // Pour l'immobilier : la contribution au patrimoine = ÉQUITÉ (currentValue - reste à payer),
+  // pas la valeur brute. Sinon le prêt non remboursé gonfle artificiellement le total.
+  // (Demandé explicitement par l'utilisateur : "uniquement la plus-value, le reste à payer
+  // ne doit pas s'afficher dans le total".)
+  const { computeRealEstateMetrics } = await import('./real-estate.js');
+
   let total = 0;
+  let realEstateDebt = 0; // total des restes à payer (pour info dans le breakdown)
   const byCategory = {};
   for (const h of list) {
-    const v = (h.value || 0) * (ratesByPair[h.currency || 'EUR'] || 1);
-    total += v;
+    const fx = ratesByPair[h.currency || 'EUR'] || 1;
+    let contribution;
+    if (h.category === 'real_estate') {
+      try {
+        const m = computeRealEstateMetrics(h);
+        contribution = m.equity * fx; // equity = currentValue - totalRemaining
+        realEstateDebt += (m.remaining || 0) * fx;
+      } catch {
+        contribution = (h.value || 0) * fx;
+      }
+    } else {
+      contribution = (h.value || 0) * fx;
+    }
+    total += contribution;
     const cat = h.category || 'other';
-    byCategory[cat] = (byCategory[cat] || 0) + v;
+    byCategory[cat] = (byCategory[cat] || 0) + contribution;
   }
-  return { total, byCategory, currency: targetCurrency, count: list.length };
+  return { total, byCategory, realEstateDebt, currency: targetCurrency, count: list.length };
 }
 
 // A6 — Filtre les holdings selon le module pour économiser les tokens.
