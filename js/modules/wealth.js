@@ -135,15 +135,11 @@ async function refreshUI() {
   // Summary
   const summary = $('#wealth-summary');
   if (summary) {
-    const debtNote = totals.realEstateDebt > 0
-      ? `<div class="wealth-total-meta" style="color:var(--text-muted);font-size:11.5px;margin-top:2px;">Net immobilier — reste à payer : <strong>${sym}${fmtMoney(totals.realEstateDebt)}</strong> (exclu du total)</div>`
-      : '';
     summary.innerHTML = `
       <div class="wealth-card">
-        <div class="wealth-total-label">Patrimoine total (${target})</div>
+        <div class="wealth-total-label">Patrimoine net (${target})</div>
         <div class="wealth-total-num">${sym}${fmtMoney(totals.total)}</div>
-        <div class="wealth-total-meta">${totals.count} holdings · ${Object.keys(totals.byCategory).length} catégories</div>
-        ${debtNote}
+        <div class="wealth-total-meta">${totals.count} holdings · ${Object.keys(totals.byCategory).length} catégories${totals.realEstateDebt > 0 ? ' · immobilier en équité' : ''}</div>
       </div>
       <div class="wealth-breakdown">
         ${WEALTH_CATEGORIES.filter(c => totals.byCategory[c.id]).map(c => {
@@ -193,6 +189,16 @@ async function refreshUI() {
               const ccySym = ({ USD: '$', EUR: '€', GBP: '£' })[ccy] || ccy;
               // Unit price : stocké directement, ou dérivé (lastPrice si auto, ou value/qty)
               const unitP = h.unitPrice || h.lastPrice || (h.quantity ? h.value / h.quantity : 0);
+              // Pour l'immobilier, on affiche l'ÉQUITÉ NETTE dans la colonne "Total value"
+              // (pas la valeur brute qui inclut le prêt non remboursé). C'est le capital réel.
+              let displayValue = h.value || 0;
+              let valueTooltip = '';
+              const hasLoan = h.category === 'real_estate' && (h.loanAmount > 0 || (h.loans && h.loans.length > 0));
+              if (hasLoan) {
+                const mv = computeRealEstateMetrics(h);
+                displayValue = mv.equity;
+                valueTooltip = `title="Équité (net) = valeur ${fmtMoney(mv.currentValue)} € − reste à payer ${fmtMoney(mv.remaining)} €"`;
+              }
               // Mini-récap immo sous la ligne si applicable
               let immoRow = '';
               if (h.category === 'real_estate' && h.loanAmount > 0) {
@@ -225,7 +231,7 @@ async function refreshUI() {
                   <td>${escHtml(h.account || '')}</td>
                   <td><strong>${h.quantity || ''}</strong></td>
                   <td>${ccySym}${unitP ? unitP.toLocaleString('fr-FR', { maximumFractionDigits: 4 }) : '—'}</td>
-                  <td><strong>${ccySym}${fmtMoney(h.value || 0)}</strong>${h.priceLastUpdated ? '<br><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">' + fmtRelative(h.priceLastUpdated) + '</span>' : ''}</td>
+                  <td ${valueTooltip}><strong style="${hasLoan ? 'color:var(--accent-green);' : ''}">${ccySym}${fmtMoney(displayValue)}</strong>${hasLoan ? '<br><span style="font-size:10px;color:var(--text-muted);">net</span>' : (h.priceLastUpdated ? '<br><span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">' + fmtRelative(h.priceLastUpdated) + '</span>' : '')}</td>
                   <td>${h.autoValue ? '⚡' : '✋'}</td>
                   <td>
                     <button class="btn-ghost wl-edit" data-id="${h.id}">✎</button>
@@ -501,7 +507,7 @@ async function openEditor(id) {
             <div class="field"><label class="field-label">Durée (années)</label><input class="input loan-years" data-idx="${idx}" type="number" step="1" min="1" max="40" value="${years}" /></div>
           </div>
           <div class="field-row">
-            <div class="field"><label class="field-label">1er prélèvement</label><input class="input loan-start" data-idx="${idx}" type="date" value="${l.startDate || ''}" /></div>
+            <div class="field"><label class="field-label" title="Date de la première mensualité — sert à calculer chaque mois ce qui te reste à payer et donc ton équité nette en temps réel.">📅 1er prélèvement <span style="color:var(--accent-green);font-size:10px;">↻ auto</span></label><input class="input loan-start" data-idx="${idx}" type="date" value="${l.startDate || ''}" /></div>
             ${showDeferral ? `<div class="field"><label class="field-label">Différé (mois)</label><input class="input loan-deferral" data-idx="${idx}" type="number" min="0" value="${l.deferralMonths || ''}" /></div>` : ''}
             ${showAmortMonths ? `<div class="field"><label class="field-label">Amortissement théorique (mois)</label><input class="input loan-amort-months" data-idx="${idx}" type="number" min="12" value="${l.amortizationMonths || 360}" /></div>` : ''}
             ${showFixedPeriod ? `<div class="field"><label class="field-label">Période fixe initiale (mois)</label><input class="input loan-fixed-period" data-idx="${idx}" type="number" min="12" value="${l.fixedPeriodMonths || 60}" /></div>` : ''}
