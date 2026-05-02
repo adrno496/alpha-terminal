@@ -82,11 +82,10 @@
       // ⚠️ Remplace par ton email réel. Première soumission = email Formsubmit
       // de confirmation à valider une seule fois.
       const FORMSUBMIT_EMAIL = 'savetheworldfr@gmail.com';
-      // PDF_URL : pointe sur la version HTML (print-ready, fonctionne tout de suite).
-      // Quand tu auras généré le vrai .pdf via Cmd+P → "Save as PDF" et placé
-      // 10-ratios-essentiels.pdf à la racine, remplace simplement la ligne ci-dessous.
-      const PDF_URL = 'lead-magnet-10-ratios.html';
-      const PDF_FILENAME = '10-ratios-essentiels-Alpha.html';
+      // ZIP contenant les 2 versions (FR + EN) du guide PDF.
+      // À placer à la racine du site : alpha-10-ratios-FR-EN.zip
+      const PDF_URL = 'alpha-10-ratios-FR-EN.zip';
+      const PDF_FILENAME = 'Alpha-10-Ratios-Essentiels-FR-EN.zip';
 
       const form = document.getElementById('newsletter-form');
       const submitBtn = document.getElementById('newsletter-submit');
@@ -132,9 +131,9 @@
         // 2. UI : message + reset visuel immédiat
         try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
         showMsg(
-          '✅ <strong>Merci !</strong> Le téléchargement du PDF a démarré.<br>'
-          + '<small style="opacity:0.85;">Tu vas aussi recevoir tes prochaines analyses mensuelles à <strong>'
-          + email + '</strong>.</small>',
+          '✅ <strong>Merci !</strong> Le ZIP se télécharge dans ta barre.<br>'
+          + '<small style="opacity:0.85;">Il contient les versions française <strong>et</strong> anglaise du guide.<br>'
+          + 'Tes prochaines analyses mensuelles arrivent à <strong>' + email + '</strong>.</small>',
           'success'
         );
         form.style.display = 'none';

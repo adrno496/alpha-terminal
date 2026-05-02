@@ -74,8 +74,9 @@
   <script>
     (function(){
       const FORMSUBMIT_EMAIL = 'savetheworldfr@gmail.com';
-      const PDF_URL = 'lead-magnet-10-ratios-en.html';
-      const PDF_FILENAME = '10-essential-ratios-Alpha.html';
+      // ZIP containing both FR and EN versions of the PDF guide.
+      const PDF_URL = 'alpha-10-ratios-FR-EN.zip';
+      const PDF_FILENAME = 'Alpha-10-Essential-Ratios-FR-EN.zip';
 
       const form = document.getElementById('newsletter-form');
       const submitBtn = document.getElementById('newsletter-submit');
@@ -117,9 +118,9 @@
         // 2. UI feedback immediate
         try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
         showMsg(
-          '✅ <strong>Thanks!</strong> The PDF download has started.<br>'
-          + '<small style="opacity:0.85;">You\'ll also receive your monthly analyses at <strong>'
-          + email + '</strong>.</small>',
+          '✅ <strong>Thanks!</strong> The ZIP is downloading.<br>'
+          + '<small style="opacity:0.85;">It contains both English <strong>and</strong> French versions of the guide.<br>'
+          + 'Your monthly analyses are coming to <strong>' + email + '</strong>.</small>',
           'success'
         );
         form.style.display = 'none';
