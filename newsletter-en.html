@@ -61,18 +61,97 @@
   <p class="lead">Plus, every month, <strong>1 in-depth stock analysis</strong> (Apple, Tesla, LVMH, Nvidia…) with BUY/SELL/HOLD verdict and the 7 ratios that matter. Straight to your inbox.</p>
 
   <div class="form">
-    <!-- Replace TON_USERNAME with your Buttondown handle. -->
-    <form
-      action="https://buttondown.email/api/emails/embed-subscribe/TON_USERNAME"
-      method="post"
-      target="popupwindow"
-      onsubmit="window.open('https://buttondown.email/TON_USERNAME', 'popupwindow'); plausible('Newsletter+Signup');"
-      class="embeddable-buttondown-form">
-      <input type="email" name="email" placeholder="your@email.com" required />
-      <button type="submit" class="plausible-event-name=Newsletter+Signup">📥 Get the PDF + newsletter</button>
+    <form id="newsletter-form" novalidate>
+      <input type="email" name="email" id="newsletter-email" placeholder="your@email.com" required />
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+      <button type="submit" id="newsletter-submit" class="plausible-event-name=Newsletter+Signup">📥 Get the PDF + newsletter</button>
     </form>
     <p class="small">✅ 100% free · No spam · 1-click unsubscribe · GDPR compliant</p>
+    <div id="newsletter-msg" style="margin-top:14px;display:none;padding:14px;border-radius:6px;"></div>
   </div>
+
+  <script>
+    (function(){
+      const FORMSUBMIT_EMAIL = 'savetheworldfr@gmail.com';
+      const PDF_URL = '10-essential-ratios.pdf';
+      const PDF_FALLBACK = 'lead-magnet-10-ratios-en.html';
+
+      const form = document.getElementById('newsletter-form');
+      const submitBtn = document.getElementById('newsletter-submit');
+      const msgBox = document.getElementById('newsletter-msg');
+
+      function showMsg(html, type) {
+        msgBox.style.display = 'block';
+        msgBox.innerHTML = html;
+        if (type === 'success') {
+          msgBox.style.background = 'rgba(0,255,136,0.08)';
+          msgBox.style.border = '1px solid #00ff88';
+          msgBox.style.color = '#00ff88';
+        } else {
+          msgBox.style.background = 'rgba(255,80,80,0.08)';
+          msgBox.style.border = '1px solid #ff5050';
+          msgBox.style.color = '#ff8888';
+        }
+      }
+
+      function triggerDownload(url, filename) {
+        const a = document.createElement('a');
+        a.href = url; a.download = filename; a.target = '_blank';
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      }
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('newsletter-email').value.trim();
+        const honey = form.querySelector('[name="_honey"]').value;
+        if (honey) return;
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showMsg('❌ Invalid email address.', 'error');
+          return;
+        }
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Sending…';
+        try {
+          const res = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              _subject: 'New Alpha newsletter signup (EN)',
+              _template: 'table',
+              _captcha: 'false',
+              source: 'newsletter-en.html'
+            })
+          });
+          const data = await res.json();
+          if (data && (data.success === 'true' || data.success === true)) {
+            try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
+            triggerDownload(PDF_URL, '10-essential-ratios.pdf');
+            setTimeout(() => {
+              fetch(PDF_URL, { method: 'HEAD' }).then(r => {
+                if (!r.ok) triggerDownload(PDF_FALLBACK, '10-essential-ratios.html');
+              }).catch(() => triggerDownload(PDF_FALLBACK, '10-essential-ratios.html'));
+            }, 800);
+            showMsg(
+              '✅ <strong>Thanks!</strong> The PDF download is starting in your bar.<br>'
+              + '<small style="opacity:0.85;">You\'ll also receive your monthly analyses at <strong>'
+              + email + '</strong>.</small>',
+              'success'
+            );
+            form.style.display = 'none';
+          } else {
+            showMsg('❌ Something went wrong. Try again or contact savetheworldfr@gmail.com', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = '📥 Get the PDF + newsletter';
+          }
+        } catch (err) {
+          showMsg('❌ Network error. Check your connection.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = '📥 Get the PDF + newsletter';
+        }
+      });
+    })();
+  </script>
 
   <div class="perks">
     <div class="perk"><div class="perk-icon">📄</div><div><strong>The "10 essential ratios" PDF</strong> sent immediately after signup. 12 pages, applicable to any stock.</div></div>

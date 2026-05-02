@@ -63,18 +63,117 @@
   <p class="lead">Plus, chaque mois, <strong>1 analyse approfondie d'action</strong> (Apple, Tesla, LVMH, Nvidia…) avec verdict ACHETER/VENDRE/ATTENDRE et les 7 ratios qui comptent. Directement dans ta boîte mail.</p>
 
   <div class="form">
-    <!-- Buttondown form. Remplace "TON_USERNAME" par ton handle Buttondown. -->
-    <form
-      action="https://buttondown.email/api/emails/embed-subscribe/TON_USERNAME"
-      method="post"
-      target="popupwindow"
-      onsubmit="window.open('https://buttondown.email/TON_USERNAME', 'popupwindow'); plausible('Newsletter+Signup');"
-      class="embeddable-buttondown-form">
-      <input type="email" name="email" placeholder="ton@email.com" required />
-      <button type="submit" class="plausible-event-name=Newsletter+Signup">📥 Recevoir le PDF + la newsletter</button>
+    <!-- Formsubmit (gratuit, pas de compte). Remplace ton@email.com par ton vrai email. -->
+    <form id="newsletter-form" novalidate>
+      <input type="email" name="email" id="newsletter-email" placeholder="ton@email.com" required />
+      <!-- Honeypot anti-bot -->
+      <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off" />
+      <button type="submit" id="newsletter-submit" class="plausible-event-name=Newsletter+Signup">📥 Recevoir le PDF + la newsletter</button>
     </form>
     <p class="small">✅ 100% gratuit · Pas de spam · Désabonnement en 1 clic · RGPD compliant</p>
+
+    <!-- Messages dynamiques -->
+    <div id="newsletter-msg" style="margin-top:14px;display:none;padding:14px;border-radius:6px;"></div>
   </div>
+
+  <script>
+    (function(){
+      // ⚠️ Remplace par ton email réel. Première soumission = email Formsubmit
+      // de confirmation à valider une seule fois.
+      const FORMSUBMIT_EMAIL = 'savetheworldfr@gmail.com';
+      const PDF_URL = '10-ratios-essentiels.pdf';     // tombe sur la version HTML si PDF absent
+      const PDF_FALLBACK = 'lead-magnet-10-ratios.html';
+
+      const form = document.getElementById('newsletter-form');
+      const submitBtn = document.getElementById('newsletter-submit');
+      const msgBox = document.getElementById('newsletter-msg');
+
+      function showMsg(html, type) {
+        msgBox.style.display = 'block';
+        msgBox.innerHTML = html;
+        if (type === 'success') {
+          msgBox.style.background = 'rgba(0,255,136,0.08)';
+          msgBox.style.border = '1px solid #00ff88';
+          msgBox.style.color = '#00ff88';
+        } else if (type === 'error') {
+          msgBox.style.background = 'rgba(255,80,80,0.08)';
+          msgBox.style.border = '1px solid #ff5050';
+          msgBox.style.color = '#ff8888';
+        }
+      }
+
+      function triggerDownload(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const email = document.getElementById('newsletter-email').value.trim();
+        const honey = form.querySelector('[name="_honey"]').value;
+        if (honey) return; // bot
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showMsg('❌ Adresse email invalide.', 'error');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = '⏳ Envoi…';
+
+        try {
+          // Formsubmit endpoint AJAX — répond JSON, pas de redirection
+          const res = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+              email: email,
+              _subject: 'Nouveau inscrit newsletter Alpha',
+              _template: 'table',
+              _captcha: 'false',
+              source: 'newsletter.html'
+            })
+          });
+          const data = await res.json();
+
+          if (data && (data.success === 'true' || data.success === true)) {
+            // 1. Track conversion
+            try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
+
+            // 2. Trigger PDF download (avec fallback HTML si .pdf absent)
+            triggerDownload(PDF_URL, '10-ratios-essentiels.pdf');
+            // Fallback : si le .pdf retourne 404, retombe sur la version HTML
+            setTimeout(() => {
+              fetch(PDF_URL, { method: 'HEAD' }).then(r => {
+                if (!r.ok) triggerDownload(PDF_FALLBACK, '10-ratios-essentiels.html');
+              }).catch(() => triggerDownload(PDF_FALLBACK, '10-ratios-essentiels.html'));
+            }, 800);
+
+            // 3. Message de succès
+            showMsg(
+              '✅ <strong>Merci !</strong> Le téléchargement du PDF démarre dans ta barre.<br>'
+              + '<small style="opacity:0.85;">Tu vas aussi recevoir tes prochaines analyses mensuelles à <strong>'
+              + email + '</strong>.</small>',
+              'success'
+            );
+            form.style.display = 'none';
+          } else {
+            showMsg('❌ Une erreur est survenue. Réessaie ou contacte savetheworldfr@gmail.com', 'error');
+            submitBtn.disabled = false;
+            submitBtn.textContent = '📥 Recevoir le PDF + la newsletter';
+          }
+        } catch (err) {
+          showMsg('❌ Erreur réseau. Vérifie ta connexion.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = '📥 Recevoir le PDF + la newsletter';
+        }
+      });
+    })();
+  </script>
 
   <div class="perks">
     <div class="perk"><div class="perk-icon">📄</div><div><strong>Le guide PDF "10 ratios essentiels"</strong> envoyé immédiatement après inscription. 12 pages, applicable à toute action.</div></div>
