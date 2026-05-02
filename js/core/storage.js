@@ -24,15 +24,29 @@ function setDbAvailable(v) {
 function openDB() {
   if (_dbPromise) return _dbPromise;
   _dbPromise = new Promise((resolve, reject) => {
-    let req;
+    // Peek d'abord la version existante pour éviter VersionError si la DB locale est plus
+    // récente que DB_VERSION (cas réel : backup.js a déjà bumpé via ensureStoresExist).
+    let peek;
     try {
-      req = indexedDB.open(DB_NAME, DB_VERSION);
+      peek = indexedDB.open(DB_NAME);
     } catch (e) {
-      // Certains navigateurs jettent synchroniously en navigation privée
       console.warn('[storage] indexedDB.open threw synchronously:', e);
       setDbAvailable(false);
       return reject(new Error('IndexedDB indisponible (navigation privée ?)'));
     }
+    peek.onerror = () => {
+      console.warn('[storage] IndexedDB peek failed:', peek.error);
+      setDbAvailable(false);
+      reject(peek.error || new Error('IndexedDB unavailable'));
+    };
+    peek.onsuccess = () => {
+      const existingVersion = peek.result.version;
+      peek.result.close();
+      const targetVersion = Math.max(existingVersion, DB_VERSION);
+      const req = indexedDB.open(DB_NAME, targetVersion);
+      attachHandlers(req);
+    };
+    function attachHandlers(req) {
     req.onupgradeneeded = (e) => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('analyses')) {
@@ -104,6 +118,7 @@ function openDB() {
       console.warn('[storage] IndexedDB blocked — autre onglet ouvre une version différente');
       // On laisse la promise pending, l'utilisateur doit fermer les autres onglets
     };
+    }
     // Timeout : si onsuccess/onerror ne se déclenchent jamais (rare bug Safari private)
     setTimeout(() => {
       if (_dbAvailable === null) {

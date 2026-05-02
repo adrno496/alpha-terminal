@@ -44,9 +44,18 @@ function categorizeKey(k) {
 
 function openDB() {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, DB_VERSION);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+    // Peek d'abord la version existante (sans forcer) pour éviter VersionError si la DB
+    // locale est plus récente que DB_VERSION (cas réel : ensureStoresExist a déjà bumpé).
+    const peek = indexedDB.open(DB_NAME);
+    peek.onerror = () => reject(peek.error);
+    peek.onsuccess = () => {
+      const existingVersion = peek.result.version;
+      peek.result.close();
+      const targetVersion = Math.max(existingVersion, DB_VERSION);
+      const req = indexedDB.open(DB_NAME, targetVersion);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+      req.onblocked = () => reject(new Error('DB bloquée par un autre onglet — ferme les autres onglets puis réessaie'));
     // CRITIQUE : si backup.js est le premier à ouvrir la DB (avant storage.js / wealth.js),
     // il faut créer TOUS les stores ici, sinon ils n'existeront jamais et les données seront
     // perdues / non exportées. Doit rester aligné avec storage.js#openDB.
@@ -93,6 +102,14 @@ function openDB() {
         g.createIndex('status', 'status', { unique: false });
         g.createIndex('targetDate', 'targetDate', { unique: false });
       }
+      if (!db.objectStoreNames.contains('watchpoints')) {
+        const w = db.createObjectStore('watchpoints', { keyPath: 'id' });
+        w.createIndex('ticker', 'ticker', { unique: false });
+        w.createIndex('type', 'type', { unique: false });
+        w.createIndex('status', 'status', { unique: false });
+        w.createIndex('createdAt', 'createdAt', { unique: false });
+      }
+    };
     };
   });
 }

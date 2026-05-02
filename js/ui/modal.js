@@ -1,6 +1,6 @@
 // Modals : setup wizard 3 étapes (au lieu du welcome modal v1) + generic modal
 import { $ } from '../core/utils.js';
-import { hasVault, setApiKeys, unlockVault, forgetVault, vaultProviderNames, isLegacyVault } from '../core/crypto.js';
+import { hasVault, setApiKeys, unlockVault, forgetVault, vaultProviderNames, isLegacyVault, tryAutoUnlock } from '../core/crypto.js';
 import { setRuntimeKeys, validateProviderKey, KNOWN_PROVIDERS } from '../core/api.js';
 import { MODULE_ROUTING } from '../core/router.js';
 import { t } from '../core/i18n.js';
@@ -28,7 +28,22 @@ export function showGenericModal(title, htmlContent, { wide = false } = {}) {
 export function closeGenericModal() { generic.overlay.classList.add('hidden'); }
 
 // === Lock flow ===
-export function openLockFlow() {
+export async function openLockFlow() {
+  // Si la session est encore fraîche (< 1h d'inactivité), auto-unlock sans prompter
+  if (hasVault()) {
+    try {
+      const auto = await tryAutoUnlock();
+      if (auto) {
+        setRuntimeKeys(auto);
+        overlay.classList.add('hidden');
+        const names = Object.keys(auto);
+        window.dispatchEvent(new CustomEvent('app:unlocked', {
+          detail: { suggestMoreKeys: names.length === 1, autoUnlocked: true }
+        }));
+        return;
+      }
+    } catch (_) { /* fallback prompt */ }
+  }
   overlay.classList.remove('hidden');
   if (hasVault()) renderUnlock();
   else renderWizardStep0(); // Intro chaleureuse avant le wizard technique

@@ -1,7 +1,7 @@
 // Entry point — bootstrap, router, landing/setup flow, home, cmdk, tooltips
 import { $, fmtUSD, fmtRelative, escHtml } from './core/utils.js';
 import { isConnected, onConnectionChange, abortCurrentCall } from './core/api.js';
-import { hasVault } from './core/crypto.js';
+import { hasVault, markActivity } from './core/crypto.js';
 import { listAnalyses, getSettings, setSettings, onDbAvailabilityChange } from './core/storage.js';
 import { getCost, onCostChange } from './core/cost-tracker.js';
 
@@ -713,3 +713,16 @@ function boot() {
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
 else boot();
+
+// Activity tracker — rafraîchit le timestamp d'inactivité (throttle 30s) tant que l'user
+// interagit. Si l'app reste inactive > 1h, le prochain openLockFlow() re-promptera la passphrase.
+let _lastMark = 0;
+function pingActivity() {
+  const now = Date.now();
+  if (now - _lastMark < 30000) return; // throttle 30s
+  _lastMark = now;
+  markActivity();
+}
+['click', 'keydown', 'visibilitychange'].forEach(ev => {
+  window.addEventListener(ev, pingActivity, { passive: true });
+});

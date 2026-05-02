@@ -8,6 +8,103 @@ import { bufToB64, b64ToBuf } from './utils.js';
 const STORAGE_KEY = 'alpha-terminal:vault';
 const PBKDF2_ITER = 100000;
 
+// === Session auto-unlock (1h idle timeout) ===
+// La clé AES dérivée est stockée comme CryptoKey non-extractable en IndexedDB.
+// Permet de zapper le re-prompt passphrase tant que l'app est utilisée régulièrement.
+// Niveau de sécurité : équivalent "stay logged in" Bitwarden — vulnérable à JS hostile
+// dans le contexte de l'app, mais protégé contre extraction simple de localStorage.
+const SESSION_DB = 'alpha-vault-session';
+const SESSION_STORE = 'session';
+const SESSION_KEY_ID = 'derived-key';
+const ACTIVITY_KEY = 'alpha-terminal:vault-last-activity';
+const IDLE_TIMEOUT_MS = 60 * 60 * 1000; // 1 heure
+
+function openSessionDB() {
+  return new Promise((resolve, reject) => {
+    let req;
+    try { req = indexedDB.open(SESSION_DB, 1); }
+    catch (e) { return reject(e); }
+    req.onupgradeneeded = () => {
+      try { req.result.createObjectStore(SESSION_STORE); } catch {}
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function storeDerivedKey(key) {
+  try {
+    const db = await openSessionDB();
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(SESSION_STORE, 'readwrite');
+      tx.objectStore(SESSION_STORE).put(key, SESSION_KEY_ID);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+    db.close();
+  } catch (e) { console.warn('[crypto] storeDerivedKey failed:', e); }
+}
+
+async function loadDerivedKey() {
+  try {
+    const db = await openSessionDB();
+    const key = await new Promise((resolve) => {
+      const tx = db.transaction(SESSION_STORE, 'readonly');
+      const req = tx.objectStore(SESSION_STORE).get(SESSION_KEY_ID);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => resolve(null);
+    });
+    db.close();
+    return key;
+  } catch { return null; }
+}
+
+export async function clearDerivedKey() {
+  localStorage.removeItem(ACTIVITY_KEY);
+  try {
+    const db = await openSessionDB();
+    await new Promise((resolve) => {
+      const tx = db.transaction(SESSION_STORE, 'readwrite');
+      tx.objectStore(SESSION_STORE).delete(SESSION_KEY_ID);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    });
+    db.close();
+  } catch {}
+}
+
+export function markActivity() {
+  try { localStorage.setItem(ACTIVITY_KEY, String(Date.now())); } catch {}
+}
+
+function isSessionFresh() {
+  const ts = parseInt(localStorage.getItem(ACTIVITY_KEY) || '0', 10);
+  if (!ts) return false;
+  return (Date.now() - ts) < IDLE_TIMEOUT_MS;
+}
+
+// Tente de déverrouiller le vault sans passphrase si la session est fraîche (< 1h).
+// Retourne les clés en clair, ou null si auto-unlock impossible.
+export async function tryAutoUnlock() {
+  if (!hasVault()) return null;
+  if (!isSessionFresh()) { await clearDerivedKey(); return null; }
+  const key = await loadDerivedKey();
+  if (!key) return null;
+  const v = loadVault();
+  if (!v || v.version !== 2 || !v.keys) return null;
+  const out = {};
+  try {
+    for (const [name, enc] of Object.entries(v.keys)) {
+      out[name] = await decryptValue(key, enc);
+    }
+  } catch {
+    await clearDerivedKey();
+    return null;
+  }
+  markActivity();
+  return out;
+}
+
 async function deriveKey(password, saltBuf) {
   const enc = new TextEncoder();
   const baseKey = await crypto.subtle.importKey(
@@ -144,6 +241,9 @@ export async function unlockVault(password) {
       throw new Error('Mot de passe incorrect');
     }
   }
+  // Mémorise la clé dérivée (non-extractable) pour auto-unlock pendant 1h d'inactivité
+  await storeDerivedKey(derived);
+  markActivity();
   return out;
 }
 
@@ -159,4 +259,6 @@ export function removeProviderKey(providerName) {
 
 export function forgetVault() {
   localStorage.removeItem(STORAGE_KEY);
+  // Best-effort : on efface aussi la session auto-unlock (fire-and-forget)
+  clearDerivedKey().catch(() => {});
 }
