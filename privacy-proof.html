@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Privacy Proof — Vérifie toi-même qu'Alpha n'envoie aucune donnée</title>
+  <meta name="description" content="On dit Alpha 100% privé. Vérifie en 30 secondes avec les DevTools de ton navigateur : aucun appel ne sort vers nos serveurs pendant tes analyses. Preuve technique reproductible." />
+  <link rel="canonical" href="https://alpha-terminal.app/privacy-proof.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/privacy-proof.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/privacy-proof-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/privacy-proof.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Privacy Proof — Vérifie toi-même qu'Alpha est 100% privé" />
+  <meta property="og:description" content="Tutoriel DevTools 30 secondes pour vérifier qu'aucune donnée ne quitte ton appareil pendant tes analyses." />
+  <meta property="og:url" content="https://alpha-terminal.app/privacy-proof.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Privacy Proof — Alpha Terminal" />
+  <meta name="twitter:description" content="Vérifie en 30 secondes que tes analyses restent locales." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Privacy Proof", "item": "https://alpha-terminal.app/privacy-proof.html" }
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Privacy Proof : vérifie toi-même qu'Alpha n'envoie aucune donnée",
+    "description": "Tutoriel reproductible pour vérifier en 30 secondes via les DevTools du navigateur que tes analyses ne quittent pas ton appareil.",
+    "datePublished": "2026-05-02",
+    "author": { "@type": "Organization", "name": "Alpha" },
+    "publisher": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/" }
+  }
+  </script>
+
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; line-height:1.65; }
+    .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; flex-wrap:wrap; gap:14px; }
+    .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }
+    .nav a { color:#ccc; text-decoration:none; font-size:14px; }
+    .nav a:hover { color:#00ff88; }
+    .lang-switch { margin-left:auto; padding:4px 8px; border:1px solid #333; border-radius:4px; font-size:12px; }
+    main { max-width:880px; margin:0 auto; padding:50px 22px 80px; }
+    .breadcrumb { font-size:12px; color:#777; margin-bottom:18px; }
+    .breadcrumb a { color:#777; text-decoration:none; }
+    h1 { font-size:clamp(30px,4vw,44px); margin:0 0 16px; line-height:1.15; }
+    h2 { font-size:22px; margin:42px 0 14px; color:#00ff88; }
+    h3 { font-size:17px; margin:28px 0 10px; }
+    .lead { font-size:18px; color:#bbb; margin:0 0 36px; }
+    .badge { display:inline-block; background:rgba(0,255,136,0.12); color:#00ff88; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; margin-bottom:18px; text-transform:uppercase; letter-spacing:0.5px; }
+    .step { background:#111; border:1px solid #222; border-left:4px solid #00ff88; border-radius:8px; padding:20px 22px; margin:18px 0; }
+    .step-num { display:inline-block; background:#00ff88; color:#000; width:28px; height:28px; line-height:28px; text-align:center; border-radius:50%; font-weight:700; margin-right:10px; }
+    .step h3 { display:inline-block; margin:0; font-size:17px; vertical-align:middle; }
+    .step p { margin:10px 0 0; color:#ccc; font-size:14.5px; }
+    code, .code { font-family:'JetBrains Mono',monospace; background:#1a1a1a; border:1px solid #333; padding:2px 7px; border-radius:4px; font-size:13px; color:#00ff88; }
+    pre.code-block { background:#1a1a1a; border:1px solid #333; padding:16px; border-radius:8px; overflow-x:auto; font-size:13px; line-height:1.6; }
+    .check-list { list-style:none; padding:0; }
+    .check-list li { padding:10px 0; border-bottom:1px solid #1a1a1a; padding-left:32px; position:relative; }
+    .check-list li::before { content:'✅'; position:absolute; left:0; top:10px; }
+    .check-list li:last-child { border-bottom:0; }
+    .grid-tech { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:14px; margin:18px 0; }
+    .tech-card { background:#111; border:1px solid #222; border-radius:8px; padding:16px 18px; }
+    .tech-card strong { color:#00ff88; display:block; margin-bottom:6px; }
+    .cta-final { background:linear-gradient(135deg,#001a0d,#0a0a0a); border:1px solid #00ff88; border-radius:12px; padding:28px; text-align:center; margin:50px 0 0; }
+    .cta-final h2 { margin:0 0 8px; color:#fff; }
+    .cta-final a { display:inline-block; margin-top:14px; background:#00ff88; color:#000; padding:14px 28px; border-radius:8px; font-weight:700; text-decoration:none; }
+    .cta-final .small { font-size:11px; color:#888; margin-top:10px; }
+    .alert { background:rgba(255,170,0,0.08); border-left:3px solid #ffaa00; border-radius:4px; padding:14px 18px; margin:18px 0; font-size:14px; }
+    table { width:100%; border-collapse:collapse; margin:18px 0; font-size:14px; }
+    th, td { padding:12px 14px; text-align:left; border-bottom:1px solid #222; }
+    th { background:#111; color:#00ff88; font-weight:600; }
+    td.no { color:#ff6666; }
+    td.yes { color:#00ff88; font-weight:600; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">α Alpha</a>
+  <a href="features.html">Fonctionnalités</a>
+  <a href="pricing.html">Tarifs</a>
+  <a href="bloomberg-alternative.html">vs Bloomberg</a>
+  <a href="blog.html">Blog</a>
+  <a href="privacy-proof-en.html" class="lang-switch" hreflang="en">🇬🇧 EN</a>
+</nav>
+
+<main>
+  <p class="breadcrumb"><a href="index.html">Accueil</a> › <span>Privacy Proof</span></p>
+
+  <span class="badge">🔒 Vérifiable techniquement</span>
+  <h1>Vérifie toi-même qu'Alpha n'envoie <span style="color:#00ff88;">aucune donnée</span> à nos serveurs</h1>
+
+  <p class="lead">On répète partout que <strong>tes analyses restent 100% locales</strong>. C'est facile à dire. Voici comment <strong>vérifier toi-même en 30 secondes</strong> avec les outils déjà installés dans ton navigateur. Aucune confiance aveugle requise.</p>
+
+  <h2>Le tutoriel reproductible (Chrome / Firefox / Safari / Edge)</h2>
+
+  <div class="step">
+    <span class="step-num">1</span><h3>Ouvre Alpha Terminal</h3>
+    <p>Rends-toi sur <a href="/" style="color:#00ff88;">alpha-terminal.app</a> et clique <strong>Démarrer</strong>. Tu peux entrer une clé API gratuite (GitHub Models, Cerebras…) ou cliquer "Accéder sans clé" pour explorer.</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">2</span><h3>Ouvre les DevTools de ton navigateur</h3>
+    <p>Raccourci clavier :</p>
+    <ul style="color:#ccc;font-size:14px;">
+      <li><strong>Mac</strong> : <code>Cmd + Option + I</code> (Chrome/Edge/Firefox) ou <code>Cmd + Option + C</code> (Safari, après avoir activé "Menu Développement" dans les Préférences)</li>
+      <li><strong>Windows / Linux</strong> : <code>F12</code> ou <code>Ctrl + Shift + I</code></li>
+    </ul>
+    <p>Va dans l'onglet <strong>Network</strong> (ou "Réseau"). Coche <strong>"Preserve log"</strong> en haut.</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">3</span><h3>Filtre les requêtes par domaine</h3>
+    <p>Dans la barre de filtre du panneau Network, tape :</p>
+    <pre class="code-block">alpha-terminal.app</pre>
+    <p>Cela ne montrera que les requêtes vers <strong>nos</strong> serveurs (et pas vers Anthropic, OpenAI, Lemonsqueezy, etc.).</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">4</span><h3>Lance une analyse</h3>
+    <p>Choisis une action (ex: AAPL) et lance une <strong>Quick Analysis</strong> ou un <strong>10-K Decoder</strong>. Tu verras défiler les requêtes en temps réel.</p>
+  </div>
+
+  <div class="step">
+    <span class="step-num">5</span><h3>Observe le résultat</h3>
+    <p>Pendant toute l'analyse, le panneau filtré sur <code>alpha-terminal.app</code> doit afficher :</p>
+    <pre class="code-block">📭 Aucune requête.</pre>
+    <p>Toutes les requêtes partent directement vers le LLM provider que tu as choisi (api.anthropic.com, api.openai.com, generativelanguage.googleapis.com, etc.) — <strong>jamais vers nos serveurs</strong>.</p>
+  </div>
+
+  <h2>Ce que tu vas voir partir, et où</h2>
+
+  <table>
+    <thead>
+      <tr><th>Donnée</th><th>Destination</th><th>Notre serveur ?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Ticker analysé (AAPL, BTC…)</td><td>API LLM choisie</td><td class="no">❌ Non</td></tr>
+      <tr><td>Tes prompts</td><td>API LLM choisie</td><td class="no">❌ Non</td></tr>
+      <tr><td>Ton portefeuille (Wealth)</td><td>localStorage navigateur</td><td class="no">❌ Non</td></tr>
+      <tr><td>Tes documents RAG</td><td>IndexedDB navigateur</td><td class="no">❌ Non</td></tr>
+      <tr><td>Données financières (cours, bilans)</td><td>FMP / Polygon / Yahoo / etc.</td><td class="no">❌ Non</td></tr>
+      <tr><td>Activation de licence</td><td>api.lemonsqueezy.com</td><td class="no">❌ Non (chez eux)</td></tr>
+      <tr><td>Anonymous analytics (visites de page)</td><td>plausible.io</td><td class="no">❌ Non · cookieless · anonymisé IP</td></tr>
+    </tbody>
+  </table>
+
+  <div class="alert">
+    ⚠️ <strong>Note transparente</strong> : la seule chose qui passe par nos serveurs c'est le <strong>chargement de l'app elle-même</strong> (HTML, CSS, JS, images) — comme n'importe quel site web. Mais une fois chargée, l'app fonctionne <strong>entièrement dans ton navigateur</strong>. C'est le principe d'une PWA client-side.
+  </div>
+
+  <h2>Architecture technique : pourquoi c'est possible</h2>
+
+  <p>Alpha n'a <strong>aucun backend pour les analyses</strong>. C'est un choix d'architecture délibéré. Voici comment chaque composant fonctionne :</p>
+
+  <div class="grid-tech">
+    <div class="tech-card">
+      <strong>🧠 LLMs</strong>
+      Tes prompts vont directement à <code>api.anthropic.com</code>, <code>api.openai.com</code>, etc. via <code>fetch()</code> dans ton navigateur. Aucune route intermédiaire chez nous.
+    </div>
+    <div class="tech-card">
+      <strong>💾 Données perso</strong>
+      Wealth, RAG, analyses passées : tout est stocké dans <code>IndexedDB</code> + <code>localStorage</code> du navigateur. Pas de DB serveur.
+    </div>
+    <div class="tech-card">
+      <strong>🔐 Vault clés API</strong>
+      Tes clés sont chiffrées <code>AES-GCM-256</code> avec ta passphrase (PBKDF2 100k iter). Le vault chiffré reste en local. On ne le voit jamais.
+    </div>
+    <div class="tech-card">
+      <strong>📊 Données financières</strong>
+      Cours, bilans, news : appels directs aux APIs publiques (FMP, Polygon, Yahoo, FRED) avec les clés que tu fournis ou les endpoints gratuits.
+    </div>
+    <div class="tech-card">
+      <strong>💳 Paiement</strong>
+      Lemonsqueezy gère le checkout. Ils nous envoient juste un webhook avec ton email pour activer la licence. Aucune autre donnée transite par nos serveurs.
+    </div>
+    <div class="tech-card">
+      <strong>📈 Analytics</strong>
+      Plausible.io en mode anonyme (cookieless, IP hashée). Tu vois nos stats publiques. Aucun tracking individuel possible.
+    </div>
+  </div>
+
+  <h2>Ce qu'on ne peut PAS faire (même si on voulait)</h2>
+
+  <ul class="check-list">
+    <li>Lire ton patrimoine ou tes positions — il n'a jamais quitté ton navigateur</li>
+    <li>Lire tes prompts d'analyse — ils vont directement au LLM provider</li>
+    <li>Lire tes clés API — elles sont chiffrées avec ta passphrase</li>
+    <li>Vendre ton activité à des annonceurs — on n'a pas la donnée</li>
+    <li>Te subpoena (même sous demande légale) tes analyses — on ne les a jamais eues</li>
+  </ul>
+
+  <h2>Open code = open audit</h2>
+
+  <p>Tu peux inspecter le code source du frontend directement dans ton navigateur :</p>
+
+  <div class="step">
+    <span class="step-num">→</span><h3>Vérifier le code source toi-même</h3>
+    <p>1. <code>Cmd+Option+U</code> (Mac) ou <code>Ctrl+U</code> (Win/Linux) → tu vois le HTML brut<br>
+    2. Onglet <strong>Sources</strong> des DevTools → tu vois tous les <code>.js</code> de l'app<br>
+    3. Cherche <code>fetch(</code> dans la recherche globale (<code>Cmd+Shift+F</code>) → tu vois TOUS les appels réseau possibles. Aucun ne pointe vers nos serveurs pour les analyses.</p>
+  </div>
+
+  <h2>Comparaison avec les concurrents "cloud"</h2>
+
+  <table>
+    <thead>
+      <tr><th>Plateforme</th><th>Tes données vont où ?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong style="color:#00ff88;">Alpha Terminal</strong></td><td class="yes">Restent sur ton appareil</td></tr>
+      <tr><td>Bloomberg Terminal</td><td class="no">Cloud Bloomberg + accès gouvernement (Patriot Act)</td></tr>
+      <tr><td>Koyfin</td><td class="no">Cloud Koyfin (USA)</td></tr>
+      <tr><td>Seeking Alpha</td><td class="no">Cloud + monétisation publicitaire</td></tr>
+      <tr><td>ChatGPT (analyse perso)</td><td class="no">Cloud OpenAI + utilisé pour entraînement (sauf opt-out)</td></tr>
+      <tr><td>Stock Rover</td><td class="no">Cloud Stock Rover</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cta-final">
+    <h2>Convaincu ? Teste sans engagement.</h2>
+    <p style="color:#aaa;margin:0;">14 jours satisfait ou remboursé · Annulation en 1 clic · Aucune CB stockée chez nous</p>
+    <a href="pricing.html" class="plausible-event-name=Privacy+Proof+CTA">→ Voir les tarifs (à partir de 9,99€/mois)</a>
+    <p class="small">🛡️ Lemonsqueezy traite le paiement (PCI-DSS). Nous ne voyons jamais ta CB.</p>
+  </div>
+
+</main>
+
+</body>
+</html>
