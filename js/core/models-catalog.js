@@ -83,14 +83,14 @@ export const MODEL_CATALOG = {
     { id: 'mistralai/mixtral-8x22b-instruct-v0.1',  tier: 'balanced', label: 'Mixtral 8x22B',              context: 65000,  pricing: { input: 1.2,  output: 1.2  } },
   ],
   huggingface: [
-    // Le router HF exige un suffixe `:sub-provider` sur le model ID. `:nebius` est cheap/free-ish.
-    // L'utilisateur doit connecter le sub-provider sur huggingface.co/settings/inference-providers.
-    // Pricing varies by underlying provider — values are typical (USD/1M tokens)
-    { id: 'meta-llama/Llama-3.3-70B-Instruct:nebius', tier: 'flagship', label: 'Llama 3.3 70B (HF·Nebius)', context: 128000, pricing: { input: 0.7,  output: 0.9  }, recommended: true },
-    { id: 'Qwen/Qwen2.5-72B-Instruct:nebius',         tier: 'balanced', label: 'Qwen2.5 72B (HF·Nebius)',   context: 128000, pricing: { input: 0.5,  output: 0.7  }, recommended: true },
-    { id: 'meta-llama/Llama-3.1-8B-Instruct:nebius',  tier: 'fast',     label: 'Llama 3.1 8B (HF·Nebius)',  context: 128000, pricing: { input: 0.1,  output: 0.1  }, recommended: true },
-    { id: 'deepseek-ai/DeepSeek-V3:novita',           tier: 'flagship', label: 'DeepSeek V3 (HF·Novita)',   context: 128000, pricing: { input: 0.27, output: 1.1  } },
-    { id: 'mistralai/Mistral-Nemo-Instruct-2407:hf-inference', tier: 'balanced', label: 'Mistral Nemo (HF·serverless)', context: 128000, pricing: { input: 0.15, output: 0.15 } },
+    // Routés via /nebius/v1/chat/completions (cf huggingface.js). Connecte Nebius dans
+    // huggingface.co/settings/inference-providers, sinon les calls retournent 404.
+    // Pricing varies — values are typical (USD/1M tokens) chez Nebius.
+    { id: 'meta-llama/Llama-3.3-70B-Instruct',        tier: 'flagship', label: 'Llama 3.3 70B (HF·Nebius)', context: 128000, pricing: { input: 0.7,  output: 0.9  }, recommended: true },
+    { id: 'Qwen/Qwen2.5-72B-Instruct',                tier: 'balanced', label: 'Qwen2.5 72B (HF·Nebius)',   context: 128000, pricing: { input: 0.5,  output: 0.7  }, recommended: true },
+    { id: 'meta-llama/Llama-3.1-8B-Instruct',         tier: 'fast',     label: 'Llama 3.1 8B (HF·Nebius)',  context: 128000, pricing: { input: 0.1,  output: 0.1  }, recommended: true },
+    { id: 'deepseek-ai/DeepSeek-V3',                  tier: 'flagship', label: 'DeepSeek V3 (HF·Nebius)',   context: 128000, pricing: { input: 0.27, output: 1.1  } },
+    { id: 'mistralai/Mistral-Nemo-Instruct-2407',     tier: 'balanced', label: 'Mistral Nemo (HF·Nebius)',  context: 128000, pricing: { input: 0.15, output: 0.15 } },
   ],
   cloudflare: [
     // Cloudflare Workers AI pricing per https://developers.cloudflare.com/workers-ai/platform/pricing/

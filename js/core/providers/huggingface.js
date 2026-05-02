@@ -15,17 +15,17 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
       name: 'huggingface',
       displayName: 'Hugging Face',
       icon: '🤗',
-      baseUrl: viaProxy('https://router.huggingface.co/v1/chat/completions'),
-      // Le router HF exige un suffixe `:provider` sur le model ID depuis le refactor 2025.
-      // Sans suffixe, le router renvoie 404 ("no route configured for this model").
-      // `:nebius` est un sub-provider gratuit/cheap par défaut. Si ton compte HF a un autre
-      // provider connecté (`:together`, `:fireworks-ai`, `:hyperbolic`...) tu peux changer.
+      // HF a déprécié le route flat `/v1/chat/completions`. Désormais, l'OpenAI-compatible
+      // router exige un sub-provider dans le path : /{provider}/v1/chat/completions.
+      // `nebius` = sub-provider gratuit avec quota correct + bonne couverture modèles.
+      // L'utilisateur doit l'avoir activé sur huggingface.co/settings/inference-providers.
+      baseUrl: viaProxy('https://router.huggingface.co/nebius/v1/chat/completions'),
       defaultModels: {
-        flagship: 'meta-llama/Llama-3.3-70B-Instruct:nebius',
-        balanced: 'Qwen/Qwen2.5-72B-Instruct:nebius',
-        fast: 'meta-llama/Llama-3.1-8B-Instruct:nebius'
+        flagship: 'meta-llama/Llama-3.3-70B-Instruct',
+        balanced: 'Qwen/Qwen2.5-72B-Instruct',
+        fast: 'meta-llama/Llama-3.1-8B-Instruct'
       },
-      validateModels: ['meta-llama/Llama-3.1-8B-Instruct:nebius']
+      validateModels: ['meta-llama/Llama-3.1-8B-Instruct']
     });
   }
 

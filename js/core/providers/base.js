@@ -194,8 +194,14 @@ export async function validateWithModelFallbacks(displayName, models, doFetch) {
       const status = res.status;
       // Rate limit → la clé existe mais quota épuisé : on la considère valide.
       if (status === 429) return { ok: true, modelTested: model, note: 'rate-limited but key valid' };
-      // 5xx → souci côté provider, pas la faute de la clé.
-      if (status >= 500) return { ok: true, modelTested: model, note: 'provider error, key likely valid' };
+      // 5xx → on ne peut PAS prouver que la clé est valide. Rapport honnête.
+      // (Avant : on retournait OK avec note "provider error" ce qui masquait des problèmes
+      //  réels : endpoint déprécié, scope manquant côté GitHub Models, etc.)
+      if (status >= 500) {
+        const t5 = await res.text().catch(() => '');
+        lastOtherErr = { ok: false, error: `[${displayName}] Erreur serveur (${status}). ${t5.slice(0, 160)}`, status };
+        continue;
+      }
       const t = await res.text();
       if (status === 401) {
         return { ok: false, error: `[${displayName}] Clé invalide ou révoquée.`, status };

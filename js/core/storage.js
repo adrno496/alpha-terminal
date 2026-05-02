@@ -241,17 +241,64 @@ function _mergeSettings(defaults, saved) {
 // on garde les settings en RAM pour que l'app continue de fonctionner pendant la session.
 const _memorySettingsStore = new Map();
 
+// Liste de model IDs dépréciés par provider — purgés à chaque getSettings().
+// Quand un provider retire un modèle, le user qui l'avait sélectionné via Settings garde
+// la valeur stale dans localStorage et tombe sur "model not found" en runtime. Cette
+// migration auto-réinitialise au default courant pour ces IDs.
+const DEPRECATED_MODELS = {
+  cerebras: ['llama-3.1-70b', 'llama3.1-70b'],
+  cloudflare: ['@cf/meta/llama-3.1-70b-instruct'],
+  // HF : tous les anciens IDs sans suffixe :provider passaient par /v1/chat/completions
+  // déprécié. Les nouveaux passent par /nebius/v1/chat/completions, donc même IDs OK.
+  // Les IDs avec suffixe :nebius (intermédiaire) sont à purger.
+  huggingface: [
+    'meta-llama/Llama-3.3-70B-Instruct:nebius',
+    'Qwen/Qwen2.5-72B-Instruct:nebius',
+    'meta-llama/Llama-3.1-8B-Instruct:nebius',
+    'deepseek-ai/DeepSeek-V3:novita',
+    'mistralai/Mistral-Nemo-Instruct-2407:hf-inference'
+  ]
+};
+
+function purgeDeprecatedOverrides(merged) {
+  if (!merged) return merged;
+  // 1. modelOverrides[provider].{flagship,balanced,fast}
+  if (merged.modelOverrides) {
+    for (const [prov, deprList] of Object.entries(DEPRECATED_MODELS)) {
+      const entry = merged.modelOverrides[prov];
+      if (!entry) continue;
+      for (const tier of ['flagship', 'balanced', 'fast']) {
+        if (deprList.includes(entry[tier])) {
+          // Restaure le default courant pour ce tier
+          entry[tier] = DEFAULT_SETTINGS.modelOverrides[prov]?.[tier] || entry[tier];
+        }
+      }
+    }
+  }
+  // 2. moduleOverrides[moduleId].model — purge si pointe vers un modèle déprécié
+  if (merged.moduleOverrides) {
+    for (const [modId, ovr] of Object.entries(merged.moduleOverrides)) {
+      if (!ovr || typeof ovr !== 'object') continue;
+      const prov = ovr.provider;
+      if (prov && DEPRECATED_MODELS[prov] && DEPRECATED_MODELS[prov].includes(ovr.model)) {
+        delete ovr.model; // laisse le tier-based picker reprendre la main
+      }
+    }
+  }
+  return merged;
+}
+
 export function getSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
     if (!raw) {
       const mem = _memorySettingsStore.get(SETTINGS_KEY);
-      return mem ? _mergeSettings(DEFAULT_SETTINGS, mem) : { ...DEFAULT_SETTINGS };
+      return purgeDeprecatedOverrides(mem ? _mergeSettings(DEFAULT_SETTINGS, mem) : { ...DEFAULT_SETTINGS });
     }
-    return _mergeSettings(DEFAULT_SETTINGS, JSON.parse(raw));
+    return purgeDeprecatedOverrides(_mergeSettings(DEFAULT_SETTINGS, JSON.parse(raw)));
   } catch {
     const mem = _memorySettingsStore.get(SETTINGS_KEY);
-    return mem ? _mergeSettings(DEFAULT_SETTINGS, mem) : { ...DEFAULT_SETTINGS };
+    return purgeDeprecatedOverrides(mem ? _mergeSettings(DEFAULT_SETTINGS, mem) : { ...DEFAULT_SETTINGS });
   }
 }
 
