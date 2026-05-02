@@ -1,3 +1,19 @@
 dist/
 node_modules/
 .DS_Store
+
+# Environment & secrets — JAMAIS committer
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Ruflo runtime data (logs, sessions, daemon state)
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
+.claude-flow/daemon.log
+.claude-flow/*.pid
+.claude/memory.db
+.claude/memory.db-*

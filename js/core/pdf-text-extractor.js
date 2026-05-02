@@ -1,9 +1,12 @@
 // Extraction texte d'un PDF côté client (fallback si provider ne supporte pas PDF natif)
-// Utilise PDF.js déjà chargé en CDN dans index.html
+// PDF.js est lazy-loadé via window.AlphaLazy.pdf() au premier usage (~1.7MB économisé sur le boot).
 
 const MAX_TEXT_LENGTH = 400000; // ~100K tokens grossier
 
 export async function extractTextFromPDF(file, { pageLimit = 300, onProgress } = {}) {
+  if (!window.pdfjsLib && window.AlphaLazy && window.AlphaLazy.pdf) {
+    await window.AlphaLazy.pdf();
+  }
   if (!window.pdfjsLib) throw new Error('PDF.js non chargé');
   const arrayBuffer = await file.arrayBuffer();
   const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;

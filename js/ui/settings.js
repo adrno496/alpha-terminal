@@ -483,6 +483,25 @@ function renderRoutingTab(c) {
     <div class="card">
       <div class="card-title">${t('settings.routing.title')}</div>
       <p style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">${t('settings.routing.desc')} <strong>L'icône ⭐ = provider optimal recommandé pour ce module.</strong> Les providers grisés ne sont pas encore configurés mais visibles pour info.</p>
+
+      <!-- Tester toutes les clés configurées -->
+      <div id="route-test-panel" style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <strong style="font-size:13px;">${isEN ? '🧪 Test all configured keys' : '🧪 Tester toutes mes clés configurées'}</strong>
+            <p style="color:var(--text-muted);font-size:11.5px;margin:4px 0 0;line-height:1.5;">
+              ${isEN
+                ? 'Pings each provider with a minimal validation request to confirm your keys are alive and authorized. Cost ≈ $0 (validation endpoints are free or near-free).'
+                : 'Envoie une requête de validation minimale à chaque provider pour vérifier que tes clés répondent. Coût ≈ 0 $ (les endpoints de validation sont gratuits ou quasi-gratuits).'}
+            </p>
+          </div>
+          <button id="route-test-all" class="btn-secondary" style="white-space:nowrap;font-size:12.5px;padding:8px 14px;">
+            ${isEN ? '⚡ Test all keys' : '⚡ Tester toutes les clés'}
+          </button>
+        </div>
+        <div id="route-test-results" style="margin-top:10px;display:none;"></div>
+      </div>
+
       <table class="wiz-routing">
         <thead><tr><th>${t('settings.routing.col_module')}</th><th>${t('settings.routing.col_auto')}</th><th>${t('settings.routing.col_status')}</th><th>${t('settings.routing.col_override')}</th></tr></thead>
         <tbody>
@@ -553,6 +572,72 @@ function renderRoutingTab(c) {
       toast('Override mis à jour', 'success');
     });
   });
+
+  // === Test all configured keys ===
+  const testBtn = c.querySelector('#route-test-all');
+  const resultsBox = c.querySelector('#route-test-results');
+  if (testBtn && resultsBox) {
+    testBtn.addEventListener('click', async () => {
+      const orch = getOrchestrator();
+      const names = orch.getProviderNames();
+      if (!names.length) {
+        resultsBox.style.display = 'block';
+        resultsBox.innerHTML = `<div style="color:var(--accent-amber);font-size:12.5px;">${isEN ? '⚠ No keys configured. Add at least one in the Keys tab.' : '⚠ Aucune clé configurée. Ajoute-en au moins une dans l\'onglet Clés API.'}</div>`;
+        return;
+      }
+      testBtn.disabled = true;
+      const oldLabel = testBtn.textContent;
+      testBtn.textContent = isEN ? '⏳ Testing…' : '⏳ Test en cours…';
+      resultsBox.style.display = 'block';
+      resultsBox.innerHTML = `<div id="rt-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;font-size:12.5px;"></div>`;
+      const grid = resultsBox.querySelector('#rt-grid');
+      // Affiche d'abord toutes les pills en "pending"
+      const pills = {};
+      for (const name of names) {
+        const meta = KNOWN_PROVIDERS.find(p => p.name === name) || { displayName: name, icon: '·' };
+        const pill = document.createElement('div');
+        pill.style.cssText = 'background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px;';
+        pill.innerHTML = `<span style="font-size:14px;">${meta.icon}</span><span style="flex:1;">${meta.displayName}</span><span class="rt-status" style="color:var(--text-muted);font-size:11px;">⏳</span>`;
+        grid.appendChild(pill);
+        pills[name] = pill;
+      }
+      // Test parallèle
+      let okCount = 0, failCount = 0;
+      await Promise.all(names.map(async (name) => {
+        const provider = orch.providers[name];
+        const status = pills[name].querySelector('.rt-status');
+        try {
+          const v = await provider.validate();
+          if (v.ok) {
+            status.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
+            okCount++;
+          } else {
+            const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').slice(0, 60);
+            status.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ ${isEN ? 'invalid' : 'invalide'}</span>`;
+            failCount++;
+          }
+        } catch (e) {
+          status.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e?.message || 'error').slice(0, 30)}</span>`;
+          failCount++;
+        }
+      }));
+      // Summary
+      const summary = document.createElement('div');
+      summary.style.cssText = 'margin-top:10px;padding:8px 12px;border-radius:6px;font-size:12px;';
+      if (failCount === 0) {
+        summary.style.background = 'rgba(0,255,136,0.08)';
+        summary.style.color = 'var(--accent-green)';
+        summary.textContent = isEN ? `✅ All ${okCount} keys are working.` : `✅ Les ${okCount} clés sont opérationnelles.`;
+      } else {
+        summary.style.background = 'rgba(255,80,80,0.08)';
+        summary.style.color = 'var(--accent-red)';
+        summary.textContent = isEN ? `⚠️ ${okCount} OK · ${failCount} failed (hover for details)` : `⚠️ ${okCount} OK · ${failCount} échec(s) (survole pour le détail)`;
+      }
+      resultsBox.appendChild(summary);
+      testBtn.disabled = false;
+      testBtn.textContent = isEN ? '⚡ Re-test all' : '⚡ Re-tester toutes';
+    });
+  }
 }
 
 // === COSTS ===

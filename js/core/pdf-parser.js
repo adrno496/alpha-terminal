@@ -24,6 +24,12 @@ export async function parsePdf(file, { withText = true, withBase64 = true, pageL
     result.base64 = await fileToB64(file);
   }
 
+  if (withText) {
+    // Lazy-load PDF.js si pas encore chargé (~1.7MB économisé au boot)
+    if (!window.pdfjsLib && window.AlphaLazy && window.AlphaLazy.pdf) {
+      await window.AlphaLazy.pdf();
+    }
+  }
   if (withText && window.pdfjsLib) {
     if (onProgress) onProgress({ stage: 'parsing' });
     const arrayBuffer = await file.arrayBuffer();

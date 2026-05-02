@@ -1,17 +1,31 @@
-// Service Worker v30 — network-first pour HTML/navigation (toujours frais),
+// Service Worker v31 — network-first pour HTML/navigation (toujours frais),
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v30';
+const CACHE = 'alpha-terminal-v31';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
 const PRECACHE_URLS = [
+  // Core
   '/',
   '/index.html',
   '/manifest.json',
   '/styles.css',
   '/icons/logo.png',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  // Pages commerciales critiques (FR + EN) — offline navigation possible
+  '/pricing.html',
+  '/pricing-en.html',
+  '/features.html',
+  '/features-en.html',
+  '/blog.html',
+  '/blog-en.html',
+  '/pour-qui.html',
+  '/who-is-it-for.html',
+  '/privacy-proof.html',
+  '/privacy-proof-en.html',
+  '/newsletter.html',
+  '/newsletter-en.html'
 ];
 
 self.addEventListener('install', (e) => {

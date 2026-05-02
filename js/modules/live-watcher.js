@@ -103,6 +103,13 @@ function stopPolling() {
 }
 
 export async function renderLiveWatcherView(viewEl) {
+  // Cleanup au changement de route : stop le polling + destroy le chart
+  // Évite memory leak (timer indéfini + canvas non libéré)
+  window.addEventListener('app:route-leaving', () => {
+    stopPolling();
+    if (chartInstance) { try { chartInstance.destroy(); } catch {} chartInstance = null; }
+  }, { once: true });
+
   const isEN = getLocale() === 'en';
   viewEl.innerHTML = `
     ${moduleHeader(
@@ -194,9 +201,14 @@ function refreshUI() {
   drawChart(selectedTicker);
 }
 
-function drawChart(ticker) {
+async function drawChart(ticker) {
   const canvas = document.getElementById('lw-chart');
-  if (!canvas || !ticker || !window.Chart) return;
+  if (!canvas || !ticker) return;
+  // Lazy-load Chart.js si pas encore chargé
+  if (!window.Chart && window.AlphaLazy && window.AlphaLazy.chart) {
+    try { await window.AlphaLazy.chart(); } catch {}
+  }
+  if (!window.Chart) return;
   const series = seriesByTicker[ticker] || [];
   if (series.length === 0) return;
   if (chartInstance) { try { chartInstance.destroy(); } catch {} chartInstance = null; }

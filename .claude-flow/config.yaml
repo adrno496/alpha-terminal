@@ -40,4 +40,9 @@ hooks:
 
 mcp:
   autoStart: false
-  port: 3000
+  port: 3001
+  transport: stdio
+
+logging:
+  level: info
+  destination: .claude-flow/logs

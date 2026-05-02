@@ -94,10 +94,14 @@
     blockUI(container, moduleId) {
       const en = isEN();
       const LIFETIME_URL = 'https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b';
+      // Échappe moduleId — vient de userland (URL hash ou config), peut contenir du HTML
+      const safeId = String(moduleId || '')
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const t = en
         ? {
             title: '🔒 Premium module',
-            sub: `<strong>${moduleId}</strong> requires an active Premium license.`,
+            sub: `<strong>${safeId}</strong> requires an active Premium license.`,
             monthlyLabel: 'Monthly',
             monthlyPrice: '€9.99/month',
             lifetimeLabel: 'Lifetime · best value',
@@ -113,7 +117,7 @@
           }
         : {
             title: '🔒 Module Premium',
-            sub: `<strong>${moduleId}</strong> nécessite une licence Premium active.`,
+            sub: `<strong>${safeId}</strong> nécessite une licence Premium active.`,
             monthlyLabel: 'Mensuel',
             monthlyPrice: '9,99€/mois',
             lifetimeLabel: 'À vie · meilleure valeur',

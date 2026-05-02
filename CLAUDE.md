@@ -1,175 +1,131 @@
-# Ruflo — Claude Code Configuration
+# Alpha Terminal — Claude Code Context
 
-## Rules
+## Produit
+PWA d'analyse financière BYOK (Bring Your Own Key) pour investisseurs particuliers.
+60+ modules orchestrant 14 fournisseurs LLM. Positionnée comme alternative à Bloomberg
+Terminal pour le retail (9,99€/mois ou 299€ à vie vs 24 000€/an).
 
-- Do what has been asked; nothing more, nothing less
-- NEVER create files unless absolutely necessary — prefer editing existing files
-- NEVER create documentation files unless explicitly requested
-- NEVER save working files or tests to root — use `/src`, `/tests`, `/docs`, `/config`, `/scripts`
-- ALWAYS read a file before editing it
-- NEVER commit secrets, credentials, or .env files
-- Keep files under 500 lines
-- Validate input at system boundaries
+## Stack technique
+- **Frontend** : Vanilla JS (ES modules natifs), **PAS de framework** (pas de React, pas de Vue, pas de build step)
+- **PWA** : `manifest.json`, `service-worker.js` v30 (cache-first assets, network-first HTML, no API caching)
+- **Storage local** : IndexedDB (12 stores) + localStorage. Aucune DB serveur pour les analyses.
+- **Vault chiffré** : clés API encryptées AES-GCM-256 avec PBKDF2 100k iter sur passphrase utilisateur
+- **Mobile** : Capacitor 8 (`webDir: dist-mobile`) pour Android + iOS
+- **Hébergement** : Vercel (statique)
+- **Analytics** : Plausible (cookieless, IP anonymisée)
 
-## Agent Comms (SendMessage-First Coordination)
-
-Named agents coordinate via `SendMessage`, not polling or shared state.
-
+## Architecture clé
 ```
-Lead (you) ←→ architect ←→ developer ←→ tester ←→ reviewer
-              (named agents message each other directly)
-```
-
-### Spawning a Coordinated Team
-
-```javascript
-// ALL agents in ONE message, each knows WHO to message next
-Agent({ prompt: "Research the codebase. SendMessage findings to 'architect'.",
-  subagent_type: "researcher", name: "researcher", run_in_background: true })
-Agent({ prompt: "Wait for 'researcher'. Design solution. SendMessage to 'coder'.",
-  subagent_type: "system-architect", name: "architect", run_in_background: true })
-Agent({ prompt: "Wait for 'architect'. Implement it. SendMessage to 'tester'.",
-  subagent_type: "coder", name: "coder", run_in_background: true })
-Agent({ prompt: "Wait for 'coder'. Write tests. SendMessage results to 'reviewer'.",
-  subagent_type: "tester", name: "tester", run_in_background: true })
-Agent({ prompt: "Wait for 'tester'. Review code quality and security.",
-  subagent_type: "reviewer", name: "reviewer", run_in_background: true })
-
-// Kick off the pipeline
-SendMessage({ to: "researcher", summary: "Start", message: "[task context]" })
+index.html              ← Single-page entry (landing + app shell)
+js/app.js               ← Router (hashchange-based)
+js/core/api.js          ← APIOrchestrator + SmartRouter (sélection LLM optimal par module)
+js/core/i18n.js         ← FR/EN dictionnaire + applyI18nAttributes
+js/core/storage.js      ← IndexedDB wrapper
+js/core/backup.js       ← Export/import full state (incluant license keys)
+js/modules/             ← 60+ modules métier (10-K Decoder, DCF, Buffett, etc.)
+js/modules/_shared.js   ← runAnalysis() = point d'entrée unique avec gate paywall
+js/ui/                  ← Composants UI (sidebar, modal, market-pulse, install-prompt)
+js/license.js           ← Lemonsqueezy License Keys validation/activation
+js/paywall.js           ← Gate Pro modules (canAccess + blockUI)
 ```
 
-### Patterns
+## Fournisseurs LLM (BYOK — 14)
+Claude (Anthropic), OpenAI, Gemini (Google), Grok (xAI), OpenRouter, Perplexity,
+Mistral, Cerebras, GitHub Models, NVIDIA NIM, HuggingFace, Cloudflare Workers AI,
+Together, Cohere.
 
-| Pattern | Flow | Use When |
-|---------|------|----------|
-| **Pipeline** | A → B → C → D | Sequential dependencies (feature dev) |
-| **Fan-out** | Lead → A, B, C → Lead | Independent parallel work (research) |
-| **Supervisor** | Lead ↔ workers | Ongoing coordination (complex refactor) |
+L'utilisateur fournit ses propres clés. Aucune clé Alpha sur les serveurs — les requêtes
+LLM partent **directement** depuis le navigateur vers les APIs respectives.
 
-### Rules
+## Fournisseurs de data financière (11)
+FMP, Polygon, Finnhub, Tiingo, Twelve Data, FRED, Etherscan, Alpha Vantage,
+CoinGecko (gratuit), Yahoo Finance unofficial, Stooq.
 
-- ALWAYS name agents — `name: "role"` makes them addressable
-- ALWAYS include comms instructions in prompts — who to message, what to send
-- Spawn ALL agents in ONE message with `run_in_background: true`
-- After spawning: STOP, tell user what's running, wait for results
-- NEVER poll status — agents message back or complete automatically
+## Modèle économique — Lemonsqueezy License Keys
+- **Mensuel** : 9,99€/mois (variant `1599882`)
+- **À vie** : 299€ paiement unique (URL : `https://alpha-terminal.lemonsqueezy.com/checkout/buy/bc77ee76-8202-4df6-8093-f353576c3f0b`)
+- **Garantie** 14 jours satisfait ou remboursé sur tous les CTA payants
+- **Validation** : POST `https://api.lemonsqueezy.com/v1/licenses/validate` au boot + revalidation 24h
+- **Activation** : POST `/v1/licenses/activate` avec `instance_name` au premier usage
+- **Auto-logout** uniquement si Lemonsqueezy retourne explicitement `expired`/`disabled`
+- **Pas d'auth Supabase active** (legacy `js/auth.js` + magic link existent mais paywall passe par licenseManager)
 
-## Swarm & Routing
+## Modules gratuits (FREE_MODULES dans paywall.js)
+`quick-analysis`, `wealth`, `watchlist`, `knowledge-base`, `budget`, `csv-import`,
+`correlation-matrix`, `watchpoints`, `accounts-view`, `goals`, `dividends-tracker`,
+`price-alerts`, `subscriptions-detector`, `capital-gains-tracker`, `multi-currency-pnl`,
+`diversification-score`, `fear-greed`, `projection`.
 
-### Config
-- **Topology**: hierarchical-mesh (anti-drift)
-- **Max Agents**: 15
-- **Memory**: hybrid
-- **HNSW**: Enabled
-- **Neural**: Enabled
+Les ~46 autres modules sont gated derrière la licence Premium.
 
+## Règles de développement
+- **Aucun framework** — vanilla JS uniquement. Pas de bundler, pas de TS.
+- **ES modules natifs** (`<script type="module">`). Imports relatifs avec `.js` explicite.
+- **Aucune clé API hardcodée** — toujours via vault utilisateur ou `getDataKey()`.
+- **Aucune donnée d'analyse vers nos serveurs** — vérifiable via DevTools Network sur `privacy-proof.html`.
+- **i18n via clés `data-i18n`** ou pattern bilingue `<span class="lang-en">` (caché par défaut, swap si `<html lang="en">`).
+- **Garder la cohérence FR/EN** : pages commerciales ont une version `-en.html` dédiée, pages légales utilisent `?lang=en` template swap.
+- **Toujours bumper la version du Service Worker** (`alpha-terminal-vXX`) après modif HTML/JS pour invalider le cache.
+- **paywall gate** dans `runAnalysis()` au début → tout module Pro s'arrête si `!canAccess(moduleId)`.
+
+## SEO + Marketing
+- 49 URLs dans `sitemap.xml`, hreflang FR/EN/x-default complet
+- JSON-LD : SoftwareApplication, Product, FAQPage, HowTo, Article, Blog, BreadcrumbList,
+  Organization, Event, WebSite — couverture quasi-complète
+- Blog section : `blog.html` + `blog-en.html` avec 12 articles SEO
+- Newsletter : Formsubmit (`savetheworldfr@gmail.com`) avec téléchargement immédiat du
+  lead magnet (`lead-magnet-10-ratios.html`)
+- Plausible event tracking sur tous CTA principaux (`Subscribe+Click`, `Lifetime+Click`,
+  `Demo+Click`, `Newsletter+Signup`, `DCF+Calculate`, `BYOK+Upsell`, etc.)
+- Pages dédiées trust : `privacy-proof.html` (DevTools tutorial) + `pour-qui.html` (3 personas)
+
+## Outils interactifs publics
+- `dcf-calculator.html` (+ EN) : calculateur DCF gratuit avec upsell
+- `byok-cost-calculator.html` (+ EN) : simulateur de coût BYOK total
+
+## Pages comparatives
+`bloomberg-alternative.html`, `alpha-vs-koyfin.html`, `alpha-vs-chatgpt.html`,
+`alpha-vs-bloomberg-detailed.html` (toutes en FR + EN).
+
+## Anti-patterns à éviter
+- ❌ Ajouter React/Vue/Svelte/etc. — la stack est volontairement vanilla
+- ❌ Ajouter un build step (Vite/Webpack/Rollup) — `<script type="module">` direct
+- ❌ Stocker quoi que ce soit côté serveur sur les analyses (briserait la promesse "100% privé")
+- ❌ Backend pour les calls LLM (briserait BYOK + privacy)
+- ❌ Auth Supabase obligatoire avant utilisation (le mode démo et le wizard "accès sans clé" doivent rester)
+- ❌ Hardcoder une URL d'environnement spécifique — toutes les URLs Lemonsqueezy/Plausible/etc. doivent passer par `window.ALPHA_CONFIG` quand applicable
+
+## Conventions de code
+- Indentation : 2 espaces
+- Strings : guillemets simples `'...'`
+- Pas de point-virgule strict (mais cohérent par fichier)
+- IIFE `(function(){ 'use strict'; ... })()` pour les scripts inline non-modules
+- ES module avec `export function` pour les fichiers `js/`
+- Commentaires en français OK (le projet est FR-first), mais EN si le contexte est universel
+
+## Commandes utiles
 ```bash
-npx @claude-flow/cli@latest swarm init --topology hierarchical --max-agents 8 --strategy specialized
+# Dev local (n'importe quel serveur statique)
+npx serve /Users/dreano/Downloads/alphaterminalpwa
+# ou
+python3 -m http.server 8080
+
+# Build mobile (Capacitor)
+npx cap sync                # copie web → dist-mobile → projets natifs
+npx cap open android        # ouvre Android Studio
+npx cap open ios            # ouvre Xcode
+
+# Validation
+node --check js/<fichier>.js                    # syntax check JS
+xmllint --noout sitemap.xml                     # validation XML
+
+# Service Worker version bump (après modif)
+sed -i '' 's|alpha-terminal-vXX|alpha-terminal-vXY|g' service-worker.js
 ```
 
-### Agent Routing
-
-| Task | Agents | Topology |
-|------|--------|----------|
-| Bug Fix | researcher, coder, tester | hierarchical |
-| Feature | architect, coder, tester, reviewer | hierarchical |
-| Refactor | architect, coder, reviewer | hierarchical |
-| Performance | perf-engineer, coder | hierarchical |
-| Security | security-architect, auditor | hierarchical |
-
-### When to Swarm
-- **YES**: 3+ files, new features, cross-module refactoring, API changes, security, performance
-- **NO**: single file edits, 1-2 line fixes, docs updates, config changes, questions
-
-### 3-Tier Model Routing
-
-| Tier | Handler | Use Cases |
-|------|---------|-----------|
-| 1 | Agent Booster (WASM) | Simple transforms — skip LLM, use Edit directly |
-| 2 | Haiku | Simple tasks, low complexity |
-| 3 | Sonnet/Opus | Architecture, security, complex reasoning |
-
-## Memory & Learning
-
-### Before Any Task
-```bash
-npx @claude-flow/cli@latest memory search --query "[task keywords]" --namespace patterns
-npx @claude-flow/cli@latest hooks route --task "[task description]"
-```
-
-### After Success
-```bash
-npx @claude-flow/cli@latest memory store --namespace patterns --key "[name]" --value "[what worked]"
-npx @claude-flow/cli@latest hooks post-task --task-id "[id]" --success true --store-results true
-```
-
-### MCP Tools (use `ToolSearch("keyword")` to discover)
-
-| Category | Key Tools |
-|----------|-----------|
-| **Memory** | `memory_store`, `memory_search`, `memory_search_unified` |
-| **Bridge** | `memory_import_claude`, `memory_bridge_status` |
-| **Swarm** | `swarm_init`, `swarm_status`, `swarm_health` |
-| **Agents** | `agent_spawn`, `agent_list`, `agent_status` |
-| **Hooks** | `hooks_route`, `hooks_post-task`, `hooks_worker-dispatch` |
-| **Security** | `aidefence_scan`, `aidefence_is_safe`, `aidefence_has_pii` |
-| **Hive-Mind** | `hive-mind_init`, `hive-mind_consensus`, `hive-mind_spawn` |
-
-### Background Workers
-
-| Worker | When |
-|--------|------|
-| `audit` | After security changes |
-| `optimize` | After performance work |
-| `testgaps` | After adding features |
-| `map` | Every 5+ file changes |
-| `document` | After API changes |
-
-```bash
-npx @claude-flow/cli@latest hooks worker dispatch --trigger audit
-```
-
-## Agents
-
-**Core**: `coder`, `reviewer`, `tester`, `planner`, `researcher`
-**Architecture**: `system-architect`, `backend-dev`, `mobile-dev`
-**Security**: `security-architect`, `security-auditor`
-**Performance**: `performance-engineer`, `perf-analyzer`
-**Coordination**: `hierarchical-coordinator`, `mesh-coordinator`, `adaptive-coordinator`
-**GitHub**: `pr-manager`, `code-review-swarm`, `issue-tracker`, `release-manager`
-
-Any string works as a custom agent type.
-
-## Build & Test
-
-- ALWAYS run tests after code changes
-- ALWAYS verify build succeeds before committing
-
-```bash
-npm run build && npm test
-```
-
-## CLI Quick Reference
-
-```bash
-npx @claude-flow/cli@latest init --wizard           # Setup
-npx @claude-flow/cli@latest swarm init --v3-mode     # Start swarm
-npx @claude-flow/cli@latest memory search --query "" # Vector search
-npx @claude-flow/cli@latest hooks route --task ""    # Route to agent
-npx @claude-flow/cli@latest doctor --fix             # Diagnostics
-npx @claude-flow/cli@latest security scan            # Security scan
-npx @claude-flow/cli@latest performance benchmark    # Benchmarks
-```
-
-26 commands, 140+ subcommands. Use `--help` on any command for details.
-
-## Setup
-
-```bash
-claude mcp add claude-flow -- npx -y @claude-flow/cli@latest
-npx @claude-flow/cli@latest daemon start
-npx @claude-flow/cli@latest doctor --fix
-```
-
-**Agent tool** handles execution (agents, files, code, git). **MCP tools** handle coordination (swarm, memory, hooks). **CLI** is the same via Bash.
+## Contacts / Liens
+- Domaine : `https://alpha-terminal.app`
+- Email contact : `savetheworldfr@gmail.com`
+- Lemonsqueezy variant mensuel : `1599882`
+- Lemonsqueezy permalink lifetime : `bc77ee76-8202-4df6-8093-f353576c3f0b`
+- Plausible domain : `alpha-terminal.app`

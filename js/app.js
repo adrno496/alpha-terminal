@@ -191,6 +191,12 @@ function navigate(route) {
   }
 
   if (STATE.currentRoute && STATE.currentRoute !== route) abortCurrentCall();
+  // Notifie tous les modules qu'on quitte la route actuelle. Permet le cleanup
+  // d'event listeners document/window, intervals, observers, etc.
+  // Usage côté module : `window.addEventListener('app:route-leaving', () => clearInterval(myTimer), { once: true });`
+  try {
+    window.dispatchEvent(new CustomEvent('app:route-leaving', { detail: { from: STATE.currentRoute, to: route } }));
+  } catch {}
   STATE.currentRoute = route;
   const view = $('#view');
   view.innerHTML = '';

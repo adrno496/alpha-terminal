@@ -13,8 +13,14 @@
   <meta name="application-name" content="Alpha Terminal" />
   <link rel="canonical" href="https://alpha-terminal.app/" />
   <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/" />
-  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/?lang=en" />
   <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/" />
+  <!-- Note : pas de hreflang="en" sur l'index racine.
+       L'app est rendue côté client (PWA) avec toggle FR/EN dynamique.
+       Les pages SEO statiques EN (features-en.html, pricing-en.html, etc.)
+       ont chacune leur propre hreflang bidirectionnel correct. -->
+
+  <!-- Sitemap location pour Google (au lieu de hreflang en racine) -->
+  <link rel="sitemap" type="application/xml" href="https://alpha-terminal.app/sitemap.xml" />
 
   <!-- ====== OPEN GRAPH ====== -->
   <meta property="og:type" content="website" />
@@ -38,6 +44,24 @@
 
   <!-- ====== TECH ====== -->
   <meta name="theme-color" content="#00ff88" />
+
+  <!-- ====== CSP (Content Security Policy) ======
+       Defense-in-depth contre XSS. Liste explicite des origines permises pour
+       chaque ressource. Si tu ajoutes un nouveau provider/CDN, mets à jour ici. -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://plausible.io;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com data:;
+    img-src 'self' data: blob: https:;
+    connect-src 'self' https://api.anthropic.com https://api.openai.com https://generativelanguage.googleapis.com https://api.x.ai https://openrouter.ai https://api.perplexity.ai https://api.mistral.ai https://api.cerebras.ai https://models.inference.ai.azure.com https://integrate.api.nvidia.com https://api-inference.huggingface.co https://api.cloudflare.com https://api.together.xyz https://api.cohere.ai https://api.lemonsqueezy.com https://*.supabase.co https://api.alternative.me https://api.coingecko.com https://api.frankfurter.dev https://stooq.com https://api.stlouisfed.org https://financialmodelingprep.com https://api.polygon.io https://finnhub.io https://api.tiingo.com https://api.twelvedata.com https://api.etherscan.io https://www.alphavantage.co https://query1.finance.yahoo.com https://query2.finance.yahoo.com https://production.dataviz.cnn.io https://plausible.io https://formsubmit.co https://buttondown.email;
+    frame-src 'self' https://www.youtube.com https://*.lemonsqueezy.com;
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self' https://formsubmit.co https://*.lemonsqueezy.com;
+    upgrade-insecure-requests;
+  " />
+
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
@@ -92,12 +116,6 @@
         "unitCode": "MON"
       },
       "availability": "https://schema.org/InStock"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "ratingCount": "127",
-      "bestRating": "5"
     },
     "softwareVersion": "2.1.0",
     "screenshot": [
@@ -554,22 +572,55 @@
   <div id="print-view" class="print-view hidden"></div>
 
   <!-- Vendors (SRI-pinned) -->
-  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"
+  <!-- Libs critiques (markdown + sanitization) — defer pour ne pas bloquer le render -->
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"
           integrity="sha384-NNQgBjjuhtXzPmmy4gurS5X7P4uTt1DThyevz4Ua0IVK5+kazYQI1W27JHjbbxQz"
           crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
+  <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"
           integrity="sha384-eEu5CTj3qGvu9PdJuS+YlkNi7d2XxQROAFYOr59zgObtlcux1ae1Il3u7jvdCSWu"
           crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"
-          integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g"
-          crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"
-          integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e"
-          crossorigin="anonymous"></script>
+  <!-- Libs lourdes (chart.js 62KB, pdfjs 1.7MB) — chargées paresseusement par les
+       modules qui en ont besoin via dynamic import dans js/ui/lazy-libs.js.
+       Pas de <script> ici → -1.7MB sur le boot path. -->
   <script>
-    if (window.pdfjsLib) {
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
-    }
+    // Helper global pour lazy-loader chart.js + pdfjs au premier usage.
+    // Les modules appellent : await window.AlphaLazy.chart() → returns Chart.
+    window.AlphaLazy = (function(){
+      let chartP, pdfP;
+      function loadScript(src, integrity) {
+        return new Promise((resolve, reject) => {
+          if (document.querySelector('script[data-lazy-src="'+src+'"]')) return resolve();
+          const s = document.createElement('script');
+          s.src = src; s.async = true; s.crossOrigin = 'anonymous';
+          if (integrity) s.integrity = integrity;
+          s.dataset.lazySrc = src;
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error('Failed to load '+src));
+          document.head.appendChild(s);
+        });
+      }
+      return {
+        async chart() {
+          if (!chartP) chartP = loadScript(
+            'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
+            'sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g'
+          ).then(() => window.Chart);
+          return chartP;
+        },
+        async pdf() {
+          if (!pdfP) pdfP = loadScript(
+            'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js',
+            'sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e'
+          ).then(() => {
+            if (window.pdfjsLib) {
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+            }
+            return window.pdfjsLib;
+          });
+          return pdfP;
+        }
+      };
+    })();
   </script>
 
   <!-- ====== Premium auth + paywall (BYOK + Lemonsqueezy) ====== -->

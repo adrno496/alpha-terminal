@@ -4,7 +4,12 @@ const TEXT_PRIMARY = '#e8e8e8';
 const TEXT_MUTED = '#888';
 const GRID = '#2a2a2a';
 
-function ensureChart() {
+// Lazy-load Chart.js au premier appel via window.AlphaLazy.chart()
+// Évite de charger 62KB au boot pour les users qui ne touchent pas aux charts.
+async function ensureChart() {
+  if (!window.Chart && window.AlphaLazy && window.AlphaLazy.chart) {
+    await window.AlphaLazy.chart();
+  }
   if (!window.Chart) throw new Error('Chart.js non chargé');
   Chart.defaults.color = TEXT_PRIMARY;
   Chart.defaults.borderColor = GRID;
