@@ -2,66 +2,62 @@
 // + memory snapshots cross-injectable into other modules
 
 import { uuid } from './utils.js';
+import { openWithMinVersion } from './db-open.js';
 
 const DB_NAME = 'alpha-terminal';
 const STORE = 'transcripts';
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 10);
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains('analyses')) {
-        const s = db.createObjectStore('analyses', { keyPath: 'id' });
-        s.createIndex('module', 'module', { unique: false });
-        s.createIndex('createdAt', 'createdAt', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('writingStyles')) db.createObjectStore('writingStyles', { keyPath: 'id' });
-      if (!db.objectStoreNames.contains('knowledge'))      db.createObjectStore('knowledge',     { keyPath: 'id' });
-      if (!db.objectStoreNames.contains('wealth'))         db.createObjectStore('wealth',        { keyPath: 'id' });
-      if (!db.objectStoreNames.contains('wealth_snapshots')) {
-        const ws = db.createObjectStore('wealth_snapshots', { keyPath: 'id' });
-        ws.createIndex('date', 'date', { unique: false });
-      }
-      if (!db.objectStoreNames.contains(STORE)) {
-        const ts = db.createObjectStore(STORE, { keyPath: 'id' });
-        ts.createIndex('createdAt', 'createdAt', { unique: false });
-        ts.createIndex('ticker', 'ticker', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('budget_entries')) {
-        const be = db.createObjectStore('budget_entries', { keyPath: 'id' });
-        be.createIndex('month', 'month', { unique: false });
-        be.createIndex('type', 'type', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('dividends_history')) {
-        const dh = db.createObjectStore('dividends_history', { keyPath: 'id' });
-        dh.createIndex('date', 'date', { unique: false });
-        dh.createIndex('ticker', 'ticker', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('insights_state')) {
-        const is = db.createObjectStore('insights_state', { keyPath: 'id' });
-        is.createIndex('generatedAt', 'generatedAt', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('price_alerts')) {
-        const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
-        pa.createIndex('ticker', 'ticker', { unique: false });
-        pa.createIndex('status', 'status', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('goals')) {
-        const g = db.createObjectStore('goals', { keyPath: 'id' });
-        g.createIndex('status', 'status', { unique: false });
-        g.createIndex('targetDate', 'targetDate', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('watchpoints')) {
-        const w = db.createObjectStore('watchpoints', { keyPath: 'id' });
-        w.createIndex('ticker', 'ticker', { unique: false });
-        w.createIndex('type', 'type', { unique: false });
-        w.createIndex('status', 'status', { unique: false });
-        w.createIndex('createdAt', 'createdAt', { unique: false });
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+  return openWithMinVersion(DB_NAME, 10, (e) => {
+    const db = e.target.result;
+    if (!db.objectStoreNames.contains('analyses')) {
+      const s = db.createObjectStore('analyses', { keyPath: 'id' });
+      s.createIndex('module', 'module', { unique: false });
+      s.createIndex('createdAt', 'createdAt', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('writingStyles')) db.createObjectStore('writingStyles', { keyPath: 'id' });
+    if (!db.objectStoreNames.contains('knowledge'))      db.createObjectStore('knowledge',     { keyPath: 'id' });
+    if (!db.objectStoreNames.contains('wealth'))         db.createObjectStore('wealth',        { keyPath: 'id' });
+    if (!db.objectStoreNames.contains('wealth_snapshots')) {
+      const ws = db.createObjectStore('wealth_snapshots', { keyPath: 'id' });
+      ws.createIndex('date', 'date', { unique: false });
+    }
+    if (!db.objectStoreNames.contains(STORE)) {
+      const ts = db.createObjectStore(STORE, { keyPath: 'id' });
+      ts.createIndex('createdAt', 'createdAt', { unique: false });
+      ts.createIndex('ticker', 'ticker', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('budget_entries')) {
+      const be = db.createObjectStore('budget_entries', { keyPath: 'id' });
+      be.createIndex('month', 'month', { unique: false });
+      be.createIndex('type', 'type', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('dividends_history')) {
+      const dh = db.createObjectStore('dividends_history', { keyPath: 'id' });
+      dh.createIndex('date', 'date', { unique: false });
+      dh.createIndex('ticker', 'ticker', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('insights_state')) {
+      const is = db.createObjectStore('insights_state', { keyPath: 'id' });
+      is.createIndex('generatedAt', 'generatedAt', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('price_alerts')) {
+      const pa = db.createObjectStore('price_alerts', { keyPath: 'id' });
+      pa.createIndex('ticker', 'ticker', { unique: false });
+      pa.createIndex('status', 'status', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('goals')) {
+      const g = db.createObjectStore('goals', { keyPath: 'id' });
+      g.createIndex('status', 'status', { unique: false });
+      g.createIndex('targetDate', 'targetDate', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('watchpoints')) {
+      const w = db.createObjectStore('watchpoints', { keyPath: 'id' });
+      w.createIndex('ticker', 'ticker', { unique: false });
+      w.createIndex('type', 'type', { unique: false });
+      w.createIndex('status', 'status', { unique: false });
+      w.createIndex('createdAt', 'createdAt', { unique: false });
+    }
   });
 }
 

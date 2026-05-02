@@ -4,17 +4,14 @@ import { listWealth, getTotals } from '../core/wealth.js';
 import { listBudgetEntries, getMonthlyTotals, projectWealth } from './budget.js';
 import { moduleHeader } from './_shared.js';
 import { getLocale } from '../core/i18n.js';
+import { openWithMinVersion } from '../core/db-open.js';
 
 const MODULE_ID = 'goals';
 const DB_NAME = 'alpha-terminal';
 const STORE = 'goals';
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 9);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  return openWithMinVersion(DB_NAME, 9, () => {});
 }
 function tx(mode = 'readonly') {
   return openDB().then(db => db.transaction(STORE, mode).objectStore(STORE));

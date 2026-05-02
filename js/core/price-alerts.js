@@ -6,16 +6,13 @@
 //     createdAt, triggeredAt?, lastCheckedAt?, lastObservedPrice? }
 
 import { uuid } from './utils.js';
+import { openWithMinVersion } from './db-open.js';
 
 const DB_NAME = 'alpha-terminal';
 const STORE = 'price_alerts';
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 8);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  return openWithMinVersion(DB_NAME, 8, () => {});
 }
 function tx(mode = 'readonly') {
   return openDB().then(db => db.transaction(STORE, mode).objectStore(STORE));

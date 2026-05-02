@@ -3,6 +3,7 @@ import { $, uuid, toast } from '../core/utils.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { budgetWaterfall } from '../ui/charts.js';
+import { openWithMinVersion } from '../core/db-open.js';
 
 const MODULE_ID = 'budget';
 const DB_NAME = 'alpha-terminal';
@@ -12,11 +13,7 @@ const ACTIVE_MONTH_KEY = 'alpha-terminal:budget:active-month';
 // ============== STORAGE ==============
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 7);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  return openWithMinVersion(DB_NAME, 7, () => {});
 }
 
 function tx(mode = 'readonly') {

@@ -3,6 +3,7 @@ import { $ } from '../core/utils.js';
 import { listWatchpoints, markDismissed } from '../core/watchpoints.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
+import { openWithMinVersion } from '../core/db-open.js';
 
 const MODULE_ID = 'smart-alerts-center';
 
@@ -41,11 +42,7 @@ async function gatherAlerts() {
   } catch {}
   // 3. Price alerts depuis IDB price_alerts
   try {
-    const db = await new Promise((res, rej) => {
-      const r = indexedDB.open('alpha-terminal', 10);
-      r.onsuccess = () => res(r.result);
-      r.onerror = () => rej(r.error);
-    });
+    const db = await openWithMinVersion('alpha-terminal', 10, () => {});
     if (db.objectStoreNames.contains('price_alerts')) {
       const store = db.transaction('price_alerts').objectStore('price_alerts');
       const all = await new Promise((res, rej) => {

@@ -5,6 +5,7 @@ import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { computeDiversificationScore } from './diversification-score.js';
 import { listBudgetEntries, getMonthlyTotals } from './budget.js';
+import { openWithMinVersion } from '../core/db-open.js';
 
 const MODULE_ID = 'insights-engine';
 const DB_NAME = 'alpha-terminal';
@@ -16,11 +17,7 @@ const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 // ============== STORAGE ==============
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 7);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  return openWithMinVersion(DB_NAME, 7, () => {});
 }
 function tx(mode = 'readonly') {
   return openDB().then(db => db.transaction(STORE, mode).objectStore(STORE));

@@ -3,29 +3,25 @@
 
 import { embedBatch, embed, cosine } from './embeddings.js';
 import { uuid } from './utils.js';
+import { openWithMinVersion } from './db-open.js';
 
 const DB_NAME = 'alpha-terminal';
 const STORE = 'knowledge';
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 2); // bump version pour ajouter store
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      if (!db.objectStoreNames.contains('analyses')) {
-        const s = db.createObjectStore('analyses', { keyPath: 'id' });
-        s.createIndex('module', 'module', { unique: false });
-        s.createIndex('createdAt', 'createdAt', { unique: false });
-      }
-      if (!db.objectStoreNames.contains('writingStyles')) {
-        db.createObjectStore('writingStyles', { keyPath: 'id' });
-      }
-      if (!db.objectStoreNames.contains(STORE)) {
-        db.createObjectStore(STORE, { keyPath: 'id' });
-      }
-    };
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
+  return openWithMinVersion(DB_NAME, 2, (e) => {
+    const db = e.target.result;
+    if (!db.objectStoreNames.contains('analyses')) {
+      const s = db.createObjectStore('analyses', { keyPath: 'id' });
+      s.createIndex('module', 'module', { unique: false });
+      s.createIndex('createdAt', 'createdAt', { unique: false });
+    }
+    if (!db.objectStoreNames.contains('writingStyles')) {
+      db.createObjectStore('writingStyles', { keyPath: 'id' });
+    }
+    if (!db.objectStoreNames.contains(STORE)) {
+      db.createObjectStore(STORE, { keyPath: 'id' });
+    }
   });
 }
 

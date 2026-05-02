@@ -4,16 +4,13 @@
 // D'autres modules peuvent les détecter et alerter (Daily Brief, Smart Alerts, Today's Actions).
 
 import { uuid } from './utils.js';
+import { openWithMinVersion } from './db-open.js';
 
 const DB_NAME = 'alpha-terminal';
 const STORE = 'watchpoints';
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 10);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  return openWithMinVersion(DB_NAME, 10, () => {});
 }
 
 async function tx(mode = 'readonly') {

@@ -5,6 +5,7 @@ import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { dividendCalendar } from '../ui/charts.js';
 import { listBudgetEntries, getMonthlyTotals } from './budget.js';
+import { openWithMinVersion } from '../core/db-open.js';
 
 const MODULE_ID = 'dividends-tracker';
 const DB_NAME = 'alpha-terminal';
@@ -13,11 +14,7 @@ const STORE = 'dividends_history';
 // ============== STORAGE ==============
 
 function openDB() {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open(DB_NAME, 7);
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
+  return openWithMinVersion(DB_NAME, 7, () => {});
 }
 function tx(mode = 'readonly') {
   return openDB().then(db => db.transaction(STORE, mode).objectStore(STORE));
