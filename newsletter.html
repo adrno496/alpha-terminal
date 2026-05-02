@@ -27,6 +27,7 @@
   <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 
   <style>
+    html, body { height: auto !important; overflow: auto !important; }
     body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; }
     .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; }
     .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }
@@ -81,8 +82,11 @@
       // ⚠️ Remplace par ton email réel. Première soumission = email Formsubmit
       // de confirmation à valider une seule fois.
       const FORMSUBMIT_EMAIL = 'savetheworldfr@gmail.com';
-      const PDF_URL = '10-ratios-essentiels.pdf';     // tombe sur la version HTML si PDF absent
-      const PDF_FALLBACK = 'lead-magnet-10-ratios.html';
+      // PDF_URL : pointe sur la version HTML (print-ready, fonctionne tout de suite).
+      // Quand tu auras généré le vrai .pdf via Cmd+P → "Save as PDF" et placé
+      // 10-ratios-essentiels.pdf à la racine, remplace simplement la ligne ci-dessous.
+      const PDF_URL = 'lead-magnet-10-ratios.html';
+      const PDF_FILENAME = '10-ratios-essentiels-Alpha.html';
 
       const form = document.getElementById('newsletter-form');
       const submitBtn = document.getElementById('newsletter-submit');
@@ -112,7 +116,7 @@
         document.body.removeChild(a);
       }
 
-      form.addEventListener('submit', async function(e) {
+      form.addEventListener('submit', function(e) {
         e.preventDefault();
         const email = document.getElementById('newsletter-email').value.trim();
         const honey = form.querySelector('[name="_honey"]').value;
@@ -122,55 +126,31 @@
           return;
         }
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = '⏳ Envoi…';
+        // 1. TÉLÉCHARGEMENT IMMÉDIAT — le user reçoit son guide dès le clic
+        triggerDownload(PDF_URL, PDF_FILENAME);
 
-        try {
-          // Formsubmit endpoint AJAX — répond JSON, pas de redirection
-          const res = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-              email: email,
-              _subject: 'Nouveau inscrit newsletter Alpha',
-              _template: 'table',
-              _captcha: 'false',
-              source: 'newsletter.html'
-            })
-          });
-          const data = await res.json();
+        // 2. UI : message + reset visuel immédiat
+        try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
+        showMsg(
+          '✅ <strong>Merci !</strong> Le téléchargement du PDF a démarré.<br>'
+          + '<small style="opacity:0.85;">Tu vas aussi recevoir tes prochaines analyses mensuelles à <strong>'
+          + email + '</strong>.</small>',
+          'success'
+        );
+        form.style.display = 'none';
 
-          if (data && (data.success === 'true' || data.success === true)) {
-            // 1. Track conversion
-            try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
-
-            // 2. Trigger PDF download (avec fallback HTML si .pdf absent)
-            triggerDownload(PDF_URL, '10-ratios-essentiels.pdf');
-            // Fallback : si le .pdf retourne 404, retombe sur la version HTML
-            setTimeout(() => {
-              fetch(PDF_URL, { method: 'HEAD' }).then(r => {
-                if (!r.ok) triggerDownload(PDF_FALLBACK, '10-ratios-essentiels.html');
-              }).catch(() => triggerDownload(PDF_FALLBACK, '10-ratios-essentiels.html'));
-            }, 800);
-
-            // 3. Message de succès
-            showMsg(
-              '✅ <strong>Merci !</strong> Le téléchargement du PDF démarre dans ta barre.<br>'
-              + '<small style="opacity:0.85;">Tu vas aussi recevoir tes prochaines analyses mensuelles à <strong>'
-              + email + '</strong>.</small>',
-              'success'
-            );
-            form.style.display = 'none';
-          } else {
-            showMsg('❌ Une erreur est survenue. Réessaie ou contacte savetheworldfr@gmail.com', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = '📥 Recevoir le PDF + la newsletter';
-          }
-        } catch (err) {
-          showMsg('❌ Erreur réseau. Vérifie ta connexion.', 'error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = '📥 Recevoir le PDF + la newsletter';
-        }
+        // 3. Envoi Formsubmit en background (fire-and-forget) — n'impacte pas l'UX
+        fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            _subject: 'Nouveau inscrit newsletter Alpha',
+            _template: 'table',
+            _captcha: 'false',
+            source: 'newsletter.html'
+          })
+        }).catch(() => {/* silently ignored, l'user a déjà son PDF */});
       });
     })();
   </script>

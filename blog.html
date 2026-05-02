@@ -59,6 +59,8 @@
   </script>
 
   <style>
+    /* Override le CSS global (body{overflow:hidden} pour l'app SPA) */
+    html, body { height: auto !important; overflow: auto !important; }
     body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; line-height:1.6; }
     .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; flex-wrap:wrap; gap:14px; }
     .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }

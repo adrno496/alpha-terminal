@@ -26,6 +26,7 @@
   <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 
   <style>
+    html, body { height: auto !important; overflow: auto !important; }
     body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; }
     .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; }
     .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }
@@ -73,8 +74,8 @@
   <script>
     (function(){
       const FORMSUBMIT_EMAIL = 'savetheworldfr@gmail.com';
-      const PDF_URL = '10-essential-ratios.pdf';
-      const PDF_FALLBACK = 'lead-magnet-10-ratios-en.html';
+      const PDF_URL = 'lead-magnet-10-ratios-en.html';
+      const PDF_FILENAME = '10-essential-ratios-Alpha.html';
 
       const form = document.getElementById('newsletter-form');
       const submitBtn = document.getElementById('newsletter-submit');
@@ -100,7 +101,7 @@
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
       }
 
-      form.addEventListener('submit', async function(e) {
+      form.addEventListener('submit', function(e) {
         e.preventDefault();
         const email = document.getElementById('newsletter-email').value.trim();
         const honey = form.querySelector('[name="_honey"]').value;
@@ -109,46 +110,32 @@
           showMsg('❌ Invalid email address.', 'error');
           return;
         }
-        submitBtn.disabled = true;
-        submitBtn.textContent = '⏳ Sending…';
-        try {
-          const res = await fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-              email: email,
-              _subject: 'New Alpha newsletter signup (EN)',
-              _template: 'table',
-              _captcha: 'false',
-              source: 'newsletter-en.html'
-            })
-          });
-          const data = await res.json();
-          if (data && (data.success === 'true' || data.success === true)) {
-            try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
-            triggerDownload(PDF_URL, '10-essential-ratios.pdf');
-            setTimeout(() => {
-              fetch(PDF_URL, { method: 'HEAD' }).then(r => {
-                if (!r.ok) triggerDownload(PDF_FALLBACK, '10-essential-ratios.html');
-              }).catch(() => triggerDownload(PDF_FALLBACK, '10-essential-ratios.html'));
-            }, 800);
-            showMsg(
-              '✅ <strong>Thanks!</strong> The PDF download is starting in your bar.<br>'
-              + '<small style="opacity:0.85;">You\'ll also receive your monthly analyses at <strong>'
-              + email + '</strong>.</small>',
-              'success'
-            );
-            form.style.display = 'none';
-          } else {
-            showMsg('❌ Something went wrong. Try again or contact savetheworldfr@gmail.com', 'error');
-            submitBtn.disabled = false;
-            submitBtn.textContent = '📥 Get the PDF + newsletter';
-          }
-        } catch (err) {
-          showMsg('❌ Network error. Check your connection.', 'error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = '📥 Get the PDF + newsletter';
-        }
+
+        // 1. IMMEDIATE DOWNLOAD — user gets the guide on click
+        triggerDownload(PDF_URL, PDF_FILENAME);
+
+        // 2. UI feedback immediate
+        try { window.plausible && window.plausible('Newsletter+Signup'); } catch {}
+        showMsg(
+          '✅ <strong>Thanks!</strong> The PDF download has started.<br>'
+          + '<small style="opacity:0.85;">You\'ll also receive your monthly analyses at <strong>'
+          + email + '</strong>.</small>',
+          'success'
+        );
+        form.style.display = 'none';
+
+        // 3. Background Formsubmit submission (fire-and-forget)
+        fetch('https://formsubmit.co/ajax/' + FORMSUBMIT_EMAIL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            _subject: 'New Alpha newsletter signup (EN)',
+            _template: 'table',
+            _captcha: 'false',
+            source: 'newsletter-en.html'
+          })
+        }).catch(() => {/* silently ignored */});
       });
     })();
   </script>
