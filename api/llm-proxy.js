@@ -12,7 +12,9 @@ const ALLOWED_HOSTS = [
   'api.cloudflare.com',                // Cloudflare Workers AI
   // Data providers CORS-blocked depuis le browser
   'api.stlouisfed.org',                // FRED API (Federal Reserve)
-  'metals-api.com'                     // Metals-API (or/argent/platine)
+  'metals-api.com',                    // Metals-API (or/argent/platine)
+  'newsapi.org',                       // NewsAPI (free tier bloque les browser direct calls)
+  'api.acleddata.com'                  // ACLED (conflits/géopolitique)
 ];
 
 const CORS_HEADERS = {

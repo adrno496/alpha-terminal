@@ -171,18 +171,20 @@ function renderPremiumTab(c) {
   if (hasLicense) {
     (async () => {
       try {
-        const { listAnalyses, getAllWealthHoldings } = await import('../core/storage.js');
+        const { listAnalyses } = await import('../core/storage.js');
+        const { listWealth } = await import('../core/wealth.js');
         const analyses = await listAnalyses();
         const totalAnalyses = analyses?.length || 0;
-        const moduleSet = new Set((analyses || []).map(a => a.moduleId).filter(Boolean));
+        // Le schéma analyses utilise `module` (pas `moduleId`) — cf. _shared.js#saveAnalysis
+        const moduleSet = new Set((analyses || []).map(a => a.module).filter(Boolean));
         // Days active : depuis l'activation de la licence
         const checkedAt = parseInt(localStorage.getItem('alpha-license-checked-at') || '0', 10);
         const days = checkedAt ? Math.max(1, Math.floor((Date.now() - checkedAt) / (24 * 3600 * 1000))) : 1;
-        // Holdings : si fonction dispo
+        // Holdings via le module wealth
         let holdings = 0;
         try {
-          const h = await getAllWealthHoldings();
-          holdings = h?.length || 0;
+          const h = await listWealth();
+          holdings = Array.isArray(h) ? h.length : 0;
         } catch {}
         const $ = (id) => c.querySelector('#' + id);
         if ($('stat-days')) $('stat-days').textContent = days;
@@ -1146,7 +1148,7 @@ function renderModelsTab(c) {
               <div class="field">
                 <label class="field-label">${tier}</label>
                 <select class="input model-select" data-prov="${p.name}" data-tier="${tier}">
-                  ${allModels.map(mod => `<option value="${mod.id}" ${ov[tier]===mod.id?'selected':''} ${mod.tier===tier?'':''}>${mod.label}${mod.recommended?' ★':''} (${mod.tier})</option>`).join('')}
+                  ${allModels.filter(mod => mod.tier === tier).map(mod => `<option value="${mod.id}" ${ov[tier]===mod.id?'selected':''}>${mod.label}${mod.recommended?' ★':''}</option>`).join('')}
                 </select>
               </div>
             `).join('')}

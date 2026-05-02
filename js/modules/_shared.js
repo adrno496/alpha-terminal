@@ -215,13 +215,24 @@ function wealthToggleHtml(moduleId) {
   </label>`;
 }
 
-export function moduleHeader(title, desc, { example, moduleId, noPdfButton = false } = {}) {
+export function moduleHeader(title, desc, { example, moduleId, noPdfButton = false, noFavoriteButton = false } = {}) {
   const pdfBtn = noPdfButton ? '' : `<button class="btn-ghost" data-export-module-pdf="${moduleId || ''}" title="${t('common.export_pdf_tip') || 'Exporter cette vue en PDF'}">📄 PDF</button>`;
+  // Favoris : étoile pleine si déjà fav, contour sinon. Lecture sync depuis localStorage.
+  let favBtn = '';
+  if (!noFavoriteButton && moduleId) {
+    let isFav = false;
+    try {
+      const raw = localStorage.getItem('alpha-terminal:favorite-modules');
+      if (raw) isFav = JSON.parse(raw).includes(moduleId);
+    } catch {}
+    favBtn = `<button class="btn-ghost" data-toggle-favorite="${moduleId}" title="${isFav ? 'Retirer des favoris' : 'Ajouter aux favoris'}" aria-pressed="${isFav}" style="font-size:14px;">${isFav ? '⭐' : '☆'}</button>`;
+  }
   return `
     <div class="module-header" data-module-header="${moduleId || ''}" data-module-title="${escHtmlAttr(title)}">
       <div class="module-header-top">
         <h2>${title}</h2>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" data-module-toolbar="${moduleId || ''}">
+          ${favBtn}
           ${moduleId && moduleId !== 'knowledge-base' ? providerSelectorHtml(moduleId) : ''}
           ${wealthToggleHtml(moduleId)}
           ${moduleId && moduleId !== 'knowledge-base' ? `<label class="rag-toggle" title="${t('rag.title')}"><input type="checkbox" data-rag="${moduleId}" /> 📚 KB</label>` : ''}
@@ -232,6 +243,23 @@ export function moduleHeader(title, desc, { example, moduleId, noPdfButton = fal
       <div class="module-desc">${desc}</div>
     </div>
   `;
+}
+
+// Délégation globale : clic sur ⭐ → toggle favori + re-render bouton + dispatch event
+if (typeof document !== 'undefined' && !window.__alphaFavoriteWired) {
+  window.__alphaFavoriteWired = true;
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-toggle-favorite]');
+    if (!btn) return;
+    e.preventDefault();
+    const moduleId = btn.getAttribute('data-toggle-favorite');
+    if (!moduleId) return;
+    const { toggleFavorite } = await import('../core/favorites.js');
+    const isFav = toggleFavorite(moduleId);
+    btn.textContent = isFav ? '⭐' : '☆';
+    btn.setAttribute('title', isFav ? 'Retirer des favoris' : 'Ajouter aux favoris');
+    btn.setAttribute('aria-pressed', String(isFav));
+  });
 }
 
 function escHtmlAttr(s) {

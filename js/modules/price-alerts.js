@@ -4,6 +4,7 @@ import { moduleHeader } from './_shared.js';
 import { getLocale } from '../core/i18n.js';
 import { listPriceAlerts, savePriceAlert, deletePriceAlert, checkPriceAlerts, dismissAlert, reactivateAlert } from '../core/price-alerts.js';
 import { updateAlertBadge } from '../ui/alerts-banner.js';
+import { ALERT_TEMPLATES, TEMPLATE_CATEGORIES } from '../core/alert-templates.js';
 
 const MODULE_ID = 'price-alerts';
 
@@ -22,10 +23,19 @@ export async function renderPriceAlertsView(viewEl) {
       </div>
     </div>
 
+    <div class="card">
+      <details>
+        <summary style="cursor:pointer;font-weight:600;color:var(--text-primary);">📋 ${isEN ? 'Alert templates' : 'Templates d\'alertes'} <span style="font-weight:400;color:var(--text-muted);font-size:12px;">— ${isEN ? 'one-click activation' : 'activation en un clic'}</span></summary>
+        <div id="pa-templates" style="margin-top:12px;"></div>
+      </details>
+    </div>
+
     <div id="pa-triggered"></div>
     <div id="pa-active"></div>
     <div id="pa-dismissed"></div>
   `;
+
+  renderTemplatesPanel(viewEl);
 
   $('#pa-add').addEventListener('click', () => openAlertEditor(viewEl));
   $('#pa-check').addEventListener('click', async () => {
@@ -95,6 +105,70 @@ async function refresh(viewEl) {
     if (!confirm(isEN ? 'Delete this alert?' : 'Supprimer cette alerte ?')) return;
     await deletePriceAlert(b.dataset.id);
     await refresh(viewEl);
+    await updateAlertBadge();
+    window.dispatchEvent(new CustomEvent('app:alerts-updated'));
+  }));
+}
+
+async function renderTemplatesPanel(viewEl) {
+  const isEN = getLocale() === 'en';
+  const wrap = $('#pa-templates');
+  if (!wrap) return;
+  const existing = await listPriceAlerts();
+  const activatedTemplateIds = new Set(existing.filter(a => a.templateId && a.status !== 'dismissed').map(a => a.templateId));
+
+  wrap.innerHTML = TEMPLATE_CATEGORIES.map(cat => {
+    const items = ALERT_TEMPLATES.filter(t => t.category === cat.id);
+    return `
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;">${cat.label}</div>
+        ${items.map(t => {
+          const active = activatedTemplateIds.has(t.id);
+          const sym = ({ USD: '$', EUR: '€' })[t.defaults.currency] || t.defaults.currency;
+          const arrow = t.defaults.direction === 'above' ? '↑' : '↓';
+          return `
+            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;margin-bottom:6px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:240px;">
+                <div style="font-size:13px;font-weight:600;">
+                  ${active ? '✓ ' : ''}${escape(t.label)}
+                  <span style="font-size:11px;color:var(--text-muted);font-weight:400;"> · ${escape(t.defaults.ticker)} ${arrow} ${t.defaults.targetPrice}${sym}</span>
+                </div>
+                <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">${escape(t.description)}</div>
+                ${t.suggestedAction ? `<div style="font-size:11px;color:var(--text-secondary);font-style:italic;margin-top:2px;">💡 ${escape(t.suggestedAction)}</div>` : ''}
+              </div>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <input type="number" class="input pa-tpl-target" data-tpl="${t.id}" value="${t.defaults.targetPrice}" step="0.01" style="width:90px;font-size:12px;padding:4px 6px;" aria-label="${isEN ? 'Threshold' : 'Seuil'}" ${active ? 'disabled' : ''}/>
+                <button class="btn-${active ? 'ghost' : 'primary'} pa-tpl-toggle" data-tpl="${t.id}" style="font-size:11px;" ${active ? 'disabled' : ''}>
+                  ${active ? (isEN ? 'Already active' : 'Déjà active') : (isEN ? '+ Activate' : '+ Activer')}
+                </button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }).join('');
+
+  wrap.querySelectorAll('.pa-tpl-toggle').forEach(btn => btn.addEventListener('click', async () => {
+    const tplId = btn.dataset.tpl;
+    const tpl = ALERT_TEMPLATES.find(t => t.id === tplId);
+    if (!tpl) return;
+    const target = parseFloat(wrap.querySelector(`.pa-tpl-target[data-tpl="${tplId}"]`)?.value);
+    if (!Number.isFinite(target) || target <= 0) {
+      toast(isEN ? 'Invalid threshold' : 'Seuil invalide', 'error');
+      return;
+    }
+    const alert = {
+      ...tpl.defaults,
+      targetPrice: target,
+      templateId: tpl.id,
+      notes: tpl.suggestedAction || '',
+      source: { type: 'manual' }
+    };
+    await savePriceAlert(alert);
+    toast(`✓ ${tpl.label}`, 'success');
+    await refresh(viewEl);
+    await renderTemplatesPanel(viewEl);
     await updateAlertBadge();
     window.dispatchEvent(new CustomEvent('app:alerts-updated'));
   }));

@@ -99,6 +99,11 @@ import { renderSmartAlertsCenterView } from './modules/smart-alerts-center.js';
 import { renderFearGreedView }         from './modules/fear-greed.js';
 import { renderWatchpointsView }       from './modules/watchpoints.js';
 
+// V15 — News + Geo + Risk Dashboard
+import { renderNewsFeedView }          from './modules/news-feed.js';
+import { renderGeoRiskView }           from './modules/geo-risk.js';
+import { renderRiskDashboardView }     from './modules/risk-dashboard.js';
+
 const ROUTES = {
   'quick-analysis':      { render: renderQuickAnalysisView,      label: '⚡ Quick Analysis' },
   'wealth':              { render: renderWealthView,             label: '💼 Patrimoine' },
@@ -166,6 +171,10 @@ const ROUTES = {
   'smart-alerts-center':   { render: renderSmartAlertsCenterView,      label: '🔔 Smart Alerts Center' },
   'fear-greed':            { render: renderFearGreedView,              label: '🌡️ Fear & Greed' },
   'watchpoints':           { render: renderWatchpointsView,            label: '📌 Mes points de surveillance' },
+  // V15 — News + Geo + Risk Dashboard (data-driven, pas LLM)
+  'news-feed':             { render: renderNewsFeedView,                label: '📰 News' },
+  'geo-risk':              { render: renderGeoRiskView,                 label: '🌍 Risque géopolitique' },
+  'risk-dashboard':        { render: renderRiskDashboardView,           label: '📊 Risk Dashboard' },
 };
 
 const STATE = { currentRoute: null };

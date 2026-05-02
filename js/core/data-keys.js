@@ -13,7 +13,9 @@ export const DATA_PROVIDERS = [
   { id: 'twelvedata',     label: 'Twelve Data',                desc: 'Real-time prices, forex, ETF (★ best for European ETF) · 800 req/day free', link: 'https://twelvedata.com/pricing' },
   { id: 'fred',           label: 'FRED API',                   desc: 'US macro indicators · unlimited free',                 link: 'https://fred.stlouisfed.org/docs/api/api_key.html' },
   { id: 'etherscan',      label: 'Etherscan',                  desc: 'On-chain ETH (balance, contracts) · 100k req/day',     link: 'https://etherscan.io/myapikey' },
-  { id: 'metals_api',     label: 'Metals-API',                 desc: 'Spot Or/Argent/Platine/Palladium · 50 req/mois free',  link: 'https://metals-api.com/register' }
+  { id: 'metals_api',     label: 'Metals-API',                 desc: 'Spot Or/Argent/Platine/Palladium · 50 req/mois free',  link: 'https://metals-api.com/register' },
+  { id: 'newsapi',        label: 'NewsAPI',                    desc: 'Actualités financières & macro · ~100 req/jour free (Developer plan)', link: 'https://newsapi.org/register' },
+  { id: 'acled',          label: 'ACLED (géopolitique)',       desc: 'Conflits/événements armés · format "email:KEY" · gratuit pour usage non-commercial', link: 'https://developer.acleddata.com/' }
 ];
 
 // Sources gratuites SANS clé requise (intégrées automatiquement dans data-context)
@@ -289,6 +291,44 @@ export async function validateDataKey(id, key) {
             return { ok: false, error: info };
           }
           return { ok: false, error: 'Réponse inattendue' };
+        };
+        break;
+      case 'newsapi': {
+        // NewsAPI bloque CORS depuis le browser → routé via proxy.
+        const proxyBase = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+        const newsTarget = `https://newsapi.org/v2/top-headlines?country=us&pageSize=1&apiKey=${encodeURIComponent(k)}`;
+        url = `${proxyBase}?url=${encodeURIComponent(newsTarget)}`;
+      }
+        parser = async (r) => {
+          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
+          if (j.status === 'ok') return { ok: true };
+          if (j.status === 'error') {
+            if (j.code === 'apiKeyInvalid' || j.code === 'apiKeyMissing') return { ok: false, error: 'Clé invalide' };
+            if (j.code === 'rateLimited') return { ok: true, note: 'rate-limited but key valid' };
+            return { ok: false, error: j.message || j.code || 'Erreur API' };
+          }
+          return { ok: false, error: 'Format inattendu' };
+        };
+        break;
+      case 'acled': {
+        // Format attendu : "email:KEY". On test un GET minimal via proxy.
+        if (!k.includes(':')) return { ok: false, error: 'Format attendu : "email:KEY". Crée ton compte sur developer.acleddata.com.' };
+        const [email, apiKey] = k.split(':');
+        const proxyBase = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+        const acledTarget = `https://api.acleddata.com/acled/read?email=${encodeURIComponent(email.trim())}&key=${encodeURIComponent(apiKey.trim())}&limit=1`;
+        url = `${proxyBase}?url=${encodeURIComponent(acledTarget)}`;
+      }
+        parser = async (r) => {
+          if (r.status === 401 || r.status === 403) return { ok: false, error: 'Email ou clé ACLED invalide.', status: r.status };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
+          if (j.success === true || Array.isArray(j.data)) return { ok: true };
+          if (j.error) return { ok: false, error: typeof j.error === 'string' ? j.error : (j.error.message || 'Erreur API') };
+          return { ok: false, error: 'Format inattendu' };
         };
         break;
       default:

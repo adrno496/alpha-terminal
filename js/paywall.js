@@ -12,6 +12,8 @@
   'use strict';
 
   // ---- Modules accessibles sans Premium ----
+  // Règle : tous les modules qui n'utilisent PAS de LLM (donc 0 coût pour Alpha)
+  // sont free. Le Premium = accès aux modules d'analyse LLM.
   const FREE_MODULES = new Set([
     // Always-visible (sidebar primaire)
     'quick-analysis',
@@ -33,6 +35,25 @@
     'diversification-score',
     'fear-greed',
     'projection',
+    // Ajoutés : modules pure-local oubliés (pas de LLM, calcul/affichage local)
+    'live-watcher',
+    'todays-actions',
+    'smart-alerts-center',
+    'daily-briefing',
+    'macro-events-calendar',
+    'earnings-calendar',
+    'performance-attribution',
+    'tax-loss-harvesting',
+    'envelope-optimizer',
+    'donations-succession',
+    'estate-doc-generator',
+    'ifi-simulator',
+    'fees-analysis',
+    'fire-calculator',
+    'wealth-method',
+    'portfolio-rebalancer',
+    'position-sizing',
+    'trade-journal',
   ]);
 
   function isEN() {
