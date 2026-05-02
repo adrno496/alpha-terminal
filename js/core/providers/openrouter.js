@@ -70,8 +70,10 @@ export class OpenRouterProvider extends BaseProvider {
   }
 
   async validate() {
-    // OpenRouter expose /api/v1/key spécifiquement pour valider une clé
-    // (retourne credits/limit/usage). Aucun coût.
+    // Format OpenRouter : sk-or-v1-… (~73 chars)
+    if (!/^sk-or-v1-[a-f0-9]{60,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[OpenRouter] Format de clé invalide. Format attendu : sk-or-v1-…', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://openrouter.ai/api/v1/key', {
       'Authorization': `Bearer ${this.apiKey}`
     });

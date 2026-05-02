@@ -70,7 +70,10 @@ export class OpenAIProvider extends BaseProvider {
   }
 
   async validate() {
-    // Endpoint léger : GET /v1/models. Pas de coût, pas de modèle requis.
+    // Format OpenAI : sk-proj-… (project keys) ou sk-… (legacy)
+    if (!/^sk-(proj-|svcacct-|admin-)?[A-Za-z0-9_-]{20,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[OpenAI] Format de clé invalide. Format attendu : sk-… ou sk-proj-…', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://api.openai.com/v1/models', {
       'Authorization': `Bearer ${this.apiKey}`
     });

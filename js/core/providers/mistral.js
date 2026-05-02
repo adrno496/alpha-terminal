@@ -19,6 +19,10 @@ export class MistralProvider extends OpenAICompatibleProvider {
 
   // Override : GET /v1/models au lieu de POST chat (aucun coût, pas de modèle requis).
   async validate() {
+    // Format Mistral : 32 chars alphanumériques sans préfixe spécifique
+    if (!/^[A-Za-z0-9]{20,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Mistral] Format de clé invalide. Doit contenir au moins 20 caractères alphanumériques.', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://api.mistral.ai/v1/models', {
       'Authorization': `Bearer ${this.apiKey}`
     });

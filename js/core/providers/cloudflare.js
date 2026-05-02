@@ -40,10 +40,22 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
     const raw = (this.apiKey || '').trim();
     if (!raw) return { ok: false, error: '[Cloudflare] Clé vide.' };
 
-    // L'endpoint /user/tokens/verify accepte juste le token (pas besoin d'account_id).
-    // C'est l'endpoint officiel de validation Cloudflare. CORS-friendly.
+    // Format Cloudflare : ACCOUNT_ID:cfut_xxx ou juste cfut_xxx
+    // ACCOUNT_ID = 32 hex chars · cfut_xxx = ~40 chars typiquement
+    const cfTokenPart = raw.includes(':') ? raw.split(':')[1] : raw;
+    if (!/^(cfut_)?[A-Za-z0-9_-]{20,}$/.test(cfTokenPart)) {
+      return { ok: false, error: '[Cloudflare] Format de token invalide. Format attendu : ACCOUNT_ID:cfut_… (ou cfut_… seul).', status: 400 };
+    }
+    // Si format ACCOUNT_ID:TOKEN, vérifie que ACCOUNT_ID ressemble à un hex 32 chars
+    if (raw.includes(':')) {
+      const accId = raw.split(':')[0];
+      if (!/^[a-f0-9]{32}$/i.test(accId)) {
+        return { ok: false, error: '[Cloudflare] Account ID invalide. Doit être 32 caractères hex (trouvé : ' + accId.length + ' chars). Récupère-le sur dash.cloudflare.com → sidebar droite.', status: 400 };
+      }
+    }
+
     const { accountId, token } = this._parseKey();
-    const tokenOnly = token || raw; // si pas de ':', traite tout comme token
+    const tokenOnly = token || raw;
 
     try {
       const res = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {

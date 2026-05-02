@@ -21,6 +21,10 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
   // consommer de quota d'inférence et sans dépendre d'un modèle spécifique.
   // Endpoint conçu pour ça : https://huggingface.co/docs/api-inference
   async validate() {
+    // Format HF : hf_… (~37 chars)
+    if (!/^hf_[A-Za-z0-9]{30,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Hugging Face] Format de token invalide. Format attendu : hf_…', status: 400 };
+    }
     try {
       const res = await fetch('https://huggingface.co/api/whoami-v2', {
         method: 'GET',

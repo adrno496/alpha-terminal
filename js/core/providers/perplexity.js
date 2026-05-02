@@ -68,6 +68,10 @@ export class PerplexityProvider extends BaseProvider {
   }
 
   async validate() {
+    // Format Perplexity : pplx-…
+    if (!/^pplx-[A-Za-z0-9]{30,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Perplexity] Format de clé invalide. Format attendu : pplx-…', status: 400 };
+    }
     // Perplexity n'expose pas d'endpoint listing → POST minimal sur sonar.
     let res;
     try {

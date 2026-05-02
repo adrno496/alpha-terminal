@@ -29,6 +29,10 @@ export class TogetherProvider extends OpenAICompatibleProvider {
 
   // Override : GET /v1/models léger (CORS-enabled, aucun coût).
   async validate() {
+    // Format Together : 64 hex chars typiquement
+    if (!/^[a-f0-9]{40,}$/i.test(this.apiKey)) {
+      return { ok: false, error: '[Together AI] Format de clé invalide. Doit être 40+ caractères hex.', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://api.together.xyz/v1/models', {
       'Authorization': `Bearer ${this.apiKey}`
     });

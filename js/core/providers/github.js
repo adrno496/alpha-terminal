@@ -24,6 +24,12 @@ export class GitHubModelsProvider extends OpenAICompatibleProvider {
   }
 
   async validate() {
+    // Étape 0 : format check — rejette les fausses clés évidentes immédiatement
+    // GitHub PAT : github_pat_xxx (fine-grained, ~93 chars) ou ghp_xxx (classic, ~40 chars)
+    if (!/^(github_pat_[A-Za-z0-9_]{60,}|ghp_[A-Za-z0-9]{36,})$/.test(this.apiKey)) {
+      return { ok: false, error: '[GitHub Models] Format de PAT invalide. Format attendu : github_pat_… (fine-grained) ou ghp_… (classic).', status: 400 };
+    }
+    // Étape 1 : tenter la validation réseau
     try {
       const res = await fetch('https://models.github.ai/catalog/models', {
         method: 'GET',
@@ -38,7 +44,6 @@ export class GitHubModelsProvider extends OpenAICompatibleProvider {
       if (r2.ok) return r2;
       if (r2.status === 401 || r2.status === 403) return r2;
     } catch {}
-    // CORS bloque tout → on est honnête : provider non utilisable depuis browser
     return { ok: false, error: 'BROWSER_INCOMPATIBLE:github', status: 0 };
   }
 }

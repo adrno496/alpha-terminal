@@ -73,8 +73,10 @@ export class GrokProvider extends BaseProvider {
   }
 
   async validate() {
-    // Endpoint léger : GET /v1/models. Évite de devoir tester plusieurs noms
-    // de modèles pour contourner les variations de tier.
+    // Format xAI Grok : xai-…
+    if (!/^xai-[A-Za-z0-9_-]{20,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[xAI Grok] Format de clé invalide. Format attendu : xai-…', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://api.x.ai/v1/models', {
       'Authorization': `Bearer ${this.apiKey}`
     });

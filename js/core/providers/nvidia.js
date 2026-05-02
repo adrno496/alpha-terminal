@@ -23,6 +23,10 @@ export class NvidiaProvider extends OpenAICompatibleProvider {
   }
 
   async validate() {
+    // Format NVIDIA : nvapi-… (~64 chars total)
+    if (!/^nvapi-[A-Za-z0-9_-]{40,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[NVIDIA NIM] Format de clé invalide. Format attendu : nvapi-…', status: 400 };
+    }
     try {
       const res = await fetch('https://integrate.api.nvidia.com/v1/models', {
         method: 'GET',

@@ -20,6 +20,10 @@ export class CerebrasProvider extends OpenAICompatibleProvider {
 
   // Override : GET /v1/models léger.
   async validate() {
+    // Format Cerebras : csk-…
+    if (!/^csk-[A-Za-z0-9_-]{30,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Cerebras] Format de clé invalide. Format attendu : csk-…', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://api.cerebras.ai/v1/models', {
       'Authorization': `Bearer ${this.apiKey}`
     });

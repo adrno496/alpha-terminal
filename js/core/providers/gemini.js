@@ -85,7 +85,10 @@ export class GeminiProvider extends BaseProvider {
   }
 
   async validate() {
-    // Endpoint léger officiel : GET /v1beta/models?key=KEY (CORS-enabled).
+    // Format Gemini : AIza… (39 chars total)
+    if (!/^AIza[A-Za-z0-9_-]{35}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Gemini] Format de clé invalide. Format attendu : AIza… (39 caractères)', status: 400 };
+    }
     const url = `${BASE}/models?key=${encodeURIComponent(this.apiKey)}`;
     return validateViaGet(this.displayName, url);
   }

@@ -97,6 +97,10 @@ export class ClaudeProvider extends BaseProvider {
   }
 
   async validate() {
+    // Format Claude : sk-ant-api03-…  ou  sk-ant-…
+    if (!/^sk-ant-(api\d{2}-)?[A-Za-z0-9_-]{40,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Anthropic Claude] Format de clé invalide. Format attendu : sk-ant-api03-…', status: 400 };
+    }
     // Endpoint léger officiel : GET /v1/models. Le header
     // `anthropic-dangerous-direct-browser-access` est OBLIGATOIRE pour les
     // appels depuis un browser, sinon Anthropic refuse en CORS.

@@ -71,7 +71,10 @@ export class CohereProvider extends BaseProvider {
   }
 
   async validate() {
-    // Endpoint léger : GET /v1/models. Aucun coût.
+    // Format Cohere : 40 chars alphanumériques
+    if (!/^[A-Za-z0-9]{30,}$/.test(this.apiKey)) {
+      return { ok: false, error: '[Cohere] Format de clé invalide. Doit contenir au moins 30 caractères alphanumériques.', status: 400 };
+    }
     return validateViaGet(this.displayName, 'https://api.cohere.ai/v1/models', {
       'Authorization': `Bearer ${this.apiKey}`
     });
