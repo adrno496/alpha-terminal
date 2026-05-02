@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Alpha pour qui ? — 3 profils d'investisseurs et leur parcours</title>
+  <meta name="description" content="Tu es débutant, investisseur sérieux ou pro / fiscaliste ? Découvre quels modules Alpha utiliser, dans quel ordre, et combien ça te coûtera vraiment selon ton profil." />
+  <link rel="canonical" href="https://alpha-terminal.app/pour-qui.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/pour-qui.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/who-is-it-for.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/pour-qui.html" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Alpha pour qui ? — 3 profils, 3 parcours" />
+  <meta property="og:description" content="Débutant, investisseur sérieux, pro/fiscaliste : quels modules utiliser, dans quel ordre, combien ça coûte." />
+  <meta property="og:url" content="https://alpha-terminal.app/pour-qui.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://alpha-terminal.app/"},{"@type":"ListItem","position":2,"name":"Pour qui","item":"https://alpha-terminal.app/pour-qui.html"}]}
+  </script>
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+    {"@type":"Question","name":"Alpha est-il adapté aux débutants ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Le module Quick Analysis donne un verdict ACHETER/VENDRE/ATTENDRE en 30 secondes avec explication pédagogique. La courbe d'apprentissage est de 5-10 minutes. Le mode démo permet d'explorer sans payer."}},
+    {"@type":"Question","name":"Alpha remplace-t-il Bloomberg pour un pro ?","acceptedAnswer":{"@type":"Answer","text":"Pour 95% des cas d'usage retail/PME : oui (analyse fondamentale, valorisation, audit Buffett, fiscalité multi-pays). Pour le HFT institutionnel ou besoins de data tick-by-tick temps réel : non, Bloomberg reste indépassable."}},
+    {"@type":"Question","name":"Combien ça coûte selon mon profil ?","acceptedAnswer":{"@type":"Answer","text":"Débutant : 9,99€/mois Alpha + 0-2€/mois en API LLM (clés gratuites GitHub Models, Cerebras, Mistral suffisent). Investisseur sérieux : 9,99€/mois + 5-15€ d'API. Pro/fiscaliste : 9,99€/mois + 15-40€ d'API selon volume."}}
+  ]}
+  </script>
+
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; line-height:1.6; }
+    .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; flex-wrap:wrap; gap:14px; }
+    .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }
+    .nav a { color:#ccc; text-decoration:none; font-size:14px; }
+    .nav a:hover { color:#00ff88; }
+    .lang-switch { margin-left:auto; padding:4px 8px; border:1px solid #333; border-radius:4px; font-size:12px; }
+    main { max-width:1100px; margin:0 auto; padding:50px 22px 80px; }
+    .breadcrumb { font-size:12px; color:#777; margin-bottom:18px; }
+    .breadcrumb a { color:#777; text-decoration:none; }
+    h1 { font-size:clamp(30px,4vw,46px); margin:0 0 16px; line-height:1.15; }
+    h2 { font-size:22px; margin:36px 0 12px; }
+    .hero-intro { font-size:18px; color:#bbb; max-width:780px; margin:0 0 40px; }
+    .picker { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; margin:0 0 50px; }
+    .picker-card { background:#111; border:2px solid #222; border-radius:12px; padding:24px; cursor:pointer; transition:all 0.18s; text-align:center; text-decoration:none; color:#fff; display:block; }
+    .picker-card:hover { border-color:#00ff88; transform:translateY(-3px); }
+    .picker-card .ico { font-size:42px; display:block; margin-bottom:10px; }
+    .picker-card h3 { margin:0 0 8px; font-size:18px; }
+    .picker-card p { margin:0; font-size:13px; color:#999; }
+
+    .persona { background:linear-gradient(135deg,#0d0d0d,#0a0a0a); border:1px solid #222; border-radius:14px; padding:32px; margin:32px 0; scroll-margin-top:20px; }
+    .persona-head { display:flex; align-items:center; gap:18px; margin-bottom:22px; flex-wrap:wrap; }
+    .persona-avatar { width:72px; height:72px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:36px; flex-shrink:0; }
+    .persona-avatar.beg { background:linear-gradient(135deg,#0088ff,#00aaff); }
+    .persona-avatar.ser { background:linear-gradient(135deg,#00cc6a,#00ff88); color:#000; }
+    .persona-avatar.pro { background:linear-gradient(135deg,#ff8800,#ffaa00); color:#000; }
+    .persona-meta { flex:1; min-width:220px; }
+    .persona-meta h2 { margin:0 0 4px; font-size:24px; color:#fff; }
+    .persona-meta .tag { font-size:13px; color:#aaa; }
+
+    .quote { background:rgba(255,255,255,0.04); border-left:3px solid #00ff88; padding:14px 18px; margin:14px 0 22px; font-style:italic; font-size:14.5px; color:#ddd; }
+
+    .grid-need { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin:18px 0 24px; }
+    .need { background:rgba(255,255,255,0.03); border:1px solid #222; border-radius:8px; padding:14px; }
+    .need strong { color:#00ff88; font-size:13px; display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.5px; }
+    .need p { margin:0; font-size:13.5px; color:#ccc; }
+
+    h3.module-title { font-size:17px; color:#00ff88; margin:24px 0 10px; }
+    .module-list { list-style:none; padding:0; margin:0; }
+    .module-list li { padding:10px 14px; background:rgba(255,255,255,0.025); border-radius:6px; margin-bottom:6px; font-size:14px; display:flex; align-items:center; gap:10px; }
+    .module-list .num { background:#00ff88; color:#000; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; flex-shrink:0; }
+    .module-list .name { font-weight:600; }
+    .module-list .why { color:#999; font-size:13px; margin-left:auto; text-align:right; max-width:60%; }
+
+    .cost-box { background:#001a0d; border:1px solid #00ff88; border-radius:8px; padding:18px 20px; margin:18px 0 0; }
+    .cost-box strong { color:#00ff88; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; display:block; margin-bottom:6px; }
+    .cost-box .total { font-size:22px; font-weight:700; color:#fff; margin:6px 0; }
+    .cost-box .small { font-size:12px; color:#aaa; }
+
+    .cta { display:inline-block; background:#00ff88; color:#000; padding:12px 22px; border-radius:8px; font-weight:700; text-decoration:none; margin-top:14px; font-size:14px; }
+    .cta.secondary { background:transparent; color:#fff; border:1px solid #444; margin-left:8px; }
+
+    .compare-table { width:100%; border-collapse:collapse; margin:30px 0; font-size:13.5px; }
+    .compare-table th, .compare-table td { padding:12px 14px; text-align:left; border-bottom:1px solid #222; }
+    .compare-table th { background:#111; color:#00ff88; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; }
+    .compare-table tr:hover td { background:rgba(0,255,136,0.03); }
+
+    .cta-final { background:linear-gradient(135deg,#001a0d,#0a0a0a); border:1px solid #00ff88; border-radius:12px; padding:32px; text-align:center; margin:50px 0 0; }
+    .cta-final h2 { margin:0 0 8px; }
+    .cta-final p { color:#aaa; margin:0 0 14px; font-size:14px; }
+    .cta-final .small { font-size:11px; color:#888; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">α Alpha</a>
+  <a href="features.html">Fonctionnalités</a>
+  <a href="pricing.html">Tarifs</a>
+  <a href="bloomberg-alternative.html">vs Bloomberg</a>
+  <a href="blog.html">Blog</a>
+  <a href="who-is-it-for.html" class="lang-switch" hreflang="en">🇬🇧 EN</a>
+</nav>
+
+<main>
+  <p class="breadcrumb"><a href="index.html">Accueil</a> › <span>Pour qui</span></p>
+
+  <h1>Alpha, c'est pour <span style="color:#00ff88;">qui</span> exactement ?</h1>
+  <p class="hero-intro">60 modules, c'est beaucoup. Voici comment Alpha s'adapte à ton profil — débutant qui veut juste un avis, investisseur sérieux qui construit un portefeuille, ou pro qui gère des situations complexes (fiscalité internationale, multi-portefeuilles, RAG perso).</p>
+
+  <div class="picker">
+    <a href="#beginner" class="picker-card">
+      <span class="ico">🌱</span>
+      <h3>Je débute en bourse</h3>
+      <p>"Je veux juste savoir si je dois acheter Apple"</p>
+    </a>
+    <a href="#serious" class="picker-card">
+      <span class="ico">📊</span>
+      <h3>J'investis sérieusement</h3>
+      <p>"Je gère 50k+, j'ai un portefeuille structuré"</p>
+    </a>
+    <a href="#pro" class="picker-card">
+      <span class="ico">🏆</span>
+      <h3>Je suis pro / fiscaliste</h3>
+      <p>"J'ai des clients, des cas complexes, multi-pays"</p>
+    </a>
+  </div>
+
+  <!-- ========== PERSONA 1 — DÉBUTANT ========== -->
+  <section class="persona" id="beginner">
+    <div class="persona-head">
+      <div class="persona-avatar beg">🌱</div>
+      <div class="persona-meta">
+        <h2>Le débutant — "Je veux juste savoir quoi acheter"</h2>
+        <div class="tag">25-40 ans · 1 000 - 20 000€ d'épargne · Trade Republic / Boursorama / Bourse Direct</div>
+      </div>
+    </div>
+
+    <div class="quote">"J'ai entendu parler de Tesla / Nvidia / Bitcoin. Je veux savoir si c'est un bon achat sans passer 3 heures à lire des forums. Et je veux comprendre le verdict, pas juste le suivre aveuglément."</div>
+
+    <h3 class="module-title">🎯 Tes besoins</h3>
+    <div class="grid-need">
+      <div class="need"><strong>Décision</strong><p>ACHETER, VENDRE ou ATTENDRE — clair, rapide, expliqué simplement.</p></div>
+      <div class="need"><strong>Pédagogie</strong><p>Comprendre POURQUOI c'est ce verdict (pas juste le subir).</p></div>
+      <div class="need"><strong>Pas de jargon</strong><p>Pas besoin de comprendre WACC ou EBITDA pour démarrer.</p></div>
+      <div class="need"><strong>Coût mini</strong><p>Tu testes sans risquer 50€/mois.</p></div>
+    </div>
+
+    <h3 class="module-title">📚 Tes 5 modules essentiels (parcours débutant)</h3>
+    <ul class="module-list">
+      <li><span class="num">1</span><span class="name">Quick Analysis</span><span class="why">Verdict en 30s sur n'importe quelle action</span></li>
+      <li><span class="num">2</span><span class="name">Wealth (Patrimoine)</span><span class="why">Suivi de tes positions + auto-refresh prix</span></li>
+      <li><span class="num">3</span><span class="name">Watchlist + Brief</span><span class="why">Surveille 10-20 actions, brief quotidien</span></li>
+      <li><span class="num">4</span><span class="name">Mode démo</span><span class="why">Explore les analyses sans payer</span></li>
+      <li><span class="num">5</span><span class="name">Knowledge Base</span><span class="why">Pose des questions sur tes documents (PEA, banque…)</span></li>
+    </ul>
+
+    <div class="cost-box">
+      <strong>💰 Ton budget mensuel total</strong>
+      <div class="total">9,99€ + 0 à 2€</div>
+      <div class="small">Alpha : 9,99€/mois (ou 299€ à vie). API LLM : <strong>0€</strong> avec une clé gratuite (GitHub Models, Cerebras, Mistral) — largement suffisant à ton usage. Tu peux upgrader plus tard à Claude Sonnet (~$0,01/analyse) si tu veux la qualité premium.</div>
+    </div>
+
+    <a href="pricing.html#monthly" class="cta plausible-event-name=Persona+Beginner+CTA">→ Démarrer pour 9,99€/mois</a>
+    <a href="api-keys-guide.html" class="cta secondary">Comment obtenir une clé gratuite ?</a>
+  </section>
+
+  <!-- ========== PERSONA 2 — INVESTISSEUR SÉRIEUX ========== -->
+  <section class="persona" id="serious">
+    <div class="persona-head">
+      <div class="persona-avatar ser">📊</div>
+      <div class="persona-meta">
+        <h2>L'investisseur sérieux — "Je gère un portefeuille, je veux les outils pro"</h2>
+        <div class="tag">35-55 ans · 50 000 - 500 000€ · CTO + PEA + assurance-vie · 20-50h/mois sur ses investissements</div>
+      </div>
+    </div>
+
+    <div class="quote">"Je suis 40 actions, j'ai mon process. Avant je passais 3h à analyser un 10-K. Je veux pouvoir auditer une action en 5 min, calculer un DCF en 1 min, et avoir un radar sur mon portefeuille global."</div>
+
+    <h3 class="module-title">🎯 Tes besoins</h3>
+    <div class="grid-need">
+      <div class="need"><strong>Profondeur</strong><p>Vrais 10-K decoders, DCF avec hypothèses, audit Buffett scoré.</p></div>
+      <div class="need"><strong>Surveillance globale</strong><p>Performance, attribution, corrélations entre lignes.</p></div>
+      <div class="need"><strong>Risque & couverture</strong><p>Stress tests, value-at-risk, scénarios macro.</p></div>
+      <div class="need"><strong>Multi-LLM</strong><p>Choisir le meilleur modèle par module, comparer les verdicts.</p></div>
+    </div>
+
+    <h3 class="module-title">📚 Tes 12 modules clés (workflow complet)</h3>
+    <ul class="module-list">
+      <li><span class="num">1</span><span class="name">10-K Decoder</span><span class="why">Décortique 200 pages en 30 secondes</span></li>
+      <li><span class="num">2</span><span class="name">DCF Valuation</span><span class="why">Valorisation intrinsèque + sensibilité</span></li>
+      <li><span class="num">3</span><span class="name">Audit Buffett</span><span class="why">Score sur les 7 critères + flags rouges</span></li>
+      <li><span class="num">4</span><span class="name">CEO Forensics</span><span class="why">Décode les vrais signaux des earnings calls</span></li>
+      <li><span class="num">5</span><span class="name">Position Sizing</span><span class="why">Combien acheter selon ta conviction (Kelly)</span></li>
+      <li><span class="num">6</span><span class="name">Performance Attribution</span><span class="why">Quelles lignes te font gagner/perdre</span></li>
+      <li><span class="num">7</span><span class="name">Correlation Matrix</span><span class="why">Détecte les doublons cachés dans ton portefeuille</span></li>
+      <li><span class="num">8</span><span class="name">Stress Test</span><span class="why">Que se passe-t-il en cas de -30% du marché ?</span></li>
+      <li><span class="num">9</span><span class="name">Macro Dashboard</span><span class="why">Cycle, taux, inflation, événements à venir</span></li>
+      <li><span class="num">10</span><span class="name">Sentiment Tracker</span><span class="why">Pulse réseaux sociaux + news</span></li>
+      <li><span class="num">11</span><span class="name">Earnings Calendar</span><span class="why">Tous les résultats à venir sur tes positions</span></li>
+      <li><span class="num">12</span><span class="name">Capital Gains FIFO/CMP</span><span class="why">Calcul automatisé pour ta déclaration</span></li>
+    </ul>
+
+    <div class="cost-box">
+      <strong>💰 Ton budget mensuel total</strong>
+      <div class="total">9,99€ + 5 à 15€</div>
+      <div class="small">Alpha : 9,99€/mois (ou 299€ à vie pour rentabiliser en 30 mois). API LLM : 5-15€ avec un mix Claude Sonnet + Cerebras gratuit. Tu peux <a href="byok-cost-calculator.html" style="color:#00ff88;">simuler ton coût exact ici</a>. À comparer aux 39€/mois de Koyfin (sans IA) ou 449€/an de Seeking Alpha.</div>
+    </div>
+
+    <a href="pricing.html#lifetime" class="cta plausible-event-name=Persona+Serious+CTA">→ Voir l'offre à vie 299€</a>
+    <a href="byok-cost-calculator.html" class="cta secondary">Simuler mon coût exact</a>
+  </section>
+
+  <!-- ========== PERSONA 3 — PRO / FISCALISTE ========== -->
+  <section class="persona" id="pro">
+    <div class="persona-head">
+      <div class="persona-avatar pro">🏆</div>
+      <div class="persona-meta">
+        <h2>Le pro / fiscaliste — "J'ai des clients, des cas complexes"</h2>
+        <div class="tag">CGP · ex-trader · family office · 500k - 5M€ AUM · multi-pays · gestion patrimoniale</div>
+      </div>
+    </div>
+
+    <div class="quote">"Mes clients ont du PEA, du CTO, de l'IFI, des holdings, parfois plusieurs résidences fiscales. Je dois calculer des plus-values FIFO/CMP en multi-devises, optimiser des donations en démembrement, et produire des analyses fondamentales défendables. Bloomberg c'est 24k€/an et zéro IA."</div>
+
+    <h3 class="module-title">🎯 Tes besoins</h3>
+    <div class="grid-need">
+      <div class="need"><strong>Multi-pays</strong><p>Tax Optimizer 8 juridictions (FR, BE, CH, LU, US, UK, IT, ES…).</p></div>
+      <div class="need"><strong>Confidentialité absolue</strong><p>Données clients ne quittent jamais ton appareil. Conformité RGPD.</p></div>
+      <div class="need"><strong>Production de rapports</strong><p>Export PDF clean, branding personnalisable.</p></div>
+      <div class="need"><strong>Backtest sur 35 ans</strong><p>Justifier une stratégie auprès d'un client : data 1990-2025.</p></div>
+    </div>
+
+    <h3 class="module-title">📚 Tes modules avancés</h3>
+    <ul class="module-list">
+      <li><span class="num">1</span><span class="name">Tax Optimizer 8 pays</span><span class="why">Plus-values, dividendes, IFI, conventions fiscales</span></li>
+      <li><span class="num">2</span><span class="name">Capital Gains FIFO/CMP/LIFO</span><span class="why">Multi-devises, multi-comptes, export Excel</span></li>
+      <li><span class="num">3</span><span class="name">IFI Calculator</span><span class="why">Patrimoine immobilier français + démembrements</span></li>
+      <li><span class="num">4</span><span class="name">Donations & Succession FR</span><span class="why">Optimisation transmissions (PEA, AV, démembrement)</span></li>
+      <li><span class="num">5</span><span class="name">Estate Documents</span><span class="why">Génère des notes de synthèse pour héritiers / notaire</span></li>
+      <li><span class="num">6</span><span class="name">Backtest 1990-2025</span><span class="why">35 ans de data pour valider une stratégie</span></li>
+      <li><span class="num">7</span><span class="name">Multi-currency P&L</span><span class="why">Conversion historique automatique pour comptes EUR/USD/CHF</span></li>
+      <li><span class="num">8</span><span class="name">RAG Knowledge Base</span><span class="why">Pose des questions sur tes propres docs (BOI, jurisprudence, fiches clients)</span></li>
+      <li><span class="num">9</span><span class="name">Performance Attribution</span><span class="why">Reporting trimestriel pour clients</span></li>
+      <li><span class="num">10</span><span class="name">CEO Forensics + Audit Buffett</span><span class="why">Justifie tes recommandations avec scoring chiffré</span></li>
+    </ul>
+
+    <div class="cost-box">
+      <strong>💰 Ton budget mensuel total (par praticien)</strong>
+      <div class="total">9,99€ + 15 à 40€</div>
+      <div class="small">Alpha : 9,99€/mois OU 299€ à vie (recommandé pour usage pro intensif). API LLM : 15-40€ pour 30-100 analyses approfondies/mois (Claude Opus pour les cas complexes). À comparer à Bloomberg : <strong>2 000€/mois</strong>. Économie : ~98%.</div>
+    </div>
+
+    <a href="pricing.html#lifetime" class="cta plausible-event-name=Persona+Pro+CTA">→ Acheter à vie 299€</a>
+    <a href="bloomberg-alternative.html" class="cta secondary">Comparer à Bloomberg</a>
+  </section>
+
+  <!-- COMPARATIF -->
+  <h2>Comparatif des 3 profils</h2>
+  <table class="compare-table">
+    <thead>
+      <tr><th>Critère</th><th>🌱 Débutant</th><th>📊 Sérieux</th><th>🏆 Pro</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Patrimoine géré</td><td>1k-20k€</td><td>50k-500k€</td><td>500k-5M€ AUM</td></tr>
+      <tr><td>Modules utilisés</td><td>5</td><td>12</td><td>20+</td></tr>
+      <tr><td>Temps gagné/mois</td><td>5-10h</td><td>20-40h</td><td>50-100h</td></tr>
+      <tr><td>Plan recommandé</td><td>Mensuel 9,99€</td><td>À vie 299€</td><td>À vie 299€</td></tr>
+      <tr><td>Coût IA mensuel</td><td>0-2€</td><td>5-15€</td><td>15-40€</td></tr>
+      <tr><td>Provider IA recommandé</td><td>GitHub Models (gratuit)</td><td>Claude Sonnet + Cerebras</td><td>Claude Opus + Sonnet</td></tr>
+      <tr><td>ROI estimé Y1</td><td>5-10× le coût</td><td>20-50× le coût</td><td>100×+ le coût</td></tr>
+    </tbody>
+  </table>
+
+  <!-- FAQ -->
+  <h2>Questions fréquentes par profil</h2>
+
+  <h3 style="margin-top:24px;">🌱 Je suis débutant, est-ce que je vais comprendre ?</h3>
+  <p style="color:#ccc;font-size:14.5px;">Oui. Le module Quick Analysis donne un verdict ACHETER / VENDRE / ATTENDRE en 1 phrase, suivi d'une explication pédagogique. Aucun jargon. Le mode démo te permet de tester sans même payer ni configurer de clé.</p>
+
+  <h3 style="margin-top:24px;">📊 J'utilise déjà Koyfin / Stock Rover. Pourquoi changer ?</h3>
+  <p style="color:#ccc;font-size:14.5px;">Koyfin et Stock Rover sont excellents pour le screening et les charts pro. Ils n'ont <strong>aucun module IA</strong>. Alpha les complète : tu gardes Koyfin pour le screening, et tu utilises Alpha pour décortiquer un 10-K, calculer un DCF, ou auditer un management. <a href="alpha-vs-koyfin.html" style="color:#00ff88;">Comparatif détaillé Alpha vs Koyfin</a>.</p>
+
+  <h3 style="margin-top:24px;">🏆 Mes clients exigent confidentialité totale. C'est garanti ?</h3>
+  <p style="color:#ccc;font-size:14.5px;">Oui — c'est notre proposition de valeur principale. Aucune donnée client ne transite par nos serveurs. Tu peux le <a href="privacy-proof.html" style="color:#00ff88;">vérifier toi-même via les DevTools</a>. Conformité RGPD totale (rien à déclarer puisque rien n'est collecté).</p>
+
+  <h3 style="margin-top:24px;">💳 Et si je veux changer de profil dans 6 mois ?</h3>
+  <p style="color:#ccc;font-size:14.5px;">Tous les modules sont inclus dans tous les plans. Tu peux passer de "5 modules essentiels" à "20+ modules avancés" sans changer de plan. C'est juste un changement d'usage.</p>
+
+  <div class="cta-final">
+    <h2>Quel que soit ton profil, démarre sans risque.</h2>
+    <p>14 jours satisfait ou remboursé · Annulation en 1 clic · Mode démo gratuit pour tester avant de payer</p>
+    <a href="pricing.html" class="cta plausible-event-name=PourQui+Final+CTA">→ Voir les tarifs</a>
+    <a href="newsletter.html" class="cta secondary">📬 Recevoir le guide PDF gratuit</a>
+    <p class="small">🛡️ 9,99€/mois ou 299€ à vie · Aucune CB stockée chez nous</p>
+  </div>
+
+</main>
+
+</body>
+</html>
