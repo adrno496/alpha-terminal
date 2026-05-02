@@ -1,5 +1,6 @@
 // Mistral AI — https://docs.mistral.ai/api/
 import { OpenAICompatibleProvider } from './openai-compatible.js';
+import { validateViaGet } from './base.js';
 
 export class MistralProvider extends OpenAICompatibleProvider {
   constructor(apiKey, modelOverrides = {}) {
@@ -13,6 +14,13 @@ export class MistralProvider extends OpenAICompatibleProvider {
         balanced: 'mistral-medium-latest',
         fast: 'mistral-small-latest'
       }
+    });
+  }
+
+  // Override : GET /v1/models au lieu de POST chat (aucun coût, pas de modèle requis).
+  async validate() {
+    return validateViaGet(this.displayName, 'https://api.mistral.ai/v1/models', {
+      'Authorization': `Bearer ${this.apiKey}`
     });
   }
 }

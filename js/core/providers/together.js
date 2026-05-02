@@ -1,6 +1,7 @@
 // Together AI — https://docs.together.ai/
 // OpenAI-compatible inference for open-source models.
 import { OpenAICompatibleProvider } from './openai-compatible.js';
+import { validateViaGet } from './base.js';
 
 export class TogetherProvider extends OpenAICompatibleProvider {
   constructor(apiKey, modelOverrides = {}) {
@@ -23,6 +24,13 @@ export class TogetherProvider extends OpenAICompatibleProvider {
         'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
         'meta-llama/Llama-3.3-70B-Instruct-Turbo'
       ]
+    });
+  }
+
+  // Override : GET /v1/models léger (CORS-enabled, aucun coût).
+  async validate() {
+    return validateViaGet(this.displayName, 'https://api.together.xyz/v1/models', {
+      'Authorization': `Bearer ${this.apiKey}`
     });
   }
 }

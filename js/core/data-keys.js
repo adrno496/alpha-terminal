@@ -47,7 +47,12 @@ export function getDataKeyStatus(id) {
 
 // === Validation réelle des clés data via appel minimal ===
 // Chaque provider est testé via son endpoint le moins coûteux.
-// Retour : { ok: bool, error?: string }
+// Retour : { ok: bool, error?: string, status?: number }
+// Conventions :
+//   - 429 → { ok: true } (rate limit ⇒ la clé existe)
+//   - 5xx → { ok: true } (serveur du provider, pas la faute de la clé)
+//   - 401/403 → { ok: false, error: ... } (clé invalide / scope manquant)
+//   - TypeError "Failed to fetch" → message CORS actionnable
 export async function validateDataKey(id, key) {
   if (!key || !String(key).trim()) return { ok: false, error: 'Clé vide' };
   const k = String(key).trim();
@@ -59,8 +64,10 @@ export async function validateDataKey(id, key) {
         // Retourne juste { symbol, price, volume } — utilisé pour valider la clé.
         url = `https://financialmodelingprep.com/api/v3/quote-short/AAPL?apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          if (r.status === 401 || r.status === 403) return { ok: false, error: 'Clé invalide (401/403)' };
-          if (r.status === 429) return { ok: false, error: 'Quota dépassé (réessaie demain)' };
+          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
+          if (r.status === 403) return { ok: false, error: 'Clé valide mais accès refusé (tier insuffisant).', status: 403 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error, key likely valid' };
           const text = await r.text();
           let j; try { j = JSON.parse(text); } catch { return { ok: false, error: 'Réponse non-JSON: ' + text.slice(0, 60) }; }
           if (j && j['Error Message']) return { ok: false, error: j['Error Message'] };
@@ -83,10 +90,15 @@ export async function validateDataKey(id, key) {
       case 'alphavantage':
         url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          const j = await r.json();
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
           if (j['Error Message']) return { ok: false, error: j['Error Message'] };
           if (j['Note'] && /invalid api key/i.test(j['Note'])) return { ok: false, error: 'Clé invalide' };
-          if (j['Information'] && /api key/i.test(j['Information'])) return { ok: false, error: j['Information'].slice(0, 80) };
+          // "Note" sans "invalid" = rate limit (Alpha Vantage utilise 200 + Note pour quota)
+          if (j['Note'] && /thank you/i.test(j['Note'])) return { ok: true, note: 'rate-limited but key valid' };
+          if (j['Information'] && /(invalid|premium)/i.test(j['Information'])) return { ok: false, error: j['Information'].slice(0, 120) };
+          if (j['Information']) return { ok: true, note: 'rate-limited but key valid' };
           if (j['Global Quote']) return { ok: true };
           return { ok: false, error: 'Format réponse inconnu' };
         };
@@ -94,8 +106,11 @@ export async function validateDataKey(id, key) {
       case 'finnhub':
         url = `https://finnhub.io/api/v1/quote?symbol=AAPL&token=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          if (r.status === 401 || r.status === 403) return { ok: false, error: 'Clé invalide' };
-          const j = await r.json();
+          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
+          if (r.status === 403) return { ok: false, error: 'Clé valide mais accès refusé.', status: 403 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
           if (j.error) return { ok: false, error: j.error };
           if (typeof j.c === 'number') return { ok: true };
           return { ok: false, error: 'Réponse inattendue' };
@@ -104,8 +119,11 @@ export async function validateDataKey(id, key) {
       case 'polygon':
         url = `https://api.polygon.io/v3/reference/tickers/AAPL?apiKey=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          if (r.status === 401 || r.status === 403) return { ok: false, error: 'Clé invalide (401/403)' };
-          const j = await r.json();
+          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
+          if (r.status === 403) return { ok: false, error: 'Clé valide mais accès refusé (tier insuffisant).', status: 403 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
           if (j.status === 'ERROR' || j.error) return { ok: false, error: j.error || j.message || 'Erreur API' };
           if (j.results) return { ok: true };
           return { ok: false, error: 'Format inattendu' };
@@ -115,16 +133,24 @@ export async function validateDataKey(id, key) {
         // Endpoint officiel de test : /api/test
         url = `https://api.tiingo.com/api/test?token=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          if (r.status === 401) return { ok: false, error: 'Token invalide' };
           if (r.ok) return { ok: true };
-          return { ok: false, error: `HTTP ${r.status}` };
+          if (r.status === 401) return { ok: false, error: 'Token invalide ou révoqué.', status: 401 };
+          if (r.status === 403) return { ok: false, error: 'Token valide mais accès refusé.', status: 403 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          return { ok: false, error: `HTTP ${r.status}`, status: r.status };
         };
         break;
       case 'twelvedata':
         url = `https://api.twelvedata.com/quote?symbol=AAPL&apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          const j = await r.json();
-          if (j.code === 401 || j.code === 400) return { ok: false, error: j.message || 'Clé invalide' };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
+          if (j.code === 401) return { ok: false, error: j.message || 'Clé invalide ou révoquée.', status: 401 };
+          if (j.code === 403) return { ok: false, error: j.message || 'Clé valide mais accès refusé.', status: 403 };
+          if (j.code === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (j.code === 400) return { ok: false, error: j.message || 'Requête mal formée' };
           if (j.status === 'error') return { ok: false, error: j.message || 'Erreur API' };
           if (j.symbol) return { ok: true };
           return { ok: false, error: 'Format inattendu' };
@@ -147,8 +173,11 @@ export async function validateDataKey(id, key) {
               return { ok: false, error: 'Erreur 400: ' + text.slice(0, 80) };
             }
           }
-          if (r.status === 403) return { ok: false, error: 'Clé révoquée ou bloquée (403)' };
-          if (!r.ok) return { ok: false, error: `HTTP ${r.status}` };
+          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
+          if (r.status === 403) return { ok: false, error: 'Clé valide mais accès refusé.', status: 403 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          if (!r.ok) return { ok: false, error: `HTTP ${r.status}`, status: r.status };
           // 200 → on parse pour valider la structure mais on est tolérant
           const text = await r.text();
           let j; try { j = JSON.parse(text); } catch { return { ok: true }; /* 200 + non-JSON = clé OK */ }
@@ -163,7 +192,10 @@ export async function validateDataKey(id, key) {
         // nouvelles clés. On utilise V2 avec chainid=1 par défaut.
         url = `https://api.etherscan.io/v2/api?chainid=1&module=stats&action=ethsupply&apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          if (r.status === 401 || r.status === 403) return { ok: false, error: 'Clé invalide' };
+          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
+          if (r.status === 403) return { ok: false, error: 'Clé valide mais accès refusé.', status: 403 };
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
           const text = await r.text();
           let j; try { j = JSON.parse(text); } catch { return { ok: false, error: 'Réponse non-JSON' }; }
           // Format Etherscan : { status: '1'|'0', message: 'OK'|'NOTOK', result: '...' }
@@ -189,9 +221,22 @@ export async function validateDataKey(id, key) {
       case 'metals_api':
         url = `https://metals-api.com/api/latest?access_key=${encodeURIComponent(k)}&base=USD&symbols=XAU`;
         parser = async (r) => {
-          const j = await r.json();
+          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error' };
+          const j = await r.json().catch(() => ({}));
           if (j.success === true) return { ok: true };
-          if (j.error) return { ok: false, error: j.error.info || j.error.type || 'Erreur API' };
+          if (j.error) {
+            const code = j.error.code;
+            const info = j.error.info || j.error.type || 'Erreur API';
+            // 101 = invalid_access_key, 102 = inactive, 105 = function_access_restricted
+            if (code === 101 || code === 102 || /invalid|access/i.test(String(j.error.type || ''))) {
+              return { ok: false, error: info, status: 401 };
+            }
+            if (code === 104 || /usage_limit|monthly/i.test(info)) {
+              return { ok: true, note: 'rate-limited but key valid' };
+            }
+            return { ok: false, error: info };
+          }
           return { ok: false, error: 'Réponse inattendue' };
         };
         break;

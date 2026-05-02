@@ -1,7 +1,7 @@
 // Cohere — https://docs.cohere.com/reference/chat
 // v2 chat endpoint accepts OpenAI-style "messages" but uses different field names
 // for response/usage. SSE streaming format is also Cohere-specific.
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateViaGet } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.cohere.com/v2/chat';
@@ -71,16 +71,10 @@ export class CohereProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await this._fetch({
-        model: this.modelOverrides.fast || 'command-r7b-12-2024',
-        messages: [{ role: 'user', content: 'ping' }],
-        max_tokens: 8
-      });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    // Endpoint léger : GET /v1/models. Aucun coût.
+    return validateViaGet(this.displayName, 'https://api.cohere.ai/v1/models', {
+      'Authorization': `Bearer ${this.apiKey}`
+    });
   }
 
   async call(params) {

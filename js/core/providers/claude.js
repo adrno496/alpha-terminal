@@ -1,5 +1,5 @@
 // Provider Anthropic Claude
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateViaGet } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.anthropic.com/v1/messages';
@@ -97,16 +97,14 @@ export class ClaudeProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await this._fetch({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 8,
-        messages: [{ role: 'user', content: 'ping' }]
-      });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    // Endpoint léger officiel : GET /v1/models. Le header
+    // `anthropic-dangerous-direct-browser-access` est OBLIGATOIRE pour les
+    // appels depuis un browser, sinon Anthropic refuse en CORS.
+    return validateViaGet(this.displayName, 'https://api.anthropic.com/v1/models', {
+      'x-api-key': this.apiKey,
+      'anthropic-version': VERSION,
+      'anthropic-dangerous-direct-browser-access': 'true'
+    });
   }
 
   async call(params) {

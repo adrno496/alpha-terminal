@@ -8,6 +8,7 @@ import { getCost, resetTotalCost, getBudgetLimits, setBudgetLimits } from '../co
 import { MODEL_CATALOG } from '../core/models-catalog.js';
 import { t, getLocale } from '../core/i18n.js';
 import { DATA_PROVIDERS, KEYLESS_DATA_SOURCES, getDataKey, setDataKey, getDataKeyStatus, validateDataKey } from '../core/data-keys.js';
+import { explainAsPillHTML, explainAsDetailHTML } from './error-explainer.js';
 import { resetTour, startTour } from './tour.js';
 import { downloadFullBackup, importBackupFromFile, getLocalDataStats, wipeAllLocalData, copyBackupToClipboard, diagnosticBackup } from '../core/backup.js';
 
@@ -239,14 +240,22 @@ function renderDataKeysTab(c) {
       statusEl.innerHTML = '<span class="spinner" style="width:10px;height:10px;display:inline-block;"></span>';
       try {
         const v = await validateDataKey(id, k);
-        if (v.ok) {
-          statusEl.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
-        } else {
-          const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').slice(0, 80);
-          statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
+        statusEl.innerHTML = explainAsPillHTML(v);
+        // Affiche aussi le détail (explication + action) sous la ligne pour que l'user comprenne
+        let detailEl = c.querySelector(`[data-detail-id="${id}"]`);
+        const detailHTML = explainAsDetailHTML(v);
+        if (detailHTML) {
+          if (!detailEl) {
+            detailEl = document.createElement('div');
+            detailEl.setAttribute('data-detail-id', id);
+            statusEl.parentElement.appendChild(detailEl);
+          }
+          detailEl.innerHTML = detailHTML;
+        } else if (detailEl) {
+          detailEl.remove();
         }
       } catch (e) {
-        statusEl.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e.message || 'erreur').slice(0, 30)}</span>`;
+        statusEl.innerHTML = explainAsPillHTML({ ok: false, error: e?.message || 'erreur' });
       } finally {
         btn.disabled = false;
         btn.textContent = oldLabel;
@@ -284,23 +293,21 @@ function renderDataKeysTab(c) {
         pills[p.id] = pill;
       }
       let okCount = 0, failCount = 0;
+      // Stocke les résultats détaillés pour les afficher en dessous
+      const failures = [];
       await Promise.all(toTest.map(async (p) => {
         const inputVal = c.querySelector(`.data-key-input[data-id="${p.id}"]`)?.value.trim();
         const key = inputVal || getDataKey(p.id);
         const status = pills[p.id].querySelector('.dt-status');
         try {
           const v = await validateDataKey(p.id, key);
-          if (v.ok) {
-            status.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
-            okCount++;
-          } else {
-            const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').slice(0, 80);
-            status.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
-            failCount++;
-          }
+          status.innerHTML = explainAsPillHTML(v);
+          if (v.ok) okCount++;
+          else { failCount++; failures.push({ p, v }); }
         } catch (e) {
-          status.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e?.message || 'error').slice(0, 30)}</span>`;
-          failCount++;
+          const errResult = { ok: false, error: e?.message || 'error' };
+          status.innerHTML = explainAsPillHTML(errResult);
+          failCount++; failures.push({ p, v: errResult });
         }
       }));
       const summary = document.createElement('div');
@@ -309,12 +316,22 @@ function renderDataKeysTab(c) {
         summary.style.background = 'rgba(0,255,136,0.08)';
         summary.style.color = 'var(--accent-green)';
         summary.textContent = `✅ Les ${okCount} clés data sont opérationnelles.`;
+        resultsBox.appendChild(summary);
       } else {
         summary.style.background = 'rgba(255,80,80,0.08)';
         summary.style.color = 'var(--accent-red)';
-        summary.textContent = `⚠️ ${okCount} OK · ${failCount} échec(s) (survole le ✗ pour le détail)`;
+        summary.innerHTML = `⚠️ ${okCount} OK · ${failCount} échec(s). <strong>Détails ci-dessous</strong> :`;
+        resultsBox.appendChild(summary);
+        // Affiche un panneau détaillé pour chaque échec avec explication + action
+        const details = document.createElement('div');
+        details.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;';
+        for (const { p, v } of failures) {
+          const block = document.createElement('div');
+          block.innerHTML = `<div style="font-size:12.5px;font-weight:600;color:var(--text-primary);">${p.label}</div>${explainAsDetailHTML(v)}`;
+          details.appendChild(block);
+        }
+        resultsBox.appendChild(details);
       }
-      resultsBox.appendChild(summary);
       testAllBtn.disabled = false;
       testAllBtn.textContent = '⚡ Re-tester toutes';
     });
@@ -714,22 +731,20 @@ function renderRoutingTab(c) {
       }
       // Test parallèle
       let okCount = 0, failCount = 0;
+      const failures = [];
       await Promise.all(names.map(async (name) => {
         const provider = orch.providers[name];
         const status = pills[name].querySelector('.rt-status');
+        const meta = KNOWN_PROVIDERS.find(p => p.name === name) || { displayName: name };
         try {
           const v = await provider.validate();
-          if (v.ok) {
-            status.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
-            okCount++;
-          } else {
-            const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').slice(0, 60);
-            status.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ ${isEN ? 'invalid' : 'invalide'}</span>`;
-            failCount++;
-          }
+          status.innerHTML = explainAsPillHTML(v);
+          if (v.ok) okCount++;
+          else { failCount++; failures.push({ name, label: meta.displayName, v }); }
         } catch (e) {
-          status.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e?.message || 'error').slice(0, 30)}</span>`;
-          failCount++;
+          const errResult = { ok: false, error: e?.message || 'error' };
+          status.innerHTML = explainAsPillHTML(errResult);
+          failCount++; failures.push({ name, label: meta.displayName, v: errResult });
         }
       }));
       // Summary
@@ -739,12 +754,24 @@ function renderRoutingTab(c) {
         summary.style.background = 'rgba(0,255,136,0.08)';
         summary.style.color = 'var(--accent-green)';
         summary.textContent = isEN ? `✅ All ${okCount} keys are working.` : `✅ Les ${okCount} clés sont opérationnelles.`;
+        resultsBox.appendChild(summary);
       } else {
         summary.style.background = 'rgba(255,80,80,0.08)';
         summary.style.color = 'var(--accent-red)';
-        summary.textContent = isEN ? `⚠️ ${okCount} OK · ${failCount} failed (hover for details)` : `⚠️ ${okCount} OK · ${failCount} échec(s) (survole pour le détail)`;
+        summary.innerHTML = isEN
+          ? `⚠️ ${okCount} OK · ${failCount} failed. <strong>Details below</strong>:`
+          : `⚠️ ${okCount} OK · ${failCount} échec(s). <strong>Détails ci-dessous</strong> :`;
+        resultsBox.appendChild(summary);
+        // Détail explicatif pour chaque échec
+        const details = document.createElement('div');
+        details.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;';
+        for (const { label, v } of failures) {
+          const block = document.createElement('div');
+          block.innerHTML = `<div style="font-size:12.5px;font-weight:600;color:var(--text-primary);">${label}</div>${explainAsDetailHTML(v)}`;
+          details.appendChild(block);
+        }
+        resultsBox.appendChild(details);
       }
-      resultsBox.appendChild(summary);
       testBtn.disabled = false;
       testBtn.textContent = isEN ? '⚡ Re-test all' : '⚡ Re-tester toutes';
     });

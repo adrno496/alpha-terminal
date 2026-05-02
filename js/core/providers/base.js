@@ -144,6 +144,42 @@ export function corsHint(providerName, err) {
   return `[${providerName}] L'API a refusé l'appel depuis le navigateur (CORS). Cette plateforme ne permet pas les appels directs depuis un browser — utilise OpenRouter ou Hugging Face Router pour accéder à ces modèles.`;
 }
 
+// Validation légère via GET sur un endpoint listing (models / metadata).
+// Format de retour standard : { ok, error?, status? }.
+// - 200/2xx → ok
+// - 401 → "Clé invalide ou révoquée"
+// - 403 → "Clé valide mais accès refusé (tier insuffisant ou scope manquant)"
+// - 429 → ok:true (rate limit ⇒ la clé existe, juste trop d'appels)
+// - 5xx → ok:true (problème côté provider, pas la faute de la clé)
+// - autre → message générique avec status
+// - TypeError "Failed to fetch" → message CORS actionnable
+export async function validateViaGet(displayName, url, headers = {}) {
+  let res;
+  try {
+    res = await fetch(url, { method: 'GET', headers, cache: 'no-store' });
+  } catch (e) {
+    if (isLikelyCORSError(e)) {
+      return {
+        ok: false,
+        error: `[${displayName}] CORS bloqué — ce provider ne permet pas la validation depuis le navigateur. La clé peut être valide ; teste-la en lançant une vraie analyse.`
+      };
+    }
+    return { ok: false, error: `[${displayName}] ${e?.message || 'Erreur réseau'}` };
+  }
+  if (res.ok) return { ok: true, status: res.status };
+  if (res.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+  if (res.status >= 500) return { ok: true, status: res.status, note: 'provider error, key likely valid' };
+  if (res.status === 401) {
+    return { ok: false, error: `[${displayName}] Clé invalide ou révoquée.`, status: 401 };
+  }
+  if (res.status === 403) {
+    return { ok: false, error: `[${displayName}] Clé valide mais accès refusé (tier insuffisant ou scope manquant).`, status: 403 };
+  }
+  let body = '';
+  try { body = (await res.text()).slice(0, 200); } catch {}
+  return { ok: false, error: `[${displayName}] HTTP ${res.status}${body ? ` — ${body}` : ''}`, status: res.status };
+}
+
 // Valide une clé en essayant plusieurs modèles (parfois le default n'est pas
 // disponible pour le tier de l'utilisateur). Retourne dès qu'un modèle réussit.
 // Si tous échouent : retourne la dernière erreur (en privilégiant les vraies
@@ -155,13 +191,19 @@ export async function validateWithModelFallbacks(displayName, models, doFetch) {
     try {
       const res = await doFetch(model);
       if (res.ok) return { ok: true, modelTested: model };
-      const t = await res.text();
       const status = res.status;
-      const hint = friendlyHttpError(status, t, displayName);
-      if (status === 401 || status === 403) {
-        // Vraie erreur d'auth : la clé est rejetée. Inutile de tester d'autres modèles.
-        return { ok: false, error: hint, status };
+      // Rate limit → la clé existe mais quota épuisé : on la considère valide.
+      if (status === 429) return { ok: true, modelTested: model, note: 'rate-limited but key valid' };
+      // 5xx → souci côté provider, pas la faute de la clé.
+      if (status >= 500) return { ok: true, modelTested: model, note: 'provider error, key likely valid' };
+      const t = await res.text();
+      if (status === 401) {
+        return { ok: false, error: `[${displayName}] Clé invalide ou révoquée.`, status };
       }
+      if (status === 403) {
+        return { ok: false, error: `[${displayName}] Clé valide mais accès refusé (tier insuffisant ou scope manquant).`, status };
+      }
+      const hint = friendlyHttpError(status, t, displayName);
       // 404 / 400 / autre : peut-être juste un model name pas disponible — on retente.
       lastOtherErr = { ok: false, error: hint, status };
     } catch (e) {

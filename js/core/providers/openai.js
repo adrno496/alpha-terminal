@@ -1,5 +1,5 @@
 // Provider OpenAI ChatGPT
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateViaGet } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.openai.com/v1/chat/completions';
@@ -70,25 +70,10 @@ export class OpenAIProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await this._fetch({
-        model: this.modelOverrides.fast || 'gpt-5-nano',
-        messages: [{ role: 'user', content: 'ping' }],
-        max_completion_tokens: 8
-      });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      // Si modèle pas trouvé, retry avec gpt-4o-mini
-      if (res.status === 404 || /model/i.test(t)) {
-        const res2 = await this._fetch({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: 'ping' }],
-          max_completion_tokens: 8
-        });
-        if (res2.ok) return { ok: true, note: 'fallback gpt-4o-mini' };
-      }
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName), status: res.status };
-    } catch (e) { return { ok: false, error: e.message }; }
+    // Endpoint léger : GET /v1/models. Pas de coût, pas de modèle requis.
+    return validateViaGet(this.displayName, 'https://api.openai.com/v1/models', {
+      'Authorization': `Bearer ${this.apiKey}`
+    });
   }
 
   async call(params) {

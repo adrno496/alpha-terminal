@@ -1,6 +1,6 @@
 // Provider OpenRouter — proxy LLM aggregator (200+ modèles)
 // API OpenAI-compatible : https://openrouter.ai/api/v1/chat/completions
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateViaGet } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -70,16 +70,11 @@ export class OpenRouterProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await this._fetch({
-        model: this.modelOverrides.fast || 'meta-llama/llama-3.3-70b-instruct',
-        messages: [{ role: 'user', content: 'ping' }],
-        max_tokens: 8
-      });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    // OpenRouter expose /api/v1/key spécifiquement pour valider une clé
+    // (retourne credits/limit/usage). Aucun coût.
+    return validateViaGet(this.displayName, 'https://openrouter.ai/api/v1/key', {
+      'Authorization': `Bearer ${this.apiKey}`
+    });
   }
 
   async call(params) {

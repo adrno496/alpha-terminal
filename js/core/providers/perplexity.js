@@ -1,6 +1,6 @@
 // Provider Perplexity AI — chat avec web search natif intégré
 // API OpenAI-compatible : https://api.perplexity.ai/chat/completions
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, isLikelyCORSError } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const URL = 'https://api.perplexity.ai/chat/completions';
@@ -68,16 +68,27 @@ export class PerplexityProvider extends BaseProvider {
   }
 
   async validate() {
+    // Perplexity n'expose pas d'endpoint listing → POST minimal sur sonar.
+    let res;
     try {
-      const res = await this._fetch({
+      res = await this._fetch({
         model: this.modelOverrides.fast || 'sonar',
         messages: [{ role: 'user', content: 'ping' }],
         max_tokens: 8
       });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    } catch (e) {
+      if (isLikelyCORSError(e)) {
+        return { ok: false, error: `[${this.displayName}] CORS bloqué — ce provider ne permet pas la validation depuis le navigateur. La clé peut être valide ; teste-la en lançant une vraie analyse.` };
+      }
+      return { ok: false, error: `[${this.displayName}] ${e?.message || 'Erreur réseau'}` };
+    }
+    if (res.ok) return { ok: true, status: res.status };
+    if (res.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+    if (res.status >= 500) return { ok: true, status: res.status, note: 'provider error, key likely valid' };
+    if (res.status === 401) return { ok: false, error: `[${this.displayName}] Clé invalide ou révoquée.`, status: 401 };
+    if (res.status === 403) return { ok: false, error: `[${this.displayName}] Clé valide mais accès refusé (tier insuffisant).`, status: 403 };
+    const t = await res.text().catch(() => '');
+    return { ok: false, error: friendlyHttpError(res.status, t, this.displayName), status: res.status };
   }
 
   async call(params) {

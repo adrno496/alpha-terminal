@@ -1,5 +1,5 @@
 // Provider Google Gemini
-import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout } from './base.js';
+import { BaseProvider, consumeSSE, friendlyHttpError, makeHttpError, withTimeout, validateViaGet } from './base.js';
 import { MODEL_CATALOG, modelPricing } from '../models-catalog.js';
 
 const BASE = 'https://generativelanguage.googleapis.com/v1beta';
@@ -85,19 +85,9 @@ export class GeminiProvider extends BaseProvider {
   }
 
   async validate() {
-    try {
-      const res = await fetch(this._url(this.modelOverrides.fast || 'gemini-2.5-flash-lite', 'generateContent'), {
-        method: 'POST',
-        headers: this._headers(),
-        body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: 'ping' }] }],
-          generationConfig: { maxOutputTokens: 8 }
-        })
-      });
-      if (res.ok) return { ok: true };
-      const t = await res.text();
-      return { ok: false, error: friendlyHttpError(res.status, t, this.displayName) };
-    } catch (e) { return { ok: false, error: e.message }; }
+    // Endpoint léger officiel : GET /v1beta/models?key=KEY (CORS-enabled).
+    const url = `${BASE}/models?key=${encodeURIComponent(this.apiKey)}`;
+    return validateViaGet(this.displayName, url);
   }
 
   async call(params) {
