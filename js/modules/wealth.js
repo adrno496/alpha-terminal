@@ -11,6 +11,7 @@ let chart = null;
 let evolutionChart = null;
 
 export async function renderWealthView(viewEl) {
+  try { showTutorialIfFirstOpen('wealth'); } catch {}
   if (chart) { try { chart.destroy(); } catch {} chart = null; }
 
   viewEl.innerHTML = `
@@ -806,6 +807,7 @@ async function importData(e) {
 
 // === Toggles per-module : "use wealth as context" ===
 import { isWealthContextEnabledFor, setWealthContextEnabled } from '../core/wealth.js';
+import { showTutorialIfFirstOpen } from '../ui/module-tutorials.js';
 
 const MODULE_TOGGLE_OPTIONS = [
   { id: 'quick-analysis',        label: '⚡ Quick Analysis' },

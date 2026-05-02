@@ -138,7 +138,60 @@ function renderPremiumTab(c) {
           : 'Annuler sur Lemonsqueezy te garde l\'accès jusqu\'à la fin de la période payée. Tu peux aussi "Retirer la licence de cet appareil" pour libérer un slot pour une autre machine.'}
       </p>
     </div>
+
+    ${hasLicense ? `
+    <!-- Stats d'utilisation locale (calculées depuis IndexedDB) -->
+    <div class="card">
+      <div class="card-title">${en ? '📊 Your Alpha usage' : '📊 Ton usage Alpha'}</div>
+      <div id="prem-stats-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:6px;">
+        <div style="background:var(--bg-tertiary);padding:14px;border-radius:8px;text-align:center;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${en ? 'Days active' : 'Jours actifs'}</div>
+          <div id="stat-days" style="font-size:24px;font-weight:700;color:var(--accent-green);margin-top:4px;">…</div>
+        </div>
+        <div style="background:var(--bg-tertiary);padding:14px;border-radius:8px;text-align:center;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${en ? 'Analyses' : 'Analyses'}</div>
+          <div id="stat-analyses" style="font-size:24px;font-weight:700;color:var(--accent-green);margin-top:4px;">…</div>
+        </div>
+        <div style="background:var(--bg-tertiary);padding:14px;border-radius:8px;text-align:center;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${en ? 'Modules used' : 'Modules utilisés'}</div>
+          <div id="stat-modules" style="font-size:24px;font-weight:700;color:var(--accent-green);margin-top:4px;">…</div>
+        </div>
+        <div style="background:var(--bg-tertiary);padding:14px;border-radius:8px;text-align:center;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${en ? 'Holdings tracked' : 'Holdings suivies'}</div>
+          <div id="stat-holdings" style="font-size:24px;font-weight:700;color:var(--accent-green);margin-top:4px;">…</div>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--text-muted);margin:12px 0 0;text-align:center;">
+        ${en ? '🔒 Stats computed locally — never sent to our servers.' : '🔒 Stats calculées localement — jamais envoyées à nos serveurs.'}
+      </p>
+    </div>` : ''}
   `;
+
+  // Calcule les stats depuis IndexedDB / localStorage (lazy, async)
+  if (hasLicense) {
+    (async () => {
+      try {
+        const { listAnalyses, getAllWealthHoldings } = await import('../core/storage.js');
+        const analyses = await listAnalyses();
+        const totalAnalyses = analyses?.length || 0;
+        const moduleSet = new Set((analyses || []).map(a => a.moduleId).filter(Boolean));
+        // Days active : depuis l'activation de la licence
+        const checkedAt = parseInt(localStorage.getItem('alpha-license-checked-at') || '0', 10);
+        const days = checkedAt ? Math.max(1, Math.floor((Date.now() - checkedAt) / (24 * 3600 * 1000))) : 1;
+        // Holdings : si fonction dispo
+        let holdings = 0;
+        try {
+          const h = await getAllWealthHoldings();
+          holdings = h?.length || 0;
+        } catch {}
+        const $ = (id) => c.querySelector('#' + id);
+        if ($('stat-days')) $('stat-days').textContent = days;
+        if ($('stat-analyses')) $('stat-analyses').textContent = totalAnalyses;
+        if ($('stat-modules')) $('stat-modules').textContent = moduleSet.size;
+        if ($('stat-holdings')) $('stat-holdings').textContent = holdings;
+      } catch {}
+    })();
+  }
 
   const recheckBtn = c.querySelector('#prem-recheck');
   if (recheckBtn) recheckBtn.addEventListener('click', async () => {
@@ -375,16 +428,14 @@ function renderKeysTab(c) {
         <summary style="cursor:pointer;color:var(--accent-blue);font-size:12px;margin-bottom:8px;">${t('settings.keys.add_modify')}</summary>
         <div class="field"><label class="field-label">${t('settings.keys.current_password')}</label><input id="keys-pwd" class="input" type="password" /></div>
         ${KNOWN_PROVIDERS.map(p => {
-          const browserBadge = p.browserIncompatible
-            ? `<span style="background:rgba(255,170,0,0.12);color:#ffaa00;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">⚠ ${isEN ? 'browser-incompat.' : 'incompat. browser'}</span>`
+          const browserBadge = p.proxiedViaApp
+            ? `<span style="background:rgba(80,180,255,0.12);color:#5ab8ff;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">🔄 ${isEN ? 'via Alpha proxy' : 'via proxy Alpha'}</span>`
             : '';
-          const browserHint = p.browserIncompatible
-            ? `<div style="background:rgba(255,170,0,0.06);border-left:2px solid #ffaa00;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--text-secondary);border-radius:3px;line-height:1.5;">
-                ⚠ <strong>${isEN ? 'CORS-blocked from browsers.' : 'Bloqué CORS depuis le navigateur.'}</strong>
-                ${p.altSetup
-                  ? (isEN ? ` Setup ${p.altSetup} or use ` : ` Configure ${p.altSetup} ou utilise `)
-                  : (isEN ? ' Use ' : ' Utilise ')}
-                <strong>OpenRouter</strong> ${isEN ? 'as a proxy (same models, browser-compatible).' : 'comme proxy (mêmes modèles, compatible browser).'}
+          const browserHint = p.proxiedViaApp
+            ? `<div style="background:rgba(80,180,255,0.06);border-left:2px solid #5ab8ff;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--text-secondary);border-radius:3px;line-height:1.5;">
+                🔄 ${isEN
+                  ? 'This provider normally requires a backend. Alpha automatically routes via its secure CORS proxy (API key passes through, never stored).'
+                  : 'Ce provider nécessite normalement un backend. Alpha route automatiquement via son proxy CORS sécurisé (clé API passe through, jamais stockée).'}
               </div>`
             : '';
           return `
@@ -416,8 +467,8 @@ function renderKeysTab(c) {
   if (!present.length) list.innerHTML = '<div class="alert alert-warning">No keys configured.</div>';
   else list.innerHTML = present.map(name => {
     const p = KNOWN_PROVIDERS.find(x => x.name === name);
-    const browserBadge = p?.browserIncompatible
-      ? `<span style="background:rgba(255,170,0,0.12);color:#ffaa00;font-size:10px;padding:2px 6px;border-radius:3px;margin-left:6px;font-weight:600;cursor:help;" title="${isEN ? 'This provider blocks browser CORS. Use OpenRouter or AI Gateway as a proxy for analyses.' : 'Ce provider bloque le CORS browser. Utilise OpenRouter ou AI Gateway comme proxy pour les analyses.'}">⚠ ${isEN ? 'browser-incompatible' : 'incompatible browser'}</span>`
+    const browserBadge = p?.proxiedViaApp
+      ? `<span style="background:rgba(80,180,255,0.12);color:#5ab8ff;font-size:10px;padding:2px 6px;border-radius:3px;margin-left:6px;font-weight:600;cursor:help;" title="${isEN ? 'Routed through Alpha CORS proxy (key passes through, never stored).' : 'Routé via le proxy CORS Alpha (clé passe through, jamais stockée).'}">🔄 ${isEN ? 'via Alpha proxy' : 'via proxy Alpha'}</span>`
       : '';
     return `
       <div class="key-row">
@@ -682,7 +733,45 @@ function renderRoutingTab(c) {
   }
   const avg = (arr) => arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;
 
+  // Détecte si l'user a des providers proxiés (les 4 ex-CORS-bloqués)
+  const proxiedProviders = avail.filter(name => {
+    const meta = KNOWN_PROVIDERS.find(p => p.name === name);
+    return meta?.proxiedViaApp === true;
+  });
+  const hasOpenRouter = avail.includes('openrouter');
+
   c.innerHTML = `
+    ${proxiedProviders.length && !hasOpenRouter ? `
+    <!-- OpenRouter migration suggestion : si user a des providers proxiés mais pas OpenRouter -->
+    <div class="card" style="border-left:4px solid var(--accent-amber);">
+      <div class="card-title">🌀 ${isEN ? 'Faster + more reliable with OpenRouter' : 'Plus rapide + plus fiable avec OpenRouter'}</div>
+      <p style="color:var(--text-secondary);font-size:13px;margin:0 0 12px;">
+        ${isEN
+          ? `You have ${proxiedProviders.length} provider(s) routed via Alpha's CORS proxy (${proxiedProviders.join(', ')}). It works but adds latency. <strong>OpenRouter</strong> exposes the same models (Llama 3.x, Qwen, Mistral, GPT-4o, etc.) with native browser support — 1 key, 200+ models, zero CORS.`
+          : `Tu as ${proxiedProviders.length} provider(s) routés via le proxy CORS Alpha (${proxiedProviders.join(', ')}). Ça marche mais ajoute de la latence. <strong>OpenRouter</strong> expose les mêmes modèles (Llama 3.x, Qwen, Mistral, GPT-4o, etc.) avec support browser natif — 1 clé, 200+ modèles, zéro CORS.`}
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="btn-primary" style="text-decoration:none;display:inline-block;font-size:12.5px;padding:8px 14px;">
+          ${isEN ? '🌀 Get an OpenRouter key (free)' : '🌀 Obtenir une clé OpenRouter (gratuit)'}
+        </a>
+        <button id="route-openrouter-info" class="btn-secondary" style="font-size:12.5px;padding:8px 14px;">
+          ${isEN ? 'Why OpenRouter ?' : 'Pourquoi OpenRouter ?'}
+        </button>
+      </div>
+      <details id="route-openrouter-detail" style="margin-top:10px;font-size:12px;color:var(--text-muted);">
+        <summary style="cursor:pointer;">${isEN ? 'See model equivalents' : 'Voir les équivalences de modèles'}</summary>
+        <table style="width:100%;border-collapse:collapse;margin-top:8px;font-size:11.5px;">
+          <thead><tr style="border-bottom:1px solid var(--border);"><th style="text-align:left;padding:4px 6px;">${isEN ? 'Proxied provider' : 'Provider proxié'}</th><th style="text-align:left;padding:4px 6px;">${isEN ? 'OpenRouter equivalent (often free)' : 'Équivalent OpenRouter (souvent gratuit)'}</th></tr></thead>
+          <tbody style="font-family:monospace;font-size:11px;">
+            <tr><td style="padding:4px 6px;">🐙 GitHub Models</td><td style="padding:4px 6px;">openai/gpt-4o · meta-llama/llama-3.3-70b-instruct:free</td></tr>
+            <tr><td style="padding:4px 6px;">🟢 NVIDIA NIM</td><td style="padding:4px 6px;">nvidia/llama-3.1-nemotron-70b-instruct:free</td></tr>
+            <tr><td style="padding:4px 6px;">🤗 Hugging Face</td><td style="padding:4px 6px;">qwen/qwen-2.5-72b-instruct:free · mistralai/mistral-7b-instruct:free</td></tr>
+            <tr><td style="padding:4px 6px;">☁️ Cloudflare AI</td><td style="padding:4px 6px;">meta-llama/llama-3.1-8b-instruct:free · google/gemma-2-9b-it:free</td></tr>
+          </tbody>
+        </table>
+      </details>
+    </div>` : ''}
+
     <div class="card" style="border-left:4px solid var(--accent-green);">
       <div class="card-title">💰 ${isEN ? 'Estimated API costs' : 'Coûts API estimés'}</div>
       <p style="color:var(--text-secondary);font-size:13px;margin:0 0 14px;">

@@ -3,10 +3,12 @@ import { $, toast } from '../core/utils.js';
 import { SYSTEM_DCF } from '../prompts/dcf.js';
 import { moduleHeader, runAnalysis, wireProviderSelector, bindDraft } from './_shared.js';
 import { t } from '../core/i18n.js';
+import { showTutorialIfFirstOpen } from '../ui/module-tutorials.js';
 
 const MODULE_ID = 'dcf';
 
 export function renderDcfView(viewEl) {
+  try { showTutorialIfFirstOpen('dcf'); } catch {}
   viewEl.innerHTML = `
     ${moduleHeader(t('mod.dcf.label'), t('mod.dcf.desc'), { example: t('mod.dcf.example'), moduleId: MODULE_ID })}
     <div class="card">

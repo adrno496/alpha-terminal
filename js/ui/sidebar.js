@@ -1,6 +1,6 @@
 // Sidebar v2 — mode simple par défaut + mode avancé avec catégories
 import { $, $$ } from '../core/utils.js';
-import { t } from '../core/i18n.js';
+import { t, getLocale } from '../core/i18n.js';
 import { getUserProfile } from '../core/user-profile.js';
 import { recommendedSet } from '../core/module-recommendations.js';
 import { isModuleMissingApiKey } from '../core/module-providers.js';
@@ -163,7 +163,19 @@ export function renderSidebar(onNavigate) {
     return `<span style="margin-left:auto;display:inline-flex;gap:4px;align-items:center;">${a}${b}${c}</span>`;
   };
 
+  const isEN = getLocale() === 'en';
+  const searchPlaceholder = isEN ? '🔍 Search modules...' : '🔍 Rechercher un module...';
   let html = '';
+  // Search box (en haut, avant ALWAYS_VISIBLE)
+  html += `
+    <div class="sidebar-search">
+      <input type="search" id="sidebar-search-input"
+             placeholder="${searchPlaceholder}"
+             autocomplete="off"
+             spellcheck="false" />
+      <button id="sidebar-search-clear" type="button" aria-label="Clear" hidden>×</button>
+    </div>
+  `;
   // Always visible
   html += ALWAYS_VISIBLE.map(m => `
     <button class="sidebar-link primary${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">
@@ -287,6 +299,144 @@ export function renderSidebar(onNavigate) {
       localStorage.setItem('alpha-terminal:sidebar-open-cats', JSON.stringify(open));
     });
   });
+
+  // === Sidebar search (filter modules by label / id) ===
+  const searchInput = nav.querySelector('#sidebar-search-input');
+  const searchClear = nav.querySelector('#sidebar-search-clear');
+  // Restore previous query (volatile, in-memory only) so re-renders during typing don't lose it
+  if (typeof window !== 'undefined' && window.__alphaSidebarSearchQ) {
+    searchInput.value = window.__alphaSidebarSearchQ;
+  }
+  // Persist across re-renders triggered by search itself
+  if (typeof window !== 'undefined' && window.__alphaSidebarAdvWasOn === undefined) {
+    window.__alphaSidebarAdvWasOn = getAdvanced();
+  }
+  let catOpenStateBeforeSearch = null;
+
+  const clearEmptyMsg = () => {
+    const m = nav.querySelector('.sidebar-search-empty-msg');
+    if (m) m.remove();
+  };
+
+  const applyFilter = () => {
+    const qRaw = (searchInput.value || '').trim();
+    const q = qRaw.toLowerCase();
+    if (typeof window !== 'undefined') window.__alphaSidebarSearchQ = qRaw;
+
+    if (!q) {
+      // Reset
+      nav.querySelectorAll('.sidebar-link.search-hidden').forEach(el => el.classList.remove('search-hidden'));
+      nav.querySelectorAll('.sidebar-cat.search-empty').forEach(el => el.classList.remove('search-empty'));
+      clearEmptyMsg();
+      searchClear.hidden = true;
+      // Restore advanced mode if we toggled it on for search only
+      const wasOn = (typeof window !== 'undefined') ? window.__alphaSidebarAdvWasOn : true;
+      if (!wasOn && getAdvanced()) {
+        setAdvanced(false);
+        if (typeof window !== 'undefined') {
+          window.__alphaSidebarSearchQ = '';
+          window.__alphaSidebarAdvWasOn = undefined;
+        }
+        renderSidebar(onNavigate);
+      } else if (catOpenStateBeforeSearch) {
+        // Restore details open state
+        nav.querySelectorAll('.sidebar-cat').forEach(d => {
+          d.open = catOpenStateBeforeSearch.has(d.dataset.cat);
+        });
+        catOpenStateBeforeSearch = null;
+      }
+      return;
+    }
+
+    // Active search
+    searchClear.hidden = false;
+
+    // If advanced mode is off, enable it temporarily so the categories render
+    if (!getAdvanced()) {
+      if (typeof window !== 'undefined') window.__alphaSidebarAdvWasOn = false;
+      setAdvanced(true);
+      renderSidebar(onNavigate);
+      // After re-render, the new input exists; re-trigger filter
+      const newInput = document.getElementById('sidebar-search-input');
+      if (newInput) {
+        newInput.value = qRaw;
+        newInput.focus();
+        // The fresh render will re-wire and call applyFilter via input event? No — call manually
+        // by dispatching input event so the new handler runs
+        newInput.dispatchEvent(new Event('input'));
+      }
+      return;
+    }
+
+    // Snapshot category open state on first active search
+    if (!catOpenStateBeforeSearch) {
+      catOpenStateBeforeSearch = new Set();
+      nav.querySelectorAll('.sidebar-cat').forEach(d => {
+        if (d.open) catOpenStateBeforeSearch.add(d.dataset.cat);
+      });
+    }
+
+    // Open all categories so matches are visible
+    nav.querySelectorAll('.sidebar-cat').forEach(d => { d.open = true; });
+
+    // Filter links
+    let totalMatches = 0;
+    nav.querySelectorAll('.sidebar-link').forEach(link => {
+      const lblEl = link.querySelector('.lbl');
+      const label = (lblEl ? lblEl.textContent : link.textContent || '').toLowerCase();
+      const route = (link.getAttribute('data-route') || '').toLowerCase();
+      const action = link.getAttribute('data-action') || '';
+      // Demo button: hide during search (not a module)
+      if (action === 'demo') { link.classList.add('search-hidden'); return; }
+      const match = label.includes(q) || route.includes(q);
+      if (match) { link.classList.remove('search-hidden'); totalMatches++; }
+      else link.classList.add('search-hidden');
+    });
+
+    // Hide empty categories
+    nav.querySelectorAll('.sidebar-cat').forEach(cat => {
+      const visible = cat.querySelectorAll('.sidebar-link:not(.search-hidden)').length;
+      cat.classList.toggle('search-empty', visible === 0);
+    });
+
+    // Empty message
+    clearEmptyMsg();
+    if (totalMatches === 0) {
+      const msg = document.createElement('div');
+      msg.className = 'sidebar-search-empty-msg';
+      msg.textContent = isEN ? `No module found for "${qRaw}"` : `Aucun module trouvé pour « ${qRaw} »`;
+      nav.appendChild(msg);
+    }
+  };
+
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilter);
+    // Apply once on render (in case of restored query)
+    if (searchInput.value) applyFilter();
+  }
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      if (typeof window !== 'undefined') window.__alphaSidebarSearchQ = '';
+      applyFilter();
+      searchInput.focus();
+    });
+  }
+
+  // Cmd+K / Ctrl+K → focus search (only wire once globally)
+  if (typeof window !== 'undefined' && !window.__alphaSidebarSearchKeyWired) {
+    window.__alphaSidebarSearchKeyWired = true;
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        const inp = document.getElementById('sidebar-search-input');
+        if (inp) {
+          e.preventDefault();
+          inp.focus();
+          inp.select();
+        }
+      }
+    });
+  }
 
   // Sidebar bottom labels
   document.querySelectorAll('.sidebar-bottom .sidebar-link').forEach(b => {

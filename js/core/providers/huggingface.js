@@ -2,13 +2,20 @@
 // One endpoint, multi-provider routing (Together, Fireworks, Cerebras, etc. — billed via HF)
 import { OpenAICompatibleProvider } from './openai-compatible.js';
 
+// Proxy CORS pour cet endpoint qui ne supporte pas les browser direct calls.
+// Si window.ALPHA_CONFIG.LLM_PROXY_URL est défini, on route à travers.
+function viaProxy(url) {
+  const base = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+  return `${base}?url=${encodeURIComponent(url)}`;
+}
+
 export class HuggingFaceProvider extends OpenAICompatibleProvider {
   constructor(apiKey, modelOverrides = {}) {
     super(apiKey, modelOverrides, {
       name: 'huggingface',
       displayName: 'Hugging Face',
       icon: '🤗',
-      baseUrl: 'https://router.huggingface.co/v1/chat/completions',
+      baseUrl: viaProxy('https://router.huggingface.co/v1/chat/completions'),
       defaultModels: {
         flagship: 'meta-llama/Llama-3.3-70B-Instruct',
         balanced: 'Qwen/Qwen2.5-72B-Instruct',
@@ -26,7 +33,7 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
       return { ok: false, error: '[Hugging Face] Format de token invalide. Format attendu : hf_…', status: 400 };
     }
     try {
-      const res = await fetch('https://huggingface.co/api/whoami-v2', {
+      const res = await fetch(viaProxy('https://huggingface.co/api/whoami-v2'), {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${this.apiKey}`, 'Accept': 'application/json' }
       });

@@ -640,4 +640,24 @@
     <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/terms.html" />
   </url>
 
+  <!-- ===== Status page (live API monitoring) ===== -->
+  <url>
+    <loc>https://alpha-terminal.app/status.html</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/status.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/status-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/status.html" />
+  </url>
+  <url>
+    <loc>https://alpha-terminal.app/status-en.html</loc>
+    <lastmod>2026-05-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/status.html" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://alpha-terminal.app/status-en.html" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/status.html" />
+  </url>
+
 </urlset>

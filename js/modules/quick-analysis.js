@@ -9,6 +9,7 @@ import { abortCurrentCall } from '../core/api.js';
 import { moduleHeader, wireProviderSelector, getModuleOverride, isRagEnabledFor } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { safeRender } from '../core/safe-render.js';
+import { showTutorialIfFirstOpen } from '../ui/module-tutorials.js';
 
 const MODULE_ID = 'quick-analysis';
 
@@ -22,6 +23,7 @@ const EXAMPLES = [
 ];
 
 export function renderQuickAnalysisView(viewEl) {
+  try { showTutorialIfFirstOpen('quick-analysis'); } catch {}
   viewEl.innerHTML = `
     ${moduleHeader('⚡ ' + t('qa.title'), t('qa.desc'), { moduleId: MODULE_ID })}
 

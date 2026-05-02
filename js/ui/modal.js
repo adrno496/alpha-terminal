@@ -31,7 +31,107 @@ export function closeGenericModal() { generic.overlay.classList.add('hidden'); }
 export function openLockFlow() {
   overlay.classList.remove('hidden');
   if (hasVault()) renderUnlock();
-  else renderWizardStep1();
+  else renderWizardStep0(); // Intro chaleureuse avant le wizard technique
+}
+
+// === STEP 0 — Intro persona ===
+// Apparaît avant le wizard technique pour orienter le user et abaisser la friction
+// du "hello set a password" qui fait fuir 30-40% des first-time visitors.
+function renderWizardStep0() {
+  const isEN = (document.documentElement.lang || 'fr').toLowerCase().startsWith('en');
+  const t = isEN ? {
+    title: '👋 Bienvenue sur Alpha',
+    sub: 'In 30 seconds, you\'ll be analyzing your first stock. What\'s your priority?',
+    p1Label: 'Quick analysis',
+    p1Desc: 'I just want to know if I should buy AAPL / TSLA / NVDA / BTC',
+    p2Label: 'Track my portfolio',
+    p2Desc: 'I have positions, I want a clear view (PnL, alerts, risks)',
+    p3Label: 'Pro / advisor',
+    p3Desc: 'I manage clients or complex situations (multi-country, IFI, succession)',
+    p4Label: 'Just exploring',
+    p4Desc: 'No idea yet, show me the demo',
+    next: 'Continue →',
+    skip: 'Skip · I know what I want',
+    note: 'Your choice helps us recommend the right starter modules. You can always change later.'
+  } : {
+    title: '👋 Bienvenue sur Alpha',
+    sub: 'Dans 30 secondes tu analyses ta première action. C\'est quoi ta priorité ?',
+    p1Label: 'Analyse rapide',
+    p1Desc: 'Je veux juste savoir si je dois acheter AAPL / TSLA / NVDA / BTC',
+    p2Label: 'Suivre mon patrimoine',
+    p2Desc: 'J\'ai des positions, je veux une vue claire (PnL, alertes, risques)',
+    p3Label: 'Pro / conseiller',
+    p3Desc: 'Je gère des clients ou des situations complexes (multi-pays, IFI, succession)',
+    p4Label: 'Je découvre',
+    p4Desc: 'Aucune idée encore, montre-moi la démo',
+    next: 'Continuer →',
+    skip: 'Skip · je sais ce que je veux',
+    note: 'Ton choix nous aide à recommander les bons modules pour démarrer. Tu peux changer plus tard.'
+  };
+
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:8px;">
+      <h2 style="margin:0 0 6px;font-size:22px;">${t.title}</h2>
+      <p style="color:var(--text-secondary);font-size:14px;margin:0 0 22px;">${t.sub}</p>
+    </div>
+    <div id="wiz0-personas" style="display:grid;gap:10px;">
+      ${[
+        { id: 'beginner', emoji: '🌱', label: t.p1Label, desc: t.p1Desc, recos: ['quick-analysis','wealth','watchlist'] },
+        { id: 'serious',  emoji: '📊', label: t.p2Label, desc: t.p2Desc, recos: ['wealth','accounts-view','correlation-matrix','dcf','decoder-10k'] },
+        { id: 'pro',      emoji: '🏆', label: t.p3Label, desc: t.p3Desc, recos: ['tax-international','ifi-simulator','capital-gains-tracker','knowledge-base','portfolio-audit'] },
+        { id: 'demo',     emoji: '🎬', label: t.p4Label, desc: t.p4Desc, recos: [] }
+      ].map(p => `
+        <button type="button" class="wiz0-persona" data-persona="${p.id}" data-recos="${p.recos.join(',')}"
+                style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-secondary);border:2px solid var(--border);border-radius:8px;cursor:pointer;text-align:left;transition:all 0.15s;color:var(--text-primary);font-family:inherit;">
+          <span style="font-size:30px;line-height:1;flex-shrink:0;">${p.emoji}</span>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:14px;margin-bottom:2px;">${p.label}</div>
+            <div style="font-size:12.5px;color:var(--text-secondary);line-height:1.4;">${p.desc}</div>
+          </div>
+        </button>
+      `).join('')}
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;flex-wrap:wrap;gap:8px;">
+      <button id="wiz0-skip" class="btn-ghost" style="font-size:12.5px;">${t.skip}</button>
+      <button id="wiz0-next" class="btn-primary" disabled style="opacity:0.5;">${t.next}</button>
+    </div>
+    <p style="font-size:11px;color:var(--text-muted);margin:14px 0 0;text-align:center;">${t.note}</p>
+  `;
+
+  // Style hover/active sur les personas
+  body.querySelectorAll('.wiz0-persona').forEach(btn => {
+    btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--accent-green)'; });
+    btn.addEventListener('mouseleave', () => {
+      if (!btn.classList.contains('selected')) btn.style.borderColor = 'var(--border)';
+    });
+    btn.addEventListener('click', () => {
+      body.querySelectorAll('.wiz0-persona').forEach(b => {
+        b.classList.remove('selected');
+        b.style.borderColor = 'var(--border)';
+      });
+      btn.classList.add('selected');
+      btn.style.borderColor = 'var(--accent-green)';
+      btn.style.background = 'rgba(0,255,136,0.06)';
+      // Stocke la sélection pour la step 2 (recommandations modules)
+      wizardState.persona = btn.dataset.persona;
+      wizardState.personaRecos = (btn.dataset.recos || '').split(',').filter(Boolean);
+      const nextBtn = $('#wiz0-next');
+      nextBtn.disabled = false;
+      nextBtn.style.opacity = '1';
+    });
+  });
+
+  $('#wiz0-next').addEventListener('click', () => {
+    // Si "Demo only" → ferme le wizard et lance la démo
+    if (wizardState.persona === 'demo') {
+      overlay.classList.add('hidden');
+      import('./demo-mode.js').then(m => m.showDemoGallery && m.showDemoGallery()).catch(() => {});
+      return;
+    }
+    renderWizardStep1();
+  });
+
+  $('#wiz0-skip').addEventListener('click', () => renderWizardStep1());
 }
 
 // ---------- UNLOCK ----------
@@ -313,12 +413,14 @@ function renderWizardStep2() {
     </div>
   `;
   $('#wiz-keys').innerHTML = KNOWN_PROVIDERS.map(p => {
-    const browserBadge = p.browserIncompatible
-      ? `<span style="background:rgba(255,170,0,0.12);color:#ffaa00;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">⚠ ${isEnLocal ? 'browser-incompat.' : 'incompat. browser'}</span>`
+    const browserBadge = p.proxiedViaApp
+      ? `<span style="background:rgba(80,180,255,0.12);color:#5ab8ff;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">🔄 ${isEnLocal ? 'via Alpha proxy' : 'via proxy Alpha'}</span>`
       : '';
-    const browserHint = p.browserIncompatible
-      ? `<div style="background:rgba(255,170,0,0.06);border-left:2px solid #ffaa00;padding:6px 10px;margin-top:6px;font-size:10.5px;color:var(--text-secondary);border-radius:3px;line-height:1.45;">
-          ⚠ ${isEnLocal ? 'CORS-blocked from browsers. Use ' : 'Bloqué CORS depuis le navigateur. Utilise '}<strong>OpenRouter</strong>${isEnLocal ? ' as a proxy (same models, browser-compatible).' : ' comme proxy (mêmes modèles, compatible browser).'}
+    const browserHint = p.proxiedViaApp
+      ? `<div style="background:rgba(80,180,255,0.06);border-left:2px solid #5ab8ff;padding:6px 10px;margin-top:6px;font-size:10.5px;color:var(--text-secondary);border-radius:3px;line-height:1.45;">
+          🔄 ${isEnLocal
+            ? 'This provider normally requires a backend. Alpha automatically routes via its secure CORS proxy (API key passes through, never stored).'
+            : 'Ce provider nécessite normalement un backend. Alpha route automatiquement via son proxy CORS sécurisé (clé API passe through, jamais stockée).'}
         </div>`
       : '';
     return `

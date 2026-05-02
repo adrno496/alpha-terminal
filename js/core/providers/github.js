@@ -3,13 +3,20 @@
 // Endpoint format: OpenAI-compatible at https://models.github.ai/inference
 import { OpenAICompatibleProvider } from './openai-compatible.js';
 
+// Proxy CORS pour cet endpoint qui ne supporte pas les browser direct calls.
+// Si window.ALPHA_CONFIG.LLM_PROXY_URL est défini, on route à travers.
+function viaProxy(url) {
+  const base = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+  return `${base}?url=${encodeURIComponent(url)}`;
+}
+
 export class GitHubModelsProvider extends OpenAICompatibleProvider {
   constructor(apiKey, modelOverrides = {}) {
     super(apiKey, modelOverrides, {
       name: 'github',
       displayName: 'GitHub Models',
       icon: '🐙',
-      baseUrl: 'https://models.github.ai/inference/chat/completions',
+      baseUrl: viaProxy('https://models.github.ai/inference/chat/completions'),
       defaultModels: {
         flagship: 'openai/gpt-4o',
         balanced: 'openai/gpt-4o-mini',
@@ -31,7 +38,7 @@ export class GitHubModelsProvider extends OpenAICompatibleProvider {
     }
     // Étape 1 : tenter la validation réseau
     try {
-      const res = await fetch('https://models.github.ai/catalog/models', {
+      const res = await fetch(viaProxy('https://models.github.ai/catalog/models'), {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${this.apiKey}`, 'Accept': 'application/json' }
       });

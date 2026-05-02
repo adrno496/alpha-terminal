@@ -5,10 +5,12 @@ import { SYSTEM_DECODER_10K } from '../prompts/decoder-10k.js';
 import { moduleHeader, runAnalysis, wireProviderSelector } from './_shared.js';
 import { ttIcon } from '../ui/tooltips.js';
 import { t } from '../core/i18n.js';
+import { showTutorialIfFirstOpen } from '../ui/module-tutorials.js';
 
 const MODULE_ID = 'decoder-10k';
 
 export function renderDecoder10kView(viewEl) {
+  try { showTutorialIfFirstOpen('decoder-10k'); } catch {}
   const state = { parsedPdf: null };
   viewEl.innerHTML = `
     ${moduleHeader(t('mod.decoder-10k.label'), t('mod.decoder-10k.desc') + ' ' + ttIcon('moat'), { moduleId: MODULE_ID })}

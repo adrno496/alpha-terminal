@@ -129,3 +129,11 @@ sed -i '' 's|alpha-terminal-vXX|alpha-terminal-vXY|g' service-worker.js
 - Lemonsqueezy variant mensuel : `1599882`
 - Lemonsqueezy permalink lifetime : `bc77ee76-8202-4df6-8093-f353576c3f0b`
 - Plausible domain : `alpha-terminal.app`
+
+## CORS Proxy (Vercel Edge Function)
+
+Pour débloquer les 4 providers LLM CORS-incompatibles (GitHub Models, NVIDIA NIM, HuggingFace, Cloudflare), une edge function `api/llm-proxy.js` agit comme proxy CORS.
+- Whitelist stricte des hosts autorisés
+- Aucune clé API stockée serveur (pass-through Authorization header)
+- Coût : 0 (Vercel free tier 100k invocations/mois)
+- Override : `window.ALPHA_CONFIG.LLM_PROXY_URL` (par défaut `/api/llm-proxy`)

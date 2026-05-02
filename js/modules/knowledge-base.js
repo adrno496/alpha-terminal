@@ -5,10 +5,12 @@ import { hasEmbeddingProvider } from '../core/embeddings.js';
 import { parsePdf } from '../core/pdf-parser.js';
 import { moduleHeader } from './_shared.js';
 import { t } from '../core/i18n.js';
+import { showTutorialIfFirstOpen } from '../ui/module-tutorials.js';
 
 const MODULE_ID = 'knowledge-base';
 
 export async function renderKnowledgeBaseView(viewEl) {
+  try { showTutorialIfFirstOpen('knowledge-base'); } catch {}
   const noEmbed = !hasEmbeddingProvider();
 
   viewEl.innerHTML = `

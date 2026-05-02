@@ -3,6 +3,13 @@
 // API key as "ACCOUNT_ID:API_TOKEN" and parse at request time.
 import { OpenAICompatibleProvider } from './openai-compatible.js';
 
+// Proxy CORS pour cet endpoint qui ne supporte pas les browser direct calls.
+// Si window.ALPHA_CONFIG.LLM_PROXY_URL est défini, on route à travers.
+function viaProxy(url) {
+  const base = (typeof window !== 'undefined' && window.ALPHA_CONFIG?.LLM_PROXY_URL) || '/api/llm-proxy';
+  return `${base}?url=${encodeURIComponent(url)}`;
+}
+
 export class CloudflareProvider extends OpenAICompatibleProvider {
   constructor(apiKey, modelOverrides = {}) {
     super(apiKey, modelOverrides, {
@@ -27,8 +34,10 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
 
   _resolveUrl() {
     const { accountId } = this._parseKey();
-    if (!accountId) return 'https://api.cloudflare.com/client/v4/accounts/MISSING_ACCOUNT_ID/ai/v1/chat/completions';
-    return `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`;
+    const target = !accountId
+      ? 'https://api.cloudflare.com/client/v4/accounts/MISSING_ACCOUNT_ID/ai/v1/chat/completions'
+      : `https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/v1/chat/completions`;
+    return viaProxy(target);
   }
 
   _resolveAuth() {
@@ -58,7 +67,7 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
     const tokenOnly = token || raw;
 
     try {
-      const res = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
+      const res = await fetch(viaProxy('https://api.cloudflare.com/client/v4/user/tokens/verify'), {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${tokenOnly}`,

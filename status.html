@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Alpha — Status des services (LLM &amp; data providers)</title>
+  <meta name="description" content="Vérifie en temps réel la disponibilité des APIs utilisées par Alpha Terminal : Claude, OpenAI, Gemini, Grok, FMP, Polygon, Finnhub, FRED, CoinGecko et plus." />
+  <link rel="canonical" href="https://alpha-terminal.app/status.html" />
+  <link rel="alternate" hreflang="fr" href="https://alpha-terminal.app/status.html" />
+  <link rel="alternate" hreflang="en" href="https://alpha-terminal.app/status-en.html" />
+  <link rel="alternate" hreflang="x-default" href="https://alpha-terminal.app/status.html" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Alpha — Status des services en temps réel" />
+  <meta property="og:description" content="Disponibilité live des APIs LLM et data providers utilisées par Alpha Terminal." />
+  <meta property="og:url" content="https://alpha-terminal.app/status.html" />
+  <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
+  <meta property="og:locale" content="fr_FR" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Alpha — Status des services" />
+  <meta name="twitter:description" content="Ping live des APIs LLM &amp; data providers." />
+  <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="styles.css" />
+
+  <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://alpha-terminal.app/" },
+      { "@type": "ListItem", "position": 2, "name": "Status", "item": "https://alpha-terminal.app/status.html" }
+    ]
+  }
+  </script>
+
+  <style>
+    html, body { height: auto !important; overflow: auto !important; }
+    body { background:#0a0a0a; color:#fff; font-family:'Inter',sans-serif; margin:0; line-height:1.65; }
+    .nav { display:flex; align-items:center; padding:16px 22px; border-bottom:1px solid #222; flex-wrap:wrap; gap:14px; }
+    .nav .brand { color:#00ff88; font-weight:700; font-size:18px; text-decoration:none; }
+    .nav a { color:#ccc; text-decoration:none; font-size:14px; }
+    .nav a:hover { color:#00ff88; }
+    .lang-switch { margin-left:auto; padding:4px 8px; border:1px solid #333; border-radius:4px; font-size:12px; }
+    main { max-width:1080px; margin:0 auto; padding:50px 22px 80px; }
+    .breadcrumb { font-size:12px; color:#777; margin-bottom:18px; }
+    .breadcrumb a { color:#777; text-decoration:none; }
+    h1 { font-size:clamp(28px,4vw,42px); margin:0 0 12px; line-height:1.15; }
+    h2 { font-size:20px; margin:38px 0 14px; color:#00ff88; }
+    .lead { font-size:16px; color:#bbb; margin:0 0 28px; }
+    .hero-state { display:inline-block; padding:10px 18px; border-radius:8px; font-weight:600; font-size:16px; margin-bottom:18px; background:#111; border:1px solid #222; }
+    .hero-state.ok { border-color:#00ff88; color:#00ff88; }
+    .hero-state.degraded { border-color:#ffaa00; color:#ffaa00; }
+    .hero-state.down { border-color:#ff5555; color:#ff5555; }
+    .summary-bar { display:flex; flex-wrap:wrap; gap:18px; align-items:center; padding:14px 18px; background:#111; border:1px solid #222; border-radius:8px; margin-bottom:24px; font-size:13px; color:#ccc; }
+    .summary-bar strong { color:#fff; font-family:'JetBrains Mono',monospace; }
+    .btn-recheck-all { margin-left:auto; background:#00ff88; color:#000; border:0; padding:10px 18px; border-radius:6px; font-weight:700; cursor:pointer; font-size:13px; }
+    .btn-recheck-all:hover { background:#00cc6e; }
+    .btn-recheck-all:disabled { opacity:0.5; cursor:wait; }
+    .status-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
+    .status-card { background:#111; border:1px solid #222; border-radius:8px; padding:16px; border-left:3px solid #444; transition:border-color .25s ease; }
+    .status-card.ok { border-left-color:#00ff88; }
+    .status-card.degraded { border-left-color:#ffaa00; }
+    .status-card.down { border-left-color:#ff5555; }
+    .status-card.checking { border-left-color:#3399ff; }
+    .status-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+    .status-icon { font-size:22px; }
+    .status-name { font-weight:600; font-size:15px; }
+    .status-cat { font-size:10px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-left:auto; }
+    .status-state { font-size:13px; margin:6px 0 4px; }
+    .status-state.ok { color:#00ff88; }
+    .status-state.degraded { color:#ffaa00; }
+    .status-state.down { color:#ff5555; }
+    .status-state.checking { color:#3399ff; }
+    .status-latency { font-size:11px; color:#888; font-family:'JetBrains Mono',monospace; }
+    .status-meta { font-size:10px; color:#666; margin-top:4px; font-family:'JetBrains Mono',monospace; }
+    .btn-recheck { margin-top:10px; background:transparent; color:#888; border:1px solid #333; padding:5px 12px; border-radius:4px; font-size:11px; cursor:pointer; }
+    .btn-recheck:hover { color:#00ff88; border-color:#00ff88; }
+    .disclaimer { background:rgba(255,170,0,0.06); border-left:3px solid #ffaa00; padding:14px 18px; border-radius:4px; margin:34px 0 0; font-size:13px; color:#ccc; }
+    .section-title { display:flex; align-items:center; gap:10px; margin:34px 0 14px; }
+    .section-title h2 { margin:0; }
+    .section-title .count { font-size:11px; color:#888; font-family:'JetBrains Mono',monospace; }
+    footer { border-top:1px solid #222; margin-top:60px; padding:24px 22px; text-align:center; font-size:12px; color:#666; }
+    footer a { color:#888; text-decoration:none; margin:0 8px; }
+    footer a:hover { color:#00ff88; }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="brand" href="index.html">α Alpha</a>
+  <a href="features.html">Fonctionnalités</a>
+  <a href="pricing.html">Tarifs</a>
+  <a href="bloomberg-alternative.html">vs Bloomberg</a>
+  <a href="blog.html">Blog</a>
+  <a href="status-en.html" class="lang-switch" hreflang="en">🇬🇧 EN</a>
+</nav>
+
+<main>
+  <p class="breadcrumb"><a href="index.html">Accueil</a> &rsaquo; <span>Status</span></p>
+
+  <h1>Status des services en temps réel</h1>
+  <p class="lead">Disponibilité live des APIs LLM et data providers qu'Alpha Terminal utilise. Tests effectués <strong>depuis ton navigateur</strong>, pas depuis un monitoring serveur.</p>
+
+  <div id="hero-state" class="hero-state checking">⏳ Vérification en cours…</div>
+
+  <div class="summary-bar">
+    <span>Dernière vérification : <strong id="last-check">—</strong></span>
+    <span>Total : <strong id="count-ok" style="color:#00ff88;">0</strong> OK · <strong id="count-deg" style="color:#ffaa00;">0</strong> dégradés · <strong id="count-down" style="color:#ff5555;">0</strong> down</span>
+    <button class="btn-recheck-all" id="btn-all" type="button">🔄 Tout retester</button>
+  </div>
+
+  <div class="section-title">
+    <h2>🤖 LLM Providers</h2>
+    <span class="count" id="cnt-llm">—</span>
+  </div>
+  <div class="status-grid" id="grid-llm"></div>
+
+  <div class="section-title">
+    <h2>📊 Data Providers</h2>
+    <span class="count" id="cnt-data">—</span>
+  </div>
+  <div class="status-grid" id="grid-data"></div>
+
+  <div class="disclaimer">
+    ⚠️ <strong>Test côté client.</strong> Ces vérifications sont exécutées <strong>depuis ton navigateur</strong>, pas depuis un monitoring serveur centralisé. Le résultat reflète <strong>la connectivité depuis ton réseau</strong> (FAI, VPN, pare-feu d'entreprise…). Un service marqué "down" peut très bien être joignable depuis un autre réseau. Auto-refresh toutes les 60 secondes.
+  </div>
+</main>
+
+<footer>
+  <a href="index.html">Accueil</a> ·
+  <a href="privacy-proof.html">Privacy Proof</a> ·
+  <a href="status.html">Status</a> ·
+  <a href="legal.html">Mentions légales</a>
+</footer>
+
+<script>
+(function(){
+  var SERVICES = [
+    // LLM
+    { id:'claude',      cat:'llm',  icon:'🤖', name:'Claude (Anthropic)', url:'https://api.anthropic.com/v1/messages', method:'HEAD' },
+    { id:'openai',      cat:'llm',  icon:'🧠', name:'OpenAI',             url:'https://api.openai.com/v1/models',       method:'GET'  },
+    { id:'gemini',      cat:'llm',  icon:'✨', name:'Gemini (Google)',    url:'https://generativelanguage.googleapis.com/v1beta/models', method:'GET' },
+    { id:'grok',        cat:'llm',  icon:'🐦', name:'Grok (xAI)',         url:'https://api.x.ai/v1/models',             method:'GET'  },
+    { id:'openrouter',  cat:'llm',  icon:'🌀', name:'OpenRouter',         url:'https://openrouter.ai/api/v1/models',    method:'GET'  },
+    { id:'perplexity',  cat:'llm',  icon:'🔎', name:'Perplexity',         url:'https://api.perplexity.ai/chat/completions', method:'HEAD' },
+    { id:'mistral',     cat:'llm',  icon:'🇫🇷', name:'Mistral',            url:'https://api.mistral.ai/v1/models',       method:'GET'  },
+    { id:'cerebras',    cat:'llm',  icon:'⚡', name:'Cerebras',           url:'https://api.cerebras.ai/v1/models',      method:'GET'  },
+    { id:'cohere',      cat:'llm',  icon:'🟦', name:'Cohere',             url:'https://api.cohere.ai/v1/models',        method:'GET'  },
+    { id:'together',    cat:'llm',  icon:'🟣', name:'Together AI',        url:'https://api.together.xyz/v1/models',     method:'GET'  },
+    // DATA
+    { id:'fmp',         cat:'data', icon:'💰', name:'FMP',                url:'https://financialmodelingprep.com/api/v3/quote/AAPL', method:'GET' },
+    { id:'polygon',     cat:'data', icon:'📊', name:'Polygon',            url:'https://api.polygon.io/v3/reference/tickers/AAPL',    method:'GET' },
+    { id:'finnhub',     cat:'data', icon:'📈', name:'Finnhub',            url:'https://finnhub.io/api/v1/quote?symbol=AAPL',         method:'GET' },
+    { id:'fred',        cat:'data', icon:'🔔', name:'FRED (St. Louis Fed)', url:'https://api.stlouisfed.org/fred/series?series_id=DGS10&file_type=json', method:'GET' },
+    { id:'coingecko',   cat:'data', icon:'🪙', name:'CoinGecko',          url:'https://api.coingecko.com/api/v3/ping', method:'GET' },
+    { id:'altme',       cat:'data', icon:'🌡️', name:'Alternative.me F&G', url:'https://api.alternative.me/fng/?limit=1', method:'GET' },
+    { id:'frankfurter', cat:'data', icon:'💵', name:'Frankfurter (FX)',   url:'https://api.frankfurter.dev/latest?from=USD&to=EUR', method:'GET' }
+  ];
+
+  var TIMEOUT_MS = 8000;
+  var DEGRADED_MS = 3000;
+  var REFRESH_MS  = 60000;
+  var refreshTimer = null;
+  var results = {};
+
+  var L = {
+    checking:'⏳ Vérification…',
+    ok:'✓ Opérationnel',
+    degraded:'⚠ Dégradé (lent)',
+    down:'✗ Indisponible',
+    recheck:'Recheck',
+    rechecking:'…',
+    allOk:'🟢 Tous les services opérationnels',
+    someDeg:function(n){ return '⚠️ '+n+' service'+(n>1?'s':'')+' dégradé'+(n>1?'s':''); },
+    someDown:function(n){ return '🔴 '+n+' service'+(n>1?'s':'')+' indisponible'+(n>1?'s':''); },
+    mixed:function(d,x){ return '⚠️ '+d+' dégradé(s), '+x+' down'; }
+  };
+
+  function el(tag, attrs, html){
+    var e = document.createElement(tag);
+    if(attrs) for(var k in attrs){ if(k==='class') e.className=attrs[k]; else e.setAttribute(k, attrs[k]); }
+    if(html!=null) e.innerHTML = html;
+    return e;
+  }
+
+  function buildCard(svc){
+    var card = el('div', { class:'status-card checking', id:'card-'+svc.id });
+    var head = el('div', { class:'status-head' });
+    head.appendChild(el('span', { class:'status-icon' }, svc.icon));
+    head.appendChild(el('span', { class:'status-name' }, svc.name));
+    head.appendChild(el('span', { class:'status-cat' }, svc.cat));
+    card.appendChild(head);
+    card.appendChild(el('div', { class:'status-state checking', id:'state-'+svc.id }, L.checking));
+    card.appendChild(el('div', { class:'status-latency', id:'lat-'+svc.id }, '—'));
+    card.appendChild(el('div', { class:'status-meta', id:'meta-'+svc.id }, ''));
+    var btn = el('button', { class:'btn-recheck', type:'button', 'data-id':svc.id }, L.recheck);
+    btn.addEventListener('click', function(){ checkOne(svc, true); });
+    card.appendChild(btn);
+    return card;
+  }
+
+  function renderSkeleton(){
+    var llm = document.getElementById('grid-llm');
+    var data = document.getElementById('grid-data');
+    llm.innerHTML = ''; data.innerHTML = '';
+    var nLlm=0, nData=0;
+    SERVICES.forEach(function(s){
+      var card = buildCard(s);
+      if(s.cat==='llm'){ llm.appendChild(card); nLlm++; } else { data.appendChild(card); nData++; }
+    });
+    document.getElementById('cnt-llm').textContent  = nLlm  + ' services';
+    document.getElementById('cnt-data').textContent = nData + ' services';
+  }
+
+  function classify(status, ms, networkErr){
+    if(networkErr) return 'down';
+    if(typeof status === 'number'){
+      // 2xx, 4xx (incl. 401/403/405) = service répond = UP
+      if(status >= 200 && status < 500) {
+        return ms > DEGRADED_MS ? 'degraded' : 'ok';
+      }
+      if(status >= 500) return 'down';
+    }
+    return 'down';
+  }
+
+  function checkOne(svc, manual){
+    var stateEl = document.getElementById('state-'+svc.id);
+    var latEl   = document.getElementById('lat-'+svc.id);
+    var metaEl  = document.getElementById('meta-'+svc.id);
+    var card    = document.getElementById('card-'+svc.id);
+    if(!stateEl) return Promise.resolve();
+    card.className = 'status-card checking';
+    stateEl.className = 'status-state checking';
+    stateEl.textContent = L.checking;
+    latEl.textContent = '—';
+
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); }, TIMEOUT_MS);
+    var t0 = performance.now();
+
+    return fetch(svc.url, {
+      method: svc.method,
+      mode: 'cors',
+      cache: 'no-store',
+      signal: ctrl ? ctrl.signal : undefined,
+      redirect: 'follow'
+    }).then(function(r){
+      clearTimeout(timer);
+      var ms = Math.round(performance.now() - t0);
+      var cls = classify(r.status, ms, false);
+      results[svc.id] = { cls:cls, ms:ms, status:r.status };
+      card.className = 'status-card ' + cls;
+      stateEl.className = 'status-state ' + cls;
+      stateEl.textContent = (cls==='ok' ? L.ok : (cls==='degraded' ? L.degraded : L.down));
+      latEl.textContent = ms + ' ms · HTTP ' + r.status;
+      metaEl.textContent = new Date().toLocaleTimeString();
+    }).catch(function(err){
+      clearTimeout(timer);
+      var ms = Math.round(performance.now() - t0);
+      // Différencier: si 4xx/5xx/Opaque → fetch n'a pas thrown. Ici err = network/CORS/abort.
+      // Pour CORS bloqué, navigateur jette TypeError mais le service peut quand même répondre côté réseau.
+      // On marque "down" car indistinguable côté client.
+      var cls = 'down';
+      results[svc.id] = { cls:cls, ms:ms, status:0, err:String(err && err.name || err) };
+      card.className = 'status-card ' + cls;
+      stateEl.className = 'status-state ' + cls;
+      var label = (err && err.name === 'AbortError') ? '✗ Timeout (>'+TIMEOUT_MS+'ms)' : L.down;
+      stateEl.textContent = label;
+      latEl.textContent = ms + ' ms · ' + (err && err.name ? err.name : 'erreur');
+      metaEl.textContent = new Date().toLocaleTimeString() + (err && err.message ? ' · '+ String(err.message).slice(0,40) : '');
+    }).then(function(){ if(manual) updateSummary(); });
+  }
+
+  function updateSummary(){
+    var ok=0, deg=0, down=0;
+    SERVICES.forEach(function(s){
+      var r = results[s.id]; if(!r) return;
+      if(r.cls==='ok') ok++; else if(r.cls==='degraded') deg++; else if(r.cls==='down') down++;
+    });
+    document.getElementById('count-ok').textContent   = ok;
+    document.getElementById('count-deg').textContent  = deg;
+    document.getElementById('count-down').textContent = down;
+    var hero = document.getElementById('hero-state');
+    var d = new Date();
+    document.getElementById('last-check').textContent = d.toLocaleTimeString();
+    if(down===0 && deg===0){ hero.className='hero-state ok'; hero.textContent = L.allOk; }
+    else if(down>0 && deg>0){ hero.className='hero-state down'; hero.textContent = L.mixed(deg,down); }
+    else if(down>0){ hero.className='hero-state down'; hero.textContent = L.someDown(down); }
+    else { hero.className='hero-state degraded'; hero.textContent = L.someDeg(deg); }
+  }
+
+  function checkAll(){
+    var btn = document.getElementById('btn-all');
+    btn.disabled = true; btn.textContent = '⏳ Vérification…';
+    var promises = SERVICES.map(function(s){ return checkOne(s, false); });
+    Promise.allSettled(promises).then(function(){
+      updateSummary();
+      btn.disabled = false; btn.textContent = '🔄 Tout retester';
+    });
+  }
+
+  function init(){
+    renderSkeleton();
+    checkAll();
+    document.getElementById('btn-all').addEventListener('click', checkAll);
+    refreshTimer = setInterval(checkAll, REFRESH_MS);
+    window.addEventListener('beforeunload', function(){ if(refreshTimer) clearInterval(refreshTimer); });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+</body>
+</html>
