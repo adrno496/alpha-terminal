@@ -1329,6 +1329,18 @@ function renderAdvancedTab(c) {
       <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">${t('settings.adv.wipe_warning')}</p>
     </div>
     <div class="card">
+      <div class="card-title">📦 Auto-backups locaux</div>
+      <p style="font-size:12px;color:var(--text-muted);margin:0 0 12px;">
+        Snapshot automatique chaque 24h dans une base IndexedDB séparée. Conserve les 7 dernières.
+        100% local — aucun upload. Permet de restaurer si la DB principale est corrompue.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+        <button id="set-autobackup-now" class="btn-secondary" style="font-size:12.5px;">📸 Créer un snapshot maintenant</button>
+        <button id="set-autobackup-refresh" class="btn-ghost" style="font-size:12px;">🔄 Rafraîchir</button>
+      </div>
+      <div id="set-autobackup-list" style="font-size:12px;color:var(--text-secondary);">Chargement…</div>
+    </div>
+    <div class="card">
       <div class="card-title">${t('tour.replay')}</div>
       <button id="set-replay-tour" class="btn-secondary">${t('tour.replay')}</button>
       <button id="set-onboarding-redo" class="btn-secondary" style="margin-left:8px;">⭐ ${getLocale() === 'en' ? 'Redo profile questionnaire' : 'Refaire le questionnaire profil'}</button>
@@ -1724,6 +1736,66 @@ function renderAdvancedTab(c) {
       setTimeout(() => location.reload(), 600);
     } catch (err) { toast('Wipe : ' + err.message, 'error'); }
   });
+  // === Auto-backup local : list / create / restore ===
+  async function refreshAutoBackupList() {
+    const el = $('#set-autobackup-list');
+    if (!el) return;
+    el.textContent = 'Chargement…';
+    try {
+      const { listAutoBackups } = await import('../core/auto-backup.js');
+      const list = await listAutoBackups();
+      if (!list.length) {
+        el.innerHTML = '<em style="color:var(--text-muted);">Aucun snapshot auto pour le moment. Le premier sera créé après ~24h d\'utilisation, ou clique « Créer un snapshot maintenant ».</em>';
+        return;
+      }
+      el.innerHTML = list.map(b => {
+        const date = new Date(b.createdAt).toLocaleString('fr-FR');
+        const sizeKb = (b.sizeBytes / 1024).toFixed(0);
+        const counts = b.counts ? Object.entries(b.counts).filter(([,v])=>v>0).map(([k,v])=>`${k}:${v}`).join(' · ') : '';
+        return `<div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:4px;margin-bottom:4px;flex-wrap:wrap;">
+          <span style="font-family:var(--font-mono);font-size:11.5px;flex:1;min-width:200px;">${date} · ${sizeKb} Ko${counts ? ' · ' + counts : ''}</span>
+          <button class="btn-ghost" data-autobackup-restore="${b.id}" style="font-size:11.5px;">↩️ Restaurer</button>
+          <button class="btn-ghost" data-autobackup-delete="${b.id}" style="font-size:11.5px;color:var(--accent-amber);" aria-label="Supprimer">🗑</button>
+        </div>`;
+      }).join('');
+      el.querySelectorAll('[data-autobackup-restore]').forEach(b => b.addEventListener('click', async (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-autobackup-restore'), 10);
+        const mode = (document.querySelector('input[name="restore-mode"]:checked')?.value) || 'merge';
+        if (!confirm(`Restaurer ce snapshot en mode "${mode}" ?\n("merge" = ajoute aux données actuelles · "replace" = écrase tout)`)) return;
+        try {
+          const { restoreAutoBackup } = await import('../core/auto-backup.js');
+          await restoreAutoBackup(id, { mode });
+          toast('✓ Snapshot restauré — rechargement…', 'success');
+          setTimeout(() => location.reload(), 800);
+        } catch (err) { toast('Restauration KO : ' + err.message, 'error'); }
+      }));
+      el.querySelectorAll('[data-autobackup-delete]').forEach(b => b.addEventListener('click', async (e) => {
+        const id = parseInt(e.currentTarget.getAttribute('data-autobackup-delete'), 10);
+        if (!confirm('Supprimer ce snapshot ?')) return;
+        try {
+          const { deleteAutoBackup } = await import('../core/auto-backup.js');
+          await deleteAutoBackup(id);
+          await refreshAutoBackupList();
+        } catch (err) { toast('Suppression KO : ' + err.message, 'error'); }
+      }));
+    } catch (err) {
+      el.innerHTML = `<em style="color:var(--accent-amber);">Erreur : ${err.message}</em>`;
+    }
+  }
+  refreshAutoBackupList();
+  $('#set-autobackup-now')?.addEventListener('click', async () => {
+    const btn = $('#set-autobackup-now');
+    btn.disabled = true; const old = btn.textContent; btn.textContent = '⏳ Création…';
+    try {
+      const { triggerAutoBackupNow } = await import('../core/auto-backup.js');
+      const r = await triggerAutoBackupNow();
+      toast(`✓ Snapshot créé (${(r.sizeBytes/1024).toFixed(0)} Ko)`, 'success');
+      await refreshAutoBackupList();
+    } catch (err) { toast('Snapshot KO : ' + err.message, 'error'); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  });
+  $('#set-autobackup-refresh')?.addEventListener('click', refreshAutoBackupList);
+
   const replayBtn = $('#set-replay-tour');
   if (replayBtn) replayBtn.addEventListener('click', () => { resetTour(); startTour(); });
 

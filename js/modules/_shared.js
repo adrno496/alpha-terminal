@@ -215,9 +215,10 @@ function wealthToggleHtml(moduleId) {
   </label>`;
 }
 
-export function moduleHeader(title, desc, { example, moduleId } = {}) {
+export function moduleHeader(title, desc, { example, moduleId, noPdfButton = false } = {}) {
+  const pdfBtn = noPdfButton ? '' : `<button class="btn-ghost" data-export-module-pdf="${moduleId || ''}" title="${t('common.export_pdf_tip') || 'Exporter cette vue en PDF'}">📄 PDF</button>`;
   return `
-    <div class="module-header">
+    <div class="module-header" data-module-header="${moduleId || ''}" data-module-title="${escHtmlAttr(title)}">
       <div class="module-header-top">
         <h2>${title}</h2>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;" data-module-toolbar="${moduleId || ''}">
@@ -225,11 +226,56 @@ export function moduleHeader(title, desc, { example, moduleId } = {}) {
           ${wealthToggleHtml(moduleId)}
           ${moduleId && moduleId !== 'knowledge-base' ? `<label class="rag-toggle" title="${t('rag.title')}"><input type="checkbox" data-rag="${moduleId}" /> 📚 KB</label>` : ''}
           ${example ? `<button class="btn-ghost" data-example>${example}</button>` : ''}
+          ${pdfBtn}
         </div>
       </div>
       <div class="module-desc">${desc}</div>
     </div>
   `;
+}
+
+function escHtmlAttr(s) {
+  return String(s ?? '').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// Délégation globale : capture la vue du module en PDF via html2pdf.
+// On capture le parent .module-view (ou le grand-parent si la structure varie)
+// et on masque temporairement les boutons d'action pour un rendu propre.
+if (typeof document !== 'undefined' && !window.__alphaModulePdfWired) {
+  window.__alphaModulePdfWired = true;
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-export-module-pdf]');
+    if (!btn) return;
+    e.preventDefault();
+    const moduleId = btn.getAttribute('data-export-module-pdf') || 'module';
+    const header = btn.closest('[data-module-header]');
+    const title = header?.getAttribute('data-module-title') || 'Vue Alpha';
+    // Cible : le conteneur racine du module = le parent direct du header
+    const target = header?.parentElement;
+    if (!target) return;
+    const oldText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    // Masque transitoirement les éléments interactifs (provider selector, RAG toggle, btn pdf eux-mêmes)
+    const hidden = target.querySelectorAll('[data-module-toolbar], [data-export-module-pdf], .provider-picker');
+    hidden.forEach(el => { el.dataset._prevDisplay = el.style.display; el.style.display = 'none'; });
+    try {
+      const { downloadElementAsPdf } = await import('../core/export.js');
+      const safeTitle = String(title).replace(/[^a-z0-9-_]+/gi, '-').slice(0, 60).toLowerCase();
+      await downloadElementAsPdf(target, {
+        title,
+        module: moduleId,
+        filename: `${moduleId}-${safeTitle}-${new Date().toISOString().slice(0,10)}.pdf`
+      });
+    } catch (err) {
+      console.error('[pdf] module export failed', err);
+      alert('Export PDF échoué : ' + (err?.message || err));
+    } finally {
+      hidden.forEach(el => { el.style.display = el.dataset._prevDisplay || ''; delete el.dataset._prevDisplay; });
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
+  });
 }
 
 const PROVIDER_ICONS = {

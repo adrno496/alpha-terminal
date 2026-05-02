@@ -473,6 +473,14 @@ function boot() {
   // === Price alerts : boot check (1h throttle) + badge sidebar ===
   // Lance en background : ne bloque pas le boot. Fire l'event si nouvelles alertes triggered.
   bootAlertCheck().then(() => updateAlertBadge()).catch(() => {});
+
+  // === Auto-backup local : snapshot 24h dans une DB séparée, conserve les 7 dernières ===
+  // Best-effort : ne bloque pas le boot et silencieux en cas d'échec (DB indispo, etc.)
+  setTimeout(() => {
+    import('./core/auto-backup.js')
+      .then(m => m.maybeRunAutoBackup())
+      .catch(() => {});
+  }, 5000); // léger delay pour ne pas concurrencer le boot critique
   window.addEventListener('app:alerts-updated', () => updateAlertBadge());
 
   // In-app footer legal links
@@ -501,18 +509,27 @@ function boot() {
   onCostChange(refreshCostBadge);
   refreshApiStatus();
 
-  // Bannière "navigation privée" si IndexedDB indisponible
-  onDbAvailabilityChange((available) => {
+  // Bannière informative si le stockage local échoue. On ne diagnostique PAS la cause
+  // (mode privé / quota / corruption) : on probe vraiment et on présente les faits.
+  onDbAvailabilityChange(async (available) => {
     let banner = document.getElementById('db-unavailable-banner');
     if (available) {
       if (banner) banner.remove();
       return;
     }
     if (banner) return;
+    // Probe explicite avant d'afficher quoi que ce soit (évite les faux positifs)
+    const { probeStorage } = await import('./core/storage.js');
+    const probe = await probeStorage();
+    // Si en réalité ça marche (faux positif), n'affiche rien
+    if (probe.indexedDB || probe.localStorage) return;
     banner = document.createElement('div');
     banner.id = 'db-unavailable-banner';
     banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:10000;padding:10px 16px;background:#b8860b;color:#fff;font-size:13px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);';
-    banner.innerHTML = '⚠️ <strong>Stockage local indisponible</strong> — Navigation privée détectée. Tes analyses ne seront pas sauvegardées. <button style="margin-left:8px;background:transparent;border:1px solid #fff;color:#fff;padding:2px 8px;cursor:pointer;border-radius:3px;">Fermer</button>';
+    const msg = probe.isLikelyPrivate
+      ? '⚠️ <strong>Stockage local désactivé</strong> — Tes analyses ne seront pas conservées entre sessions sur cet appareil.'
+      : '⚠️ <strong>Stockage local indisponible</strong> — Tes analyses ne seront pas conservées. Essaie de recharger la page.';
+    banner.innerHTML = `${msg} <button style="margin-left:8px;background:transparent;border:1px solid #fff;color:#fff;padding:2px 8px;cursor:pointer;border-radius:3px;" aria-label="Fermer">Fermer</button>`;
     banner.querySelector('button').addEventListener('click', () => banner.remove());
     document.body.appendChild(banner);
   });

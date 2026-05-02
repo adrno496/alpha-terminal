@@ -119,13 +119,11 @@ function openDB() {
       // On laisse la promise pending, l'utilisateur doit fermer les autres onglets
     };
     }
-    // Timeout : si onsuccess/onerror ne se déclenchent jamais (rare bug Safari private)
-    setTimeout(() => {
-      if (_dbAvailable === null) {
-        setDbAvailable(false);
-        reject(new Error('IndexedDB timeout — navigation privée ?'));
-      }
-    }, 5000);
+    // NOTE : pas de timeout artificiel ici. Le précédent setTimeout 5s déclenchait
+    // un FAUX POSITIF "navigation privée" sur les devices lents (mobile, Capacitor) où
+    // l'open IndexedDB peut prendre plusieurs secondes. On laisse onerror/onsuccess
+    // décider — si le navigateur n'envoie aucun des deux, c'est qu'IndexedDB est bloqué
+    // par un autre onglet (req.onblocked gère ce cas).
   });
   return _dbPromise.catch(err => {
     // Reset le promise pour permettre un retry futur si l'environnement change
@@ -239,18 +237,68 @@ function _mergeSettings(defaults, saved) {
   return out;
 }
 
+// Fallback mémoire : si localStorage est indisponible (vrai mode privé ou quota=0),
+// on garde les settings en RAM pour que l'app continue de fonctionner pendant la session.
+const _memorySettingsStore = new Map();
+
 export function getSettings() {
   try {
     const raw = localStorage.getItem(SETTINGS_KEY);
-    if (!raw) return { ...DEFAULT_SETTINGS };
+    if (!raw) {
+      const mem = _memorySettingsStore.get(SETTINGS_KEY);
+      return mem ? _mergeSettings(DEFAULT_SETTINGS, mem) : { ...DEFAULT_SETTINGS };
+    }
     return _mergeSettings(DEFAULT_SETTINGS, JSON.parse(raw));
   } catch {
-    return { ...DEFAULT_SETTINGS };
+    const mem = _memorySettingsStore.get(SETTINGS_KEY);
+    return mem ? _mergeSettings(DEFAULT_SETTINGS, mem) : { ...DEFAULT_SETTINGS };
   }
 }
 
 export function setSettings(patch) {
   const next = { ...getSettings(), ...patch };
-  localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+  try {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+  } catch (e) {
+    // Quota dépassé ou stockage bloqué → fallback RAM (ne crash pas l'app)
+    console.warn('[storage] setSettings localStorage failed, using memory fallback:', e?.message);
+    _memorySettingsStore.set(SETTINGS_KEY, next);
+  }
   return next;
+}
+
+// Probe explicite et NON-INVASIVE de la santé du stockage.
+// Retourne { localStorage, indexedDB, isLikelyPrivate } sans assumer la cause.
+// L'app peut afficher une bannière informative basée sur ces faits réels.
+export async function probeStorage() {
+  const result = { localStorage: false, indexedDB: false, isLikelyPrivate: false };
+  // Test localStorage (write/read/remove)
+  try {
+    const k = '__alpha_probe_' + Math.random().toString(36).slice(2);
+    localStorage.setItem(k, '1');
+    const ok = localStorage.getItem(k) === '1';
+    localStorage.removeItem(k);
+    result.localStorage = ok;
+  } catch { result.localStorage = false; }
+  // Test IndexedDB (open + close + delete d'une DB jetable)
+  try {
+    await new Promise((resolve, reject) => {
+      const probeName = '__alpha_probe_' + Math.random().toString(36).slice(2);
+      const req = indexedDB.open(probeName, 1);
+      req.onsuccess = () => {
+        try { req.result.close(); } catch {}
+        try { indexedDB.deleteDatabase(probeName); } catch {}
+        result.indexedDB = true;
+        resolve();
+      };
+      req.onerror = () => reject(req.error);
+      req.onblocked = () => reject(new Error('blocked'));
+      // Timeout court juste pour ce probe (pas pour l'app)
+      setTimeout(() => reject(new Error('probe-timeout')), 3000);
+    });
+  } catch { result.indexedDB = false; }
+  // Heuristique privée : seulement si BOTH sont KO (Safari private bloque les deux).
+  // Un seul KO peut venir d'une corruption locale, pas du mode privé.
+  result.isLikelyPrivate = !result.localStorage && !result.indexedDB;
+  return result;
 }
