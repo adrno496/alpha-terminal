@@ -293,9 +293,15 @@ export async function validateDataKey(id, key) {
   } catch (e) {
     const msg = e?.message || 'Erreur réseau';
     // Détection CORS : "Failed to fetch" / "NetworkError" sont les patterns Chrome/Firefox/Safari
-    // pour un blocage CORS. On retourne un message actionnable.
+    // pour un blocage CORS. On retourne un code BROWSER_INCOMPATIBLE pour les providers
+    // connus pour ne pas supporter CORS du tout, et un warning générique sinon.
     if (/failed to fetch|networkerror|cors/i.test(msg)) {
-      return { ok: false, error: 'CORS bloqué : ce provider ne permet pas la validation depuis le navigateur. La clé peut être valide — teste-la directement en lançant une analyse.' };
+      // Providers data dont l'API a un CORS strict (validation impossible browser)
+      const browserIncompatibleData = ['fred', 'metals_api'];
+      if (browserIncompatibleData.includes(id)) {
+        return { ok: false, error: `BROWSER_INCOMPATIBLE:${id}`, status: 0 };
+      }
+      return { ok: false, error: 'Failed to fetch — réseau ou CORS', status: 0 };
     }
     return { ok: false, error: msg };
   }

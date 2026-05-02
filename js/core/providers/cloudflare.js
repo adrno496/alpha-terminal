@@ -67,7 +67,8 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
       }
       return { ok: false, error: `[Cloudflare] HTTP ${res.status}`, status: res.status };
     } catch (e) {
-      return { ok: false, error: `[Cloudflare] ${e?.message || 'Erreur réseau'} — vérifie que le token n'a pas expiré.` };
+      // CORS bloque api.cloudflare.com depuis le browser sauf si AI Gateway custom
+      return { ok: false, error: 'BROWSER_INCOMPATIBLE:cloudflare', status: 0 };
     }
   }
 }

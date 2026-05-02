@@ -24,26 +24,24 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
     try {
       const res = await fetch('https://huggingface.co/api/whoami-v2', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Accept': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${this.apiKey}`, 'Accept': 'application/json' }
       });
       if (res.ok) {
         const data = await res.json().catch(() => null);
-        // Réponse contient { name, type, ... } pour un token valide
         if (data && (data.name || data.type)) return { ok: true };
         return { ok: true };
       }
-      if (res.status === 401) {
-        return { ok: false, error: '[Hugging Face] Token invalide ou révoqué.', status: 401 };
-      }
-      if (res.status === 403) {
-        return { ok: false, error: '[Hugging Face] Token sans permission suffisante (scope inference manquant).', status: 403 };
-      }
+      if (res.status === 401) return { ok: false, error: '[Hugging Face] Token invalide ou révoqué.', status: 401 };
+      if (res.status === 403) return { ok: false, error: '[Hugging Face] Token sans permission inference suffisante.', status: 403 };
       return { ok: false, error: `[Hugging Face] HTTP ${res.status}`, status: res.status };
-    } catch (e) {
-      return { ok: false, error: `[Hugging Face] ${e?.message || 'Erreur réseau'}` };
+    } catch {
+      // CORS sur whoami-v2 → on tente le router chat
+      try {
+        const r2 = await super.validate();
+        if (r2.ok) return r2;
+        if (r2.status === 401 || r2.status === 403) return r2;
+      } catch {}
+      return { ok: false, error: 'BROWSER_INCOMPATIBLE:huggingface', status: 0 };
     }
   }
 }

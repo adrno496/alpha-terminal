@@ -374,16 +374,31 @@ function renderKeysTab(c) {
       <details>
         <summary style="cursor:pointer;color:var(--accent-blue);font-size:12px;margin-bottom:8px;">${t('settings.keys.add_modify')}</summary>
         <div class="field"><label class="field-label">${t('settings.keys.current_password')}</label><input id="keys-pwd" class="input" type="password" /></div>
-        ${KNOWN_PROVIDERS.map(p => `
+        ${KNOWN_PROVIDERS.map(p => {
+          const browserBadge = p.browserIncompatible
+            ? `<span style="background:rgba(255,170,0,0.12);color:#ffaa00;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">⚠ ${isEN ? 'browser-incompat.' : 'incompat. browser'}</span>`
+            : '';
+          const browserHint = p.browserIncompatible
+            ? `<div style="background:rgba(255,170,0,0.06);border-left:2px solid #ffaa00;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--text-secondary);border-radius:3px;line-height:1.5;">
+                ⚠ <strong>${isEN ? 'CORS-blocked from browsers.' : 'Bloqué CORS depuis le navigateur.'}</strong>
+                ${p.altSetup
+                  ? (isEN ? ` Setup ${p.altSetup} or use ` : ` Configure ${p.altSetup} ou utilise `)
+                  : (isEN ? ' Use ' : ' Utilise ')}
+                <strong>OpenRouter</strong> ${isEN ? 'as a proxy (same models, browser-compatible).' : 'comme proxy (mêmes modèles, compatible browser).'}
+              </div>`
+            : '';
+          return `
           <div class="field">
-            <label class="field-label">${p.icon} ${p.displayName} <span class="keys-set-status" data-status-set="${p.name}" style="margin-left:6px;font-size:11px;"></span></label>
+            <label class="field-label">${p.icon} ${p.displayName}${browserBadge} <span class="keys-set-status" data-status-set="${p.name}" style="margin-left:6px;font-size:11px;"></span></label>
             <div style="display:flex;gap:6px;align-items:center;">
               <input id="keys-set-${p.name}" class="input" type="password" placeholder="${present.includes(p.name) ? '••• (' + t('common.optional') + ')' : (p.placeholder || 'sk-...')}" style="flex:1;" />
               <button type="button" class="btn-secondary" data-test-set="${p.name}" title="Tester cette clé sans la sauvegarder" style="font-size:11.5px;padding:6px 10px;white-space:nowrap;">⚡ ${t('common.test')}</button>
             </div>
             <div class="field-hint">${p.recommendedFor} · <a href="${p.linkKey}" target="_blank">${t('settings.keys.create')}</a></div>
+            ${browserHint}
           </div>
-        `).join('')}
+        `;
+        }).join('')}
         <button id="keys-save" class="btn-primary">${t('common.save')}</button>
         <span id="keys-status" style="margin-left:10px;font-size:12px;"></span>
       </details>
@@ -401,10 +416,13 @@ function renderKeysTab(c) {
   if (!present.length) list.innerHTML = '<div class="alert alert-warning">No keys configured.</div>';
   else list.innerHTML = present.map(name => {
     const p = KNOWN_PROVIDERS.find(x => x.name === name);
+    const browserBadge = p?.browserIncompatible
+      ? `<span style="background:rgba(255,170,0,0.12);color:#ffaa00;font-size:10px;padding:2px 6px;border-radius:3px;margin-left:6px;font-weight:600;cursor:help;" title="${isEN ? 'This provider blocks browser CORS. Use OpenRouter or AI Gateway as a proxy for analyses.' : 'Ce provider bloque le CORS browser. Utilise OpenRouter ou AI Gateway comme proxy pour les analyses.'}">⚠ ${isEN ? 'browser-incompatible' : 'incompatible browser'}</span>`
+      : '';
     return `
       <div class="key-row">
         <span style="font-size:18px;">${p?.icon || '🔑'}</span>
-        <span style="flex:1;">${p?.displayName || name} <span style="color:var(--text-muted);font-size:11px;">· ${t('settings.keys.encrypted')}</span></span>
+        <span style="flex:1;">${p?.displayName || name} <span style="color:var(--text-muted);font-size:11px;">· ${t('settings.keys.encrypted')}</span>${browserBadge}</span>
         <button class="btn-ghost" data-test="${name}">${t('common.test')}</button>
         <button class="btn-danger" data-rm="${name}">×</button>
       </div>

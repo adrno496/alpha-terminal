@@ -59,16 +59,49 @@ export function explainValidationResult(result) {
   const status = result.status;
   const errMsg = String(result.error || '').slice(0, 200);
 
-  // CORS bloqué (cas spécial — pas un vrai code HTTP)
+  // BROWSER_INCOMPATIBLE — provider ne fonctionne PAS depuis browser
+  // (validation ET analyses échoueront toutes les deux à cause de CORS)
+  if (/^BROWSER_INCOMPATIBLE/.test(errMsg)) {
+    const provider = errMsg.split(':')[1] || 'this provider';
+    const proxyAdvice = {
+      github: en
+        ? 'Use OpenRouter instead (covers OpenAI/Llama models via GitHub). Or self-host an AI Gateway proxy.'
+        : 'Utilise OpenRouter à la place (couvre les modèles OpenAI/Llama de GitHub). Ou self-host un proxy AI Gateway.',
+      nvidia: en
+        ? 'NVIDIA NIM only allows server-to-server calls. Use OpenRouter (carries Llama 3.x, Nemotron) or a backend proxy.'
+        : 'NVIDIA NIM n\'autorise que les calls server-to-server. Utilise OpenRouter (qui propose Llama 3.x, Nemotron) ou un proxy backend.',
+      huggingface: en
+        ? 'Use OpenRouter (carries the same Llama/Qwen/Mistral models). HF Inference router blocks browser CORS.'
+        : 'Utilise OpenRouter (qui propose les mêmes modèles Llama/Qwen/Mistral). Le router HF bloque le CORS browser.',
+      cloudflare: en
+        ? 'Cloudflare Workers AI requires their AI Gateway proxy for browser access. Setup: dash.cloudflare.com → AI → AI Gateway → enable.'
+        : 'Cloudflare Workers AI nécessite leur proxy AI Gateway pour l\'accès browser. Setup : dash.cloudflare.com → AI → AI Gateway → activer.',
+      fred: en
+        ? 'FRED API CORS is intermittent. Most calls work but validation may fail. The key likely works in actual usage.'
+        : 'L\'API FRED a un CORS intermittent. La plupart des appels fonctionnent mais la validation échoue. La clé fonctionne sûrement à l\'usage réel.'
+    };
+    return {
+      label: en ? '⛔ Not browser-compatible' : '⛔ Incompatible navigateur',
+      explanation: en
+        ? `${provider} blocks direct calls from browsers (CORS). Your analyses with this provider will also fail.`
+        : `${provider} bloque les appels directs depuis un navigateur (CORS). Tes analyses avec ce provider échoueront aussi.`,
+      action: proxyAdvice[provider] || (en
+        ? 'Use OpenRouter as a proxy or skip this provider.'
+        : 'Utilise OpenRouter comme proxy ou n\'utilise pas ce provider.'),
+      severity: 'error'
+    };
+  }
+
+  // CORS bloqué générique (réseau / DNS / autre — la clé peut être valide)
   if (/cors|failed to fetch|networkerror/i.test(errMsg)) {
     return {
-      label: en ? '⚠ CORS blocked' : '⚠ CORS bloqué',
+      label: en ? '⚠ Network/CORS issue' : '⚠ Réseau/CORS',
       explanation: en
-        ? 'The provider doesn\'t allow validation calls from a browser. Your key may actually be valid — we just can\'t test it from here.'
-        : 'Le provider ne permet pas les appels de validation depuis un navigateur. Ta clé peut très bien être valide — on ne peut juste pas la tester d\'ici.',
+        ? 'Couldn\'t reach the provider for validation. Could be a temporary network issue, ad blocker, or browser extension blocking the request.'
+        : 'Impossible de joindre le provider pour validation. Peut être un problème réseau temporaire, ad-blocker, ou extension navigateur qui bloque la requête.',
       action: en
-        ? 'Try running an actual analysis with this provider — if it works, the key is fine.'
-        : 'Lance une vraie analyse avec ce provider — si ça marche, la clé est bonne.',
+        ? 'Disable ad blockers / extensions, then retry. Try running an actual analysis — if it works, the key is fine.'
+        : 'Désactive ad-blockers/extensions et réessaie. Si une vraie analyse fonctionne, la clé est bonne.',
       severity: 'warning'
     };
   }

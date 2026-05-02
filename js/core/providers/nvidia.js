@@ -22,29 +22,21 @@ export class NvidiaProvider extends OpenAICompatibleProvider {
     });
   }
 
-  // Override : utilise l'endpoint /v1/models (listing) au lieu de POST chat.
-  // Plus léger, ne consomme pas de crédit, et plus tolérant côté CORS.
   async validate() {
     try {
       const res = await fetch('https://integrate.api.nvidia.com/v1/models', {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
-          'Accept': 'application/json'
-        }
+        headers: { 'Authorization': `Bearer ${this.apiKey}`, 'Accept': 'application/json' }
       });
       if (res.ok) return { ok: true };
-      if (res.status === 401) {
-        return { ok: false, error: '[NVIDIA NIM] Clé invalide ou révoquée.', status: 401 };
-      }
-      if (res.status === 403) {
-        return { ok: false, error: '[NVIDIA NIM] Clé valide mais sans accès aux modèles. Vérifie les crédits restants sur build.nvidia.com.', status: 403 };
-      }
-      // Si /v1/models n'est pas dispo, fallback sur le POST chat habituel
-      return await super.validate();
-    } catch (e) {
-      // Erreur réseau / CORS
-      return await super.validate();
-    }
+      if (res.status === 401) return { ok: false, error: '[NVIDIA NIM] Clé invalide ou révoquée.', status: 401 };
+      if (res.status === 403) return { ok: false, error: '[NVIDIA NIM] Clé valide mais sans accès aux modèles.', status: 403 };
+    } catch {}
+    try {
+      const r2 = await super.validate();
+      if (r2.ok) return r2;
+      if (r2.status === 401 || r2.status === 403) return r2;
+    } catch {}
+    return { ok: false, error: 'BROWSER_INCOMPATIBLE:nvidia', status: 0 };
   }
 }

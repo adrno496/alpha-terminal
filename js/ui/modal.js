@@ -312,11 +312,20 @@ function renderWizardStep2() {
       </div>
     </div>
   `;
-  $('#wiz-keys').innerHTML = KNOWN_PROVIDERS.map(p => `
+  $('#wiz-keys').innerHTML = KNOWN_PROVIDERS.map(p => {
+    const browserBadge = p.browserIncompatible
+      ? `<span style="background:rgba(255,170,0,0.12);color:#ffaa00;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">⚠ ${isEnLocal ? 'browser-incompat.' : 'incompat. browser'}</span>`
+      : '';
+    const browserHint = p.browserIncompatible
+      ? `<div style="background:rgba(255,170,0,0.06);border-left:2px solid #ffaa00;padding:6px 10px;margin-top:6px;font-size:10.5px;color:var(--text-secondary);border-radius:3px;line-height:1.45;">
+          ⚠ ${isEnLocal ? 'CORS-blocked from browsers. Use ' : 'Bloqué CORS depuis le navigateur. Utilise '}<strong>OpenRouter</strong>${isEnLocal ? ' as a proxy (same models, browser-compatible).' : ' comme proxy (mêmes modèles, compatible browser).'}
+        </div>`
+      : '';
+    return `
     <div class="wiz-key" data-provider="${p.name}">
       <div class="wiz-key-header">
         <span class="wiz-key-icon">${p.icon}</span>
-        <span class="wiz-key-name">${p.displayName}</span>
+        <span class="wiz-key-name">${p.displayName}${browserBadge}</span>
         <span class="wiz-key-status" id="status-${p.name}"></span>
       </div>
       <div style="display:flex;gap:6px;align-items:center;">
@@ -325,10 +334,12 @@ function renderWizardStep2() {
       </div>
       <div class="wiz-key-meta">
         <span style="color:var(--text-muted);font-size:11px;">${p.recommendedFor}</span>
-        <a href="${p.linkKey}" target="_blank" rel="noopener" style="font-size:11px;">→ Créer une clé</a>
+        <a href="${p.linkKey}" target="_blank" rel="noopener" style="font-size:11px;">→ ${isEnLocal ? 'Create a key' : 'Créer une clé'}</a>
       </div>
+      ${browserHint}
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   $('#wiz-back').addEventListener('click', renderWizardStep1);
   $('#wiz-test').addEventListener('click', testKeys);
