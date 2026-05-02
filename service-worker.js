@@ -1,6 +1,6 @@
-// Service Worker v63 — network-first pour HTML/navigation (toujours frais),
+// Service Worker v64 — network-first pour HTML/navigation (toujours frais),
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v63';
+const CACHE = 'alpha-terminal-v64';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
@@ -45,6 +45,12 @@ self.addEventListener('activate', (e) => {
       Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
+});
+
+// Permet aux pages de demander un skipWaiting immédiat (utilisé par le bouton
+// "Hard refresh" dans Fear & Greed et autres flushs cache manuels).
+self.addEventListener('message', (e) => {
+  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // Détecte les URLs API LLM qui ne doivent JAMAIS être cachées.

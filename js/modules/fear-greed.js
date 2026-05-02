@@ -266,11 +266,21 @@ export async function renderFearGreedView(viewEl) {
   if (refreshBtn) {
     refreshBtn.addEventListener('click', async () => {
       refreshBtn.disabled = true;
-      refreshBtn.textContent = isEN ? '⏳ Refreshing…' : '⏳ Rafraîchissement…';
-      await loadAndRender(viewEl);
-      wireVixApiButton(viewEl);
-      refreshBtn.disabled = false;
-      refreshBtn.innerHTML = '🔄 ' + (isEN ? 'Refresh' : 'Rafraîchir');
+      refreshBtn.textContent = isEN ? '⏳ Hard refresh…' : '⏳ Rafraîchissement complet…';
+      // 1. Vide TOUS les caches Service Worker (assets + responses)
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch (e) { console.warn('[fg] cache clear failed:', e); }
+      // 2. Force le SW à passer en activated state (skipWaiting)
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration();
+        if (reg?.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } catch {}
+      // 3. Recharge la page sans cache (les données F&G se re-fetchent naturellement)
+      location.reload();
     });
   }
 }
