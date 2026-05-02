@@ -291,5 +291,3 @@ export function showTutorialIfFirstOpen(moduleId) {
 if (typeof window !== 'undefined') {
   window.AlphaTutorials = { show: showTutorialIfFirstOpen, reset: resetTutorials };
 }
-</content>
-</invoke>
