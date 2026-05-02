@@ -199,9 +199,9 @@ async function refreshUI() {
                 displayValue = mv.equity;
                 valueTooltip = `title="Équité (net) = valeur ${fmtMoney(mv.currentValue)} € − reste à payer ${fmtMoney(mv.remaining)} €"`;
               }
-              // Mini-récap immo sous la ligne si applicable
+              // Mini-récap immo sous la ligne si applicable (nouveau format `loans[]` OU ancien `loanAmount`)
               let immoRow = '';
-              if (h.category === 'real_estate' && h.loanAmount > 0) {
+              if (hasLoan) {
                 const m = computeRealEstateMetrics(h);
                 const typeLabel = h.propertyType === 'locatif' ? '🏘️ Locatif' : h.propertyType === 'secondary_residence' ? '🏖️ Secondaire' : '🏠 RP';
                 const cashflowChip = h.propertyType === 'locatif' && m.monthlyRent > 0
@@ -210,13 +210,15 @@ async function refreshUI() {
                 const yieldChip = h.propertyType === 'locatif' && m.grossYield > 0
                   ? ` · 💎 Brute : ${m.grossYield.toFixed(2)}% / Nette : ${m.netYield.toFixed(2)}%`
                   : '';
+                // Durée totale : depuis loans[0] (nouveau format) ou loanDuration (legacy)
+                const totalDur = (h.loans && h.loans[0]?.durationMonths) || h.loanDuration || 0;
                 immoRow = `
                   <tr data-id="${h.id}-immo" class="wl-immo-row">
                     <td colspan="10" style="padding:6px 12px;background:var(--bg-tertiary);font-size:11.5px;font-family:var(--font-mono);color:var(--text-secondary);border-top:0;">
                       ${typeLabel} · 💸 Mensualité : <strong>${fmtMoney(m.monthlyPayment)} €</strong>
-                      · 📉 Restant : <strong style="color:var(--accent-orange);">${fmtMoney(m.remaining)} €</strong>
-                      · 📅 ${fmtMonths(m.monthsElapsed)} / ${fmtMonths((h.loanDuration || 0))} (${m.progressPct.toFixed(0)}%)
-                      · 📈 Équité : <strong style="color:var(--accent-green);">${fmtMoney(m.equity)} €</strong>
+                      · 📉 Reste à payer : <strong style="color:var(--accent-orange);">${fmtMoney(m.remaining)} €</strong>
+                      · 📅 ${fmtMonths(m.monthsElapsed)} / ${fmtMonths(totalDur)} (${m.progressPct.toFixed(0)}%)
+                      · 💰 <strong>Vrai capital (équité)</strong> : <strong style="color:var(--accent-green);font-size:12.5px;">${fmtMoney(m.equity)} €</strong>
                       · LTV : ${m.ltv.toFixed(0)}%${cashflowChip}${yieldChip}
                     </td>
                   </tr>
