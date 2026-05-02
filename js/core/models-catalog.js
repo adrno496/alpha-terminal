@@ -63,9 +63,8 @@ export const MODEL_CATALOG = {
   ],
   cerebras: [
     { id: 'llama-3.3-70b',          tier: 'flagship', label: 'Llama 3.3 70B (ultra-fast)', context: 128000, pricing: { input: 0.85, output: 1.2  }, recommended: true },
-    { id: 'llama-3.1-70b',          tier: 'balanced', label: 'Llama 3.1 70B',              context: 128000, pricing: { input: 0.6,  output: 0.6  } },
+    { id: 'qwen-3-32b',             tier: 'balanced', label: 'Qwen3 32B',                  context: 128000, pricing: { input: 0.4,  output: 0.8  }, recommended: true },
     { id: 'llama-3.1-8b',           tier: 'fast',     label: 'Llama 3.1 8B',               context: 128000, pricing: { input: 0.1,  output: 0.1  }, recommended: true },
-    { id: 'qwen-3-32b',             tier: 'balanced', label: 'Qwen3 32B',                  context: 128000, pricing: { input: 0.4,  output: 0.8  } },
   ],
   github: [
     // GitHub Models has free tier (rate-limited). Pricing kept at 0 — costs hit your GitHub quota.
@@ -84,12 +83,14 @@ export const MODEL_CATALOG = {
     { id: 'mistralai/mixtral-8x22b-instruct-v0.1',  tier: 'balanced', label: 'Mixtral 8x22B',              context: 65000,  pricing: { input: 1.2,  output: 1.2  } },
   ],
   huggingface: [
+    // Le router HF exige un suffixe `:sub-provider` sur le model ID. `:nebius` est cheap/free-ish.
+    // L'utilisateur doit connecter le sub-provider sur huggingface.co/settings/inference-providers.
     // Pricing varies by underlying provider — values are typical (USD/1M tokens)
-    { id: 'meta-llama/Llama-3.3-70B-Instruct',        tier: 'flagship', label: 'Llama 3.3 70B (HF)',     context: 128000, pricing: { input: 0.7,  output: 0.9  }, recommended: true },
-    { id: 'Qwen/Qwen2.5-72B-Instruct',                tier: 'balanced', label: 'Qwen2.5 72B (HF)',       context: 128000, pricing: { input: 0.5,  output: 0.7  }, recommended: true },
-    { id: 'meta-llama/Llama-3.1-8B-Instruct',         tier: 'fast',     label: 'Llama 3.1 8B (HF)',      context: 128000, pricing: { input: 0.1,  output: 0.1  }, recommended: true },
-    { id: 'deepseek-ai/DeepSeek-V3',                  tier: 'flagship', label: 'DeepSeek V3 (HF)',       context: 128000, pricing: { input: 0.27, output: 1.1  } },
-    { id: 'mistralai/Mistral-Nemo-Instruct-2407',     tier: 'balanced', label: 'Mistral Nemo (HF)',      context: 128000, pricing: { input: 0.15, output: 0.15 } },
+    { id: 'meta-llama/Llama-3.3-70B-Instruct:nebius', tier: 'flagship', label: 'Llama 3.3 70B (HF·Nebius)', context: 128000, pricing: { input: 0.7,  output: 0.9  }, recommended: true },
+    { id: 'Qwen/Qwen2.5-72B-Instruct:nebius',         tier: 'balanced', label: 'Qwen2.5 72B (HF·Nebius)',   context: 128000, pricing: { input: 0.5,  output: 0.7  }, recommended: true },
+    { id: 'meta-llama/Llama-3.1-8B-Instruct:nebius',  tier: 'fast',     label: 'Llama 3.1 8B (HF·Nebius)',  context: 128000, pricing: { input: 0.1,  output: 0.1  }, recommended: true },
+    { id: 'deepseek-ai/DeepSeek-V3:novita',           tier: 'flagship', label: 'DeepSeek V3 (HF·Novita)',   context: 128000, pricing: { input: 0.27, output: 1.1  } },
+    { id: 'mistralai/Mistral-Nemo-Instruct-2407:hf-inference', tier: 'balanced', label: 'Mistral Nemo (HF·serverless)', context: 128000, pricing: { input: 0.15, output: 0.15 } },
   ],
   cloudflare: [
     // Cloudflare Workers AI pricing per https://developers.cloudflare.com/workers-ai/platform/pricing/

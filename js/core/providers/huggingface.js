@@ -16,42 +16,53 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
       displayName: 'Hugging Face',
       icon: '🤗',
       baseUrl: viaProxy('https://router.huggingface.co/v1/chat/completions'),
+      // Le router HF exige un suffixe `:provider` sur le model ID depuis le refactor 2025.
+      // Sans suffixe, le router renvoie 404 ("no route configured for this model").
+      // `:nebius` est un sub-provider gratuit/cheap par défaut. Si ton compte HF a un autre
+      // provider connecté (`:together`, `:fireworks-ai`, `:hyperbolic`...) tu peux changer.
       defaultModels: {
-        flagship: 'meta-llama/Llama-3.3-70B-Instruct',
-        balanced: 'Qwen/Qwen2.5-72B-Instruct',
-        fast: 'meta-llama/Llama-3.1-8B-Instruct'
-      }
+        flagship: 'meta-llama/Llama-3.3-70B-Instruct:nebius',
+        balanced: 'Qwen/Qwen2.5-72B-Instruct:nebius',
+        fast: 'meta-llama/Llama-3.1-8B-Instruct:nebius'
+      },
+      validateModels: ['meta-llama/Llama-3.1-8B-Instruct:nebius']
     });
   }
 
-  // Override : utilise l'endpoint officiel `whoami-v2` qui valide le token sans
-  // consommer de quota d'inférence et sans dépendre d'un modèle spécifique.
-  // Endpoint conçu pour ça : https://huggingface.co/docs/api-inference
+  // Override : format check d'abord (rejette les fausses clés), puis whoami-v2 pour
+  // valider le token sans consommer de quota. Si whoami passe ET le format est OK, on retourne OK.
+  // L'inférence elle-même peut quand même 404 si le sub-provider n'est pas connecté côté HF
+  // — d'où le bouton "tester maintenant" qui passe par super.validate() pour un VRAI POST chat.
   async validate() {
-    // Format HF : hf_… (~37 chars)
     if (!/^hf_[A-Za-z0-9]{30,}$/.test(this.apiKey)) {
       return { ok: false, error: '[Hugging Face] Format de token invalide. Format attendu : hf_…', status: 400 };
     }
+    // 1. Tente d'abord un VRAI POST chat (super.validate) — c'est ça qui détecte si l'inference
+    //    est réellement utilisable avec le model courant.
+    try {
+      const r = await super.validate();
+      if (r.ok) return r;
+      // 404 = model/sub-provider absent → suggère la cause
+      if (r.status === 404) {
+        return { ok: false, error: '[Hugging Face] Modèle non disponible via le router. Connecte un sub-provider (Nebius/Together/Fireworks) sur huggingface.co/settings/inference-providers, ou change le suffixe `:provider` du modèle.', status: 404 };
+      }
+      if (r.status === 401 || r.status === 403) {
+        return { ok: false, error: '[Hugging Face] Token invalide ou sans permission inference. Recrée-le avec le scope « Inference » sur huggingface.co/settings/tokens.', status: r.status };
+      }
+      // Autre erreur → fallback whoami pour distinguer auth vs autre
+    } catch {}
+    // 2. Fallback whoami-v2 — au moins on confirme que le token existe
     try {
       const res = await fetch(viaProxy('https://huggingface.co/api/whoami-v2'), {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${this.apiKey}`, 'Accept': 'application/json' }
       });
       if (res.ok) {
-        const data = await res.json().catch(() => null);
-        if (data && (data.name || data.type)) return { ok: true };
-        return { ok: true };
+        return { ok: false, error: '[Hugging Face] Token valide ✓ mais l\'inférence chat a échoué. Vérifie qu\'un sub-provider est connecté sur huggingface.co/settings/inference-providers.', status: 0 };
       }
       if (res.status === 401) return { ok: false, error: '[Hugging Face] Token invalide ou révoqué.', status: 401 };
-      if (res.status === 403) return { ok: false, error: '[Hugging Face] Token sans permission inference suffisante.', status: 403 };
       return { ok: false, error: `[Hugging Face] HTTP ${res.status}`, status: res.status };
     } catch {
-      // CORS sur whoami-v2 → on tente le router chat
-      try {
-        const r2 = await super.validate();
-        if (r2.ok) return r2;
-        if (r2.status === 401 || r2.status === 403) return r2;
-      } catch {}
       return { ok: false, error: 'BROWSER_INCOMPATIBLE:huggingface', status: 0 };
     }
   }

@@ -18,8 +18,9 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
       icon: '☁️',
       baseUrl: '', // resolved per-request from account_id parsed in the key
       defaultModels: {
+        // @cf/meta/llama-3.1-70b-instruct a été déprécié — remplacé par 3.3-70b-fp8-fast
         flagship: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
-        balanced: '@cf/meta/llama-3.1-70b-instruct',
+        balanced: '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
         fast: '@cf/meta/llama-3.1-8b-instruct'
       }
     });
@@ -76,11 +77,32 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
       });
       const data = await res.json().catch(() => null);
       if (res.ok && data && data.success === true && data.result?.status === 'active') {
-        // Token valide — vérifie aussi qu'on a l'account_id pour pouvoir utiliser Workers AI
+        // Token valide globalement — il faut aussi qu'il ait la permission Workers AI
+        // sur l'account. tokens/verify ne le confirme PAS. On teste en listant les modèles AI.
         if (!accountId) {
           return { ok: false, error: '[Cloudflare] Token valide ✓ mais format attendu pour Workers AI : ACCOUNT_ID:API_TOKEN. Trouve ton Account ID sur dash.cloudflare.com → sidebar droite.' };
         }
-        return { ok: true };
+        // Vraie vérification de la permission Workers AI : GET listing des modèles AI sur l'account.
+        // Si 403 → token sans scope « Account → Workers AI : Read/Edit ».
+        // Si 404 → account_id incorrect.
+        try {
+          const aiRes = await fetch(viaProxy(`https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/models/search?per_page=1`), {
+            method: 'GET',
+            headers: { 'Authorization': `Bearer ${tokenOnly}`, 'Accept': 'application/json' }
+          });
+          if (aiRes.ok) return { ok: true };
+          if (aiRes.status === 403) {
+            return { ok: false, error: '[Cloudflare] Token sans permission Workers AI. Recrée-le avec le scope « Account → Workers AI : Edit » sur dash.cloudflare.com/profile/api-tokens.', status: 403 };
+          }
+          if (aiRes.status === 404) {
+            return { ok: false, error: '[Cloudflare] Account ID introuvable côté Workers AI. Vérifie l\'Account ID (32 chars hex sur la sidebar dash.cloudflare.com).', status: 404 };
+          }
+          // Autre statut : on accepte (le token est valide) mais on warn
+          return { ok: true };
+        } catch {
+          // Si ce 2nd appel CORS-fail, on accepte quand même puisque tokens/verify a réussi
+          return { ok: true };
+        }
       }
       if (res.status === 401 || (data && data.success === false)) {
         const msg = data?.errors?.[0]?.message || 'Token invalide';

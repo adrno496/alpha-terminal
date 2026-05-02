@@ -207,7 +207,7 @@ const DEFAULT_SETTINGS = {
     openrouter:  { flagship: 'anthropic/claude-opus-4', balanced: 'openai/gpt-5-mini',     fast: 'meta-llama/llama-3.3-70b-instruct' },
     perplexity:  { flagship: 'sonar-pro',         balanced: 'sonar',                       fast: 'sonar' },
     mistral:     { flagship: 'mistral-large-latest', balanced: 'mistral-medium-latest',    fast: 'mistral-small-latest' },
-    cerebras:    { flagship: 'llama-3.3-70b',     balanced: 'llama-3.1-70b',               fast: 'llama-3.1-8b' },
+    cerebras:    { flagship: 'llama-3.3-70b',     balanced: 'llama-3.3-70b',               fast: 'llama-3.1-8b' },
     github:      { flagship: 'openai/gpt-4o',     balanced: 'openai/gpt-4o-mini',          fast: 'meta/Llama-3.2-11B-Vision-Instruct' },
     nvidia:      { flagship: 'nvidia/llama-3.1-nemotron-70b-instruct', balanced: 'meta/llama-3.3-70b-instruct', fast: 'meta/llama-3.1-8b-instruct' },
     huggingface: { flagship: 'meta-llama/Llama-3.3-70B-Instruct', balanced: 'Qwen/Qwen2.5-72B-Instruct', fast: 'meta-llama/Llama-3.1-8B-Instruct' },
