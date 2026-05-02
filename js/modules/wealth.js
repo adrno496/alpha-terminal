@@ -605,43 +605,76 @@ async function openEditor(id) {
     if (!preview) return;
     const fmt = (n) => Math.round(n).toLocaleString('fr-FR');
 
-    if (loans.length === 0) {
-      let html = `<span style="color:var(--text-muted);">Aucun prêt saisi — bien possédé sans financement.</span>`;
-      if (currentVal > 0 && purchase > 0) {
-        html += `<br>📈 <strong>Plus-value</strong> : <span style="color:${m.capitalGain >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.capitalGain >= 0 ? '+' : ''}${fmt(m.capitalGain)} € (${m.capitalGainPct >= 0 ? '+' : ''}${m.capitalGainPct.toFixed(1)}%)</span>`;
+    // Bloc "Mon vrai capital" — toujours en haut, prominent, color-coded.
+    // Ce qui compte pour l'utilisateur : combien il a VRAIMENT (équité = valeur - reste à payer).
+    // Affiché dès qu'on a au moins une valeur (currentVal ou purchase).
+    function buildHeroBlock() {
+      if (currentVal === 0 && purchase === 0) {
+        return `<div style="padding:10px 12px;border:1px dashed var(--border);border-radius:6px;color:var(--text-muted);font-size:12px;">💡 Saisis le prix d'achat ou la valeur actuelle pour voir ton capital réel.</div>`;
       }
-      preview.innerHTML = html;
+      const equityValue = m.equity;
+      const equityColor = equityValue >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+      const gainColor = m.capitalGain >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+      const hasLoan = loans.length > 0 && m.remaining > 0;
+      return `
+        <div style="padding:14px 16px;background:var(--bg-tertiary);border-left:4px solid ${equityColor};border-radius:6px;margin-bottom:12px;">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">💰 Mon vrai capital sur ce bien</div>
+          <div style="font-size:24px;font-weight:700;color:${equityColor};font-family:var(--font-mono);">${fmt(equityValue)} €</div>
+          <div style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.6;">
+            ${currentVal > 0 ? `Valeur actuelle <strong>${fmt(currentVal)} €</strong>` : `Valeur d'achat <strong>${fmt(purchase)} €</strong>`}
+            ${hasLoan ? ` − Reste à payer <strong style="color:var(--accent-orange);">${fmt(m.remaining)} €</strong>` : ''}
+            = <strong style="color:${equityColor};">${fmt(equityValue)} €</strong>
+          </div>
+          ${purchase > 0 && currentVal > 0 ? `
+            <div style="font-size:12px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+              📈 Plus-value : <strong style="color:${gainColor};">${m.capitalGain >= 0 ? '+' : ''}${fmt(m.capitalGain)} € (${m.capitalGainPct >= 0 ? '+' : ''}${m.capitalGainPct.toFixed(1)}%)</strong>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    if (loans.length === 0) {
+      preview.innerHTML = buildHeroBlock() + `<div style="font-size:11.5px;color:var(--text-muted);">Aucun prêt saisi — bien possédé sans financement.</div>`;
       return;
     }
 
-    // Mini-preview par prêt
+    // Mini-preview par prêt (à côté de chaque ligne de prêt)
     m.loans.forEach(({ loan, metrics }, idx) => {
       const miniEl = document.querySelector(`.loan-mini-preview[data-idx="${idx}"]`);
       if (!miniEl) return;
-      if (metrics.monthly === 0 && metrics.remaining === 0) { miniEl.innerHTML = ''; return; }
-      miniEl.innerHTML = `💸 ${fmt(metrics.monthly)} €/mois · 📉 restant ${fmt(metrics.remaining)} € · 📅 ${fmtMonths(metrics.monthsElapsed)} / ${fmtMonths((loan.durationMonths || 0))} (${metrics.progressPct.toFixed(0)}%)`;
+      if (metrics.monthly === 0 && metrics.remaining === 0) {
+        miniEl.innerHTML = `<span style="color:var(--text-muted);">Saisis montant + taux + durée + 1er prélèvement pour calculer.</span>`;
+        return;
+      }
+      miniEl.innerHTML = `
+        💸 <strong>${fmt(metrics.monthly)} €/mois</strong>
+        · 📉 reste à payer <strong style="color:var(--accent-orange);">${fmt(metrics.remaining)} €</strong>
+        · 📅 ${fmtMonths(metrics.monthsElapsed)} écoulés / ${fmtMonths((loan.durationMonths || 0))} (${metrics.progressPct.toFixed(0)}%)
+        · ✅ remboursé ${fmt(metrics.principalRepaid)} €
+      `;
     });
 
-    let html = `
-      💸 <strong>Mensualité totale</strong> : ${fmt(m.monthlyPayment)} €
-      · 📉 <strong>Capital restant dû total</strong> : <span style="color:var(--accent-orange);">${fmt(m.remaining)} €</span>
-      <br>
-      ✅ <strong>Capital remboursé</strong> : ${fmt(m.principalRepaid)} €
-      · 💰 <strong>Intérêts payés à ce jour</strong> : ${fmt(m.interestPaid)} €
-      · 📊 <strong>Intérêts totaux à terme</strong> : ${fmt(m.totalInterest)} €
+    let html = buildHeroBlock();
+    html += `
+      <div style="font-size:12px;line-height:1.7;">
+        💸 <strong>Mensualité totale</strong> : ${fmt(m.monthlyPayment)} €
+        · 📉 <strong>Capital restant dû total</strong> : <span style="color:var(--accent-orange);">${fmt(m.remaining)} €</span>
+        · <strong>LTV</strong> : ${m.ltv.toFixed(1)}%
+        <br>
+        ✅ <strong>Capital remboursé</strong> : ${fmt(m.principalRepaid)} €
+        · 💰 <strong>Intérêts payés à ce jour</strong> : ${fmt(m.interestPaid)} €
+        · 📊 <strong>Intérêts totaux à terme</strong> : ${fmt(m.totalInterest)} €
+      </div>
     `;
-    if (currentVal > 0) {
-      html += `<br>📈 <strong>Équité (valeur - capital restant)</strong> : <span style="color:var(--accent-green);">${fmt(m.equity)} €</span> · <strong>LTV</strong> : ${m.ltv.toFixed(1)}%`;
-      if (purchase > 0) {
-        html += ` · <strong>Plus-value</strong> : <span style="color:${m.capitalGain >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.capitalGain >= 0 ? '+' : ''}${fmt(m.capitalGain)} € (${m.capitalGainPct >= 0 ? '+' : ''}${m.capitalGainPct.toFixed(1)}%)</span>`;
-      }
-    }
     if (propType === 'locatif' && rent > 0) {
-      html += `<br>🏘️ <strong>Cash-flow mensuel</strong> : <span style="color:${m.monthlyCashflow >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.monthlyCashflow >= 0 ? '+' : ''}${fmt(m.monthlyCashflow)} €</span>`;
-      html += ` · <strong>Cash-flow annuel</strong> : ${m.annualCashflow >= 0 ? '+' : ''}${fmt(m.annualCashflow)} €`;
+      html += `<div style="font-size:12px;margin-top:6px;line-height:1.7;">
+        🏘️ <strong>Cash-flow mensuel</strong> : <span style="color:${m.monthlyCashflow >= 0 ? 'var(--accent-green)' : 'var(--accent-red)'};">${m.monthlyCashflow >= 0 ? '+' : ''}${fmt(m.monthlyCashflow)} €</span>
+        · <strong>annuel</strong> : ${m.annualCashflow >= 0 ? '+' : ''}${fmt(m.annualCashflow)} €`;
       if (purchase > 0) {
         html += `<br>💎 <strong>Rentabilité brute</strong> : ${m.grossYield.toFixed(2)}% · <strong>nette</strong> : ${m.netYield.toFixed(2)}%`;
       }
+      html += `</div>`;
     }
     preview.innerHTML = html;
   }
