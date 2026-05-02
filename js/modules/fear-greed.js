@@ -2,10 +2,12 @@
 // Sources :
 //   - Crypto F&G : alternative.me (CORS OK, sans clé)
 //   - Stocks F&G : CNN dataviz endpoint (CORS variable selon proxy)
-//   - VIX : Stooq CSV (CORS OK)
+//   - VIX : Stooq CSV (CORS OK) + bouton FRED (Fed Reserve, clé gratuite)
 import { $ } from '../core/utils.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
+import { fredLatest } from '../core/data-providers/fred.js';
+import { getDataKey } from '../core/data-keys.js';
 
 const MODULE_ID = 'fear-greed';
 
@@ -90,19 +92,74 @@ function gauge(value, label) {
     </div>`;
 }
 
-function vixCard(data) {
-  if (!data) {
-    return `<div style="background:var(--bg-tertiary);padding:18px;border-radius:8px;text-align:center;color:var(--text-muted);">VIX N/A</div>`;
-  }
-  const c = classifyVix(data.value);
+function vixCard(data, isEN) {
+  const inner = data ? (() => {
+    const c = classifyVix(data.value);
+    return `
+      <div style="font-family:var(--font-mono);font-size:42px;font-weight:700;color:${c.color};line-height:1;">${data.value.toFixed(2)}</div>
+      <div style="color:${c.color};font-size:12px;margin-top:6px;">${c.label}</div>
+      <div style="color:var(--text-muted);font-size:10px;margin-top:8px;">${isEN ? 'Date' : 'Date'} : ${data.date} · ${data.source || 'Stooq'}</div>
+    `;
+  })() : `<div style="color:var(--text-muted);padding:18px 0;">${isEN ? 'VIX unavailable from primary source' : 'VIX indisponible (source primaire)'}</div>`;
+
   return `
     <div style="background:var(--bg-tertiary);padding:18px;border-radius:8px;text-align:center;">
       <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">VIX · CBOE Volatility</div>
-      <div style="font-family:var(--font-mono);font-size:42px;font-weight:700;color:${c.color};line-height:1;">${data.value.toFixed(2)}</div>
-      <div style="color:${c.color};font-size:12px;margin-top:6px;">${c.label}</div>
-      <div style="color:var(--text-muted);font-size:10px;margin-top:8px;">Date : ${data.date} · Source Stooq</div>
+      <div id="vix-value-area">${inner}</div>
+      <button id="vix-refresh-api" type="button" style="margin-top:14px;background:transparent;border:1px solid var(--accent-green);color:var(--accent-green);padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;">
+        🔍 ${isEN ? 'Fetch via FRED API' : 'Rechercher via FRED API'}
+      </button>
+      <div id="vix-api-msg" style="margin-top:8px;font-size:11px;color:var(--text-muted);"></div>
     </div>
   `;
+}
+
+async function fetchVixViaFRED() {
+  // FRED VIXCLS = VIX daily close. Free key (api.stlouisfed.org).
+  if (!getDataKey('fred')) {
+    return { error: 'no-key' };
+  }
+  try {
+    const r = await fredLatest('VIXCLS');
+    if (!r || r.value == null || isNaN(r.value)) return { error: 'no-data' };
+    return { value: r.value, date: r.date, source: 'FRED · Federal Reserve' };
+  } catch (e) {
+    return { error: 'fetch-failed', detail: e?.message || String(e) };
+  }
+}
+
+function wireVixApiButton(viewEl) {
+  const btn = viewEl.querySelector('#vix-refresh-api');
+  if (!btn) return;
+  const isEN = getLocale() === 'en';
+  btn.addEventListener('click', async () => {
+    const valueArea = viewEl.querySelector('#vix-value-area');
+    const msgEl = viewEl.querySelector('#vix-api-msg');
+    btn.disabled = true;
+    const original = btn.innerHTML;
+    btn.innerHTML = isEN ? '⏳ Fetching…' : '⏳ Récupération…';
+    msgEl.textContent = '';
+
+    const res = await fetchVixViaFRED();
+
+    if (res.error === 'no-key') {
+      msgEl.innerHTML = isEN
+        ? '⚠️ FRED key not configured. <a href="#settings" style="color:var(--accent-green);">Settings → Data Keys</a> (free, instant).'
+        : '⚠️ Clé FRED non configurée. <a href="#settings" style="color:var(--accent-green);">Settings → Clés Data</a> (gratuit, instantané).';
+    } else if (res.error) {
+      msgEl.textContent = (isEN ? 'Error: ' : 'Erreur : ') + (res.detail || res.error);
+    } else {
+      const c = classifyVix(res.value);
+      valueArea.innerHTML = `
+        <div style="font-family:var(--font-mono);font-size:42px;font-weight:700;color:${c.color};line-height:1;">${res.value.toFixed(2)}</div>
+        <div style="color:${c.color};font-size:12px;margin-top:6px;">${c.label}</div>
+        <div style="color:var(--text-muted);font-size:10px;margin-top:8px;">Date : ${res.date} · ${res.source}</div>
+      `;
+      msgEl.innerHTML = '✅ ' + (isEN ? 'Fetched from FRED' : 'Récupéré via FRED');
+    }
+    btn.disabled = false;
+    btn.innerHTML = original;
+  });
 }
 
 async function loadAndRender(viewEl) {
@@ -176,7 +233,7 @@ async function loadAndRender(viewEl) {
 
       <!-- VIX card -->
       <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:10px;padding:18px;">
-        ${vixCard(vix)}
+        ${vixCard(vix, isEN)}
         <div style="margin-top:14px;padding:10px;background:var(--bg-tertiary);border-radius:6px;font-size:11px;color:var(--text-muted);line-height:1.5;">
           💡 ${isEN
             ? '<strong>VIX</strong> = "fear gauge" of stocks. < 20 = calm market, > 30 = panic. Extreme spikes (> 40) often mark bottoms.'
@@ -203,6 +260,7 @@ export async function renderFearGreedView(viewEl) {
     <div id="fg-content"></div>
   `;
   await loadAndRender(viewEl);
+  wireVixApiButton(viewEl);
 
   const refreshBtn = $('#fg-refresh');
   if (refreshBtn) {
@@ -210,6 +268,7 @@ export async function renderFearGreedView(viewEl) {
       refreshBtn.disabled = true;
       refreshBtn.textContent = isEN ? '⏳ Refreshing…' : '⏳ Rafraîchissement…';
       await loadAndRender(viewEl);
+      wireVixApiButton(viewEl);
       refreshBtn.disabled = false;
       refreshBtn.innerHTML = '🔄 ' + (isEN ? 'Refresh' : 'Rafraîchir');
     });
