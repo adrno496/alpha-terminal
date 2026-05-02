@@ -16,4 +16,34 @@ export class HuggingFaceProvider extends OpenAICompatibleProvider {
       }
     });
   }
+
+  // Override : utilise l'endpoint officiel `whoami-v2` qui valide le token sans
+  // consommer de quota d'inférence et sans dépendre d'un modèle spécifique.
+  // Endpoint conçu pour ça : https://huggingface.co/docs/api-inference
+  async validate() {
+    try {
+      const res = await fetch('https://huggingface.co/api/whoami-v2', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Accept': 'application/json'
+        }
+      });
+      if (res.ok) {
+        const data = await res.json().catch(() => null);
+        // Réponse contient { name, type, ... } pour un token valide
+        if (data && (data.name || data.type)) return { ok: true };
+        return { ok: true };
+      }
+      if (res.status === 401) {
+        return { ok: false, error: '[Hugging Face] Token invalide ou révoqué.', status: 401 };
+      }
+      if (res.status === 403) {
+        return { ok: false, error: '[Hugging Face] Token sans permission suffisante (scope inference manquant).', status: 403 };
+      }
+      return { ok: false, error: `[Hugging Face] HTTP ${res.status}`, status: res.status };
+    } catch (e) {
+      return { ok: false, error: `[Hugging Face] ${e?.message || 'Erreur réseau'}` };
+    }
+  }
 }

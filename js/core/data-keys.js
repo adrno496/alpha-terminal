@@ -55,13 +55,29 @@ export async function validateDataKey(id, key) {
     let url, parser;
     switch (id) {
       case 'fmp':
-        url = `https://financialmodelingprep.com/api/v3/profile/AAPL?apikey=${encodeURIComponent(k)}`;
+        // /quote-short est l'endpoint le plus léger toujours dispo en free tier.
+        // Retourne juste { symbol, price, volume } — utilisé pour valider la clé.
+        url = `https://financialmodelingprep.com/api/v3/quote-short/AAPL?apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
           if (r.status === 401 || r.status === 403) return { ok: false, error: 'Clé invalide (401/403)' };
-          const j = await r.json();
+          if (r.status === 429) return { ok: false, error: 'Quota dépassé (réessaie demain)' };
+          const text = await r.text();
+          let j; try { j = JSON.parse(text); } catch { return { ok: false, error: 'Réponse non-JSON: ' + text.slice(0, 60) }; }
           if (j && j['Error Message']) return { ok: false, error: j['Error Message'] };
-          if (Array.isArray(j) && j.length > 0) return { ok: true };
-          return { ok: false, error: 'Réponse vide' };
+          if (Array.isArray(j) && j.length > 0 && j[0].symbol) return { ok: true };
+          // Tolérant : si 200 + JSON vide, on essaie le fallback /profile
+          if (r.ok && Array.isArray(j) && j.length === 0) {
+            // Probable que la clé est OK mais le tier free a des limites — on retente avec /profile
+            try {
+              const r2 = await fetch(`https://financialmodelingprep.com/api/v3/profile/AAPL?apikey=${encodeURIComponent(k)}`, { cache: 'no-store' });
+              if (r2.ok) {
+                const j2 = await r2.json();
+                if (Array.isArray(j2) && j2.length > 0) return { ok: true };
+              }
+            } catch {}
+            return { ok: false, error: 'Réponse vide — tier limité ?' };
+          }
+          return { ok: false, error: 'Réponse inattendue' };
         };
         break;
       case 'alphavantage':
@@ -115,25 +131,59 @@ export async function validateDataKey(id, key) {
         };
         break;
       case 'fred':
-        url = `https://api.stlouisfed.org/fred/series/observations?series_id=DGS10&limit=1&api_key=${encodeURIComponent(k)}&file_type=json`;
+        // /fred/series (metadata) est plus léger que /observations et plus tolérant.
+        // FRED API supporte CORS depuis 2023 sur les endpoints GET.
+        url = `https://api.stlouisfed.org/fred/series?series_id=DGS10&api_key=${encodeURIComponent(k)}&file_type=json`;
         parser = async (r) => {
           if (r.status === 400) {
-            const j = await r.json().catch(() => ({}));
-            return { ok: false, error: j.error_message || 'Clé invalide (400)' };
+            const text = await r.text();
+            try {
+              const j = JSON.parse(text);
+              if (j.error_message && /api.?key/i.test(j.error_message)) {
+                return { ok: false, error: 'Clé FRED invalide ou format incorrect' };
+              }
+              return { ok: false, error: j.error_message || 'Erreur 400' };
+            } catch {
+              return { ok: false, error: 'Erreur 400: ' + text.slice(0, 80) };
+            }
           }
+          if (r.status === 403) return { ok: false, error: 'Clé révoquée ou bloquée (403)' };
           if (!r.ok) return { ok: false, error: `HTTP ${r.status}` };
-          const j = await r.json();
-          if (j.observations && j.observations.length > 0) return { ok: true };
-          return { ok: false, error: 'Pas d\'observations' };
+          // 200 → on parse pour valider la structure mais on est tolérant
+          const text = await r.text();
+          let j; try { j = JSON.parse(text); } catch { return { ok: true }; /* 200 + non-JSON = clé OK */ }
+          if (j.seriess && j.seriess.length > 0) return { ok: true };
+          // Réponse vide mais 200 = clé probablement OK
+          return { ok: true };
         };
         break;
       case 'etherscan':
-        url = `https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${encodeURIComponent(k)}`;
+        // Etherscan a migré vers V2 multichain en 2024. V2 nécessite chainid=1 pour Ethereum.
+        // V1 (api.etherscan.io/api) reste compatible mais peut retourner des erreurs sur les
+        // nouvelles clés. On utilise V2 avec chainid=1 par défaut.
+        url = `https://api.etherscan.io/v2/api?chainid=1&module=stats&action=ethsupply&apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
-          const j = await r.json();
+          if (r.status === 401 || r.status === 403) return { ok: false, error: 'Clé invalide' };
+          const text = await r.text();
+          let j; try { j = JSON.parse(text); } catch { return { ok: false, error: 'Réponse non-JSON' }; }
+          // Format Etherscan : { status: '1'|'0', message: 'OK'|'NOTOK', result: '...' }
           if (j.status === '1') return { ok: true };
-          if (j.message) return { ok: false, error: j.message };
-          return { ok: false, error: 'Réponse inattendue' };
+          if (j.message === 'NOTOK' && j.result) {
+            // Erreur typique : "Invalid API Key" ou "Max calls per sec rate limit reached (5/sec)"
+            if (/invalid.*api.?key/i.test(j.result)) return { ok: false, error: 'Clé invalide' };
+            if (/rate limit/i.test(j.result)) return { ok: true }; // Rate limit = clé valide mais trop d'appels
+            return { ok: false, error: j.result };
+          }
+          // Fallback V1 si V2 ne répond pas comme prévu
+          try {
+            const r2 = await fetch(`https://api.etherscan.io/api?module=stats&action=ethsupply&apikey=${encodeURIComponent(k)}`, { cache: 'no-store' });
+            const j2 = await r2.json();
+            if (j2.status === '1') return { ok: true };
+            if (j2.result && /rate limit/i.test(j2.result)) return { ok: true };
+            return { ok: false, error: j2.result || j2.message || 'Réponse inattendue' };
+          } catch {
+            return { ok: false, error: 'Validation échouée (V1 + V2)' };
+          }
         };
         break;
       case 'metals_api':
@@ -151,6 +201,12 @@ export async function validateDataKey(id, key) {
     const res = await fetch(url, { cache: 'no-store' });
     return await parser(res);
   } catch (e) {
-    return { ok: false, error: e?.message || 'Erreur réseau' };
+    const msg = e?.message || 'Erreur réseau';
+    // Détection CORS : "Failed to fetch" / "NetworkError" sont les patterns Chrome/Firefox/Safari
+    // pour un blocage CORS. On retourne un message actionnable.
+    if (/failed to fetch|networkerror|cors/i.test(msg)) {
+      return { ok: false, error: 'CORS bloqué : ce provider ne permet pas la validation depuis le navigateur. La clé peut être valide — teste-la directement en lançant une analyse.' };
+    }
+    return { ok: false, error: msg };
   }
 }

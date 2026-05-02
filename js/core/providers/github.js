@@ -15,15 +15,40 @@ export class GitHubModelsProvider extends OpenAICompatibleProvider {
         balanced: 'openai/gpt-4o-mini',
         fast: 'openai/gpt-4o-mini'
       },
-      // GitHub Models exige un PAT avec scope `models:read` (classic) ou
-      // permission `Models` (fine-grained). Sans ce scope → 401, peu importe
-      // le modèle. gpt-4o-mini est le plus universellement dispo, on l'essaie
-      // en premier puis fallback Llama (parfois plus accessible en free tier).
       validateModels: [
         'openai/gpt-4o-mini',
         'openai/gpt-4o',
         'meta/Llama-3.3-70B-Instruct'
       ]
     });
+  }
+
+  // Override : validation légère via /catalog/models (endpoint listing, pas de chat).
+  // Beaucoup plus fiable que POST chat/completions qui échoue si le PAT n'a pas
+  // explicitement le scope `models:read`. Le catalog est public + token valide.
+  // Fallback : si le catalog échoue (rare), tente le POST chat habituel.
+  async validate() {
+    try {
+      const res = await fetch('https://models.github.ai/catalog/models', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Accept': 'application/json'
+        }
+      });
+      if (res.ok) return { ok: true };
+      if (res.status === 401) {
+        return { ok: false, error: '[GitHub Models] Token invalide ou expiré.', status: 401 };
+      }
+      if (res.status === 403) {
+        // Le token est valide mais n'a pas le scope models:read
+        return { ok: false, error: '[GitHub Models] Token valide mais sans scope « models:read ». Recrée le PAT avec ce scope (Settings → Developer settings → Personal access tokens → cocher « Models »).', status: 403 };
+      }
+      // Autre code → tente le fallback POST chat pour confirmer
+      return await super.validate();
+    } catch (e) {
+      // Erreur réseau / CORS → fallback chat
+      return await super.validate();
+    }
   }
 }

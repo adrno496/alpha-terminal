@@ -37,14 +37,37 @@ export class CloudflareProvider extends OpenAICompatibleProvider {
   }
 
   async validate() {
+    const raw = (this.apiKey || '').trim();
+    if (!raw) return { ok: false, error: '[Cloudflare] Clé vide.' };
+
+    // L'endpoint /user/tokens/verify accepte juste le token (pas besoin d'account_id).
+    // C'est l'endpoint officiel de validation Cloudflare. CORS-friendly.
     const { accountId, token } = this._parseKey();
-    if (!accountId || !token) {
-      return { ok: false, error: '[Cloudflare] Format attendu : ACCOUNT_ID:API_TOKEN (deux parties séparées par ":").' };
+    const tokenOnly = token || raw; // si pas de ':', traite tout comme token
+
+    try {
+      const res = await fetch('https://api.cloudflare.com/client/v4/user/tokens/verify', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${tokenOnly}`,
+          'Accept': 'application/json'
+        }
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data && data.success === true && data.result?.status === 'active') {
+        // Token valide — vérifie aussi qu'on a l'account_id pour pouvoir utiliser Workers AI
+        if (!accountId) {
+          return { ok: false, error: '[Cloudflare] Token valide ✓ mais format attendu pour Workers AI : ACCOUNT_ID:API_TOKEN. Trouve ton Account ID sur dash.cloudflare.com → sidebar droite.' };
+        }
+        return { ok: true };
+      }
+      if (res.status === 401 || (data && data.success === false)) {
+        const msg = data?.errors?.[0]?.message || 'Token invalide';
+        return { ok: false, error: `[Cloudflare] ${msg}`, status: res.status };
+      }
+      return { ok: false, error: `[Cloudflare] HTTP ${res.status}`, status: res.status };
+    } catch (e) {
+      return { ok: false, error: `[Cloudflare] ${e?.message || 'Erreur réseau'} — vérifie que le token n'a pas expiré.` };
     }
-    // Cloudflare's REST endpoint at api.cloudflare.com ne renvoie pas Access-Control-Allow-Origin
-    // pour les origines browser arbitraires → CORS fail systématique sans AI Gateway custom.
-    // On laisse le test tenter, mais si c'est un TypeError "Failed to fetch", on retourne
-    // un message explicite plutôt que le générique "[Cloudflare] Failed to fetch".
-    return super.validate();
   }
 }
