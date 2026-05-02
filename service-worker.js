@@ -1,6 +1,6 @@
-// Service Worker v31 — network-first pour HTML/navigation (toujours frais),
+// Service Worker v32 — network-first pour HTML/navigation (toujours frais),
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v31';
+const CACHE = 'alpha-terminal-v32';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.

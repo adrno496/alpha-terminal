@@ -7,7 +7,7 @@ import { MODULES as ALL_MODULES } from './sidebar.js';
 import { getCost, resetTotalCost, getBudgetLimits, setBudgetLimits } from '../core/cost-tracker.js';
 import { MODEL_CATALOG } from '../core/models-catalog.js';
 import { t, getLocale } from '../core/i18n.js';
-import { DATA_PROVIDERS, KEYLESS_DATA_SOURCES, getDataKey, setDataKey, getDataKeyStatus } from '../core/data-keys.js';
+import { DATA_PROVIDERS, KEYLESS_DATA_SOURCES, getDataKey, setDataKey, getDataKeyStatus, validateDataKey } from '../core/data-keys.js';
 import { resetTour, startTour } from './tour.js';
 import { downloadFullBackup, importBackupFromFile, getLocalDataStats, wipeAllLocalData, copyBackupToClipboard, diagnosticBackup } from '../core/backup.js';
 
@@ -181,6 +181,21 @@ function renderDataKeysTab(c) {
     <div class="card">
       <div class="card-title">${t('settings.data.title')}</div>
       <p style="color:var(--text-secondary);font-size:13px;margin-bottom:14px;">${t('settings.data.desc')}</p>
+
+      <!-- Test all data keys panel -->
+      <div id="data-test-panel" style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <strong style="font-size:13px;">🧪 Tester toutes mes clés data configurées</strong>
+            <p style="color:var(--text-muted);font-size:11.5px;margin:4px 0 0;line-height:1.5;">
+              Envoie une requête de validation minimale (~1 call gratuit) à chaque provider pour vérifier que tes clés sont valides.
+            </p>
+          </div>
+          <button id="data-test-all" class="btn-secondary" style="white-space:nowrap;font-size:12.5px;padding:8px 14px;">⚡ Tester toutes</button>
+        </div>
+        <div id="data-test-results" style="margin-top:10px;display:none;"></div>
+      </div>
+
       ${DATA_PROVIDERS.map(p => {
         const status = getDataKeyStatus(p.id);
         const value = getDataKey(p.id) || '';
@@ -191,7 +206,8 @@ function renderDataKeysTab(c) {
             <span class="data-key-desc">${p.desc}</span>
           </div>
           <input type="password" class="input data-key-input" data-id="${p.id}" placeholder="${status === 'set' ? '••• (' + t('common.optional') + ')' : 'API key…'}" />
-          <span class="data-key-status">${status === 'set' ? '✅' : '⏳'}</span>
+          <span class="data-key-status" data-status-id="${p.id}">${status === 'set' ? '✅' : '⏳'}</span>
+          <button type="button" class="btn-secondary data-key-test" data-test-id="${p.id}" title="Tester cette clé" style="font-size:11px;padding:5px 9px;white-space:nowrap;">⚡ Test</button>
           <a href="${p.link}" target="_blank" class="btn-ghost data-key-getlink" rel="noopener">${t('settings.data.get_key')}</a>
         </div>
         `;
@@ -208,6 +224,101 @@ function renderDataKeysTab(c) {
     toast(t('common.save'), 'success');
     setTimeout(() => renderTab('data_keys'), 400);
   });
+
+  // Test individuel par clé : prend la valeur de l'input si présente, sinon la clé sauvée.
+  c.querySelectorAll('.data-key-test').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-test-id');
+      const input = c.querySelector(`.data-key-input[data-id="${id}"]`);
+      const statusEl = c.querySelector(`[data-status-id="${id}"]`);
+      const k = (input?.value || '').trim() || getDataKey(id) || '';
+      if (!k) { statusEl.innerHTML = '<span style="color:var(--accent-amber);">⚠ vide</span>'; return; }
+      const oldLabel = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '⏳';
+      statusEl.innerHTML = '<span class="spinner" style="width:10px;height:10px;display:inline-block;"></span>';
+      try {
+        const v = await validateDataKey(id, k);
+        if (v.ok) {
+          statusEl.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
+        } else {
+          const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').slice(0, 80);
+          statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
+        }
+      } catch (e) {
+        statusEl.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e.message || 'erreur').slice(0, 30)}</span>`;
+      } finally {
+        btn.disabled = false;
+        btn.textContent = oldLabel;
+      }
+    });
+  });
+
+  // Tester toutes les clés configurées en parallèle
+  const testAllBtn = c.querySelector('#data-test-all');
+  const resultsBox = c.querySelector('#data-test-results');
+  if (testAllBtn && resultsBox) {
+    testAllBtn.addEventListener('click', async () => {
+      // Récupère uniquement les providers avec une clé saisie ou sauvée
+      const toTest = DATA_PROVIDERS.filter(p => {
+        const inputVal = c.querySelector(`.data-key-input[data-id="${p.id}"]`)?.value.trim();
+        return inputVal || getDataKey(p.id);
+      });
+      if (!toTest.length) {
+        resultsBox.style.display = 'block';
+        resultsBox.innerHTML = `<div style="color:var(--accent-amber);font-size:12.5px;">⚠ Aucune clé data configurée. Saisis-en au moins une ci-dessous.</div>`;
+        return;
+      }
+      testAllBtn.disabled = true;
+      const oldLabel = testAllBtn.textContent;
+      testAllBtn.textContent = '⏳ Test en cours…';
+      resultsBox.style.display = 'block';
+      resultsBox.innerHTML = `<div id="dt-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;font-size:12.5px;"></div>`;
+      const grid = resultsBox.querySelector('#dt-grid');
+      const pills = {};
+      for (const p of toTest) {
+        const pill = document.createElement('div');
+        pill.style.cssText = 'background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px;';
+        pill.innerHTML = `<span style="flex:1;font-size:12px;">${p.label}</span><span class="dt-status" style="color:var(--text-muted);font-size:11px;">⏳</span>`;
+        grid.appendChild(pill);
+        pills[p.id] = pill;
+      }
+      let okCount = 0, failCount = 0;
+      await Promise.all(toTest.map(async (p) => {
+        const inputVal = c.querySelector(`.data-key-input[data-id="${p.id}"]`)?.value.trim();
+        const key = inputVal || getDataKey(p.id);
+        const status = pills[p.id].querySelector('.dt-status');
+        try {
+          const v = await validateDataKey(p.id, key);
+          if (v.ok) {
+            status.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
+            okCount++;
+          } else {
+            const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').slice(0, 80);
+            status.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
+            failCount++;
+          }
+        } catch (e) {
+          status.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e?.message || 'error').slice(0, 30)}</span>`;
+          failCount++;
+        }
+      }));
+      const summary = document.createElement('div');
+      summary.style.cssText = 'margin-top:10px;padding:8px 12px;border-radius:6px;font-size:12px;';
+      if (failCount === 0) {
+        summary.style.background = 'rgba(0,255,136,0.08)';
+        summary.style.color = 'var(--accent-green)';
+        summary.textContent = `✅ Les ${okCount} clés data sont opérationnelles.`;
+      } else {
+        summary.style.background = 'rgba(255,80,80,0.08)';
+        summary.style.color = 'var(--accent-red)';
+        summary.textContent = `⚠️ ${okCount} OK · ${failCount} échec(s) (survole le ✗ pour le détail)`;
+      }
+      resultsBox.appendChild(summary);
+      testAllBtn.disabled = false;
+      testAllBtn.textContent = '⚡ Re-tester toutes';
+    });
+  }
 }
 
 // === KEYS ===
