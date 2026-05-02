@@ -341,6 +341,7 @@ function renderDataKeysTab(c) {
 // === KEYS ===
 function renderKeysTab(c) {
   const present = vaultProviderNames();
+  const isEN = getLocale() === 'en';
   c.innerHTML = `
     <div class="card">
       <div class="card-title">${t('settings.keys.title')}</div>
@@ -348,6 +349,24 @@ function renderKeysTab(c) {
         ${isConnected() ? `<span style="color:var(--accent-green);">${t('settings.keys.unlocked')}</span>` : `<span style="color:var(--accent-red);">${t('settings.keys.locked')}</span>`}
         ${hasVault() ? ' · ' + t('settings.keys.has_vault') : ' · ' + t('settings.keys.no_vault')}
       </p>
+
+      <!-- Test all configured LLM keys -->
+      ${isConnected() && present.length ? `
+      <div id="llm-test-panel" style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+          <div>
+            <strong style="font-size:13px;">${isEN ? '🧪 Test all configured LLM keys' : '🧪 Tester toutes mes clés LLM configurées'}</strong>
+            <p style="color:var(--text-muted);font-size:11.5px;margin:4px 0 0;line-height:1.5;">
+              ${isEN
+                ? 'Pings each provider with a minimal validation request to confirm your keys are alive and authorized.'
+                : 'Envoie une requête de validation minimale à chaque provider pour vérifier que tes clés répondent.'}
+            </p>
+          </div>
+          <button id="llm-test-all" class="btn-secondary" style="white-space:nowrap;font-size:12.5px;padding:8px 14px;">${isEN ? '⚡ Test all' : '⚡ Tester toutes'}</button>
+        </div>
+        <div id="llm-test-results" style="margin-top:10px;display:none;"></div>
+      </div>` : ''}
+
       <div id="keys-list"></div>
       <p style="color:var(--text-muted);font-size:11.5px;margin-top:12px;">
         ${t('settings.keys.add_help')}
@@ -406,10 +425,24 @@ function renderKeysTab(c) {
     const provider = getOrchestrator().providers[name];
     if (!provider) return;
     b.disabled = true; b.textContent = '⏳';
-    const v = await provider.validate();
+    let v;
+    try { v = await provider.validate(); }
+    catch (e) { v = { ok: false, error: e?.message || 'erreur' }; }
     b.disabled = false;
-    b.textContent = v.ok ? '✓ OK' : '✗ ' + (v.error || '').slice(0, 40);
-    setTimeout(() => b.textContent = 'Test', 2500);
+    // Affiche le résultat compact dans le bouton + détail en dessous de la ligne
+    const explained = explainAsPillHTML(v);
+    // Le bouton ne supporte que du texte simple, donc on injecte l'HTML dans un span sibling
+    const row = b.closest('.key-row');
+    let detailEl = row?.nextElementSibling;
+    if (!detailEl || !detailEl.classList.contains('key-row-detail')) {
+      detailEl = document.createElement('div');
+      detailEl.className = 'key-row-detail';
+      detailEl.style.cssText = 'margin:-4px 0 8px 36px;';
+      row?.parentElement?.insertBefore(detailEl, row.nextSibling);
+    }
+    detailEl.innerHTML = `<div style="font-size:12px;">${explained}</div>${explainAsDetailHTML(v)}`;
+    b.textContent = v.ok ? '✓' : '✗';
+    setTimeout(() => b.textContent = 'Test', 4000);
   }));
 
   $('#set-lock').addEventListener('click', () => { clearRuntimeKeys(); location.reload(); });
@@ -437,14 +470,23 @@ function renderKeysTab(c) {
       if (statusEl) statusEl.innerHTML = '<span class="spinner" style="width:10px;height:10px;display:inline-block;"></span>';
       try {
         const v = await validateProviderKey(name, k);
-        if (v.ok) {
-          if (statusEl) statusEl.innerHTML = '<span style="color:var(--accent-green);">✓ OK</span>';
-        } else {
-          const safeErr = String(v.error || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-          if (statusEl) statusEl.innerHTML = `<span style="color:var(--accent-red);" title="${safeErr}">✗ invalide</span>`;
+        if (statusEl) statusEl.innerHTML = explainAsPillHTML(v);
+        // Affiche aussi l'explication détaillée sous le champ pour aiguiller l'user
+        const fieldEl = statusEl?.closest('.field');
+        let detailEl = fieldEl?.querySelector('.key-test-detail');
+        const detailHTML = explainAsDetailHTML(v);
+        if (detailHTML) {
+          if (!detailEl) {
+            detailEl = document.createElement('div');
+            detailEl.className = 'key-test-detail';
+            fieldEl?.appendChild(detailEl);
+          }
+          detailEl.innerHTML = detailHTML;
+        } else if (detailEl) {
+          detailEl.remove();
         }
       } catch (e) {
-        if (statusEl) statusEl.innerHTML = `<span style="color:var(--accent-red);">✗ ${(e.message || 'erreur').slice(0,40)}</span>`;
+        if (statusEl) statusEl.innerHTML = explainAsPillHTML({ ok: false, error: e?.message || 'erreur' });
       } finally {
         btn.disabled = false;
         btn.textContent = old;
@@ -475,6 +517,78 @@ function renderKeysTab(c) {
       status.textContent = '✗ ' + e.message; status.style.color = 'var(--accent-red)';
     }
   });
+
+  // === Tester toutes les clés LLM configurées ===
+  const llmTestBtn = c.querySelector('#llm-test-all');
+  const llmResultsBox = c.querySelector('#llm-test-results');
+  if (llmTestBtn && llmResultsBox && isConnected()) {
+    llmTestBtn.addEventListener('click', async () => {
+      const orch = getOrchestrator();
+      const names = orch.getProviderNames();
+      if (!names.length) {
+        llmResultsBox.style.display = 'block';
+        llmResultsBox.innerHTML = `<div style="color:var(--accent-amber);font-size:12.5px;">${isEN ? '⚠ No keys configured.' : '⚠ Aucune clé configurée.'}</div>`;
+        return;
+      }
+      llmTestBtn.disabled = true;
+      const oldLabel = llmTestBtn.textContent;
+      llmTestBtn.textContent = isEN ? '⏳ Testing…' : '⏳ Test en cours…';
+      llmResultsBox.style.display = 'block';
+      llmResultsBox.innerHTML = `<div id="lt-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;"></div>`;
+      const grid = llmResultsBox.querySelector('#lt-grid');
+      const pills = {};
+      for (const name of names) {
+        const meta = KNOWN_PROVIDERS.find(p => p.name === name) || { displayName: name, icon: '·' };
+        const pill = document.createElement('div');
+        pill.style.cssText = 'background:var(--bg-secondary);border:1px solid var(--border);border-radius:6px;padding:8px 10px;display:flex;align-items:center;gap:8px;';
+        pill.innerHTML = `<span style="font-size:14px;">${meta.icon}</span><span style="flex:1;font-size:12px;">${meta.displayName}</span><span class="lt-status" style="color:var(--text-muted);font-size:11px;">⏳</span>`;
+        grid.appendChild(pill);
+        pills[name] = pill;
+      }
+      let okCount = 0, failCount = 0;
+      const failures = [];
+      await Promise.all(names.map(async (name) => {
+        const provider = orch.providers[name];
+        const status = pills[name].querySelector('.lt-status');
+        const meta = KNOWN_PROVIDERS.find(p => p.name === name) || { displayName: name };
+        try {
+          const v = await provider.validate();
+          status.innerHTML = explainAsPillHTML(v);
+          if (v.ok) okCount++;
+          else { failCount++; failures.push({ label: meta.displayName, v }); }
+        } catch (e) {
+          const errResult = { ok: false, error: e?.message || 'error' };
+          status.innerHTML = explainAsPillHTML(errResult);
+          failCount++; failures.push({ label: meta.displayName, v: errResult });
+        }
+      }));
+      const summary = document.createElement('div');
+      summary.style.cssText = 'margin-top:10px;padding:8px 12px;border-radius:6px;font-size:12px;';
+      if (failCount === 0) {
+        summary.style.background = 'rgba(0,255,136,0.08)';
+        summary.style.color = 'var(--accent-green)';
+        summary.textContent = isEN ? `✅ All ${okCount} LLM keys are working.` : `✅ Les ${okCount} clés LLM sont opérationnelles.`;
+        llmResultsBox.appendChild(summary);
+      } else {
+        summary.style.background = 'rgba(255,80,80,0.08)';
+        summary.style.color = 'var(--accent-red)';
+        summary.innerHTML = isEN
+          ? `⚠️ ${okCount} OK · ${failCount} failed. <strong>Details below</strong>:`
+          : `⚠️ ${okCount} OK · ${failCount} échec(s). <strong>Détails ci-dessous</strong> :`;
+        llmResultsBox.appendChild(summary);
+        const details = document.createElement('div');
+        details.style.cssText = 'margin-top:10px;display:flex;flex-direction:column;gap:8px;';
+        for (const { label, v } of failures) {
+          const block = document.createElement('div');
+          block.innerHTML = `<div style="font-size:12.5px;font-weight:600;color:var(--text-primary);">${label}</div>${explainAsDetailHTML(v)}`;
+          details.appendChild(block);
+        }
+        llmResultsBox.appendChild(details);
+      }
+      llmTestBtn.disabled = false;
+      llmTestBtn.textContent = isEN ? '⚡ Re-test all' : '⚡ Re-tester toutes';
+    });
+  }
 }
 
 // === ROUTING ===

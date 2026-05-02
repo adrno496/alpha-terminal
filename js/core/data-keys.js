@@ -59,34 +59,79 @@ export async function validateDataKey(id, key) {
   try {
     let url, parser;
     switch (id) {
-      case 'fmp':
-        // /quote-short est l'endpoint le plus léger toujours dispo en free tier.
-        // Retourne juste { symbol, price, volume } — utilisé pour valider la clé.
-        url = `https://financialmodelingprep.com/api/v3/quote-short/AAPL?apikey=${encodeURIComponent(k)}`;
-        parser = async (r) => {
-          if (r.status === 401) return { ok: false, error: 'Clé invalide ou révoquée.', status: 401 };
-          if (r.status === 403) return { ok: false, error: 'Clé valide mais accès refusé (tier insuffisant).', status: 403 };
-          if (r.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
-          if (r.status >= 500) return { ok: true, status: r.status, note: 'provider error, key likely valid' };
-          const text = await r.text();
-          let j; try { j = JSON.parse(text); } catch { return { ok: false, error: 'Réponse non-JSON: ' + text.slice(0, 60) }; }
-          if (j && j['Error Message']) return { ok: false, error: j['Error Message'] };
-          if (Array.isArray(j) && j.length > 0 && j[0].symbol) return { ok: true };
-          // Tolérant : si 200 + JSON vide, on essaie le fallback /profile
-          if (r.ok && Array.isArray(j) && j.length === 0) {
-            // Probable que la clé est OK mais le tier free a des limites — on retente avec /profile
-            try {
-              const r2 = await fetch(`https://financialmodelingprep.com/api/v3/profile/AAPL?apikey=${encodeURIComponent(k)}`, { cache: 'no-store' });
-              if (r2.ok) {
-                const j2 = await r2.json();
-                if (Array.isArray(j2) && j2.length > 0) return { ok: true };
+      case 'fmp': {
+        // FMP a migré vers la "Stable API" en 2024-2025 (docs officielles :
+        // https://site.financialmodelingprep.com/developer/docs).
+        // Deux méthodes d'auth supportées :
+        //   1. Header : `apikey: KEY` (recommandé par FMP, plus sécurisé)
+        //   2. URL : `?apikey=KEY` (legacy, encore actif)
+        // On essaie 3 endpoints en cascade pour maximiser les chances de succès :
+        //   1. Stable API /stable/profile (nouveau, free tier)
+        //   2. Legacy /api/v3/quote (free tier toujours actif)
+        //   3. Legacy /api/v3/profile (free tier toujours actif)
+        //
+        // Pour chacun on utilise les 2 méthodes d'auth (header + URL) — couvre
+        // les cas où le tier free n'autorise qu'une des deux.
+        const symbol = 'AAPL';
+        const candidates = [
+          { name: 'Stable API /profile',  url: `https://financialmodelingprep.com/stable/profile?symbol=${symbol}` },
+          { name: 'v3 /quote',            url: `https://financialmodelingprep.com/api/v3/quote/${symbol}` },
+          { name: 'v3 /profile',          url: `https://financialmodelingprep.com/api/v3/profile/${symbol}` },
+          { name: 'v3 /quote-short',      url: `https://financialmodelingprep.com/api/v3/quote-short/${symbol}` }
+        ];
+
+        // Tentative chaînée : pour chaque endpoint, on essaie d'abord avec header
+        // `apikey: KEY` (méthode officielle recommandée), puis URL `?apikey=KEY`.
+        let lastError = 'Tous les endpoints FMP ont échoué';
+        let lastStatus = null;
+        for (const cand of candidates) {
+          // Tentative 1 : header apikey
+          try {
+            const r1 = await fetch(cand.url, {
+              method: 'GET',
+              cache: 'no-store',
+              headers: { 'apikey': k, 'Accept': 'application/json' }
+            });
+            if (r1.status === 401) { lastError = 'Clé invalide ou révoquée.'; lastStatus = 401; continue; }
+            if (r1.status === 403) { lastError = 'Clé valide mais accès refusé (tier insuffisant pour cet endpoint).'; lastStatus = 403; continue; }
+            if (r1.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+            if (r1.status >= 500) { lastError = `Provider error ${r1.status}`; lastStatus = r1.status; continue; }
+            if (r1.ok) {
+              const j = await r1.json().catch(() => null);
+              if (Array.isArray(j) && j.length > 0 && (j[0].symbol || j[0].companyName)) {
+                return { ok: true };
               }
-            } catch {}
-            return { ok: false, error: 'Réponse vide — tier limité ?' };
+              if (j && typeof j === 'object' && (j.symbol || j.companyName)) return { ok: true };
+              if (j && j['Error Message']) { lastError = j['Error Message']; continue; }
+            }
+          } catch (e) {
+            // Réseau / CORS — on essaie l'URL param en fallback
           }
-          return { ok: false, error: 'Réponse inattendue' };
-        };
-        break;
+          // Tentative 2 : URL ?apikey=
+          try {
+            const sep = cand.url.includes('?') ? '&' : '?';
+            const r2 = await fetch(`${cand.url}${sep}apikey=${encodeURIComponent(k)}`, {
+              method: 'GET',
+              cache: 'no-store',
+              headers: { 'Accept': 'application/json' }
+            });
+            if (r2.status === 401) { lastError = 'Clé invalide ou révoquée.'; lastStatus = 401; continue; }
+            if (r2.status === 403) { lastError = 'Clé valide mais accès refusé (tier insuffisant pour cet endpoint).'; lastStatus = 403; continue; }
+            if (r2.status === 429) return { ok: true, status: 429, note: 'rate-limited but key valid' };
+            if (r2.status >= 500) { lastError = `Provider error ${r2.status}`; lastStatus = r2.status; continue; }
+            if (r2.ok) {
+              const j = await r2.json().catch(() => null);
+              if (Array.isArray(j) && j.length > 0 && (j[0].symbol || j[0].companyName)) return { ok: true };
+              if (j && typeof j === 'object' && (j.symbol || j.companyName)) return { ok: true };
+              if (j && j['Error Message']) { lastError = j['Error Message']; continue; }
+            }
+          } catch (e) {
+            // Si même URL fallback échoue, on passe au candidat suivant
+            lastError = e?.message || 'Erreur réseau';
+          }
+        }
+        return { ok: false, error: lastError, status: lastStatus };
+      }
       case 'alphavantage':
         url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${encodeURIComponent(k)}`;
         parser = async (r) => {
