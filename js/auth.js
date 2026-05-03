@@ -63,12 +63,20 @@
       if (!this.client) throw new Error('Supabase non configuré');
       const cleanEmail = String(email || '').trim().toLowerCase();
       if (!cleanEmail || !cleanEmail.includes('@')) throw new Error('Email invalide');
+      // Détermine l'URL de redirection :
+      // - En localhost (dev) → utilise quand même localhost (le user dev local lit son mail sur le même device)
+      // - En prod (alpha-terminal.app, *.vercel.app, etc.) → utilise l'origin courant
+      // - Override possible via window.ALPHA_CONFIG.AUTH_REDIRECT_URL
+      const cfgRedirect = window.ALPHA_CONFIG?.AUTH_REDIRECT_URL;
+      const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(window.location.hostname);
+      const redirectTo = cfgRedirect
+        || (isLocalhost ? 'https://alpha-terminal.app/' : window.location.origin + '/');
       const { error } = await this.client.auth.signInWithOtp({
         email: cleanEmail,
-        options: { emailRedirectTo: window.location.origin + '/' },
+        options: { emailRedirectTo: redirectTo },
       });
       if (error) throw error;
-      return { ok: true, message: 'Lien magique envoyé. Clique le lien dans ton email.' };
+      return { ok: true, message: `Lien magique envoyé. Clique le lien dans ton email (redirection vers ${redirectTo}).` };
     }
 
     // ---- Getters ----
