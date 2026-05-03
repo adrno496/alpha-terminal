@@ -457,6 +457,60 @@ if (typeof document !== 'undefined' && !window.__wealthToggleWired) {
   });
 }
 
+// === Global delegation : auto-wire des sélecteurs provider + model ===
+// Garantit que LE choix dans le dropdown header (LLM + modèle) est TOUJOURS
+// pris en compte, même si un module oublie d'appeler wireProviderSelector().
+// Pattern identique aux boutons ⭐ favoris et 📄 PDF.
+if (typeof document !== 'undefined' && !window.__providerSelectorAutoWired) {
+  window.__providerSelectorAutoWired = true;
+
+  // Provider change → écrit moduleOverrides[moduleId] = { provider }
+  document.addEventListener('change', async (e) => {
+    const sel = e.target.closest('select.provider-selector[data-module]');
+    if (!sel) return;
+    const moduleId = sel.getAttribute('data-module');
+    const settings = getSettings();
+    const overrides = { ...(settings.moduleOverrides || {}) };
+    if (sel.value === 'auto') delete overrides[moduleId];
+    else overrides[moduleId] = { provider: sel.value };
+    setSettings({ moduleOverrides: overrides });
+    // Re-render le model selector (le module avait peut-être ou pas appelé wireProviderSelector)
+    try {
+      const view = sel.closest('.module-header')?.parentElement || document;
+      const modelSel = view.querySelector(`.model-selector[data-module="${moduleId}"]`);
+      if (modelSel) {
+        if (sel.value === 'auto') {
+          modelSel.style.display = 'none';
+          modelSel.innerHTML = '';
+        } else {
+          modelSel.style.display = '';
+          const { MODEL_CATALOG } = await import('../core/models-catalog.js');
+          const models = MODEL_CATALOG[sel.value] || [];
+          const ovr = (settings.moduleOverrides || {})[moduleId];
+          const cur = ovr?.model || (models.find(m => m.recommended)?.id) || (models[0]?.id);
+          modelSel.innerHTML = models.map(m =>
+            `<option value="${m.id}" ${m.id===cur?'selected':''}>${m.label}${m.recommended?' ★':''} (${m.tier})</option>`
+          ).join('');
+        }
+      }
+    } catch {}
+  });
+
+  // Model change → écrit moduleOverrides[moduleId] = { provider, model }
+  document.addEventListener('change', (e) => {
+    const sel = e.target.closest('select.model-selector[data-module]');
+    if (!sel) return;
+    const moduleId = sel.getAttribute('data-module');
+    const view = sel.closest('.module-header')?.parentElement || document;
+    const provSel = view.querySelector(`.provider-selector[data-module="${moduleId}"]`);
+    if (!provSel || provSel.value === 'auto') return;
+    const settings = getSettings();
+    const overrides = { ...(settings.moduleOverrides || {}) };
+    overrides[moduleId] = { provider: provSel.value, model: sel.value };
+    setSettings({ moduleOverrides: overrides });
+  });
+}
+
 // Récupère l'override courant pour un module
 export function getModuleOverride(moduleId) {
   const settings = getSettings();
@@ -613,6 +667,18 @@ export async function runAnalysis(moduleId, params, container, { onTitle, sugges
   let fullText = '';
   const sys = await applyCustomPrompt(moduleId, params.system);
   let messages = params.messages;
+
+  // === Backwards-compat shim ===
+  // Si un module passe `userMsg`/`prompt`/`userMessage` (string) au lieu de
+  // `messages: [{role:'user', content}]`, on convertit automatiquement.
+  // Évite que la moindre faute de frappe casse l'analyse silencieusement.
+  if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    const fallbackText = params.userMsg || params.userMessage || params.prompt || params.user;
+    if (typeof fallbackText === 'string' && fallbackText.trim().length > 0) {
+      messages = [{ role: 'user', content: fallbackText }];
+      console.warn(`[runAnalysis] Module "${moduleId}" passe un message au mauvais format (userMsg/prompt). Auto-converti en messages[]. À corriger en passant: messages: [{role:'user', content: ...}]`);
+    }
+  }
 
   // Clone des params modifiables — ne JAMAIS muter l'objet du caller (évite des
   // bugs sneaky si le module réutilise le même params à travers plusieurs runs).

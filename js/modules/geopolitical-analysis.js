@@ -122,9 +122,9 @@ async function run() {
 
   await runAnalysis(MODULE_ID, {
     system: sys,
-    userMsg,
+    messages: [{ role: 'user', content: userMsg }],
     recordInput: `${region} · ${input.slice(0, 80)}`,
-    needsWebSearch: true  // hint pour le router : préfère les providers avec web search natif
+    useWebSearch: true  // préfère les providers avec web search natif (Perplexity/Grok)
   }, out, {
     onTitle: (title) => { /* le router passera le titre dans la sauvegarde */ }
   });

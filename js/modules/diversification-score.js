@@ -314,16 +314,51 @@ function renderScore(viewEl, holdings) {
         .map(h => ({ ...h, _ev: getEffectiveValue(h) }))
         .sort((a, b) => b._ev - a._ev);
       const totalValue = sortedHoldings.reduce((s, h) => s + h._ev, 0);
-      const holdingsList = sortedHoldings.map(h =>
-        `- ${h.name || h.ticker || 'Sans nom'} (${h.category}) : ${Math.round(h._ev).toLocaleString('fr-FR')} ${h.currency || 'EUR'} (${(h._ev / totalValue * 100).toFixed(1)}%)`
-      ).join('\n');
+      const holdingsList = sortedHoldings.map(h => {
+        const pct = totalValue > 0 ? (h._ev / totalValue * 100).toFixed(1) : '0.0';
+        const tag = h.category === 'real_estate' && h.propertyType
+          ? ` [${h.propertyType === 'residence_principale' ? 'RP' : h.propertyType === 'secondary_residence' ? 'RS' : h.propertyType === 'locatif' ? 'locatif' : h.propertyType}]`
+          : '';
+        return `- ${h.name || h.ticker || 'Sans nom'} (${h.category}${tag}) : ${Math.round(h._ev).toLocaleString('fr-FR')} ${h.currency || 'EUR'} (${pct}%)`;
+      }).join('\n');
+
+      // === BLOC IMMOBILIER DÉDIÉ ===
+      // L'IA doit voir explicitement les biens immo (RP, RS, locatif) avec valeur brute,
+      // équité, prêt, mensualité — pas juste l'équité agrégée. Sinon une RP avec gros prêt
+      // apparaît avec poids ~nul dans l'analyse alors qu'elle représente un actif majeur.
+      const realEstateHoldings = holdings.filter(h => h.category === 'real_estate');
+      let realEstateBlock = '';
+      if (realEstateHoldings.length > 0) {
+        try {
+          const { computeRealEstateMetrics } = await import('../core/real-estate.js');
+          const lines = realEstateHoldings.map(h => {
+            const m = computeRealEstateMetrics(h);
+            const typeLabel = h.propertyType === 'residence_principale' ? 'Résidence principale'
+              : h.propertyType === 'secondary_residence' ? 'Résidence secondaire'
+              : h.propertyType === 'locatif' ? 'Investissement locatif' : 'Bien immobilier';
+            const lines = [
+              `${typeLabel} "${h.name || 'sans nom'}" :`,
+              `  - Valeur actuelle estimée : ${Math.round(m.currentValue).toLocaleString('fr-FR')} €`,
+            ];
+            if (h.purchasePrice) lines.push(`  - Prix d'achat : ${Math.round(h.purchasePrice).toLocaleString('fr-FR')} € (${h.purchaseDate || '?'})`);
+            if (m.remaining > 0) lines.push(`  - Capital restant dû : ${Math.round(m.remaining).toLocaleString('fr-FR')} € · Mensualité : ${Math.round(m.monthlyPayment).toLocaleString('fr-FR')} €/mois · LTV : ${m.ltv.toFixed(0)}%`);
+            lines.push(`  - **Équité nette (capital réel)** : ${Math.round(m.equity).toLocaleString('fr-FR')} €`);
+            if (h.purchasePrice) lines.push(`  - Plus-value : ${m.capitalGain >= 0 ? '+' : ''}${Math.round(m.capitalGain).toLocaleString('fr-FR')} € (${m.capitalGainPct >= 0 ? '+' : ''}${m.capitalGainPct.toFixed(1)}%)`);
+            if (h.propertyType === 'locatif' && m.monthlyRent > 0) {
+              lines.push(`  - Loyer : ${Math.round(m.monthlyRent).toLocaleString('fr-FR')} €/mois · Cash-flow : ${m.monthlyCashflow >= 0 ? '+' : ''}${Math.round(m.monthlyCashflow).toLocaleString('fr-FR')} €/mois · Rendement net : ${m.netYield.toFixed(2)}%`);
+            }
+            return lines.join('\n');
+          }).join('\n\n');
+          realEstateBlock = `\n\n🏠 PATRIMOINE IMMOBILIER (${realEstateHoldings.length} bien${realEstateHoldings.length > 1 ? 's' : ''}) :\n${lines}\n\nIMPORTANT : l'équité nette des biens immobiliers EST comptée dans le total ci-dessus, mais leur poids dans le portefeuille reflète UNIQUEMENT le capital réellement détenu (équité), pas la valeur brute. Une résidence principale fortement endettée a donc un poids faible dans l'allocation, ce qui est normal — elle reste néanmoins un actif majeur à considérer dans la stratégie globale (illiquide, lien personnel, fiscalité spéciale).`;
+        } catch (e) { console.warn('[diversif] real-estate block failed:', e); }
+      }
 
       const sectorsBreakdown = Object.entries(result.stats.bySector || {})
         .sort((a, b) => b[1] - a[1])
-        .map(([s, v]) => `  - ${s} : ${(v / totalValue * 100).toFixed(1)}%`).join('\n');
+        .map(([s, v]) => `  - ${s} : ${totalValue > 0 ? (v / totalValue * 100).toFixed(1) : '0.0'}%`).join('\n');
       const geoBreakdown = Object.entries(result.stats.byGeo || {})
         .sort((a, b) => b[1] - a[1])
-        .map(([g, v]) => `  - ${g} : ${(v / totalValue * 100).toFixed(1)}%`).join('\n');
+        .map(([g, v]) => `  - ${g} : ${totalValue > 0 ? (v / totalValue * 100).toFixed(1) : '0.0'}%`).join('\n');
 
       // System prompt : rôle du LLM + ton attendu
       const systemPrompt = isEN
@@ -341,6 +376,7 @@ Breakdown:
 
 My holdings (sorted by net value, total ${Math.round(totalValue).toLocaleString('en-US')} €):
 ${holdingsList}
+${realEstateBlock}
 
 By sector:
 ${sectorsBreakdown}
@@ -363,6 +399,7 @@ Détail :
 
 Mes holdings (triés par valeur nette, total ${Math.round(totalValue).toLocaleString('fr-FR')} €) :
 ${holdingsList}
+${realEstateBlock}
 
 Par secteur :
 ${sectorsBreakdown}
@@ -377,16 +414,37 @@ Donne-moi :
 4. Risques de mon allocation actuelle
 5. Allocation cible pour un portefeuille équilibré à mon profil`;
 
+      // Garde-fou : on s'assure que le user message n'est jamais vide (sinon certaines
+      // APIs comme Cerebras renvoient "Input required: specify prompt or messages").
+      const safeUserMessage = (userMessage && userMessage.trim().length > 50)
+        ? userMessage
+        : (isEN
+            ? `Analyze my portfolio diversification (score ${result.total}/100). I have ${holdings.length} holdings. Provide actionable recommendations to improve.`
+            : `Analyse la diversification de mon portefeuille (score ${result.total}/100). J'ai ${holdings.length} holdings. Donne-moi des recommandations actionnables pour améliorer.`);
+
+      // Debug log : utile si l'API renvoie une erreur "messages empty"
+      console.log('[diversification-score] AI request:', {
+        moduleId: MODULE_ID,
+        systemLength: systemPrompt.length,
+        userMessageLength: safeUserMessage.length,
+        userMessagePreview: safeUserMessage.slice(0, 200),
+        holdingsCount: holdings.length,
+        totalValue
+      });
+
       try {
         await runAnalysis(MODULE_ID, {
           system: systemPrompt,
-          messages: [{ role: 'user', content: userMessage }],
+          messages: [{ role: 'user', content: safeUserMessage }],
           maxTokens: 3000,
-          recordInput: { score: result.total, breakdown: result.breakdown, totalValue }
+          temperature: 0.4,
+          _bypassCache: true, // toujours frais — analyse contextuelle, pas un calcul déterministe
+          recordInput: { score: result.total, breakdown: result.breakdown, totalValue, ts: Date.now() }
         }, resultEl, {
           onTitle: () => `Score Diversification ${result.total}/100`
         });
       } catch (e) {
+        console.error('[diversification-score] runAnalysis failed:', e);
         toast('Analyse IA : ' + (e?.message || 'erreur'), 'error');
       }
     });

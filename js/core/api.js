@@ -137,11 +137,34 @@ export class APIOrchestrator {
     const controller = new AbortController();
     _controllers.set(state.requestId, controller);
 
-    const { messages, files } = await this._preparePDFsIfNeeded(
+    const { messages: preppedMessages, files } = await this._preparePDFsIfNeeded(
       sel.provider,
       params.files || [],
       params.messages
     );
+
+    // === SAFETY NET — messages NEVER empty when reaching provider ===
+    // Toutes les APIs LLM (Claude, OpenAI, Cerebras, etc.) rejettent un body avec
+    // messages: []. Si pour une raison quelconque (module qui oublie messages,
+    // context injection qui mute mal, etc.) on arrive ici avec rien, on force un
+    // message minimal basé sur le system prompt. Sinon on lève une erreur claire.
+    let messages = Array.isArray(preppedMessages) ? preppedMessages.filter(m => {
+      if (!m || !m.role) return false;
+      const c = m.content;
+      if (typeof c === 'string') return c.trim().length > 0;
+      if (Array.isArray(c)) return c.length > 0;
+      return c != null;
+    }) : [];
+    if (messages.length === 0) {
+      // Fallback : si on a un system prompt, on construit un message user minimal
+      const sys = params.system;
+      if (sys && typeof sys === 'string' && sys.trim().length > 10) {
+        messages = [{ role: 'user', content: 'Réponds en suivant les instructions du système.' }];
+        console.warn('[orchestrator] messages array was empty — fallback user message injected for module', moduleId);
+      } else {
+        throw new Error(`Module "${moduleId}" : aucun message à envoyer (params.messages vide ou invalide). Vérifie que runAnalysis() reçoit { system, messages: [{role:"user", content:"..."}] }.`);
+      }
+    }
 
     const callParams = {
       system: params.system,
