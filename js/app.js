@@ -415,6 +415,34 @@ function startLockFlow() {
   openLockFlow();
 }
 
+// === KILL-SWITCH cache : force le purge quand on déploie une nouvelle version ===
+// Compare APP_VERSION (hardcodé ci-dessous, à bumper à chaque release) avec la valeur
+// stockée dans localStorage. Si différentes → vide tous les caches SW + reload.
+// Évite que les users restent bloqués sur une vieille version cachée.
+const APP_VERSION = 'v75-2026-05-04';
+const APP_VERSION_KEY = 'alpha-terminal:app-version';
+(async function killOldCache() {
+  try {
+    const stored = localStorage.getItem(APP_VERSION_KEY);
+    if (stored === APP_VERSION) return; // déjà à jour
+    console.log(`[boot] Kill-switch cache : ${stored || 'aucune'} → ${APP_VERSION}`);
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+    }
+    try {
+      const reg = await navigator.serviceWorker?.getRegistration();
+      if (reg?.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    } catch {}
+    localStorage.setItem(APP_VERSION_KEY, APP_VERSION);
+    // Reload UNE seule fois pour récupérer les assets frais (boucle évitée par le check ci-dessus)
+    if (!sessionStorage.getItem('alpha-cache-killed')) {
+      sessionStorage.setItem('alpha-cache-killed', '1');
+      location.reload();
+    }
+  } catch (e) { console.warn('[boot] kill-switch failed:', e); }
+})();
+
 function boot() {
   renderSidebar(navigate);
 
