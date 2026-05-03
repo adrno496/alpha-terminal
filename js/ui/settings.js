@@ -18,7 +18,7 @@ export function renderSettingsView(viewEl) {
   viewEl.innerHTML = `
     <div class="module-header"><h2>${t('settings.title')}</h2><div class="module-desc">${t('settings.desc')}</div></div>
     <div class="tabs-bar">
-      ${['keys','data_keys','routing','costs','models','premium','advanced'].map(tab => `<button class="tab ${tab===currentTab?'active':''}" data-tab="${tab}">${tabLabel(tab)}</button>`).join('')}
+      ${['keys','data_keys','routing','costs','models','premium','cloud_sync','advanced'].map(tab => `<button class="tab ${tab===currentTab?'active':''}" data-tab="${tab}">${tabLabel(tab)}</button>`).join('')}
     </div>
     <div id="settings-content"></div>
   `;
@@ -30,6 +30,8 @@ export function renderSettingsView(viewEl) {
 }
 
 function tabLabel(tab) {
+  // Onglet Cloud Sync : libellé hardcodé (pas dans i18n.js)
+  if (tab === 'cloud_sync') return '☁️ Sync Cloud';
   return t('settings.tabs.' + tab) || tab;
 }
 
@@ -41,6 +43,7 @@ function renderTab(tab) {
   else if (tab === 'costs') renderCostsTab(c);
   else if (tab === 'models') renderModelsTab(c);
   else if (tab === 'premium') renderPremiumTab(c);
+  else if (tab === 'cloud_sync') renderCloudSyncTab(c);
   else if (tab === 'advanced') renderAdvancedTab(c);
 }
 
@@ -1312,6 +1315,255 @@ function renderModelsTab(c) {
 }
 
 // === ADVANCED ===
+// ============================================================
+// ☁️ SYNC CLOUD E2EE — backup chiffré bout-en-bout vers Supabase
+// ============================================================
+async function renderCloudSyncTab(c) {
+  const cs = await import('../core/cloud-sync.js');
+  const enabled = cs.isCloudSyncEnabled();
+  const onboarded = cs.isCloudSyncOnboarded();
+  let user = null;
+  try { user = await cs.getCloudSyncUser(); } catch {}
+  const deviceLabel = cs.getDeviceLabel();
+
+  c.innerHTML = `
+    <div class="card">
+      <div class="card-title">☁️ Sync Cloud (optionnel)</div>
+      <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:14px;">
+        Sauvegarde tes données <strong>chiffrées bout-en-bout</strong> sur Supabase pour les retrouver sur n'importe quel autre appareil.
+        Ni Alpha ni Supabase ne peuvent les lire — la passphrase reste sur ton appareil.
+      </p>
+
+      ${!enabled ? `
+        <div style="background:rgba(80,180,255,0.06);border-left:3px solid #5ab8ff;padding:12px 14px;border-radius:4px;margin-bottom:16px;font-size:13px;line-height:1.6;">
+          ⚠️ Cette feature est <strong>OPTIONNELLE</strong>. Tes données restent 100% locales par défaut.<br>
+          Si tu actives la sync, les backups sont chiffrés AVANT upload — Alpha et Supabase ne peuvent jamais les lire.
+        </div>
+        <button id="cs-activate" class="btn-primary">✅ Activer la sync cloud</button>
+      ` : `
+        <div style="background:var(--bg-tertiary);padding:12px 14px;border-radius:6px;margin-bottom:14px;">
+          <div style="font-size:13px;margin-bottom:6px;">
+            État : <span style="color:var(--accent-green);font-weight:600;">🟢 Actif</span>
+            ${user ? ` · Compte : <strong>${escape(user.email || '?')}</strong>` : ' · <span style="color:var(--accent-amber);">Non connecté</span>'}
+          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">
+            Device : <input id="cs-device" class="input" type="text" value="${escape(deviceLabel)}" maxlength="60" style="display:inline-block;width:200px;font-size:12px;padding:3px 6px;margin:0 4px;" />
+            <button id="cs-device-save" class="btn-ghost" style="font-size:11px;padding:3px 8px;">Sauver</button>
+          </div>
+        </div>
+
+        ${!user ? `
+          <div class="card" style="background:var(--bg-tertiary);margin-bottom:14px;">
+            <div style="font-size:13px;margin-bottom:8px;font-weight:600;">📧 Connexion magic link</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+              <input id="cs-email" class="input" type="email" placeholder="ton@email.com" style="flex:1;min-width:240px;" />
+              <button id="cs-send-link" class="btn-primary">Envoyer lien magique</button>
+            </div>
+            <div id="cs-login-status" style="margin-top:8px;font-size:12px;"></div>
+          </div>
+        ` : `
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+            <button id="cs-push-now" class="btn-primary">📤 Push maintenant</button>
+            <button id="cs-refresh" class="btn-secondary">🔄 Refresh liste</button>
+            <button id="cs-logout" class="btn-ghost" style="margin-left:auto;">Logout cloud</button>
+          </div>
+
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">Backups distants (max 20)</div>
+          <div id="cs-backup-list" style="font-size:12.5px;">⏳ Chargement…</div>
+        `}
+
+        <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
+          <button id="cs-disable" class="btn-ghost" style="font-size:12px;color:var(--accent-amber);">🔇 Désactiver la sync cloud</button>
+          <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">(les backups distants restent stockés mais plus rien n'est uploadé)</span>
+        </div>
+      `}
+    </div>
+  `;
+
+  // === Activation ===
+  $('#cs-activate')?.addEventListener('click', async () => {
+    const { showCloudSyncOnboarding } = await import('./cloud-sync-onboarding.js');
+    if (!onboarded) {
+      showCloudSyncOnboarding({
+        onAccept: () => {
+          cs.setCloudSyncEnabled(true);
+          renderTab('cloud_sync');
+        }
+      });
+    } else {
+      cs.setCloudSyncEnabled(true);
+      renderTab('cloud_sync');
+    }
+  });
+
+  // === Désactivation ===
+  $('#cs-disable')?.addEventListener('click', () => {
+    if (!confirm('Désactiver la sync cloud ? Tes backups distants resteront stockés mais plus rien ne sera uploadé.')) return;
+    cs.setCloudSyncEnabled(false);
+    renderTab('cloud_sync');
+  });
+
+  // === Device label ===
+  $('#cs-device-save')?.addEventListener('click', () => {
+    const v = $('#cs-device')?.value.trim();
+    if (v) {
+      cs.setDeviceLabel(v);
+      toast('Device label sauvegardé', 'success');
+    }
+  });
+
+  // === Login magic link ===
+  $('#cs-send-link')?.addEventListener('click', async () => {
+    const email = $('#cs-email')?.value.trim();
+    const status = $('#cs-login-status');
+    if (!email) { status.innerHTML = '<span style="color:var(--accent-amber);">⚠ Email requis</span>'; return; }
+    status.innerHTML = '⏳ Envoi…';
+    try {
+      await cs.sendCloudSyncMagicLink(email);
+      status.innerHTML = '<span style="color:var(--accent-green);">✓ Lien envoyé. Clique le lien dans ton email pour te connecter.</span>';
+    } catch (e) {
+      status.innerHTML = `<span style="color:var(--accent-red);">❌ ${escape(e?.message || 'erreur')}</span>`;
+    }
+  });
+
+  // === Logout ===
+  $('#cs-logout')?.addEventListener('click', async () => {
+    if (!confirm('Logout du compte cloud ? La sync sera désactivée.')) return;
+    await cs.cloudSignOut();
+    cs.setCloudSyncEnabled(false);
+    renderTab('cloud_sync');
+  });
+
+  // === Push ===
+  $('#cs-push-now')?.addEventListener('click', () => openPushModal(c));
+
+  // === Refresh ===
+  $('#cs-refresh')?.addEventListener('click', () => loadBackupList(c));
+
+  // === Liste backups (auto au render si user logged in) ===
+  if (user) loadBackupList(c);
+}
+
+async function loadBackupList(c) {
+  const listEl = c.querySelector('#cs-backup-list');
+  if (!listEl) return;
+  listEl.innerHTML = '⏳ Chargement…';
+  try {
+    const cs = await import('../core/cloud-sync.js');
+    const list = await cs.listCloudBackups();
+    if (!list.length) {
+      listEl.innerHTML = '<div style="color:var(--text-muted);font-size:12px;font-style:italic;padding:10px 0;">Aucun backup distant. Clique "📤 Push maintenant" pour créer le premier.</div>';
+      return;
+    }
+    listEl.innerHTML = list.map(b => {
+      const date = new Date(b.created_at).toLocaleString('fr-FR');
+      const sizeKb = (b.payload_size / 1024).toFixed(0);
+      const dev = b.device_label || 'Device';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:4px;margin-bottom:6px;flex-wrap:wrap;">
+        <span style="font-family:var(--font-mono);font-size:11.5px;flex:1;min-width:240px;">📦 ${escape(dev)} · ${date} · ${sizeKb} Ko</span>
+        <button class="btn-secondary cs-restore" data-id="${b.id}" style="font-size:11.5px;padding:4px 10px;">↩ Restaurer</button>
+        <button class="btn-danger cs-delete" data-id="${b.id}" aria-label="Supprimer" style="font-size:11.5px;padding:4px 8px;">×</button>
+      </div>`;
+    }).join('');
+    listEl.querySelectorAll('.cs-restore').forEach(b => b.addEventListener('click', () => openRestoreModal(b.dataset.id, c)));
+    listEl.querySelectorAll('.cs-delete').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Supprimer ce backup distant ? Action irréversible.')) return;
+      try {
+        const { deleteCloudBackup } = await import('../core/cloud-sync.js');
+        await deleteCloudBackup(b.dataset.id);
+        toast('Backup supprimé', 'success');
+        loadBackupList(c);
+      } catch (e) { toast('Erreur : ' + e.message, 'error'); }
+    }));
+  } catch (e) {
+    listEl.innerHTML = `<div style="color:var(--accent-red);font-size:12px;">❌ ${escape(e?.message || 'erreur')}</div>`;
+  }
+}
+
+function openPushModal(parentC) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:440px;width:100%;">
+      <h3 style="margin:0 0 12px;font-size:16px;">📤 Push backup chiffré vers le cloud</h3>
+      <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">
+        Tes données vont être chiffrées sur cet appareil avec ta passphrase, puis uploadées en blob opaque.
+      </p>
+      <label class="field-label" style="display:block;margin-bottom:4px;">Passphrase vault</label>
+      <input id="cs-push-pwd" class="input" type="password" placeholder="Ta passphrase" style="width:100%;margin-bottom:12px;" />
+      <div id="cs-push-status" style="font-size:12px;margin-bottom:12px;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button id="cs-push-cancel" class="btn-ghost">Annuler</button>
+        <button id="cs-push-go" class="btn-primary">📤 Push</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cs-push-cancel').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#cs-push-go').addEventListener('click', async () => {
+    const pwd = overlay.querySelector('#cs-push-pwd').value;
+    const status = overlay.querySelector('#cs-push-status');
+    if (!pwd) { status.innerHTML = '<span style="color:var(--accent-amber);">⚠ Passphrase requise</span>'; return; }
+    status.innerHTML = '⏳ Chiffrement + upload…';
+    try {
+      const { pushCloudBackup } = await import('../core/cloud-sync.js');
+      const r = await pushCloudBackup(pwd);
+      toast(`✓ Backup uploadé (${(r.sizeBytes/1024).toFixed(0)} Ko)`, 'success');
+      overlay.remove();
+      loadBackupList(parentC);
+    } catch (e) {
+      status.innerHTML = `<span style="color:var(--accent-red);">❌ ${escape(e?.message || 'erreur')}</span>`;
+    }
+  });
+}
+
+function openRestoreModal(backupId, parentC) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:8px;padding:18px;max-width:480px;width:100%;">
+      <h3 style="margin:0 0 12px;font-size:16px;">↩ Restaurer un backup distant</h3>
+      <p style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">
+        Le blob va être téléchargé puis déchiffré sur cet appareil avec ta passphrase.
+      </p>
+      <label class="field-label" style="display:block;margin-bottom:4px;">Passphrase vault</label>
+      <input id="cs-restore-pwd" class="input" type="password" placeholder="Ta passphrase" style="width:100%;margin-bottom:12px;" />
+      <label class="field-label" style="display:block;margin-bottom:4px;">Mode</label>
+      <label style="display:block;font-size:12.5px;margin-bottom:6px;">
+        <input type="radio" name="cs-restore-mode" value="merge" checked /> <strong>Merge</strong> — fusionne avec tes données actuelles
+      </label>
+      <label style="display:block;font-size:12.5px;margin-bottom:12px;">
+        <input type="radio" name="cs-restore-mode" value="replace" /> <strong>Replace</strong> — écrase tes données actuelles
+      </label>
+      <div id="cs-restore-status" style="font-size:12px;margin-bottom:12px;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button id="cs-restore-cancel" class="btn-ghost">Annuler</button>
+        <button id="cs-restore-go" class="btn-primary">↩ Restaurer</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#cs-restore-cancel').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#cs-restore-go').addEventListener('click', async () => {
+    const pwd = overlay.querySelector('#cs-restore-pwd').value;
+    const mode = overlay.querySelector('input[name="cs-restore-mode"]:checked')?.value || 'merge';
+    const status = overlay.querySelector('#cs-restore-status');
+    if (!pwd) { status.innerHTML = '<span style="color:var(--accent-amber);">⚠ Passphrase requise</span>'; return; }
+    status.innerHTML = '⏳ Téléchargement + déchiffrement + import…';
+    try {
+      const { restoreCloudBackup } = await import('../core/cloud-sync.js');
+      await restoreCloudBackup(backupId, pwd, { mode });
+      toast('✓ Backup restauré — rechargement…', 'success');
+      overlay.remove();
+      setTimeout(() => location.reload(), 800);
+    } catch (e) {
+      status.innerHTML = `<span style="color:var(--accent-red);">❌ ${escape(e?.message || 'erreur')}</span>`;
+    }
+  });
+}
+
+function escape(s) { return String(s ?? '').replace(/[<>&"']/g, c => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&#39;' }[c])); }
+
 function renderAdvancedTab(c) {
   const s = getSettings();
   c.innerHTML = `

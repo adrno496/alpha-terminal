@@ -105,7 +105,10 @@ export async function tryAutoUnlock() {
   return out;
 }
 
-async function deriveKey(password, saltBuf) {
+// Note : ces 3 helpers (deriveKey, encryptValue, decryptValue) sont exportés
+// pour être réutilisés par cloud-sync.js (E2EE backup). Les helpers b64ToBuf/bufToB64
+// viennent de utils.js. Le pattern reste identique au vault local : PBKDF2 100k → AES-GCM 256.
+export async function deriveKey(password, saltBuf) {
   const enc = new TextEncoder();
   const baseKey = await crypto.subtle.importKey(
     'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
@@ -119,7 +122,7 @@ async function deriveKey(password, saltBuf) {
   );
 }
 
-async function encryptValue(key, plain) {
+export async function encryptValue(key, plain) {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ct = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv }, key, new TextEncoder().encode(plain)
@@ -127,7 +130,7 @@ async function encryptValue(key, plain) {
   return { ct: bufToB64(ct), iv: bufToB64(iv.buffer) };
 }
 
-async function decryptValue(key, { ct, iv }) {
+export async function decryptValue(key, { ct, iv }) {
   const plain = await crypto.subtle.decrypt(
     { name: 'AES-GCM', iv: new Uint8Array(b64ToBuf(iv)) },
     key,

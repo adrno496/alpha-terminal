@@ -133,7 +133,20 @@
     <p><strong>Ce qui n'est JAMAIS envoyé à Supabase :</strong> tes analyses, tes prompts, ton patrimoine, tes notes, transcripts, knowledge base. Le BYOK et le 100% client-side restent intacts. Vérification ouverte via DevTools → Network : tu observes uniquement des appels vers <code>*.supabase.co</code> au login + à l'activation premium, jamais pendant les analyses.</p>
     <p>Suppression du compte Premium : envoie un mail à <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a> — suppression sous 30 jours (CASCADE auto sur <code>auth.users</code>, <code>premium_access</code>, <code>payments</code>).</p>
 
-    <h2>8. Contact</h2>
+    <h2>8. Sync cloud optionnelle — chiffrement bout-en-bout (E2EE)</h2>
+    <p>Alpha propose une <strong>option</strong> de sauvegarde cloud chiffrée pour faciliter la récupération de tes données sur un autre appareil (PC ↔ mobile). Cette feature est <strong>désactivée par défaut</strong> et doit être explicitement activée dans Settings → ☁️ Sync Cloud.</p>
+    <p><strong>Comment ça marche :</strong></p>
+    <ul>
+      <li><strong>Avant l'upload</strong>, l'intégralité de tes données (patrimoine, watchlist, goals, budget, dividendes, knowledge base, historique d'analyses) est chiffrée sur ton appareil avec ta passphrase vault (AES-GCM 256, PBKDF2 100k itérations).</li>
+      <li><strong>Le serveur Supabase ne voit que des bytes opaques</strong> : ni Alpha, ni Supabase, ni un attaquant qui pirate la base ne peut lire ton contenu sans ta passphrase.</li>
+      <li><strong>La passphrase reste sur ton appareil</strong> : jamais transmise, jamais stockée côté serveur, jamais récupérable. C'est le coût du chiffrement E2EE.</li>
+      <li><strong>Maximum 20 backups</strong> par utilisateur, auto-purge des plus anciens via trigger Postgres.</li>
+    </ul>
+    <p><strong>Données transmises au serveur (en clair) :</strong> ton email (pour le magic link), un device label (ex: « MacBook Pro » — éditable), la taille du blob, la date de création. <strong>Aucune autre information lisible.</strong></p>
+    <p><strong>Vérification ouverte :</strong> DevTools → Network pendant un push → tu vois uniquement <code>encrypted_payload</code> en binaire opaque parti vers <code>*.supabase.co</code>. Aucun champ lisible. <strong>Si tu n'actives pas la sync cloud, aucune donnée n'est uploadée — l'app reste 100% locale.</strong></p>
+    <p><strong>⚠️ Risque assumé :</strong> si tu oublies ta passphrase, tes backups cloud sont définitivement perdus. Aucun support, aucun reset password. Une fiche de récupération imprimable est proposée à l'activation.</p>
+
+    <h2>9. Contact</h2>
     <p>Pour toute question sur cette politique : <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a>.</p>
 
     <p style="margin-top:30px;"><a href="index.html" style="color:var(--accent-green);">← Retour à l'accueil</a></p>
