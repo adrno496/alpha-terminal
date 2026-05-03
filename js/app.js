@@ -419,7 +419,7 @@ function startLockFlow() {
 // Compare APP_VERSION (hardcodé ci-dessous, à bumper à chaque release) avec la valeur
 // stockée dans localStorage. Si différentes → vide tous les caches SW + reload.
 // Évite que les users restent bloqués sur une vieille version cachée.
-const APP_VERSION = 'v77-2026-05-04';
+const APP_VERSION = 'v79-2026-05-04';
 const APP_VERSION_KEY = 'alpha-terminal:app-version';
 (async function killOldCache() {
   try {
@@ -451,24 +451,14 @@ function boot() {
   });
   document.querySelector('.sidebar-logo')?.addEventListener('click', () => navigate('home'));
 
-  // Bouton "Hard refresh" — vide tous les caches SW et reload la page
+  // Bouton "Hard refresh" sidebar : utilise le helper global (caches + SW unregister + URL cache-bust + replace)
   const hardRefreshBtn = document.getElementById('sidebar-hard-refresh');
   if (hardRefreshBtn) {
-    hardRefreshBtn.addEventListener('click', async () => {
-      const original = hardRefreshBtn.innerHTML;
+    hardRefreshBtn.addEventListener('click', () => {
       hardRefreshBtn.disabled = true;
       hardRefreshBtn.innerHTML = '<span class="dot">⏳</span> Vidage cache…';
-      try {
-        if ('caches' in window) {
-          const keys = await caches.keys();
-          await Promise.all(keys.map(k => caches.delete(k)));
-        }
-      } catch (e) { console.warn('[hard-refresh] cache clear failed:', e); }
-      try {
-        const reg = await navigator.serviceWorker?.getRegistration();
-        if (reg?.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-      } catch {}
-      location.reload();
+      if (typeof window.alphaForceRefresh === 'function') window.alphaForceRefresh();
+      else location.reload();
     });
   }
 

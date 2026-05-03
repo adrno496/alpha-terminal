@@ -250,6 +250,56 @@
   <script defer data-domain="alpha-terminal.app" src="https://plausible.io/js/script.outbound-links.tagged-events.js"></script>
 </head>
 <body>
+
+  <!-- Bouton flottant "Hard refresh" : vide caches + unregister SW + cache-bust URL + reload.
+       Toujours visible, même quand l'app crash. Système éprouvé. -->
+  <button id="force-refresh-btn" type="button" aria-label="Forcer le rafraîchissement et vider le cache" title="Vider le cache et recharger" onclick="window.alphaForceRefresh()">↻</button>
+  <style>
+    #force-refresh-btn {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 8px);
+      right: 8px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(40,40,44,0.85);
+      border: 1px solid #2a2a2e;
+      color: #aaa;
+      font-size: 16px;
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: transform .2s ease, color .2s ease;
+    }
+    #force-refresh-btn:active { transform: scale(0.92); color: #00ff88; }
+    #force-refresh-btn.spin { animation: alphaFrSpin .8s linear infinite; }
+    @keyframes alphaFrSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  </style>
+  <script>
+    // forceRefresh universel — disponible AVANT que app.js charge (utilisable même si l'app crash).
+    window.alphaForceRefresh = async function() {
+      const btn = document.getElementById('force-refresh-btn');
+      if (btn) { btn.classList.add('spin'); btn.disabled = true; }
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+        if ('serviceWorker' in navigator) {
+          const regs = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(regs.map(r => r.unregister()));
+        }
+      } catch (e) { console.warn('[force-refresh] cleanup failed:', e); }
+      // Cache-bust via URL parameter — force le navigateur à re-fetch tout
+      const url = new URL(window.location.href);
+      url.searchParams.set('_cb', Date.now().toString(36));
+      // location.replace() = pas d'entrée dans l'historique, plus propre
+      window.location.replace(url.toString());
+    };
+  </script>
+
   <!-- Welcome / Lock modal -->
   <div id="lock-modal" class="modal-overlay hidden">
     <div class="modal">

@@ -210,16 +210,46 @@ export const MODULE_ROUTING = {
     fallbackProviders: ['claude', 'openai', 'openrouter'],
     recommendedTier: 'flagship',
     reason: 'Actu géopolitique = web search natif requis · raisonnement nuancé sur scénarios probabilistes'
+  },
+  'diversification-score': {
+    needsCapabilities: [],
+    optimalProviders: ['claude', 'openai', 'gemini'],
+    fallbackProviders: ['grok', 'openrouter', 'mistral'],
+    recommendedTier: 'balanced',
+    reason: 'Analyse IA approfondie du portefeuille — raisonnement structuré sur allocation et recommandations ETF'
+  },
+  'daily-briefing': {
+    needsCapabilities: ['supportsWebSearch'],
+    optimalProviders: ['perplexity', 'grok', 'gemini'],
+    fallbackProviders: ['claude', 'openai', 'openrouter'],
+    recommendedTier: 'balanced',
+    reason: 'Brief quotidien — fraîcheur des données + synthèse rapide'
   }
-  // budget, dividends-tracker, diversification-score, csv-import : pure local, pas de routing LLM
+  // Note : pour les autres modules pure-local (budget, dividends-tracker, csv-import,
+  // watchpoints, goals, etc.) qui n'appellent JAMAIS runAnalysis(), pas besoin de routing LLM.
+};
+
+// Config par défaut utilisée si un moduleId n'est pas trouvé dans MODULE_ROUTING.
+// Évite les crashes silencieux si on ajoute un nouveau module qui appelle runAnalysis()
+// sans penser à l'enregistrer ici (c'était le bug "Module X non configuré").
+const DEFAULT_ROUTING = {
+  needsCapabilities: [],
+  optimalProviders: ['claude', 'openai', 'gemini', 'grok', 'openrouter'],
+  fallbackProviders: ['perplexity', 'mistral', 'cerebras'],
+  recommendedTier: 'balanced',
+  reason: 'Default routing (module non listé dans MODULE_ROUTING)'
 };
 
 export class SmartRouter {
   constructor(providers) { this.providers = providers; }
 
   selectProvider(moduleId, context = {}) {
-    const config = MODULE_ROUTING[moduleId];
-    if (!config) throw new Error(`Module ${moduleId} non configuré dans le router`);
+    // Fallback défensif : si moduleId pas dans MODULE_ROUTING, utilise DEFAULT_ROUTING
+    // (avec un warn console pour qu'on s'en rende compte sans crasher l'analyse).
+    const config = MODULE_ROUTING[moduleId] || DEFAULT_ROUTING;
+    if (!MODULE_ROUTING[moduleId]) {
+      console.warn(`[router] Module "${moduleId}" non listé dans MODULE_ROUTING — fallback sur config générique. Ajoute-le pour un routing optimal.`);
+    }
 
     // 1. Override manuel — provider + (optionally) modèle exact
     if (context.forceProvider && this.providers[context.forceProvider]) {
