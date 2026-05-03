@@ -218,6 +218,9 @@ function renderPremiumTab(c) {
 }
 
 function renderDataKeysTab(c) {
+  // Liste des clés déjà enregistrées (tous les providers ayant une valeur en localStorage)
+  const presentIds = DATA_PROVIDERS.filter(p => getDataKeyStatus(p.id) === 'set').map(p => p.id);
+
   c.innerHTML = `
     <div class="card">
       <div class="card-title">✅ Active free sources (no key required)</div>
@@ -234,6 +237,7 @@ function renderDataKeysTab(c) {
         `).join('')}
       </div>
     </div>
+
     <div class="card">
       <div class="card-title">${t('settings.data.title')}</div>
       <p style="color:var(--text-secondary);font-size:13px;margin-bottom:14px;">${t('settings.data.desc')}</p>
@@ -252,33 +256,91 @@ function renderDataKeysTab(c) {
         <div id="data-test-results" style="margin-top:10px;display:none;"></div>
       </div>
 
-      ${DATA_PROVIDERS.map(p => {
-        const status = getDataKeyStatus(p.id);
-        const value = getDataKey(p.id) || '';
-        return `
-        <div class="data-key-row">
-          <div class="data-key-info">
-            <strong>${p.label}</strong>
-            <span class="data-key-desc">${p.desc}</span>
-            <span class="data-key-quota" data-quota-id="${p.id}" style="font-size:10.5px;color:var(--text-muted);margin-left:8px;"></span>
+      <!-- Liste compacte des clés déjà enregistrées -->
+      <div id="data-keys-list"></div>
+
+      <p style="color:var(--text-muted);font-size:11.5px;margin-top:12px;">
+        Pour ajouter / modifier une clé, fournis le mot de passe local actuel.
+      </p>
+
+      <details>
+        <summary style="cursor:pointer;color:var(--accent-blue);font-size:12px;margin-bottom:8px;">+ Ajouter / modifier une clé</summary>
+        <div class="field"><label class="field-label">Mot de passe local actuel</label><input id="data-keys-pwd" class="input" type="password" placeholder="Ton mot de passe vault" /></div>
+        ${DATA_PROVIDERS.map(p => {
+          const status = getDataKeyStatus(p.id);
+          return `
+          <div class="data-key-row">
+            <div class="data-key-info">
+              <strong>${p.label}</strong>
+              <span class="data-key-desc">${p.desc}</span>
+              <span class="data-key-quota" data-quota-id="${p.id}" style="font-size:10.5px;color:var(--text-muted);margin-left:8px;"></span>
+            </div>
+            <input type="password" class="input data-key-input" data-id="${p.id}" placeholder="${status === 'set' ? '••• (' + t('common.optional') + ')' : 'API key…'}" />
+            <span class="data-key-status" data-status-id="${p.id}">${status === 'set' ? '✅' : '⏳'}</span>
+            <button type="button" class="btn-secondary data-key-test" data-test-id="${p.id}" title="Tester cette clé" style="font-size:11px;padding:5px 9px;white-space:nowrap;">⚡ Test</button>
+            <a href="${p.link}" target="_blank" class="btn-ghost data-key-getlink" rel="noopener">${t('settings.data.get_key')}</a>
           </div>
-          <input type="password" class="input data-key-input" data-id="${p.id}" placeholder="${status === 'set' ? '••• (' + t('common.optional') + ')' : 'API key…'}" />
-          <span class="data-key-status" data-status-id="${p.id}">${status === 'set' ? '✅' : '⏳'}</span>
-          <button type="button" class="btn-secondary data-key-test" data-test-id="${p.id}" title="Tester cette clé" style="font-size:11px;padding:5px 9px;white-space:nowrap;">⚡ Test</button>
-          <a href="${p.link}" target="_blank" class="btn-ghost data-key-getlink" rel="noopener">${t('settings.data.get_key')}</a>
-        </div>
-        `;
-      }).join('')}
-      <button id="data-keys-save" class="btn-primary" style="margin-top:10px;">${t('common.save')}</button>
+          `;
+        }).join('')}
+        <button id="data-keys-save" class="btn-primary">${t('common.save')}</button>
+        <span id="data-keys-save-status" style="margin-left:10px;font-size:12px;"></span>
+      </details>
     </div>
   `;
-  $('#data-keys-save').addEventListener('click', () => {
+
+  // Render compact list of saved keys (mirror of LLM keys list pattern)
+  const listEl = $('#data-keys-list');
+  if (!presentIds.length) {
+    listEl.innerHTML = '<div class="alert alert-warning">Aucune clé data configurée pour l\'instant.</div>';
+  } else {
+    listEl.innerHTML = presentIds.map(id => {
+      const p = DATA_PROVIDERS.find(x => x.id === id);
+      return `
+        <div class="key-row">
+          <span style="font-size:18px;">🔑</span>
+          <span style="flex:1;">${p?.label || id} <span style="color:var(--text-muted);font-size:11px;">· ${p?.desc?.split('·')[0]?.trim() || ''}</span></span>
+          <button class="btn-ghost data-key-test" data-test-id="${id}" title="Tester cette clé">${t('common.test')}</button>
+          <button class="btn-danger" data-rm-data="${id}" aria-label="Supprimer">×</button>
+          <span class="data-key-status" data-status-id="${id}" style="margin-left:6px;font-size:12px;">✅</span>
+        </div>
+      `;
+    }).join('');
+    // Bind suppression
+    listEl.querySelectorAll('[data-rm-data]').forEach(b => b.addEventListener('click', () => {
+      const id = b.getAttribute('data-rm-data');
+      if (!confirm(`Supprimer la clé ${id} ?`)) return;
+      // Suppression : pas besoin du mot de passe (cohérent avec removeProviderKey LLM qui ne le demande pas)
+      setDataKey(id, null);
+      toast('Clé supprimée', 'success');
+      renderTab('data_keys');
+    }));
+  }
+
+  $('#data-keys-save').addEventListener('click', async () => {
+    const pwd = $('#data-keys-pwd').value;
+    const statusEl = $('#data-keys-save-status');
+    statusEl.textContent = '';
+    // Si un vault existe, on demande le mot de passe pour gater l'add/modif (cohérent avec LLM keys)
+    if (hasVault()) {
+      if (!pwd) {
+        statusEl.innerHTML = '<span style="color:var(--accent-amber);">⚠ Mot de passe requis</span>';
+        return;
+      }
+      try {
+        await unlockVault(pwd); // valide le mot de passe sans utiliser le résultat
+      } catch {
+        statusEl.innerHTML = '<span style="color:var(--accent-red);">❌ Mot de passe incorrect</span>';
+        return;
+      }
+    }
+    // Mot de passe OK (ou pas de vault) → applique les changements
+    let changed = 0;
     c.querySelectorAll('.data-key-input').forEach(inp => {
       const id = inp.getAttribute('data-id');
       const v = inp.value.trim();
-      if (v) setDataKey(id, v);
+      if (v) { setDataKey(id, v); changed++; }
     });
-    toast(t('common.save'), 'success');
+    toast(`${changed} clé(s) sauvegardée(s)`, 'success');
     setTimeout(() => renderTab('data_keys'), 400);
   });
 
