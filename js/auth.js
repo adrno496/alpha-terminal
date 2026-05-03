@@ -70,7 +70,7 @@
       const cfgRedirect = window.ALPHA_CONFIG?.AUTH_REDIRECT_URL;
       const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(window.location.hostname);
       const redirectTo = cfgRedirect
-        || (isLocalhost ? 'https://alpha-terminal.app/' : window.location.origin + '/');
+        || (isLocalhost ? 'https://alpha-terminal-sepia.vercel.app/' : window.location.origin + '/');
       const { error } = await this.client.auth.signInWithOtp({
         email: cleanEmail,
         options: { emailRedirectTo: redirectTo },
