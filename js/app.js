@@ -491,6 +491,22 @@ function boot() {
         showCloudRestoreBanner(list, navigate);
       } catch (err) { console.warn('[boot] cloud backups check failed:', err); }
     });
+
+    // CRITIQUE : check d'état au boot — couvre le cas où alpha:authChanged
+    // a été dispatché AVANT que ce listener ne soit attaché (race condition).
+    // Sans ça, un user qui clique le magic link sur un nouveau device n'aurait
+    // jamais vu la bannière de restore.
+    setTimeout(async () => {
+      try {
+        if (!window.alphaAuth) return;
+        await window.alphaAuth.ready();
+        const user = await window.alphaAuth.getUser();
+        if (!user) return;
+        const { listCloudBackups } = await import('./core/cloud-sync.js');
+        const list = await listCloudBackups();
+        if (list.length > 0) showCloudRestoreBanner(list, navigate);
+      } catch (err) { console.warn('[boot] cloud auto-check failed:', err); }
+    }, 1500); // léger délai pour laisser auth.js + supabase sdk init
   }
 
   // Banner "Backups cloud disponibles" — affiché en haut de l'app après login.
