@@ -7,7 +7,9 @@ import { openWithMinVersion } from './db-open.js';
 
 const DB_NAME = 'alpha-autobackup';
 const STORE = 'snapshots';
-const DB_VERSION = 1;
+// v2 (2026-05) : bump pour forcer la création du store sur les DBs créées en v1
+// sans store (cas d'un upgrade interrompu ou d'un browser qui a sauté l'upgrade).
+const DB_VERSION = 2;
 const KEEP_LAST_N = 7;
 const INTERVAL_MS = 24 * 60 * 60 * 1000; // 24h
 const LAST_RUN_KEY = 'alpha-terminal:auto-backup-last-run';

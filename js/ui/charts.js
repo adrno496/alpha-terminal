@@ -17,8 +17,8 @@ async function ensureChart() {
   Chart.defaults.font.size = 11;
 }
 
-export function pieAllocation(canvas, items) {
-  ensureChart();
+export async function pieAllocation(canvas, items) {
+  await ensureChart();
   return new Chart(canvas, {
     type: 'doughnut',
     data: {
@@ -50,8 +50,8 @@ export function pieAllocation(canvas, items) {
 }
 
 // Gauge sentiment (0-100)
-export function gaugeSentiment(canvas, score) {
-  ensureChart();
+export async function gaugeSentiment(canvas, score) {
+  await ensureChart();
   const color = score < 25 ? '#ff3355' : score < 45 ? '#ffaa00' : score < 55 ? '#888' : score < 75 ? '#88ee66' : '#00ff88';
   return new Chart(canvas, {
     type: 'doughnut',
@@ -75,8 +75,8 @@ export function gaugeSentiment(canvas, score) {
 }
 
 // Wealth evolution — line chart (total + lignes par catégorie)
-export function wealthEvolution(canvas, snapshots, { categories = null } = {}) {
-  ensureChart();
+export async function wealthEvolution(canvas, snapshots, { categories = null } = {}) {
+  await ensureChart();
   if (!snapshots || !snapshots.length) return null;
   const labels = snapshots.map(s => new Date(s.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }));
   const totalData = snapshots.map(s => s.total);
@@ -143,8 +143,8 @@ export function wealthEvolution(canvas, snapshots, { categories = null } = {}) {
 }
 
 // Simulation 100 trades Kelly (lignes Full / Half / Quarter)
-export function kellySimulation(canvas, { winrate, R, capital, kelly, runs = 100 }) {
-  ensureChart();
+export async function kellySimulation(canvas, { winrate, R, capital, kelly, runs = 100 }) {
+  await ensureChart();
   const fractions = [
     { label: 'Full Kelly',    f: kelly,        color: '#ff3355' },
     { label: 'Half Kelly',    f: kelly / 2,    color: '#00ff88' },
@@ -198,8 +198,8 @@ export function kellySimulation(canvas, { winrate, R, capital, kelly, runs = 100
 
 // Calendrier mensuel des dividendes (bar chart 12 mois).
 //   monthlyTotals : tableau de 12 nombres (€) jan..dec
-export function dividendCalendar(canvas, monthlyTotals) {
-  ensureChart();
+export async function dividendCalendar(canvas, monthlyTotals) {
+  await ensureChart();
   const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
   return new Chart(canvas, {
     type: 'bar',
@@ -238,8 +238,8 @@ export function dividendCalendar(canvas, monthlyTotals) {
 }
 
 // Gauge score de diversification (0-100). Identique pattern à gaugeSentiment mais palette différente.
-export function diversificationGauge(canvas, score) {
-  ensureChart();
+export async function diversificationGauge(canvas, score) {
+  await ensureChart();
   const color = score < 30 ? '#ff3355' : score < 50 ? '#ffaa00' : score < 70 ? '#88ee66' : '#00ff88';
   return new Chart(canvas, {
     type: 'doughnut',
@@ -264,8 +264,8 @@ export function diversificationGauge(canvas, score) {
 
 // Budget : bar empilé revenus → dépenses fixes / variables / épargne
 //   data : { revenus, fixes, variables, epargne }
-export function budgetWaterfall(canvas, data) {
-  ensureChart();
+export async function budgetWaterfall(canvas, data) {
+  await ensureChart();
   return new Chart(canvas, {
     type: 'bar',
     data: {
@@ -294,8 +294,8 @@ export function budgetWaterfall(canvas, data) {
 
 // Impact frais composé sur 10/20/30 ans
 //   scenarios : [{ label, points: [{years, value}] }, ...]
-export function feesImpact10y20y30y(canvas, scenarios) {
-  ensureChart();
+export async function feesImpact10y20y30y(canvas, scenarios) {
+  await ensureChart();
   return new Chart(canvas, {
     type: 'line',
     data: {

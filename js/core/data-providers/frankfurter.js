@@ -2,7 +2,8 @@
 // 100% gratuit, no key, illimité. CORS-enabled.
 // Doc : https://www.frankfurter.app/docs/
 
-const BASE = 'https://api.frankfurter.dev';
+// Note 2025 : .dev a été retiré, .app est le domaine officiel actuel.
+const BASE = 'https://api.frankfurter.app';
 
 const cache = new Map();
 function memo(key, ttl, fn) {

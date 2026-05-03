@@ -260,17 +260,22 @@ export async function getTotals(targetCurrency = 'EUR') {
   // Récupère taux pour toutes les devises présentes
   const currencies = [...new Set(list.map(h => h.currency || 'EUR'))];
   const ratesByPair = {};
-  // Frankfurter : on demande latest base = target → rates pour autres
-  try {
-    const r = await fxLatest(targetCurrency, currencies.filter(c => c !== targetCurrency));
-    // Note : r.rates[X] = combien de X pour 1 target. Pour convertir X → target : value / rate
-    for (const c of currencies) {
-      if (c === targetCurrency) ratesByPair[c] = 1;
-      else if (r.rates && r.rates[c]) ratesByPair[c] = 1 / r.rates[c]; // X → target
-      else ratesByPair[c] = 1; // fallback : pas de conversion
-    }
-  } catch {
+  // Si toutes les holdings sont dans la devise cible, pas besoin d'appel Frankfurter (économise 1 req).
+  const foreignCurrencies = currencies.filter(c => c !== targetCurrency);
+  if (foreignCurrencies.length === 0) {
     for (const c of currencies) ratesByPair[c] = 1;
+  } else {
+    try {
+      const r = await fxLatest(targetCurrency, foreignCurrencies);
+      // Note : r.rates[X] = combien de X pour 1 target. Pour convertir X → target : value / rate
+      for (const c of currencies) {
+        if (c === targetCurrency) ratesByPair[c] = 1;
+        else if (r.rates && r.rates[c]) ratesByPair[c] = 1 / r.rates[c];
+        else ratesByPair[c] = 1;
+      }
+    } catch {
+      for (const c of currencies) ratesByPair[c] = 1;
+    }
   }
 
   // Pour l'immobilier : la contribution au patrimoine = ÉQUITÉ (currentValue - reste à payer),
