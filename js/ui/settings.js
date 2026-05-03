@@ -1334,13 +1334,24 @@ async function renderCloudSyncTab(c) {
         Ni Alpha ni Supabase ne peuvent les lire — la passphrase reste sur ton appareil.
       </p>
 
-      ${!enabled ? `
+      ${user ? `
+        <!-- Cas spécial : connecté mais sync pas encore activée localement (ex: nouveau device après magic link).
+             On affiche directement la liste des backups distants pour qu'il puisse restaurer immédiatement. -->
+        ${!enabled ? `
+          <div style="background:rgba(80,180,255,0.10);border-left:3px solid #5ab8ff;padding:12px 14px;border-radius:4px;margin-bottom:14px;font-size:13px;line-height:1.6;">
+            👋 Connecté en tant que <strong>${escape(user.email || '?')}</strong> — tu peux <strong>restaurer un backup</strong> ci-dessous, ou activer la sync sur ce device pour push automatique.
+          </div>
+          <button id="cs-activate" class="btn-primary" style="margin-bottom:14px;">✅ Activer la sync sur ce device</button>
+        ` : ''}
+      ` : ''}
+
+      ${!enabled && !user ? `
         <div style="background:rgba(80,180,255,0.06);border-left:3px solid #5ab8ff;padding:12px 14px;border-radius:4px;margin-bottom:16px;font-size:13px;line-height:1.6;">
           ⚠️ Cette feature est <strong>OPTIONNELLE</strong>. Tes données restent 100% locales par défaut.<br>
           Si tu actives la sync, les backups sont chiffrés AVANT upload — Alpha et Supabase ne peuvent jamais les lire.
         </div>
         <button id="cs-activate" class="btn-primary">✅ Activer la sync cloud</button>
-      ` : `
+      ` : enabled || user ? `
         <div style="background:var(--bg-tertiary);padding:12px 14px;border-radius:6px;margin-bottom:14px;">
           <div style="font-size:13px;margin-bottom:6px;">
             État : <span style="color:var(--accent-green);font-weight:600;">🟢 Actif</span>
@@ -1372,11 +1383,12 @@ async function renderCloudSyncTab(c) {
           <div id="cs-backup-list" style="font-size:12.5px;">⏳ Chargement…</div>
         `}
 
+        ${enabled ? `
         <div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--border);">
           <button id="cs-disable" class="btn-ghost" style="font-size:12px;color:var(--accent-amber);">🔇 Désactiver la sync cloud</button>
           <span style="font-size:11px;color:var(--text-muted);margin-left:8px;">(les backups distants restent stockés mais plus rien n'est uploadé)</span>
-        </div>
-      `}
+        </div>` : ''}
+      ` : ''}
     </div>
   `;
 

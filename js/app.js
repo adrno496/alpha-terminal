@@ -479,6 +479,46 @@ function boot() {
     window.addEventListener('alpha:premiumChanged', () => {
       try { renderSidebar(navigate); } catch {}
     });
+
+    // Cloud sync : quand le user vient de se connecter via magic link, on check
+    // s'il a des backups distants → propose de restaurer en banner.
+    window.addEventListener('alpha:authChanged', async (e) => {
+      if (!e?.detail?.user) return; // logout ou état initial
+      try {
+        const { listCloudBackups } = await import('./core/cloud-sync.js');
+        const list = await listCloudBackups();
+        if (!list.length) return;
+        showCloudRestoreBanner(list, navigate);
+      } catch (err) { console.warn('[boot] cloud backups check failed:', err); }
+    });
+  }
+
+  // Banner "Backups cloud disponibles" — affiché en haut de l'app après login.
+  // Permet à un user qui vient de se connecter sur un nouveau device de restaurer en 1 clic.
+  function showCloudRestoreBanner(backups, navigateFn) {
+    if (document.getElementById('cloud-restore-banner')) return; // déjà affiché
+    const banner = document.createElement('div');
+    banner.id = 'cloud-restore-banner';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;background:linear-gradient(90deg,#0066cc,#0088ee);color:#fff;padding:12px 16px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;';
+    const latest = backups[0];
+    const date = new Date(latest.created_at).toLocaleString('fr-FR');
+    const sizeKb = (latest.payload_size / 1024).toFixed(0);
+    banner.innerHTML = `
+      <span>☁️ <strong>${backups.length} backup${backups.length>1?'s':''} cloud disponible${backups.length>1?'s':''}</strong> — dernier : ${latest.device_label || 'Device'} · ${date} · ${sizeKb} Ko</span>
+      <button id="cloud-restore-go" style="background:#fff;color:#0066cc;border:0;padding:5px 12px;border-radius:4px;font-weight:600;cursor:pointer;font-size:13px;">↩ Restaurer maintenant</button>
+      <button id="cloud-restore-dismiss" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.5);padding:5px 10px;border-radius:4px;cursor:pointer;font-size:12px;" aria-label="Fermer">×</button>
+    `;
+    document.body.appendChild(banner);
+    banner.querySelector('#cloud-restore-go').addEventListener('click', () => {
+      banner.remove();
+      navigateFn('settings');
+      // Force le tab cloud_sync au prochain render
+      setTimeout(() => {
+        const tabBtn = document.querySelector('.tab[data-tab="cloud_sync"]');
+        if (tabBtn) tabBtn.click();
+      }, 200);
+    });
+    banner.querySelector('#cloud-restore-dismiss').addEventListener('click', () => banner.remove());
   }
   onCostChange(refreshCostBadge);
   refreshApiStatus();
