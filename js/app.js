@@ -419,7 +419,7 @@ function startLockFlow() {
 // Compare APP_VERSION (hardcodé ci-dessous, à bumper à chaque release) avec la valeur
 // stockée dans localStorage. Si différentes → vide tous les caches SW + reload.
 // Évite que les users restent bloqués sur une vieille version cachée.
-const APP_VERSION = 'v79-2026-05-04';
+const APP_VERSION = 'v80-2026-05-04';
 const APP_VERSION_KEY = 'alpha-terminal:app-version';
 (async function killOldCache() {
   try {

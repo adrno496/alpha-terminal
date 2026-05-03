@@ -1,7 +1,7 @@
 // F3 — Score de diversification 0-100 : algo local pur (HHI + secteurs + géo + classes)
 import { $, toast } from '../core/utils.js';
 import { listWealth, WEALTH_CATEGORIES, getEffectiveValue } from '../core/wealth.js';
-import { moduleHeader, runAnalysis } from './_shared.js';
+import { moduleHeader, runAnalysis, wireProviderSelector } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { diversificationGauge } from '../ui/charts.js';
 
@@ -212,6 +212,9 @@ export function renderDiversificationScoreView(viewEl) {
     </div>
   `;
 
+  // Wire le sélecteur provider/modèle dans le header (comme tous les autres modules LLM)
+  wireProviderSelector(viewEl, MODULE_ID);
+
   // Example loader
   const ex = viewEl.querySelector('[data-example]');
   if (ex) ex.addEventListener('click', () => renderScore(viewEl, exampleHoldings()));
@@ -322,7 +325,13 @@ function renderScore(viewEl, holdings) {
         .sort((a, b) => b[1] - a[1])
         .map(([g, v]) => `  - ${g} : ${(v / totalValue * 100).toFixed(1)}%`).join('\n');
 
-      const prompt = isEN ? `My diversification score is ${result.total}/100.
+      // System prompt : rôle du LLM + ton attendu
+      const systemPrompt = isEN
+        ? `You are a portfolio diversification expert. Analyze the user's portfolio and provide actionable recommendations to improve their diversification score. Be specific, use real ETF tickers, and base everything on their ACTUAL holdings (not generic advice). Structure your response with clear sections.`
+        : `Tu es un expert en diversification de portefeuille. Analyse le portefeuille de l'utilisateur et fournis des recommandations actionnables pour améliorer son score de diversification. Sois spécifique, utilise des tickers d'ETF réels, et base tout sur ses holdings RÉELS (pas de conseils génériques). Structure ta réponse en sections claires.`;
+
+      // User message : les données concrètes du portefeuille + ce qu'on demande
+      const userMessage = isEN ? `My diversification score is ${result.total}/100.
 
 Breakdown:
 - Concentration: ${result.breakdown.concentration}/40
@@ -344,9 +353,7 @@ Please provide:
 2. 5-7 SPECIFIC, ACTIONABLE recommendations to improve my score, ordered by impact
 3. Concrete examples of ETFs/assets I could add (with tickers)
 4. Risks of my current allocation
-5. Target allocation for a balanced portfolio at my profile
-
-Be specific to MY actual holdings, not generic advice.` : `Mon score de diversification est ${result.total}/100.
+5. Target allocation for a balanced portfolio at my profile` : `Mon score de diversification est ${result.total}/100.
 
 Détail :
 - Concentration : ${result.breakdown.concentration}/40
@@ -368,12 +375,15 @@ Donne-moi :
 2. 5-7 recommandations CONCRÈTES et ACTIONNABLES pour améliorer mon score, ordonnées par impact
 3. Exemples concrets d'ETFs/actifs à ajouter (avec tickers réels)
 4. Risques de mon allocation actuelle
-5. Allocation cible pour un portefeuille équilibré à mon profil
-
-Sois spécifique à MES holdings réels, pas des conseils génériques.`;
+5. Allocation cible pour un portefeuille équilibré à mon profil`;
 
       try {
-        await runAnalysis(MODULE_ID, { prompt, score: result.total, breakdown: result.breakdown }, resultEl, {
+        await runAnalysis(MODULE_ID, {
+          system: systemPrompt,
+          messages: [{ role: 'user', content: userMessage }],
+          maxTokens: 3000,
+          recordInput: { score: result.total, breakdown: result.breakdown, totalValue }
+        }, resultEl, {
           onTitle: () => `Score Diversification ${result.total}/100`
         });
       } catch (e) {
