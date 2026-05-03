@@ -1,7 +1,7 @@
 // F3 — Score de diversification 0-100 : algo local pur (HHI + secteurs + géo + classes)
-import { $ } from '../core/utils.js';
+import { $, toast } from '../core/utils.js';
 import { listWealth, WEALTH_CATEGORIES, getEffectiveValue } from '../core/wealth.js';
-import { moduleHeader } from './_shared.js';
+import { moduleHeader, runAnalysis } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { diversificationGauge } from '../ui/charts.js';
 
@@ -266,6 +266,16 @@ function renderScore(viewEl, holdings) {
       <ol style="margin:0;padding-left:20px;line-height:1.9;">${result.recommendations.map(r => `<li>${r}</li>`).join('')}</ol>
     </div>` : ''}
 
+    ${holdings.length > 0 ? `
+    <div class="card" style="background:linear-gradient(135deg,rgba(0,255,136,0.06),rgba(80,180,255,0.06));border-left:3px solid var(--accent-green);">
+      <div class="card-title">🔬 ${isEN ? 'In-depth AI analysis' : 'Analyse IA approfondie'}</div>
+      <p style="font-size:13px;color:var(--text-secondary);margin:0 0 12px;line-height:1.6;">
+        ${isEN ? 'Get a personalized analysis of your portfolio diversification with actionable steps to improve your score, based on your actual holdings.' : 'Obtiens une analyse personnalisée de la diversification de ton portefeuille avec des étapes concrètes pour améliorer ton score, basée sur tes holdings réels.'}
+      </p>
+      <button id="div-analyze-ai" class="btn-primary">🔬 ${isEN ? 'Analyze with AI' : 'Analyser avec IA'}</button>
+      <div id="div-ai-result" style="margin-top:14px;"></div>
+    </div>` : ''}
+
     ${result.stats.totalValue ? `
     <div class="card">
       <div class="card-title">📊 ${isEN ? 'Breakdown' : 'Répartition'}</div>
@@ -286,6 +296,90 @@ function renderScore(viewEl, holdings) {
   const gaugeCanvas = document.getElementById('div-gauge');
   if (gaugeCanvas) {
     try { diversificationGauge(gaugeCanvas, result.total); } catch (e) { console.warn('Chart not loaded:', e); }
+  }
+
+  // Bouton "Analyser avec IA" — analyse LLM contextuelle basée sur les holdings + score
+  const aiBtn = document.getElementById('div-analyze-ai');
+  if (aiBtn) {
+    aiBtn.addEventListener('click', async () => {
+      const isEN = getLocale() === 'en';
+      const resultEl = document.getElementById('div-ai-result');
+      if (!resultEl) return;
+
+      // Construit un payload texte structuré du portefeuille pour le LLM
+      const sortedHoldings = holdings.slice()
+        .map(h => ({ ...h, _ev: getEffectiveValue(h) }))
+        .sort((a, b) => b._ev - a._ev);
+      const totalValue = sortedHoldings.reduce((s, h) => s + h._ev, 0);
+      const holdingsList = sortedHoldings.map(h =>
+        `- ${h.name || h.ticker || 'Sans nom'} (${h.category}) : ${Math.round(h._ev).toLocaleString('fr-FR')} ${h.currency || 'EUR'} (${(h._ev / totalValue * 100).toFixed(1)}%)`
+      ).join('\n');
+
+      const sectorsBreakdown = Object.entries(result.stats.bySector || {})
+        .sort((a, b) => b[1] - a[1])
+        .map(([s, v]) => `  - ${s} : ${(v / totalValue * 100).toFixed(1)}%`).join('\n');
+      const geoBreakdown = Object.entries(result.stats.byGeo || {})
+        .sort((a, b) => b[1] - a[1])
+        .map(([g, v]) => `  - ${g} : ${(v / totalValue * 100).toFixed(1)}%`).join('\n');
+
+      const prompt = isEN ? `My diversification score is ${result.total}/100.
+
+Breakdown:
+- Concentration: ${result.breakdown.concentration}/40
+- Sectors: ${result.breakdown.sectors}/20
+- Geography: ${result.breakdown.geography}/20
+- Asset classes: ${result.breakdown.assetClasses}/20
+
+My holdings (sorted by net value, total ${Math.round(totalValue).toLocaleString('en-US')} €):
+${holdingsList}
+
+By sector:
+${sectorsBreakdown}
+
+By geography:
+${geoBreakdown}
+
+Please provide:
+1. Detailed diagnosis of WHY my score is what it is (strengths and weaknesses)
+2. 5-7 SPECIFIC, ACTIONABLE recommendations to improve my score, ordered by impact
+3. Concrete examples of ETFs/assets I could add (with tickers)
+4. Risks of my current allocation
+5. Target allocation for a balanced portfolio at my profile
+
+Be specific to MY actual holdings, not generic advice.` : `Mon score de diversification est ${result.total}/100.
+
+Détail :
+- Concentration : ${result.breakdown.concentration}/40
+- Secteurs : ${result.breakdown.sectors}/20
+- Géographie : ${result.breakdown.geography}/20
+- Classes d'actifs : ${result.breakdown.assetClasses}/20
+
+Mes holdings (triés par valeur nette, total ${Math.round(totalValue).toLocaleString('fr-FR')} €) :
+${holdingsList}
+
+Par secteur :
+${sectorsBreakdown}
+
+Par géographie :
+${geoBreakdown}
+
+Donne-moi :
+1. Diagnostic DÉTAILLÉ du POURQUOI mon score est à ce niveau (forces et faiblesses)
+2. 5-7 recommandations CONCRÈTES et ACTIONNABLES pour améliorer mon score, ordonnées par impact
+3. Exemples concrets d'ETFs/actifs à ajouter (avec tickers réels)
+4. Risques de mon allocation actuelle
+5. Allocation cible pour un portefeuille équilibré à mon profil
+
+Sois spécifique à MES holdings réels, pas des conseils génériques.`;
+
+      try {
+        await runAnalysis(MODULE_ID, { prompt, score: result.total, breakdown: result.breakdown }, resultEl, {
+          onTitle: () => `Score Diversification ${result.total}/100`
+        });
+      } catch (e) {
+        toast('Analyse IA : ' + (e?.message || 'erreur'), 'error');
+      }
+    });
   }
 }
 
