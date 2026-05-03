@@ -1,6 +1,6 @@
 // F6 — Méthode patrimoniale : rules engine FR + checklist + deep-dive LLM
 import { $, toast } from '../core/utils.js';
-import { listWealth } from '../core/wealth.js';
+import { listWealth, getEffectiveValue } from '../core/wealth.js';
 import { moduleHeader, runAnalysis, wireProviderSelector } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { SYSTEM_WEALTH_METHOD, SYSTEM_WEALTH_METHOD_EN } from '../prompts/wealth-method.js';
@@ -74,7 +74,7 @@ export function buildContext(holdings) {
 
   if (!holdings || holdings.length === 0) return ctx;
 
-  const totalValue = holdings.reduce((s, h) => s + (Number(h.value) || 0), 0);
+  const totalValue = holdings.reduce((s, h) => s + getEffectiveValue(h), 0);
   ctx.total_wealth = totalValue;
   if (totalValue === 0) return ctx;
 

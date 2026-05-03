@@ -4,6 +4,36 @@
 import { uuid } from './utils.js';
 import { openWithMinVersion } from './db-open.js';
 
+// === Helper : valeur "effective" pour les analyses ===
+// Pour les biens immobiliers AVEC prêt → équité (valeur - reste à payer).
+// Pour tout le reste (cash, actions, crypto, RE sans prêt) → h.value direct.
+// Utilisé par diversification-score, correlation-matrix, performance-attribution,
+// wealth-method, etc. — pour que les pondérations reflètent le VRAI net worth de l'user
+// et pas un montant gonflé par un prêt non remboursé.
+export function getEffectiveValue(h) {
+  if (!h) return 0;
+  if (h.category === 'real_estate' && (h.loanAmount > 0 || (h.loans && h.loans.length > 0))) {
+    try {
+      // Lazy import via eval pour éviter cycle d'imports (real-estate.js peut importer wealth.js)
+      // En pratique : on récupère la fonction depuis le module global cache après 1er load.
+      const re = (typeof window !== 'undefined' && window.__alphaRealEstate) || null;
+      if (re?.computeRealEstateMetrics) {
+        const m = re.computeRealEstateMetrics(h);
+        return Math.max(0, m.equity || 0);
+      }
+    } catch {}
+    // Fallback : valeur brute si import dispo plus tard
+    return Number(h.value) || 0;
+  }
+  return Number(h.value) || 0;
+}
+
+// Pré-charge real-estate.js dans un cache global pour éviter le cycle d'imports
+// (appelé au boot par n'importe quel module qui importe wealth.js).
+if (typeof window !== 'undefined' && !window.__alphaRealEstate) {
+  import('./real-estate.js').then(re => { window.__alphaRealEstate = re; }).catch(() => {});
+}
+
 const DB_NAME = 'alpha-terminal';
 const STORE = 'wealth';
 

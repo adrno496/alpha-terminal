@@ -1,5 +1,5 @@
 // Asset Correlation Matrix — corrélations approchées par classe d'actifs / secteur sur historique typique
-import { listWealth } from '../core/wealth.js';
+import { listWealth, getEffectiveValue } from '../core/wealth.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 
@@ -49,8 +49,9 @@ export async function renderCorrelationMatrixView(viewEl) {
   let total = 0;
   for (const h of wealth) {
     const c = holdingClass(h);
-    byClass[c] = (byClass[c] || 0) + (h.value || 0);
-    total += h.value || 0;
+    const v = getEffectiveValue(h);
+    byClass[c] = (byClass[c] || 0) + v;
+    total += v;
   }
   const classes = Object.keys(byClass).filter(c => byClass[c] > 0);
   // Average portfolio correlation (weighted)

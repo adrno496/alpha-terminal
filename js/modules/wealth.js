@@ -510,6 +510,7 @@ async function openEditor(id) {
           </div>
           <div class="field-row">
             <div class="field"><label class="field-label" title="Date de la première mensualité — sert à calculer chaque mois ce qui te reste à payer et donc ton équité nette en temps réel.">📅 1er prélèvement <span style="color:var(--accent-green);font-size:10px;">↻ auto</span></label><input class="input loan-start" data-idx="${idx}" type="date" value="${l.startDate || ''}" /></div>
+            <div class="field"><label class="field-label" title="Si la mensualité réelle de ton relevé bancaire ne correspond pas au calcul auto (cas des prêts à mensualité paliée, prêt employeur spécial, etc.), saisis ici la VRAIE mensualité que tu paies. Vide = calcul auto depuis montant + taux + durée.">💸 Mensualité réelle (€) <span style="color:var(--text-muted);font-size:10px;">override</span></label><input class="input loan-monthly-override" data-idx="${idx}" type="number" step="0.01" min="0" value="${l.monthlyOverride || ''}" placeholder="Auto" /></div>
             ${showDeferral ? `<div class="field"><label class="field-label">Différé (mois)</label><input class="input loan-deferral" data-idx="${idx}" type="number" min="0" value="${l.deferralMonths || ''}" /></div>` : ''}
             ${showAmortMonths ? `<div class="field"><label class="field-label">Amortissement théorique (mois)</label><input class="input loan-amort-months" data-idx="${idx}" type="number" min="12" value="${l.amortizationMonths || 360}" /></div>` : ''}
             ${showFixedPeriod ? `<div class="field"><label class="field-label">Période fixe initiale (mois)</label><input class="input loan-fixed-period" data-idx="${idx}" type="number" min="12" value="${l.fixedPeriodMonths || 60}" /></div>` : ''}
@@ -549,6 +550,7 @@ async function openEditor(id) {
     container.querySelectorAll('.loan-rate').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'rate', (parseFloat(el.value) || 0) / 100); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-years').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'durationMonths', (parseInt(el.value, 10) || 0) * 12); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-start').forEach(el => el.addEventListener('change', () => { updateLoanField(+el.dataset.idx, 'startDate', el.value || null); updateRealEstatePreview(); }));
+    container.querySelectorAll('.loan-monthly-override').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'monthlyOverride', parseFloat(el.value) || 0); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-deferral').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'deferralMonths', parseInt(el.value, 10) || 0); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-amort-months').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'amortizationMonths', parseInt(el.value, 10) || 360); updateRealEstatePreview(); }));
     container.querySelectorAll('.loan-fixed-period').forEach(el => el.addEventListener('input', () => { updateLoanField(+el.dataset.idx, 'fixedPeriodMonths', parseInt(el.value, 10) || 60); updateRealEstatePreview(); }));
@@ -651,12 +653,25 @@ async function openEditor(id) {
     m.loans.forEach(({ loan, metrics }, idx) => {
       const miniEl = document.querySelector(`.loan-mini-preview[data-idx="${idx}"]`);
       if (!miniEl) return;
-      if (metrics.monthly === 0 && metrics.remaining === 0) {
+      if (metrics.monthlyTheoretical === 0 && metrics.remaining === 0) {
         miniEl.innerHTML = `<span style="color:var(--text-muted);">Saisis montant + taux + durée + 1er prélèvement pour calculer.</span>`;
         return;
       }
+      // Cas spécial : prêt futur (date de prélèvement pas encore atteinte)
+      if (metrics.isFuture) {
+        miniEl.innerHTML = `
+          <span style="color:var(--accent-amber);">⏳ Prêt futur (démarre ${loan.startDate ? new Date(loan.startDate).toLocaleDateString('fr-FR') : '?'})</span>
+          · 💸 mensualité contractuelle <strong>${fmt(metrics.monthlyTheoretical)} €/mois</strong>
+          · 📉 capital engagé <strong>${fmt(metrics.remaining)} €</strong>
+          <span style="color:var(--text-muted);"> · pas encore actif → 0 €/mois aujourd'hui</span>
+        `;
+        return;
+      }
+      const overrideBadge = metrics.monthlyOverride
+        ? ` <span style="background:rgba(80,180,255,0.15);color:#5ab8ff;font-size:9.5px;padding:1px 5px;border-radius:3px;font-weight:600;" title="Mensualité saisie manuellement (override) — ${fmt(metrics.monthlyTheoretical)} €/mois calculée par formule">override</span>`
+        : '';
       miniEl.innerHTML = `
-        💸 <strong>${fmt(metrics.monthly)} €/mois</strong>
+        💸 <strong>${fmt(metrics.monthly)} €/mois</strong>${overrideBadge}
         · 📉 reste à payer <strong style="color:var(--accent-orange);">${fmt(metrics.remaining)} €</strong>
         · 📅 ${fmtMonths(metrics.monthsElapsed)} écoulés / ${fmtMonths((loan.durationMonths || 0))} (${metrics.progressPct.toFixed(0)}%)
         · ✅ remboursé ${fmt(metrics.principalRepaid)} €

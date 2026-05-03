@@ -1,6 +1,6 @@
 // F3 — Score de diversification 0-100 : algo local pur (HHI + secteurs + géo + classes)
 import { $ } from '../core/utils.js';
-import { listWealth, WEALTH_CATEGORIES } from '../core/wealth.js';
+import { listWealth, WEALTH_CATEGORIES, getEffectiveValue } from '../core/wealth.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 import { diversificationGauge } from '../ui/charts.js';
@@ -78,7 +78,7 @@ export function computeDiversificationScore(holdings) {
     };
   }
 
-  const totalValue = holdings.reduce((s, h) => s + (Number(h.value) || 0), 0);
+  const totalValue = holdings.reduce((s, h) => s + getEffectiveValue(h), 0);
   if (totalValue === 0) {
     return {
       total: 0,
@@ -90,7 +90,7 @@ export function computeDiversificationScore(holdings) {
     };
   }
 
-  const weights = holdings.map(h => (Number(h.value) || 0) / totalValue);
+  const weights = holdings.map(h => getEffectiveValue(h) / totalValue);
 
   // 1. CONCENTRATION (40 pts) — HHI + max position
   const hhi = weights.reduce((s, w) => s + w * w, 0); // 0..1
@@ -104,7 +104,7 @@ export function computeDiversificationScore(holdings) {
   const bySector = {};
   for (const h of holdings) {
     const s = inferSector(h);
-    bySector[s] = (bySector[s] || 0) + (Number(h.value) || 0);
+    bySector[s] = (bySector[s] || 0) + getEffectiveValue(h);
   }
   const sectorWeights = Object.values(bySector).map(v => v / totalValue);
   const maxSector = sectorWeights.length ? Math.max(...sectorWeights) : 1;
@@ -119,7 +119,7 @@ export function computeDiversificationScore(holdings) {
   const byGeo = {};
   for (const h of holdings) {
     const g = inferGeography(h);
-    byGeo[g] = (byGeo[g] || 0) + (Number(h.value) || 0);
+    byGeo[g] = (byGeo[g] || 0) + getEffectiveValue(h);
   }
   const numRegions = Object.keys(byGeo).length;
   const geoWeights = Object.values(byGeo).map(v => v / totalValue);
@@ -134,7 +134,7 @@ export function computeDiversificationScore(holdings) {
   const byClass = {};
   for (const h of holdings) {
     const c = CATEGORY_TO_CLASS[h.category] || 'other';
-    byClass[c] = (byClass[c] || 0) + (Number(h.value) || 0);
+    byClass[c] = (byClass[c] || 0) + getEffectiveValue(h);
   }
   const classKeys = Object.keys(byClass);
   const numClasses = classKeys.length;

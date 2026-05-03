@@ -1,6 +1,6 @@
 // Portfolio Performance Attribution — décompose la perf en : allocation, sélection, devise
 // Brinson model simplifié (allocation + selection effects)
-import { listWealth } from '../core/wealth.js';
+import { listWealth, getEffectiveValue } from '../core/wealth.js';
 import { moduleHeader } from './_shared.js';
 import { t, getLocale } from '../core/i18n.js';
 
@@ -52,9 +52,10 @@ export async function renderPerformanceAttributionView(viewEl) {
   for (const h of wealth) {
     const s = inferSector(h);
     if (!bySector[s]) bySector[s] = { value: 0, cost: 0 };
-    bySector[s].value += h.value || 0;
-    bySector[s].cost += (h.purchasePrice || 0) * (h.quantity || 0) || (h.value || 0);
-    total += h.value || 0;
+    const ev = getEffectiveValue(h);
+    bySector[s].value += ev;
+    bySector[s].cost += (h.purchasePrice || 0) * (h.quantity || 0) || ev;
+    total += ev;
   }
 
   // Compute portfolio return per sector vs benchmark

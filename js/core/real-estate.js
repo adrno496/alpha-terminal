@@ -319,9 +319,33 @@ export function computeLoanMetrics(loan) {
     }
   }
 
+  // Override manuel : si le user a saisi une mensualité réelle, on la prend en priorité.
+  // (Cas réel : prêt avec mensualité paliée non standard, prêt employeur avec calcul spécial, etc.)
+  const monthlyOverride = Number(loan.monthlyOverride) || 0;
+  if (monthlyOverride > 0) {
+    monthly = monthlyOverride;
+  }
+
+  // Détecte si le prêt n'a pas encore commencé (date de 1er prélèvement dans le futur)
+  // → la mensualité ACTIVE est 0, mais le capital restant reste plein (engagement contractuel).
+  // Cas typique : prêt à démarrage différé (ex: prêt employeur avec déblocage en 2033).
+  const isFuture = (() => {
+    if (!loan.startDate) return false;
+    const start = new Date(loan.startDate);
+    if (isNaN(start.getTime())) return false;
+    return start.getTime() > Date.now();
+  })();
+  // Détecte si le prêt est entièrement remboursé
+  const isPaidOff = elapsed >= totalMonths && totalMonths > 0;
+
   return {
     type,
-    monthly: Math.max(0, monthly),
+    // monthly = ce que tu payes RÉELLEMENT ce mois-ci (0 si pas encore commencé ou soldé)
+    monthly: isFuture || isPaidOff ? 0 : Math.max(0, monthly),
+    monthlyTheoretical: Math.max(0, monthly), // pour affichage info
+    monthlyOverride: monthlyOverride > 0 ? monthlyOverride : null,
+    isFuture,
+    isPaidOff,
     monthsElapsed: elapsed,
     monthsRemaining: Math.max(0, totalMonths - elapsed),
     remaining: Math.max(0, remaining),
