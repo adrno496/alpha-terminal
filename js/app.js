@@ -418,10 +418,31 @@ function startLockFlow() {
 function boot() {
   renderSidebar(navigate);
 
-  document.querySelectorAll('.sidebar-bottom .sidebar-link').forEach(b => {
+  document.querySelectorAll('.sidebar-bottom .sidebar-link[data-route]').forEach(b => {
     b.addEventListener('click', () => navigate(b.getAttribute('data-route')));
   });
   document.querySelector('.sidebar-logo')?.addEventListener('click', () => navigate('home'));
+
+  // Bouton "Hard refresh" — vide tous les caches SW et reload la page
+  const hardRefreshBtn = document.getElementById('sidebar-hard-refresh');
+  if (hardRefreshBtn) {
+    hardRefreshBtn.addEventListener('click', async () => {
+      const original = hardRefreshBtn.innerHTML;
+      hardRefreshBtn.disabled = true;
+      hardRefreshBtn.innerHTML = '<span class="dot">⏳</span> Vidage cache…';
+      try {
+        if ('caches' in window) {
+          const keys = await caches.keys();
+          await Promise.all(keys.map(k => caches.delete(k)));
+        }
+      } catch (e) { console.warn('[hard-refresh] cache clear failed:', e); }
+      try {
+        const reg = await navigator.serviceWorker?.getRegistration();
+        if (reg?.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      } catch {}
+      location.reload();
+    });
+  }
 
   // === Price alerts : boot check (1h throttle) + badge sidebar ===
   // Lance en background : ne bloque pas le boot. Fire l'event si nouvelles alertes triggered.

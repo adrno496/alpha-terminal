@@ -105,12 +105,30 @@
           ${pillHTML('Crypto', c?.value ?? null, cClass.emoji, cClass.color)}
           ${s != null ? pillHTML('Stocks', s, sClass.emoji, sClass.color) : ''}
         </div>
-        <button class="mp-refresh" type="button" title="Refresh" aria-label="Refresh">↻</button>
+        <button class="mp-refresh" type="button" title="Click : refresh data · Shift+Click : hard refresh (vide tout le cache + reload)" aria-label="Refresh">↻</button>
       </div>
     `;
     const btn = container.querySelector('.mp-refresh');
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
+      // Shift+Click : hard refresh complet (vide le cache SW + reload page).
+      // Click simple : refresh des données seulement (rapide, sans perdre le contexte).
+      if (e.shiftKey) {
+        btn.classList.add('spinning');
+        btn.disabled = true;
+        try {
+          if ('caches' in window) {
+            const keys = await caches.keys();
+            await Promise.all(keys.map(k => caches.delete(k)));
+          }
+        } catch (err) { console.warn('[mp] cache clear failed:', err); }
+        try {
+          const reg = await navigator.serviceWorker?.getRegistration();
+          if (reg?.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        } catch {}
+        location.reload();
+        return;
+      }
       btn.classList.add('spinning');
       btn.disabled = true;
       const fresh = await loadAll(true);
