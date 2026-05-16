@@ -113,8 +113,9 @@ function downloadRecoverySheet() {
   </div>
 
   <div class="field">
-    <span class="field-label">Email du compte (magic link)</span>
+    <span class="field-label">Compte Google utilisé</span>
     <div class="field-value">_____________________________________________</div>
+    <div style="font-size:11px;color:#666;margin-top:6px;">L'adresse Gmail (ou Google Workspace) avec laquelle tu t'es connecté à Alpha Terminal.</div>
   </div>
 
   <div class="field">
@@ -127,8 +128,7 @@ function downloadRecoverySheet() {
   <ol>
     <li>Ouvre <strong>alpha-terminal.app</strong> sur le nouveau device</li>
     <li>Va dans <strong>Settings → ☁️ Sync Cloud</strong></li>
-    <li>Clique <strong>"J'ai déjà un compte"</strong></li>
-    <li>Entre l'<strong>email</strong> ci-dessus → reçois un magic link → connecte-toi</li>
+    <li>Clique <strong>"Se connecter avec Google"</strong> et choisis le compte ci-dessus</li>
     <li>La liste des backups distants s'affiche → choisis le plus récent</li>
     <li>Entre la <strong>passphrase</strong> ci-dessus → tes données sont restaurées ✓</li>
   </ol>

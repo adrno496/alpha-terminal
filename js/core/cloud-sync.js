@@ -61,7 +61,7 @@ export function setDeviceLabel(label) {
   try { localStorage.setItem(DEVICE_LABEL_KEY, String(label || '').slice(0, 60)); } catch {}
 }
 
-// === Auth helper — réutilise window.alphaAuth (legacy magic link) ===
+// === Auth helper — réutilise window.alphaAuth (Google OAuth via Supabase) ===
 async function getSupabaseClient() {
   if (typeof window === 'undefined' || !window.alphaAuth) throw new Error('Auth non initialisée');
   await window.alphaAuth.ready();
@@ -74,9 +74,9 @@ export async function getCloudSyncUser() {
   return await window.alphaAuth.getUser();
 }
 
-export async function sendCloudSyncMagicLink(email) {
+export async function signInWithGoogleCloudSync() {
   if (typeof window === 'undefined' || !window.alphaAuth) throw new Error('Auth non initialisée');
-  return await window.alphaAuth.sendMagicLink(email);
+  return await window.alphaAuth.signInWithGoogle();
 }
 
 export async function cloudSignOut() {

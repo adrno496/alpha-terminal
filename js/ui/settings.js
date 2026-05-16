@@ -1335,7 +1335,7 @@ async function renderCloudSyncTab(c) {
       </p>
 
       ${user ? `
-        <!-- Cas spécial : connecté mais sync pas encore activée localement (ex: nouveau device après magic link).
+        <!-- Cas spécial : connecté mais sync pas encore activée localement (ex: nouveau device après login Google).
              On affiche directement la liste des backups distants pour qu'il puisse restaurer immédiatement. -->
         ${!enabled ? `
           <div style="background:rgba(80,180,255,0.10);border-left:3px solid #5ab8ff;padding:12px 14px;border-radius:4px;margin-bottom:14px;font-size:13px;line-height:1.6;">
@@ -1365,12 +1365,20 @@ async function renderCloudSyncTab(c) {
 
         ${!user ? `
           <div class="card" style="background:var(--bg-tertiary);margin-bottom:14px;">
-            <div style="font-size:13px;margin-bottom:8px;font-weight:600;">📧 Connexion magic link</div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-              <input id="cs-email" class="input" type="email" placeholder="ton@email.com" style="flex:1;min-width:240px;" />
-              <button id="cs-send-link" class="btn-primary">Envoyer lien magique</button>
-            </div>
+            <div style="font-size:13px;margin-bottom:10px;font-weight:600;">🔐 Connexion avec Google</div>
+            <button id="cs-google-login" class="btn-primary" style="display:flex;align-items:center;gap:10px;justify-content:center;width:100%;">
+              <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+                <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.583-5.036-3.71H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+                <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+                <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+              </svg>
+              <span>Se connecter avec Google</span>
+            </button>
             <div id="cs-login-status" style="margin-top:8px;font-size:12px;"></div>
+            <div style="margin-top:8px;font-size:11px;color:var(--text-muted);">
+              Tu seras redirigé vers Google pour autoriser Alpha Terminal. Aucun mot de passe à créer.
+            </div>
           </div>
         ` : `
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
@@ -1424,15 +1432,13 @@ async function renderCloudSyncTab(c) {
     }
   });
 
-  // === Login magic link ===
-  $('#cs-send-link')?.addEventListener('click', async () => {
-    const email = $('#cs-email')?.value.trim();
+  // === Login Google OAuth ===
+  $('#cs-google-login')?.addEventListener('click', async () => {
     const status = $('#cs-login-status');
-    if (!email) { status.innerHTML = '<span style="color:var(--accent-amber);">⚠ Email requis</span>'; return; }
-    status.innerHTML = '⏳ Envoi…';
+    status.innerHTML = '⏳ Redirection vers Google…';
     try {
-      await cs.sendCloudSyncMagicLink(email);
-      status.innerHTML = '<span style="color:var(--accent-green);">✓ Lien envoyé. Clique le lien dans ton email pour te connecter.</span>';
+      await cs.signInWithGoogleCloudSync();
+      // signInWithOAuth déclenche une redirection — pas de code après ce point.
     } catch (e) {
       status.innerHTML = `<span style="color:var(--accent-red);">❌ ${escape(e?.message || 'erreur')}</span>`;
     }

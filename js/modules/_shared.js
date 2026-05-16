@@ -6,6 +6,7 @@ import { safeRender } from '../core/safe-render.js';
 import { getModuleById } from '../ui/sidebar.js';
 import { abortCurrentCall, analyzeStream, getOrchestrator, isConnected } from '../core/api.js';
 import { t } from '../core/i18n.js';
+import { trackValueAction } from '../core/value-tracker.js';
 
 // Loading rich state
 export function showLoading(el, message = 'Analyzing...', { showAbort = true } = {}) {
@@ -92,6 +93,9 @@ export function finalizeStream({ container, streamHandle, module, title, markdow
     starred: false
   };
   saveAnalysis(record).catch(err => console.error('Save failed:', err));
+
+  // 💎 Track value : compte chaque analyse réussie pour le compteur "valeur consommée"
+  try { trackValueAction(module); } catch {}
 
   // === A2 : Persiste le résultat dans le cache 24h pour dedup ===
   try {

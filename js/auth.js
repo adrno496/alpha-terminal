@@ -1,4 +1,4 @@
-// Alpha Terminal — Auth (magic link Supabase)
+// Alpha Terminal — Auth (Google OAuth via Supabase)
 // Aucune donnée d'analyse n'est envoyée. Sert uniquement à savoir
 // QUI est connecté et SI le compte est premium (via premium_access).
 //
@@ -10,6 +10,16 @@
 
   const CFG = window.ALPHA_CONFIG || {};
   const PREMIUM_CACHE_KEY = 'alpha-terminal:premium-cache';
+
+  function resolveRedirectUrl() {
+    // - En localhost (dev), on garde un redirect prod pour éviter de casser Google qui exige
+    //   des Authorized JS Origins déclarés. Override possible via ALPHA_CONFIG.AUTH_REDIRECT_URL.
+    // - En prod (alpha-terminal.app, *.vercel.app, etc.), utilise l'origin courant.
+    const cfgRedirect = window.ALPHA_CONFIG?.AUTH_REDIRECT_URL;
+    if (cfgRedirect) return cfgRedirect;
+    const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(window.location.hostname);
+    return isLocalhost ? 'https://alpha-terminal-sepia.vercel.app/' : window.location.origin + '/';
+  }
 
   class AlphaAuth {
     constructor() {
@@ -30,7 +40,8 @@
           storage: window.localStorage,
           persistSession: true,
           autoRefreshToken: true,
-          detectSessionInUrl: true, // capture le token du magic link au retour
+          detectSessionInUrl: true, // capture le token du callback OAuth au retour
+          flowType: 'pkce',         // PKCE = sécurité standard pour OAuth dans SPA
         },
       });
 
@@ -57,26 +68,26 @@
       return !!this.client;
     }
 
-    // ---- Magic link ----
-    async sendMagicLink(email) {
+    // ---- Google OAuth ----
+    async signInWithGoogle() {
       await this.ready();
       if (!this.client) throw new Error('Supabase non configuré');
-      const cleanEmail = String(email || '').trim().toLowerCase();
-      if (!cleanEmail || !cleanEmail.includes('@')) throw new Error('Email invalide');
-      // Détermine l'URL de redirection :
-      // - En localhost (dev) → utilise quand même localhost (le user dev local lit son mail sur le même device)
-      // - En prod (alpha-terminal.app, *.vercel.app, etc.) → utilise l'origin courant
-      // - Override possible via window.ALPHA_CONFIG.AUTH_REDIRECT_URL
-      const cfgRedirect = window.ALPHA_CONFIG?.AUTH_REDIRECT_URL;
-      const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(window.location.hostname);
-      const redirectTo = cfgRedirect
-        || (isLocalhost ? 'https://alpha-terminal-sepia.vercel.app/' : window.location.origin + '/');
-      const { error } = await this.client.auth.signInWithOtp({
-        email: cleanEmail,
-        options: { emailRedirectTo: redirectTo },
+      const redirectTo = resolveRedirectUrl();
+      const { data, error } = await this.client.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          queryParams: {
+            // Force le sélecteur de compte Google même si l'user est déjà loggé
+            // sur un seul compte → meilleure UX quand on a plusieurs comptes Gmail.
+            prompt: 'select_account',
+          },
+        },
       });
       if (error) throw error;
-      return { ok: true, message: `Lien magique envoyé. Clique le lien dans ton email (redirection vers ${redirectTo}).` };
+      // signInWithOAuth déclenche un window.location redirect vers Google.
+      // Le retour se fait sur redirectTo avec un fragment de session, capté par detectSessionInUrl.
+      return { ok: true, url: data?.url };
     }
 
     // ---- Getters ----

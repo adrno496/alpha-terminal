@@ -6,6 +6,8 @@ import { recommendedSet } from '../core/module-recommendations.js';
 import { isModuleMissingApiKey } from '../core/module-providers.js';
 import { getFavorites } from '../core/favorites.js';
 import { getRecentModules } from '../core/module-usage.js';
+import { getStreak } from '../core/streak.js';
+import { getValueOverDays } from '../core/value-tracker.js';
 
 // Modules toujours visibles (mode simple)
 const ALWAYS_VISIBLE = [
@@ -14,6 +16,18 @@ const ALWAYS_VISIBLE = [
   { id: 'watchlist',        num: '👁' },
   { id: 'knowledge-base',   num: '📚' }
 ];
+
+// 🏆 TOP PICKS — modules à plus forte valeur ajoutée selon retours users.
+// Surfacés dans une section dédiée + badge 🏆 dans les catégories.
+// Ordre = priorité (du plus important au moins important dans la sélection).
+const TOP_PICKS = [
+  { id: 'daily-briefing',         num: '🌅' },  // routine matinale, engagement quotidien
+  { id: 'decoder-10k',            num: '📑' },  // killer feature LLM, justifie le Pro
+  { id: 'dcf',                    num: '💹' },  // valuation gold-standard + lead magnet SEO
+  { id: 'diversification-score',  num: '🎲' },  // synthèse patrimoine, vraie douleur retail
+  { id: 'risk-dashboard',         num: '📊' }   // contexte macro/géo unique vs concurrents
+];
+const TOP_PICK_IDS = new Set(TOP_PICKS.map(m => m.id));
 
 // Modules avancés groupés par PARCOURS UTILISATEUR (au lieu de 14 silos techniques).
 // Chaque catégorie a une description éducative pour qu'un nouvel utilisateur
@@ -156,6 +170,12 @@ export function renderSidebar(onNavigate) {
     window.addEventListener('alpha:module-usage-changed', () => {
       try { renderSidebar(onNavigate); } catch {}
     });
+    window.addEventListener('alpha:streak-changed', () => {
+      try { renderSidebar(onNavigate); } catch {}
+    });
+    window.addEventListener('alpha:value-tracker-changed', () => {
+      try { renderSidebar(onNavigate); } catch {}
+    });
   }
   const nav = $('#sidebar-nav');
   const advanced = getAdvanced();
@@ -171,11 +191,12 @@ export function renderSidebar(onNavigate) {
   const recoBadge = (id) => recoSet.has(id) ? `<span class="reco-star" title="${t('reco.tooltip')}" style="color:#ffd700;font-size:13px;line-height:1;" aria-label="recommended">⭐</span>` : '';
   const missingBadge = (id) => missingKey(id) ? `<span class="missing-key" title="${t('reco.missing_key_tooltip')}" style="color:var(--accent-red);font-size:13px;line-height:1;font-weight:700;" aria-label="API key needed">!</span>` : '';
   const lockBadge = (id) => lockedPro(id) ? `<span class="lock-pro" title="Module Premium — abonne-toi pour débloquer" style="color:var(--accent-amber);font-size:13px;line-height:1;" aria-label="Premium only">🔒</span>` : '';
-  // Si reco ET missing ET lock : on affiche les badges côté à côté
+  const topPickBadge = (id) => TOP_PICK_IDS.has(id) ? `<span class="top-pick" title="${isEN ? 'Top pick — most-loved module' : 'Top pick — module le plus utilisé'}" style="font-size:12px;line-height:1;" aria-label="top pick">🏆</span>` : '';
+  // Si reco ET missing ET lock ET top : on affiche les badges côté à côté
   const sideBadges = (id) => {
-    const a = missingBadge(id), b = recoBadge(id), c = lockBadge(id);
-    if (!a && !b && !c) return '';
-    return `<span style="margin-left:auto;display:inline-flex;gap:4px;align-items:center;">${a}${b}${c}</span>`;
+    const a = missingBadge(id), b = recoBadge(id), c = lockBadge(id), d = topPickBadge(id);
+    if (!a && !b && !c && !d) return '';
+    return `<span style="margin-left:auto;display:inline-flex;gap:4px;align-items:center;">${a}${d}${b}${c}</span>`;
   };
 
   const isEN = getLocale() === 'en';
@@ -191,6 +212,34 @@ export function renderSidebar(onNavigate) {
       <button id="sidebar-search-clear" type="button" aria-label="Clear" hidden>×</button>
     </div>
   `;
+
+  // === 🔥 Widget engagement : streak + valeur consommée ce mois ===
+  // Affiché en haut sidebar pour ancrer l'habitude (Duolingo-style) + justifier l'abo.
+  try {
+    const s = getStreak();
+    const v = getValueOverDays(30);
+    if (s.current > 0 || v.actionCount > 0) {
+      const streakLabel = isEN ? 'day streak' : (s.current > 1 ? 'jours' : 'jour');
+      const bestLabel = isEN ? 'best' : 'record';
+      const valueLabel = isEN ? 'this month' : 'ce mois';
+      html += `
+        <div class="sidebar-engagement" style="margin:6px 8px 4px;padding:8px 10px;background:linear-gradient(135deg,rgba(255,140,0,0.08),rgba(167,139,250,0.08));border:1px solid var(--border);border-radius:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          ${s.current > 0 ? `
+            <div title="${isEN ? `Best: ${s.best} ${bestLabel}` : `Record : ${s.best} ${bestLabel}`}" style="display:flex;flex-direction:column;align-items:flex-start;gap:1px;">
+              <div style="font-size:14px;font-weight:700;line-height:1;">🔥 ${s.current}</div>
+              <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">${streakLabel}</div>
+            </div>
+          ` : '<div></div>'}
+          ${v.actionCount > 0 ? `
+            <div title="${isEN ? `${v.actionCount} actions vs Bloomberg-equivalent ~${v.totalEur}€` : `${v.actionCount} analyses · équivalent Bloomberg ~${v.totalEur}€`}" style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;">
+              <div style="font-size:13px;font-weight:700;line-height:1;color:#a78bfa;">💎 ${v.totalEur}€</div>
+              <div style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.4px;">${valueLabel}</div>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+  } catch {}
   // Always visible
   html += ALWAYS_VISIBLE.map(m => `
     <button class="sidebar-link primary${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t(`mod.${m.id}.desc`)}${missingKey(m.id) ? ' — ⚠️ ' + t('reco.missing_key_tooltip') : ''}">
@@ -207,6 +256,25 @@ export function renderSidebar(onNavigate) {
       <span class="num">🎬</span>
       <span class="lbl">${t('demo.title')}</span>
     </button>
+  `;
+
+  // === 🏆 ESSENTIELS — top picks Alpha Terminal (toujours visibles) ===
+  // Surfacés en haut pour qu'un nouveau user trouve direct la valeur, sans
+  // avoir à fouiller les 7 catégories du mode avancé.
+  html += `
+    <div class="sidebar-toppicks" style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px;">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);padding:4px 12px;text-transform:uppercase;letter-spacing:0.6px;display:flex;align-items:center;gap:6px;">
+        <span>🏆</span><span>${isEN ? 'Essentials' : 'Essentiels'}</span>
+        <span style="margin-left:auto;font-weight:400;color:var(--text-muted);">${TOP_PICKS.length}</span>
+      </div>
+      ${TOP_PICKS.map(m => `
+        <button class="sidebar-link${recoSet.has(m.id) ? ' recommended' : ''}${missingKey(m.id) ? ' needs-key' : ''}" data-route="${m.id}" data-num="${m.num}" title="${t('mod.' + m.id + '.desc')}">
+          <span class="num">${m.num}</span>
+          <span class="lbl">${t('mod.' + m.id + '.label')}</span>
+          ${sideBadges(m.id)}
+        </button>
+      `).join('')}
+    </div>
   `;
 
   // === 🕐 RÉCEMMENT UTILISÉS — top 5 derniers modules ouverts ===

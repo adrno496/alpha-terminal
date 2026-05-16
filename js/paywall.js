@@ -87,7 +87,7 @@
 
     // Source de vérité (par ordre) :
     //   1. License Key Lemonsqueezy active (window.licenseManager.isPremium)
-    //   2. Fallback Supabase magic link (legacy, en cours de dépréciation)
+    //   2. Fallback Supabase (Google OAuth → premium_access table)
     _readCache() {
       try {
         if (window.licenseManager && window.licenseManager.isPremium()) return true;
@@ -200,25 +200,18 @@
       }
     }
 
-    /** Petit prompt natif pour saisir l'email du magic link. */
+    /** Login via Google OAuth. Redirige vers Google → retour avec session. */
     async promptLogin() {
       const en = isEN();
-      const email = window.prompt(
-        en
-          ? 'Enter your email to receive a magic link:'
-          : 'Entre ton email pour recevoir un lien magique :',
-        ''
-      );
-      if (!email) return;
+      if (!window.alphaAuth) {
+        alert(en ? 'Auth not initialized' : 'Auth non initialisée');
+        return;
+      }
       try {
-        await window.alphaAuth.sendMagicLink(email);
-        alert(
-          en
-            ? '✅ Magic link sent. Check your inbox (and spam folder).'
-            : '✅ Lien magique envoyé. Vérifie ta boîte mail (et les spams).'
-        );
+        await window.alphaAuth.signInWithGoogle();
+        // Pas d'alert : la page va rediriger vers Google immédiatement.
       } catch (e) {
-        alert((en ? 'Error: ' : 'Erreur : ') + (e?.message || e));
+        alert((en ? 'Google sign-in error: ' : 'Erreur connexion Google : ') + (e?.message || e));
       }
     }
   }

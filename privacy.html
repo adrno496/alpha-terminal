@@ -125,7 +125,7 @@
     <h2>7. Compte Premium (optionnel) — données collectées par Supabase</h2>
     <p>Si tu actives un abonnement Premium (9,99 €/mois), un compte est créé sur notre infrastructure <strong>Supabase</strong> (hébergée dans l'UE — Frankfurt) pour la seule gestion du paiement et de l'accès. Les données collectées sont strictement minimales :</p>
     <ul>
-      <li><strong>Email</strong> — pour t'envoyer le lien magique de connexion (Supabase Auth, pas de mot de passe).</li>
+      <li><strong>Email Google</strong> — récupéré via OAuth (« Se connecter avec Google ») pour identifier ton compte. Aucun mot de passe créé ou stocké chez nous. Google fournit ton adresse email vérifiée et un identifiant unique ; Alpha ne demande aucun autre scope (pas de Gmail, pas de Drive, pas de Calendar, pas de profil étendu).</li>
       <li><strong>Identifiants Lemonsqueezy</strong> — <code>customer_id</code>, <code>order_id</code>, <code>subscription_id</code> (compliance comptable et gestion des renouvellements).</li>
       <li><strong>Montant et devise</strong> du paiement (compliance fiscale).</li>
       <li><strong>Statut Premium</strong> — booléen <code>is_active</code> + date d'expiration.</li>
@@ -142,7 +142,7 @@
       <li><strong>La passphrase reste sur ton appareil</strong> : jamais transmise, jamais stockée côté serveur, jamais récupérable. C'est le coût du chiffrement E2EE.</li>
       <li><strong>Maximum 20 backups</strong> par utilisateur, auto-purge des plus anciens via trigger Postgres.</li>
     </ul>
-    <p><strong>Données transmises au serveur (en clair) :</strong> ton email (pour le magic link), un device label (ex: « MacBook Pro » — éditable), la taille du blob, la date de création. <strong>Aucune autre information lisible.</strong></p>
+    <p><strong>Données transmises au serveur (en clair) :</strong> ton email Google (issu d'OAuth), un device label (ex: « MacBook Pro » — éditable), la taille du blob, la date de création. <strong>Aucune autre information lisible.</strong></p>
     <p><strong>Vérification ouverte :</strong> DevTools → Network pendant un push → tu vois uniquement <code>encrypted_payload</code> en binaire opaque parti vers <code>*.supabase.co</code>. Aucun champ lisible. <strong>Si tu n'actives pas la sync cloud, aucune donnée n'est uploadée — l'app reste 100% locale.</strong></p>
     <p><strong>⚠️ Risque assumé :</strong> si tu oublies ta passphrase, tes backups cloud sont définitivement perdus. Aucun support, aucun reset password. Une fiche de récupération imprimable est proposée à l'activation.</p>
 

@@ -43,6 +43,8 @@ import { openComparePicker } from './ui/compare.js';
 // alerts-banner garde ses imports statiques car utilisés au boot (badge sidebar, etc.)
 import { bootAlertCheck, updateAlertBadge } from './ui/alerts-banner.js';
 import { trackModuleUsage } from './core/module-usage.js';
+import { tickStreak } from './core/streak.js';
+import { recordVisit, shouldShowSummary, buildSinceLastSummary } from './core/since-last-visit.js';
 
 // === ROUTES — chaque module est lazy-loaded au premier navigate() ===
 // Le `render` retourne une Promise mais on l'appelle sans `await` (le rendu est async fire-and-forget).
@@ -419,7 +421,7 @@ function startLockFlow() {
 // Compare APP_VERSION (hardcodé ci-dessous, à bumper à chaque release) avec la valeur
 // stockée dans localStorage. Si différentes → vide tous les caches SW + reload.
 // Évite que les users restent bloqués sur une vieille version cachée.
-const APP_VERSION = 'v85-2026-05-04';
+const APP_VERSION = 'v87-2026-05-04';
 const APP_VERSION_KEY = 'alpha-terminal:app-version';
 (async function killOldCache() {
   try {
@@ -444,6 +446,32 @@ const APP_VERSION_KEY = 'alpha-terminal:app-version';
 })();
 
 function boot() {
+  // 🔥 Streak quotidien — incrémente si nouveau jour, reset si gap > 1 jour.
+  // Si milestone atteint (3/7/14/30/60/100/200/365), on toaste plus tard.
+  let streakInfo = null;
+  try { streakInfo = tickStreak(); } catch {}
+
+  // 🆕 "Depuis ta dernière visite" — affiche un banner si > 8h depuis dernier accès
+  try {
+    if (shouldShowSummary()) {
+      buildSinceLastSummary().then(sum => {
+        if (sum.alerts > 0 || sum.watchlistMoves > 0) {
+          showSinceLastBanner(sum);
+        }
+      }).catch(() => {});
+    }
+  } catch {}
+  try { recordVisit(); } catch {}
+
+  // Toast milestone streak (timing : 1.5s pour ne pas concurrencer le boot)
+  if (streakInfo && streakInfo.milestoneHit) {
+    setTimeout(() => {
+      import('./core/utils.js').then(({ toast }) => {
+        toast(`🔥 ${streakInfo.milestoneHit} jours d'affilée ! Continue comme ça.`, 'success');
+      }).catch(() => {});
+    }, 1500);
+  }
+
   renderSidebar(navigate);
 
   document.querySelectorAll('.sidebar-bottom .sidebar-link[data-route]').forEach(b => {
@@ -498,7 +526,7 @@ function boot() {
       try { renderSidebar(navigate); } catch {}
     });
 
-    // Cloud sync : quand le user vient de se connecter via magic link, on check
+    // Cloud sync : quand le user vient de se connecter via Google OAuth, on check
     // s'il a des backups distants → propose de restaurer en banner.
     window.addEventListener('alpha:authChanged', async (e) => {
       if (!e?.detail?.user) return; // logout ou état initial
@@ -512,7 +540,7 @@ function boot() {
 
     // CRITIQUE : check d'état au boot — couvre le cas où alpha:authChanged
     // a été dispatché AVANT que ce listener ne soit attaché (race condition).
-    // Sans ça, un user qui clique le magic link sur un nouveau device n'aurait
+    // Sans ça, un user qui revient du redirect Google sur un nouveau device n'aurait
     // jamais vu la bannière de restore.
     setTimeout(async () => {
       try {
@@ -774,6 +802,34 @@ function boot() {
       openLockFlow();
     }
   });
+}
+
+// === 🆕 Banner "Depuis ta dernière visite" ===
+// Affiché en haut du contenu principal au boot si data justifie.
+// Auto-dismiss après 12s ou clic sur ✕.
+function showSinceLastBanner(sum) {
+  try {
+    const existing = document.getElementById('since-last-banner');
+    if (existing) existing.remove();
+    const isEN = (document.documentElement.lang || 'fr').startsWith('en');
+    const parts = [];
+    if (sum.alerts > 0) parts.push(`${sum.alerts} ${isEN ? 'alert' + (sum.alerts > 1 ? 's' : '') : 'alerte' + (sum.alerts > 1 ? 's' : '')}`);
+    if (sum.watchlistMoves > 0) parts.push(`${sum.watchlistMoves} ${isEN ? 'watchlist move' + (sum.watchlistMoves > 1 ? 's' : '') + ' >3%' : 'mouvement' + (sum.watchlistMoves > 1 ? 's' : '') + ' watchlist >3%'}`);
+    if (parts.length === 0) return;
+    const hoursLabel = sum.hoursSince >= 24
+      ? `${Math.floor(sum.hoursSince / 24)}${isEN ? 'd' : 'j'}`
+      : `${sum.hoursSince}h`;
+    const banner = document.createElement('div');
+    banner.id = 'since-last-banner';
+    banner.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,#5b8def,#a78bfa);color:#fff;padding:10px 18px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.2);font-size:13px;font-weight:500;z-index:9999;display:flex;align-items:center;gap:12px;max-width:90vw;';
+    banner.innerHTML = `
+      <span>🆕 ${isEN ? `In the last ${hoursLabel}` : `Depuis ${hoursLabel}`} : ${parts.join(' · ')}</span>
+      <button id="since-last-close" style="background:rgba(255,255,255,0.2);color:#fff;border:none;border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;">×</button>
+    `;
+    document.body.appendChild(banner);
+    document.getElementById('since-last-close')?.addEventListener('click', () => banner.remove());
+    setTimeout(() => banner.remove(), 12000);
+  } catch {}
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

@@ -125,7 +125,7 @@
     <h2>7. Premium account (optional) — data collected by Supabase</h2>
     <p>If you activate a Premium subscription (€9.99/month), an account is created on our <strong>Supabase</strong> infrastructure (EU-hosted — Frankfurt) solely for payment and access management. Strictly minimal data is collected:</p>
     <ul>
-      <li><strong>Email</strong> — to send the magic sign-in link (Supabase Auth, no password).</li>
+      <li><strong>Google email</strong> — retrieved via OAuth (« Sign in with Google ») to identify your account. No password created or stored on our side. Google provides your verified email and a unique identifier; Alpha requests no other scope (no Gmail, no Drive, no Calendar, no extended profile).</li>
       <li><strong>Lemonsqueezy IDs</strong> — <code>customer_id</code>, <code>order_id</code>, <code>subscription_id</code> (accounting compliance and renewal management).</li>
       <li><strong>Amount and currency</strong> of the payment (tax compliance).</li>
       <li><strong>Premium status</strong> — <code>is_active</code> boolean + expiration date.</li>
