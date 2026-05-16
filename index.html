@@ -599,6 +599,16 @@
             <span class="status-dot"></span>
             <span class="status-text">API disconnected</span>
           </span>
+          <!-- Compte (Google OAuth) : caché par défaut, affiché si user connecté.
+               Inject via script en bas de cette page (cf. <script defer> account-pill). -->
+          <div id="account-pill" style="display:none;align-items:center;gap:6px;margin-left:10px;padding:4px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:20px;font-size:12px;">
+            <span style="width:6px;height:6px;border-radius:50%;background:#34A853;flex-shrink:0;"></span>
+            <span id="account-pill-email" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+            <button id="account-pill-logout" type="button" title="Se déconnecter"
+              style="background:transparent;border:0;color:var(--text-muted);cursor:pointer;padding:2px 6px;font-size:14px;line-height:1;">
+              ⏻
+            </button>
+          </div>
         </div>
       </header>
 
@@ -873,6 +883,53 @@
       // Premier check au boot + réagir aux changements d'auth.
       refreshAuthState();
       window.addEventListener('alpha:authChanged', refreshAuthState);
+    });
+  </script>
+
+  <!-- Account pill (topbar) — visible quand connecté Google, avec logout 1-clic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const pill = document.getElementById('account-pill');
+      const emailEl = document.getElementById('account-pill-email');
+      const logoutBtn = document.getElementById('account-pill-logout');
+      if (!pill || !emailEl || !logoutBtn) return;
+
+      function paint(user) {
+        if (user && user.email) {
+          emailEl.textContent = user.email;
+          emailEl.title = user.email;
+          pill.style.display = 'inline-flex';
+        } else {
+          pill.style.display = 'none';
+        }
+      }
+
+      logoutBtn.addEventListener('click', async () => {
+        if (!window.alphaAuth) return;
+        if (!confirm('Se déconnecter de Google ?')) return;
+        try {
+          await window.alphaAuth.logout();
+          // Si une license Lemonsqueezy est aussi posée, on la retire pour éviter
+          // un état "demi-connecté".
+          if (window.licenseManager && typeof window.licenseManager.logout === 'function') {
+            try { window.licenseManager.logout(); } catch {}
+          }
+          setTimeout(() => location.reload(), 200);
+        } catch (e) {
+          alert('Erreur logout : ' + (e?.message || e));
+        }
+      });
+
+      (async () => {
+        try {
+          if (!window.alphaAuth) return;
+          await window.alphaAuth.ready();
+          const user = await window.alphaAuth.getUser();
+          paint(user);
+        } catch {}
+      })();
+
+      window.addEventListener('alpha:authChanged', (e) => paint(e?.detail?.user || null));
     });
   </script>
 

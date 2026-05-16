@@ -223,6 +223,33 @@ function stepperHtml(active) {
 function renderWizardStep1() {
   body.innerHTML = `
     ${stepperHtml(1)}
+
+    <!-- === Google OAuth (récupération abonnement + backups cloud) === -->
+    <div id="wiz-google-block" style="margin:0 0 18px;padding:14px;border:1px solid var(--border);border-radius:6px;background:var(--bg-tertiary);">
+      <div style="font-size:13px;font-weight:600;margin-bottom:6px;">🔐 Tu as déjà un compte Premium ?</div>
+      <p style="font-size:12px;color:var(--text-secondary);margin:0 0 10px;line-height:1.5;">
+        Connecte-toi avec Google pour retrouver ton abonnement et tes backups cloud chiffrés.
+      </p>
+      <button type="button" id="wiz-google-login"
+        style="width:100%;background:#fff;color:#3c4043;border:1px solid #dadce0;border-radius:6px;padding:10px 14px;font-size:13.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:'Roboto',Arial,sans-serif;">
+        <svg width="17" height="17" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.583-5.036-3.71H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+          <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+          <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+        </svg>
+        <span>Se connecter avec Google</span>
+      </button>
+      <div id="wiz-google-status" style="margin-top:8px;font-size:12px;color:var(--text-muted);min-height:16px;"></div>
+    </div>
+
+    <!-- Séparateur OU -->
+    <div style="display:flex;align-items:center;gap:10px;margin:0 0 14px;color:var(--text-muted);font-size:11.5px;text-transform:uppercase;letter-spacing:0.5px;">
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+      <span>OU crée un vault local</span>
+      <div style="flex:1;height:1px;background:var(--border);"></div>
+    </div>
+
     <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:14px;">${t('wiz.password_intro')}</p>
     <div class="field">
       <label class="field-label">${t('wiz.password')}</label>
@@ -253,6 +280,40 @@ function renderWizardStep1() {
       <div id="wiz-import-status" style="margin-top:8px;font-size:12px;color:var(--text-muted);"></div>
     </div>
   `;
+
+  // === Google OAuth handler dans le wizard ===
+  const gBtn = $('#wiz-google-login');
+  const gStatus = $('#wiz-google-status');
+  if (gBtn) {
+    gBtn.addEventListener('click', async () => {
+      if (!window.alphaAuth) {
+        gStatus.innerHTML = '<span style="color:var(--accent-red);">Auth non initialisée — recharge la page.</span>';
+        return;
+      }
+      gStatus.innerHTML = '⏳ Redirection vers Google…';
+      try {
+        await window.alphaAuth.signInWithGoogle();
+        // Redirection immédiate vers Google — pas de code après.
+      } catch (e) {
+        gStatus.innerHTML = `<span style="color:var(--accent-red);">${e?.message || e}</span>`;
+      }
+    });
+  }
+  // Si l'user est déjà loggé (revient du callback Google), on l'indique.
+  (async () => {
+    try {
+      if (!window.alphaAuth) return;
+      await window.alphaAuth.ready();
+      const user = await window.alphaAuth.getUser();
+      if (user) {
+        gBtn.disabled = true;
+        gBtn.style.opacity = '0.6';
+        gBtn.style.cursor = 'default';
+        gStatus.innerHTML = `<span style="color:var(--accent-green);">✓ Connecté en tant que <strong>${(user.email||'?').replace(/[<>]/g,'')}</strong></span>`;
+      }
+    } catch {}
+  })();
+
   ['wiz-pwd', 'wiz-pwd2'].forEach(id => {
     $('#' + id).addEventListener('keydown', e => { if (e.key === 'Enter') next1(); });
   });
