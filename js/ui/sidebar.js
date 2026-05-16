@@ -574,6 +574,85 @@ export function renderSidebar(onNavigate) {
     else if (route === 'settings') b.innerHTML = '<span class="dot"></span> ' + t('sidebar.settings');
     else if (route === 'landing') b.innerHTML = '<span class="dot"></span> ' + t('sidebar.about');
   });
+
+  // === Bouton "Se connecter avec Google" / état connecté ===
+  // Injecte (ou met à jour) en haut de la sidebar-bottom une UI auth.
+  // Si l'user n'est pas connecté → bouton Google.
+  // Si connecté → email tronqué + bouton Logout.
+  renderSidebarAuth();
+}
+
+function renderSidebarAuth() {
+  const bottom = document.querySelector('.sidebar-bottom');
+  if (!bottom) return;
+  let slot = document.getElementById('sidebar-auth-slot');
+  if (!slot) {
+    slot = document.createElement('div');
+    slot.id = 'sidebar-auth-slot';
+    slot.style.cssText = 'padding:8px 10px;border-bottom:1px solid var(--border, rgba(255,255,255,0.06));margin-bottom:6px;';
+    bottom.insertBefore(slot, bottom.firstChild);
+  }
+  const en = (typeof getLocale === 'function' && getLocale() === 'en');
+  const auth = (typeof window !== 'undefined') ? window.alphaAuth : null;
+
+  function paint(user) {
+    if (user) {
+      const emailRaw = String(user.email || user.user_metadata?.email || '?');
+      const truncated = emailRaw.length > 22 ? emailRaw.slice(0, 19) + '…' : emailRaw;
+      slot.innerHTML = `
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">${en ? 'Signed in as' : 'Connecté'}</div>
+        <div style="font-size:12.5px;font-weight:500;margin-bottom:6px;word-break:break-all;" title="${emailRaw}">${truncated}</div>
+        <button id="sidebar-logout" type="button" style="width:100%;background:transparent;color:var(--text-secondary);border:1px solid var(--border);border-radius:4px;padding:5px 8px;font-size:11.5px;cursor:pointer;">
+          ${en ? 'Sign out' : 'Se déconnecter'}
+        </button>
+      `;
+      slot.querySelector('#sidebar-logout')?.addEventListener('click', async () => {
+        try { await auth?.logout(); } catch {}
+      });
+    } else {
+      slot.innerHTML = `
+        <button id="sidebar-google-login" type="button" style="width:100%;background:#fff;color:#3c4043;border:1px solid #dadce0;border-radius:4px;padding:7px 10px;font-size:12.5px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Roboto',Arial,sans-serif;">
+          <svg width="14" height="14" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.583-5.036-3.71H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+            <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+          </svg>
+          <span>${en ? 'Sign in with Google' : 'Se connecter avec Google'}</span>
+        </button>
+      `;
+      slot.querySelector('#sidebar-google-login')?.addEventListener('click', async () => {
+        if (!auth) {
+          alert(en ? 'Auth not initialized — reload the page' : 'Auth non initialisée — recharge la page');
+          return;
+        }
+        try {
+          await auth.signInWithGoogle();
+          // Redirection immédiate vers Google.
+        } catch (e) {
+          alert((en ? 'Google sign-in error: ' : 'Erreur connexion Google : ') + (e?.message || e));
+        }
+      });
+    }
+  }
+
+  // Render initial (peut être null tant qu'auth n'est pas ready)
+  (async () => {
+    try {
+      if (!auth) { paint(null); return; }
+      await auth.ready();
+      const user = await auth.getUser();
+      paint(user);
+    } catch { paint(null); }
+  })();
+
+  // Écoute les changements de session (login, logout) — wire une seule fois global.
+  if (typeof window !== 'undefined' && !window.__alphaSidebarAuthWired) {
+    window.__alphaSidebarAuthWired = true;
+    window.addEventListener('alpha:authChanged', (e) => {
+      paint(e?.detail?.user || null);
+    });
+  }
 }
 
 export function setActiveSidebar(route) {
