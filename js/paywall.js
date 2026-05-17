@@ -121,35 +121,35 @@
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const t = en
         ? {
-            title: '🔒 Premium module',
-            sub: `<strong>${safeId}</strong> requires an active Premium license.`,
+            title: '🔒 This module is part of Premium',
+            sub: `To use <strong>${safeId}</strong>, you need an Alpha Premium subscription.`,
             monthlyLabel: 'Monthly',
             monthlyPrice: '€9.99/month',
             lifetimeLabel: 'Lifetime · best value',
-            lifetimePrice: '€299 once',
+            lifetimePrice: '€299 one-time payment',
             buyBtn: '🚀 Subscribe €9.99/month',
-            lifetimeBtn: '♾️ Get lifetime access €299',
-            keyBtn: '🔑 I have a license key',
+            lifetimeBtn: '♾️ Lifetime access €299',
+            keyBtn: '🔑 I already bought a key',
             bullets: [
-              '✅ Unlimited access to all Pro modules',
-              '✅ Your analyses stay 100% local (BYOK)',
-              '✅ Cancel anytime · Lifetime breaks even after 30 months',
+              '✅ Unlock all 46 Pro modules without limits',
+              '✅ Your analyses stay 100% on your device (you bring your AI key)',
+              '✅ Cancel in 1 click · Lifetime pays off after ~30 months',
             ],
           }
         : {
-            title: '🔒 Module Premium',
-            sub: `<strong>${safeId}</strong> nécessite une licence Premium active.`,
+            title: '🔒 Ce module fait partie de Premium',
+            sub: `Pour utiliser <strong>${safeId}</strong>, il te faut un abonnement Alpha Premium.`,
             monthlyLabel: 'Mensuel',
             monthlyPrice: '9,99€/mois',
             lifetimeLabel: 'À vie · meilleure valeur',
             lifetimePrice: '299€ paiement unique',
             buyBtn: '🚀 S\'abonner 9,99€/mois',
             lifetimeBtn: '♾️ Accès à vie 299€',
-            keyBtn: '🔑 J\'ai déjà une clé',
+            keyBtn: '🔑 J\'ai déjà acheté une clé',
             bullets: [
-              '✅ Accès illimité aux modules Pro',
-              '✅ Tes analyses restent 100% locales (BYOK)',
-              '✅ Annulable à tout moment · À vie rentabilisé en 30 mois',
+              '✅ Débloque les 46 modules Pro sans limite',
+              '✅ Tes analyses restent 100% sur ton appareil (tu apportes ta clé IA)',
+              '✅ Annulable en 1 clic · À vie rentabilisé après ~30 mois',
             ],
           };
 
