@@ -1,6 +1,6 @@
-// Service Worker v95 — network-first pour HTML/navigation (toujours frais),
+// Service Worker v96 — network-first pour HTML/navigation (toujours frais),
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v95';
+const CACHE = 'alpha-terminal-v96';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
