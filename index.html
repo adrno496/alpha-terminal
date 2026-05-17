@@ -819,15 +819,24 @@
 
       logoutBtn.addEventListener('click', async () => {
         if (!window.alphaAuth) return;
-        if (!confirm('Se déconnecter de Google ?')) return;
+        if (!confirm('Se déconnecter ?')) return;
         try {
           await window.alphaAuth.logout();
-          // Si une license Lemonsqueezy est aussi posée, on la retire pour éviter
-          // un état "demi-connecté".
+          // Retire aussi license + browse-mode pour qu'au prochain boot la landing
+          // s'affiche (et pas la version "déjà loggé" avec accès direct à l'app).
           if (window.licenseManager && typeof window.licenseManager.logout === 'function') {
             try { window.licenseManager.logout(); } catch {}
           }
-          setTimeout(() => location.reload(), 200);
+          try { localStorage.removeItem('alpha-terminal:browse-mode'); } catch {}
+          // Reset le flag "vu la landing" pour la re-montrer apres logout.
+          // Sans ça, certains code paths sautent direct au wizard.
+          try {
+            const s = JSON.parse(localStorage.getItem('alpha-terminal:settings') || '{}');
+            s.hasSeenLanding = false;
+            localStorage.setItem('alpha-terminal:settings', JSON.stringify(s));
+          } catch {}
+          // Redirige vers la racine (qui affiche la landing si pas authentifié).
+          location.replace('index.html');
         } catch (e) {
           alert('Erreur logout : ' + (e?.message || e));
         }
