@@ -243,7 +243,7 @@
       Connecte-toi avec Google pour retrouver ton abonnement Premium et tes backups cloud chiffrés.
     </p>
 
-    <!-- === Primary CTA : Google === -->
+    <!-- === Primary CTA : Google (seule méthode d'auth pour entrer dans l'app) === -->
     <button type="button" id="google-btn" class="google-btn">
       <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
@@ -255,37 +255,13 @@
     </button>
     <div id="status" class="status" role="status" aria-live="polite"></div>
 
-    <!-- === OU === -->
-    <div class="divider" id="divider-label">OU</div>
-
-    <!-- === Secondary actions === -->
-    <button type="button" class="secondary" id="continue-without">
-      👀 <span id="continue-label">Continuer sans compte (démo)</span>
-    </button>
-    <button type="button" class="secondary" id="show-license">
-      🔑 <span id="license-label">J'ai une clé de licence</span>
-    </button>
-
-    <!-- License key form (hidden by default) -->
-    <div class="license-form" id="license-form">
-      <label for="license-input" id="license-input-label">Clé de licence Lemonsqueezy</label>
-      <input
-        type="text"
-        id="license-input"
-        placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-        autocomplete="off"
-        autocapitalize="characters"
-        spellcheck="false"
-      />
-      <div class="row">
-        <button type="button" id="license-submit">Activer</button>
-        <button type="button" class="cancel" id="license-cancel">Annuler</button>
-      </div>
-      <div id="license-status" class="status" style="margin-top:8px;"></div>
-    </div>
+    <p style="font-size:12px;color:var(--text-muted,#888);text-align:center;margin:22px 0 0;line-height:1.6;">
+      <span id="info-line-1">Tu as déjà acheté une clé de licence Premium ?</span><br>
+      <span id="info-line-2">Connecte-toi d'abord avec Google, puis active ta clé depuis les paramètres de l'app.</span>
+    </p>
 
     <div class="legal">
-      Pas de mot de passe à créer · Aucun scope Google demandé hors email · 100% local après login<br>
+      <span id="legal-tagline">Pas de mot de passe à créer · Aucun scope Google demandé hors email · 100% local après login</span><br>
       <a href="privacy.html" id="legal-privacy">Confidentialité</a> ·
       <a href="terms.html" id="legal-terms">CGU</a> ·
       <a href="index.html" id="legal-back">← Site</a>
@@ -301,7 +277,6 @@
   </script>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="js/auth.js" defer></script>
-  <script src="js/license.js" defer></script>
 
   <script defer>
     (function () {
@@ -317,13 +292,11 @@
         document.documentElement.lang = 'en';
         document.title = 'Alpha Terminal — Sign in';
         document.getElementById('title').textContent = 'Welcome 👋';
-        document.getElementById('subtitle').textContent = 'Sign in with Google to recover your Premium subscription and encrypted cloud backups.';
+        document.getElementById('subtitle').textContent = 'Sign in with Google to access Alpha Terminal. Required to use the app.';
         document.getElementById('google-btn-label').textContent = 'Sign in with Google';
-        document.getElementById('divider-label').textContent = 'OR';
-        document.getElementById('continue-label').textContent = 'Continue without account (demo)';
-        document.getElementById('license-label').textContent = 'I have a license key';
-        document.getElementById('license-input-label').textContent = 'Lemonsqueezy license key';
-        document.querySelector('.legal').firstChild.textContent = 'No password to create · No Google scope beyond email · 100% local after sign-in';
+        document.getElementById('info-line-1').textContent = 'Already bought a Premium license key?';
+        document.getElementById('info-line-2').textContent = 'Sign in with Google first, then activate your key from the app settings.';
+        document.getElementById('legal-tagline').textContent = 'No password to create · No Google scope beyond email · 100% local after sign-in';
         document.getElementById('legal-privacy').textContent = 'Privacy';
         document.getElementById('legal-privacy').href = 'privacy-en.html';
         document.getElementById('legal-terms').textContent = 'Terms';
@@ -338,18 +311,12 @@
         alreadyLoggedIn: 'Already signed in — redirecting…',
         errorAuth: 'Sign-in error: ',
         errorInit: 'Auth not initialized — please reload',
-        license_validating: '⏳ Validating with Lemonsqueezy…',
-        license_invalid: '❌ Invalid license key',
-        license_ok: '✓ License activated — redirecting…',
       } : {
         redirecting: '⏳ Redirection vers Google…',
         loggedIn: '✓ Connecté en tant que ',
         alreadyLoggedIn: 'Déjà connecté — redirection…',
         errorAuth: 'Erreur connexion : ',
         errorInit: 'Auth non initialisée — recharge la page',
-        license_validating: '⏳ Vérification auprès de Lemonsqueezy…',
-        license_invalid: '❌ Clé de licence invalide',
-        license_ok: '✓ Licence activée — redirection…',
       };
 
       const status = document.getElementById('status');
@@ -381,7 +348,7 @@
         }
       }
 
-      // === Google login ===
+      // === Google login (seule méthode autorisée) ===
       document.getElementById('google-btn').addEventListener('click', async () => {
         if (!window.alphaAuth) { setStatus(T.errorInit, 'err'); return; }
         setStatus(T.redirecting);
@@ -391,61 +358,6 @@
         } catch (e) {
           setStatus(T.errorAuth + (e?.message || e), 'err');
         }
-      });
-
-      // === Continuer sans compte (browse-mode) ===
-      document.getElementById('continue-without').addEventListener('click', () => {
-        try { localStorage.setItem('alpha-terminal:browse-mode', '1'); } catch {}
-        redirectToApp();
-      });
-
-      // === License key ===
-      const licenseForm = document.getElementById('license-form');
-      const licenseInput = document.getElementById('license-input');
-      const licenseStatus = document.getElementById('license-status');
-
-      document.getElementById('show-license').addEventListener('click', () => {
-        licenseForm.classList.toggle('open');
-        if (licenseForm.classList.contains('open')) {
-          setTimeout(() => licenseInput.focus(), 80);
-        }
-      });
-      document.getElementById('license-cancel').addEventListener('click', () => {
-        licenseForm.classList.remove('open');
-        licenseInput.value = '';
-        licenseStatus.textContent = '';
-      });
-
-      async function activateLicense() {
-        const key = (licenseInput.value || '').trim();
-        if (!key) return;
-        licenseStatus.textContent = T.license_validating;
-        licenseStatus.className = 'status';
-        if (!window.licenseManager) {
-          licenseStatus.textContent = T.errorInit;
-          licenseStatus.className = 'status err';
-          return;
-        }
-        try {
-          const result = await window.licenseManager.activateLicense(key);
-          if (result && result.success) {
-            licenseStatus.textContent = T.license_ok;
-            licenseStatus.className = 'status ok';
-            setTimeout(redirectToApp, 600);
-          } else {
-            licenseStatus.textContent = '❌ ' + (result?.error || T.license_invalid);
-            licenseStatus.className = 'status err';
-          }
-        } catch (e) {
-          licenseStatus.textContent = '❌ ' + (e?.message || e);
-          licenseStatus.className = 'status err';
-        }
-      }
-
-      document.getElementById('license-submit').addEventListener('click', activateLicense);
-      licenseInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') activateLicense();
-        if (e.key === 'Escape') document.getElementById('license-cancel').click();
       });
 
       // === Au boot : vérifie si déjà connecté (callback OAuth ou session reprise) ===

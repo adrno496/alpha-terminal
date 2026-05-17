@@ -786,40 +786,48 @@ function boot() {
       });
       return;
     }
-    // === Décide quoi afficher au boot ===
-    // Politique : anonyme (ou logout récent) → landing avec CTA vers /login.html.
-    // Une session active ou un vault déjà déchiffrable = "authentifié" → entre dans l'app.
-    const cameFromLogin = (() => {
-      try { return localStorage.getItem('alpha-terminal:browse-mode') === '1'; } catch { return false; }
-    })();
+    // === Décide quoi afficher au boot — POLITIQUE STRICTE ===
+    // Une session Supabase active EST OBLIGATOIRE pour accéder à l'app.
+    // Sans session : landing (CTA → /login.html). License ou vault seul ne suffit pas.
+    // Justification : éviter qu'un user puisse utiliser l'app sans avoir validé son
+    // identité via Google (besoin pour premium gating + cloud sync + audit).
     const hasSupabaseSession = (() => {
       try {
         const cfg = (typeof window !== 'undefined' && window.ALPHA_CONFIG) || {};
         const m = String(cfg.SUPABASE_URL || '').match(/https?:\/\/([^.]+)/);
         if (!m) return false;
         const raw = localStorage.getItem('sb-' + m[1] + '-auth-token');
-        if (!raw) return false;
-        // Token peut être JSON ou string brut — on considère qu'il y a une session si non vide.
-        return raw.length > 10;
+        return !!raw && raw.length > 10;
       } catch { return false; }
     })();
-    const hasLicense = (() => {
-      try { return !!localStorage.getItem('alpha-license-key'); } catch { return false; }
-    })();
-    const authenticated = hasVault() || hasSupabaseSession || hasLicense || cameFromLogin;
 
-    if (!authenticated) {
-      // Anonymous → landing (CTA pointe vers /login.html)
+    if (!hasSupabaseSession) {
+      // Aucune session → landing (page "À propos" avec CTA vers /login.html).
+      // Edge case : si l'URL contient un callback OAuth (#access_token=…), on
+      // attend que detectSessionInUrl capture la session (peut prendre ~200ms),
+      // puis on déclenche le boot normal une fois que la session est en place.
+      const urlHasOAuthCallback = /access_token=|provider_token=/.test(location.hash || '');
       showLanding();
       setTimeout(() => {
         document.querySelectorAll('[data-demo-trigger]').forEach(b => b.addEventListener('click', () => showDemoGallery()));
       }, 300);
-    } else if (hasVault()) {
-      // Vault existant → unlock direct
+      // Si OAuth callback en cours, on écoute alpha:authChanged et on reload
+      // dès qu'une session apparait → le user passe directement dans l'app.
+      if (urlHasOAuthCallback) {
+        window.addEventListener('alpha:authChanged', (e) => {
+          if (e?.detail?.user) location.replace('index.html');
+        }, { once: true });
+      }
+      return;
+    }
+
+    // === Session active → on entre dans l'app ===
+    if (hasVault()) {
+      // Vault local existant → unlock pour décrypter les clés API
       startLockFlow();
-    } else if (cameFromLogin || hasSupabaseSession || hasLicense) {
-      // Connecté Google/License sans vault → mode browse, l'app est utilisable,
-      // le vault sera créé à la première sauvegarde de clé API.
+    } else {
+      // Pas de vault local : on n'impose pas le wizard de mot de passe au boot.
+      // Le vault sera créé à la première sauvegarde de clé API (Settings).
       setSettings({ hasSeenLanding: true });
       hideLanding();
       window.dispatchEvent(new CustomEvent('app:browse-mode-enabled'));
