@@ -157,7 +157,7 @@ function renderUnlock() {
       <div class="wiz-step active">🔓 Déverrouillage</div>
     </div>
     <p style="color:var(--text-secondary);font-size:13px;margin-bottom:14px;">
-      Vault détecté${isLegacy ? ' (v1 — sera migré automatiquement vers v2 multi-LLM)' : ''}.
+      Coffre détecté${isLegacy ? ' (ancienne version — sera mis à jour automatiquement)' : ''}.
       Entre ton mot de passe.
     </p>
     <div class="field">
@@ -166,7 +166,7 @@ function renderUnlock() {
     </div>
     <div id="unlock-error" class="alert alert-danger hidden"></div>
     <div style="display:flex;gap:8px;justify-content:space-between;margin-top:8px;">
-      <button id="unlock-forget" class="btn-danger">Reset vault</button>
+      <button id="unlock-forget" class="btn-danger">Effacer le coffre</button>
       <button id="unlock-submit" class="btn-primary">Déverrouiller</button>
     </div>
   `;
@@ -174,7 +174,7 @@ function renderUnlock() {
   $('#unlock-submit').addEventListener('click', handleUnlock);
   $('#unlock-pwd').addEventListener('keydown', e => { if (e.key === 'Enter') handleUnlock(); });
   $('#unlock-forget').addEventListener('click', () => {
-    if (confirm('Effacer le vault ? Toutes les clés API devront être ressaisies.')) {
+    if (confirm('Effacer le coffre ? Toutes les clés API devront être ressaisies.')) {
       forgetVault(); renderWizardStep1();
     }
   });
@@ -317,7 +317,7 @@ function handleWizardImportSuccess(counts) {
   if (a.goals) dataLines.push(`🎯 ${a.goals} goals`);
 
   const settingsLines = [];
-  if (r.apiKeys) settingsLines.push('🔑 Clés API LLM (vault)');
+  if (r.apiKeys) settingsLines.push('🔑 Clés IA (coffre chiffré)');
   if (r.dataKeys) settingsLines.push('📊 Clés API data');
   if (r.settings) settingsLines.push('⚙️ Settings + routing');
   if (r.profile) settingsLines.push('👤 Profil utilisateur');
@@ -326,7 +326,7 @@ function handleWizardImportSuccess(counts) {
   if (r.costs) settingsLines.push('💵 Historique coûts');
 
   const premiumLine = counts.licenseRestored
-    ? `<div style="color:var(--accent-green);background:rgba(0,255,136,0.08);padding:8px 10px;border-radius:4px;margin:8px 0;font-size:12px;border-left:3px solid var(--accent-green);">💎 <strong>Licence Premium restaurée</strong> — accès Pro débloqué après déverrouillage du vault.</div>`
+    ? `<div style="color:var(--accent-green);background:rgba(0,255,136,0.08);padding:8px 10px;border-radius:4px;margin:8px 0;font-size:12px;border-left:3px solid var(--accent-green);">💎 <strong>Licence Premium restaurée</strong> — accès Pro débloqué après déverrouillage du coffre.</div>`
     : `<div style="color:var(--accent-amber);background:rgba(255,170,0,0.08);padding:8px 10px;border-radius:4px;margin:8px 0;font-size:12px;border-left:3px solid var(--accent-amber);">⚠️ <strong>Pas de licence Premium</strong> dans ce backup. Si tu en avais une, ré-exporte un backup récent depuis l'appareil source.</div>`;
 
   const html = `
@@ -342,7 +342,7 @@ function handleWizardImportSuccess(counts) {
       <div style="color:var(--text-muted);text-transform:uppercase;font-size:10px;letter-spacing:0.5px;margin-bottom:4px;">Paramètres</div>
       <div style="color:var(--text-primary);line-height:1.7;">${settingsLines.join(' · ')}</div>
     </div>` : ''}
-    <div style="color:var(--text-muted);font-size:11px;margin-top:10px;">⏳ Rechargement dans 2s pour appliquer le vault chiffré…</div>
+    <div style="color:var(--text-muted);font-size:11px;margin-top:10px;">⏳ Rechargement dans 2s pour appliquer le coffre chiffré…</div>
   `;
   if (status) status.innerHTML = html;
 
