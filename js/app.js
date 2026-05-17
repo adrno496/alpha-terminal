@@ -2,6 +2,42 @@
 import { $, fmtUSD, fmtRelative, escHtml } from './core/utils.js';
 import { isConnected, onConnectionChange, abortCurrentCall } from './core/api.js';
 import { hasVault, markActivity } from './core/crypto.js';
+
+// === Redirect vers /login.html si pas authentifié ===
+// Critères "authentifié" (au moins UN suffit) :
+//   1. just-logged-in (vient de login.html)
+//   2. Browse-mode activé (l'user a explicitement choisi "sans compte")
+//   3. Vault local existant (legacy user déjà configuré)
+//   4. Session Supabase en cache (token OAuth présent)
+//   5. License Lemonsqueezy active
+//   6. URL contient une analyse partagée (#share=…)
+// On le fait dès le tout début du module pour éviter de charger l'app entière inutilement.
+(function maybeRedirectToLogin() {
+  try {
+    const onLoginPage = /\/login\.html$/.test(location.pathname);
+    if (onLoginPage) return;
+    if (sessionStorage.getItem('alpha-terminal:just-logged-in') === '1') {
+      sessionStorage.removeItem('alpha-terminal:just-logged-in');
+      return;
+    }
+    // Si l'URL est un callback OAuth (#access_token=…) ou contient un partage,
+    // on laisse la page se charger pour que detectSessionInUrl capte la session.
+    const h = location.hash || '';
+    if (/access_token=|error=|provider_token=|^#share=/.test(h)) return;
+    if (localStorage.getItem('alpha-terminal:browse-mode') === '1') return;
+    if (hasVault()) return;
+    if (localStorage.getItem('alpha-license-key')) return;
+    // Supabase stocke la session sous "sb-{ref}-auth-token"
+    const cfg = (typeof window !== 'undefined' && window.ALPHA_CONFIG) || {};
+    const m = String(cfg.SUPABASE_URL || '').match(/https?:\/\/([^.]+)/);
+    if (m && localStorage.getItem('sb-' + m[1] + '-auth-token')) return;
+    // Aucun critère rempli → vers la page de connexion.
+    location.replace('login.html');
+  } catch {
+    // En cas d'erreur on n'oblige pas la redirection (ne pas bloquer l'app).
+  }
+})();
+
 import { listAnalyses, getSettings, setSettings, onDbAvailabilityChange } from './core/storage.js';
 import { getCost, onCostChange } from './core/cost-tracker.js';
 
@@ -787,7 +823,13 @@ function boot() {
     // Décide quoi afficher au boot
     const settings = getSettings();
     const seen = settings.hasSeenLanding;
-    if (!seen && !hasVault()) {
+    // Si l'user vient de login.html (Google ou license), on saute le wizard de mot de passe :
+    // le vault sera créé à la 1ère sauvegarde de clé API (lazy). En attendant on est en
+    // browse-mode pour pouvoir explorer l'app librement.
+    const cameFromLogin = (() => {
+      try { return localStorage.getItem('alpha-terminal:browse-mode') === '1'; } catch { return false; }
+    })();
+    if (!seen && !hasVault() && !cameFromLogin) {
       // Premier lancement → landing avec demo CTA
       showLanding();
       // Wire le bouton "Voir une analyse demo" si présent
@@ -797,6 +839,12 @@ function boot() {
     } else if (hasVault()) {
       // Vault existant → unlock direct
       startLockFlow();
+    } else if (cameFromLogin) {
+      // Connecté Google sans vault → mode browse, l'app est utilisable, le vault
+      // sera créé à la première sauvegarde de clé API.
+      setSettings({ hasSeenLanding: true });
+      hideLanding();
+      window.dispatchEvent(new CustomEvent('app:browse-mode-enabled'));
     } else {
       // Pas de vault mais déjà vu landing → wizard direct
       openLockFlow();

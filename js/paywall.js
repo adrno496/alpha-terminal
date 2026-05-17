@@ -130,8 +130,6 @@
             buyBtn: '🚀 Subscribe €9.99/month',
             lifetimeBtn: '♾️ Get lifetime access €299',
             keyBtn: '🔑 I have a license key',
-            loginBtn: 'Sign in with Google',
-            loginHint: 'Already subscribed?',
             bullets: [
               '✅ Unlimited access to all Pro modules',
               '✅ Your analyses stay 100% local (BYOK)',
@@ -148,8 +146,6 @@
             buyBtn: '🚀 S\'abonner 9,99€/mois',
             lifetimeBtn: '♾️ Accès à vie 299€',
             keyBtn: '🔑 J\'ai déjà une clé',
-            loginBtn: 'Se connecter avec Google',
-            loginHint: 'Déjà abonné ?',
             bullets: [
               '✅ Accès illimité aux modules Pro',
               '✅ Tes analyses restent 100% locales (BYOK)',
@@ -176,20 +172,8 @@
                   <a href="${LIFETIME_URL}" target="_blank" rel="noopener" class="paywall-btn" style="width:100%;text-decoration:none;display:block;text-align:center;box-sizing:border-box;">${t.lifetimeBtn}</a>
                 </div>
               </div>
-              <div style="text-align:center;margin:6px 0 14px;display:flex;flex-direction:column;gap:8px;align-items:center;">
+              <div style="text-align:center;margin:6px 0 14px;">
                 <button type="button" class="paywall-btn paywall-btn-secondary" data-paywall-action="enter-key">${t.keyBtn}</button>
-                <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-muted);margin-top:4px;">
-                  <span>${t.loginHint}</span>
-                  <button type="button" data-paywall-action="login-google" style="background:#fff;color:#3c4043;border:1px solid #dadce0;border-radius:4px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-family:'Roboto',Arial,sans-serif;">
-                    <svg width="16" height="16" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
-                      <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.583-5.036-3.71H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
-                      <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
-                      <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
-                    </svg>
-                    <span>${t.loginBtn}</span>
-                  </button>
-                </div>
               </div>
               <ul class="paywall-info">
                 ${t.bullets.map((b) => `<li>${b}</li>`).join('')}
@@ -205,8 +189,6 @@
               window.lemonsqueezy.open();
             } else if (action === 'enter-key' && window.licenseManager) {
               window.licenseManager.showLicenseModal();
-            } else if (action === 'login-google') {
-              window.paywall.promptLogin();
             }
           });
         });

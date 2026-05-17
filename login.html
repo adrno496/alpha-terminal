@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b0b0d" />
+  <title>Alpha Terminal — Connexion</title>
+  <meta name="description" content="Connecte-toi à Alpha Terminal avec ton compte Google, une clé de licence, ou continue sans compte." />
+  <meta name="robots" content="noindex,nofollow" />
+
+  <!-- CSP : reste cohérente avec index.html. *.supabase.co couvre OAuth callbacks. -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' https://unpkg.com;
+    style-src 'self' 'unsafe-inline';
+    img-src 'self' data:;
+    connect-src 'self' https://*.supabase.co https://api.lemonsqueezy.com;
+    form-action 'self';
+    base-uri 'self';
+    upgrade-insecure-requests;
+  " />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>α</text></svg>" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-primary, #0b0b0d);
+      color: var(--text-primary, #e7e7ea);
+      font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-secondary, #131316);
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      border-radius: 12px;
+      padding: 36px 32px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+    }
+    .brand {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .brand-mark {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--accent-green, #00ff88);
+    }
+    .brand-tag {
+      font-size: 12px;
+      color: var(--text-muted, #999);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-top: 4px;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 22px 0 6px;
+      text-align: center;
+    }
+    .sub {
+      font-size: 13px;
+      color: var(--text-secondary, #aaa);
+      text-align: center;
+      margin: 0 0 24px;
+      line-height: 1.5;
+    }
+    .google-btn {
+      width: 100%;
+      background: #fff;
+      color: #3c4043;
+      border: 1px solid #dadce0;
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-family: 'Roboto', Arial, sans-serif;
+      transition: box-shadow .15s, background .15s;
+    }
+    .google-btn:hover {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      background: #f8f9fa;
+    }
+    .google-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .status {
+      min-height: 18px;
+      font-size: 12.5px;
+      color: var(--text-muted, #888);
+      text-align: center;
+      margin: 10px 0 0;
+    }
+    .status.ok { color: var(--accent-green, #00ff88); }
+    .status.err { color: #ff6b6b; }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 18px;
+      color: var(--text-muted, #666);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border, rgba(255,255,255,0.08));
+    }
+    .secondary {
+      display: block;
+      width: 100%;
+      background: transparent;
+      color: var(--text-primary, #e7e7ea);
+      border: 1px solid var(--border, rgba(255,255,255,0.12));
+      border-radius: 6px;
+      padding: 11px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+    .secondary:hover {
+      background: var(--bg-tertiary, rgba(255,255,255,0.04));
+    }
+    .ghost {
+      background: transparent;
+      color: var(--text-muted, #888);
+      border: 0;
+      font-size: 12px;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      padding: 4px 8px;
+    }
+    .license-form {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--bg-tertiary, #1a1a1d);
+      border: 1px solid var(--border, rgba(255,255,255,0.08));
+      border-radius: 6px;
+    }
+    .license-form.open { display: block; }
+    .license-form label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted, #888);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .license-form input {
+      width: 100%;
+      background: var(--bg-primary, #0b0b0d);
+      border: 1px solid var(--border, rgba(255,255,255,0.12));
+      color: var(--text-primary, #e7e7ea);
+      border-radius: 4px;
+      padding: 9px 11px;
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      box-sizing: border-box;
+    }
+    .license-form .row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .license-form button {
+      flex: 1;
+      background: var(--accent-green, #00ff88);
+      color: #000;
+      border: 0;
+      border-radius: 4px;
+      padding: 9px 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .license-form .cancel {
+      background: transparent;
+      color: var(--text-muted, #999);
+      border: 1px solid var(--border, rgba(255,255,255,0.12));
+      flex: 0 0 auto;
+      padding: 9px 14px;
+    }
+    .center { text-align: center; margin-top: 18px; }
+    .legal {
+      margin-top: 28px;
+      font-size: 11px;
+      color: var(--text-muted, #666);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .legal a { color: var(--text-muted, #888); text-decoration: underline; }
+    .lang-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      font-size: 12px;
+      color: var(--text-muted, #888);
+    }
+    .lang-toggle a { color: var(--text-muted, #888); text-decoration: none; padding: 4px 8px; }
+    .lang-toggle a.active { color: var(--accent-green, #00ff88); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="lang-toggle">
+    <a href="?lang=fr" data-lang-set="fr" class="active">FR</a>
+    <a href="?lang=en" data-lang-set="en">EN</a>
+  </div>
+
+  <main class="login-card" role="main">
+    <div class="brand">
+      <div class="brand-mark">Alpha</div>
+      <div class="brand-tag" id="brand-tag">Terminal</div>
+    </div>
+
+    <h1 id="title">Bienvenue 👋</h1>
+    <p class="sub" id="subtitle">
+      Connecte-toi avec Google pour retrouver ton abonnement Premium et tes backups cloud chiffrés.
+    </p>
+
+    <!-- === Primary CTA : Google === -->
+    <button type="button" id="google-btn" class="google-btn">
+      <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.259c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.583-5.036-3.71H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+      </svg>
+      <span id="google-btn-label">Se connecter avec Google</span>
+    </button>
+    <div id="status" class="status" role="status" aria-live="polite"></div>
+
+    <!-- === OU === -->
+    <div class="divider" id="divider-label">OU</div>
+
+    <!-- === Secondary actions === -->
+    <button type="button" class="secondary" id="continue-without">
+      👀 <span id="continue-label">Continuer sans compte (démo)</span>
+    </button>
+    <button type="button" class="secondary" id="show-license">
+      🔑 <span id="license-label">J'ai une clé de licence</span>
+    </button>
+
+    <!-- License key form (hidden by default) -->
+    <div class="license-form" id="license-form">
+      <label for="license-input" id="license-input-label">Clé de licence Lemonsqueezy</label>
+      <input
+        type="text"
+        id="license-input"
+        placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+      />
+      <div class="row">
+        <button type="button" id="license-submit">Activer</button>
+        <button type="button" class="cancel" id="license-cancel">Annuler</button>
+      </div>
+      <div id="license-status" class="status" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="legal">
+      Pas de mot de passe à créer · Aucun scope Google demandé hors email · 100% local après login<br>
+      <a href="privacy.html" id="legal-privacy">Confidentialité</a> ·
+      <a href="terms.html" id="legal-terms">CGU</a> ·
+      <a href="index.html" id="legal-back">← Site</a>
+    </div>
+  </main>
+
+  <!-- ALPHA_CONFIG (publique, RLS protège côté DB) -->
+  <script>
+    window.ALPHA_CONFIG = window.ALPHA_CONFIG || {
+      SUPABASE_URL: 'https://bobuovfuxzobhfjcgxlb.supabase.co',
+      SUPABASE_ANON: 'sb_publishable_AcJ08S0oY1DAJYDMwZ6N9A_6IiIH1j0'
+    };
+  </script>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="js/auth.js" defer></script>
+  <script src="js/license.js" defer></script>
+
+  <script defer>
+    (function () {
+      'use strict';
+
+      // === i18n minimal (FR par défaut, EN si ?lang=en ou navigator) ===
+      const params = new URLSearchParams(location.search);
+      const explicitLang = params.get('lang');
+      const isEN = explicitLang === 'en'
+        || (!explicitLang && (navigator.language || 'fr').toLowerCase().startsWith('en'));
+
+      if (isEN) {
+        document.documentElement.lang = 'en';
+        document.title = 'Alpha Terminal — Sign in';
+        document.getElementById('title').textContent = 'Welcome 👋';
+        document.getElementById('subtitle').textContent = 'Sign in with Google to recover your Premium subscription and encrypted cloud backups.';
+        document.getElementById('google-btn-label').textContent = 'Sign in with Google';
+        document.getElementById('divider-label').textContent = 'OR';
+        document.getElementById('continue-label').textContent = 'Continue without account (demo)';
+        document.getElementById('license-label').textContent = 'I have a license key';
+        document.getElementById('license-input-label').textContent = 'Lemonsqueezy license key';
+        document.querySelector('.legal').firstChild.textContent = 'No password to create · No Google scope beyond email · 100% local after sign-in';
+        document.getElementById('legal-privacy').textContent = 'Privacy';
+        document.getElementById('legal-privacy').href = 'privacy-en.html';
+        document.getElementById('legal-terms').textContent = 'Terms';
+        document.getElementById('legal-terms').href = 'terms-en.html';
+        document.getElementById('legal-back').textContent = '← Site';
+        document.querySelectorAll('.lang-toggle a').forEach(a => a.classList.toggle('active', a.dataset.langSet === 'en'));
+      }
+
+      const T = isEN ? {
+        redirecting: '⏳ Redirecting to Google…',
+        loggedIn: '✓ Signed in as ',
+        alreadyLoggedIn: 'Already signed in — redirecting…',
+        errorAuth: 'Sign-in error: ',
+        errorInit: 'Auth not initialized — please reload',
+        license_validating: '⏳ Validating with Lemonsqueezy…',
+        license_invalid: '❌ Invalid license key',
+        license_ok: '✓ License activated — redirecting…',
+      } : {
+        redirecting: '⏳ Redirection vers Google…',
+        loggedIn: '✓ Connecté en tant que ',
+        alreadyLoggedIn: 'Déjà connecté — redirection…',
+        errorAuth: 'Erreur connexion : ',
+        errorInit: 'Auth non initialisée — recharge la page',
+        license_validating: '⏳ Vérification auprès de Lemonsqueezy…',
+        license_invalid: '❌ Clé de licence invalide',
+        license_ok: '✓ Licence activée — redirection…',
+      };
+
+      const status = document.getElementById('status');
+      const setStatus = (msg, type) => {
+        status.textContent = msg || '';
+        status.className = 'status' + (type ? ' ' + type : '');
+      };
+
+      // === Helpers ===
+      function redirectToApp() {
+        // Marque le boot : "user vient de login → n'a pas besoin d'être renvoyé ici"
+        try { sessionStorage.setItem('alpha-terminal:just-logged-in', '1'); } catch {}
+        location.replace('index.html');
+      }
+
+      async function checkAlreadyLoggedIn() {
+        // Si l'user revient du callback Google (URL contient #access_token=…) OU
+        // si une session est déjà stockée, on redirige direct vers l'app.
+        try {
+          if (!window.alphaAuth) return;
+          await window.alphaAuth.ready();
+          const user = await window.alphaAuth.getUser();
+          if (user) {
+            setStatus(T.alreadyLoggedIn, 'ok');
+            setTimeout(redirectToApp, 350);
+          }
+        } catch (e) {
+          // Pas grave, le user reste sur login.html
+        }
+      }
+
+      // === Google login ===
+      document.getElementById('google-btn').addEventListener('click', async () => {
+        if (!window.alphaAuth) { setStatus(T.errorInit, 'err'); return; }
+        setStatus(T.redirecting);
+        try {
+          await window.alphaAuth.signInWithGoogle();
+          // signInWithGoogle déclenche window.location → page se recharge sur Google.
+        } catch (e) {
+          setStatus(T.errorAuth + (e?.message || e), 'err');
+        }
+      });
+
+      // === Continuer sans compte (browse-mode) ===
+      document.getElementById('continue-without').addEventListener('click', () => {
+        try { localStorage.setItem('alpha-terminal:browse-mode', '1'); } catch {}
+        redirectToApp();
+      });
+
+      // === License key ===
+      const licenseForm = document.getElementById('license-form');
+      const licenseInput = document.getElementById('license-input');
+      const licenseStatus = document.getElementById('license-status');
+
+      document.getElementById('show-license').addEventListener('click', () => {
+        licenseForm.classList.toggle('open');
+        if (licenseForm.classList.contains('open')) {
+          setTimeout(() => licenseInput.focus(), 80);
+        }
+      });
+      document.getElementById('license-cancel').addEventListener('click', () => {
+        licenseForm.classList.remove('open');
+        licenseInput.value = '';
+        licenseStatus.textContent = '';
+      });
+
+      async function activateLicense() {
+        const key = (licenseInput.value || '').trim();
+        if (!key) return;
+        licenseStatus.textContent = T.license_validating;
+        licenseStatus.className = 'status';
+        if (!window.licenseManager) {
+          licenseStatus.textContent = T.errorInit;
+          licenseStatus.className = 'status err';
+          return;
+        }
+        try {
+          const result = await window.licenseManager.activateLicense(key);
+          if (result && result.success) {
+            licenseStatus.textContent = T.license_ok;
+            licenseStatus.className = 'status ok';
+            setTimeout(redirectToApp, 600);
+          } else {
+            licenseStatus.textContent = '❌ ' + (result?.error || T.license_invalid);
+            licenseStatus.className = 'status err';
+          }
+        } catch (e) {
+          licenseStatus.textContent = '❌ ' + (e?.message || e);
+          licenseStatus.className = 'status err';
+        }
+      }
+
+      document.getElementById('license-submit').addEventListener('click', activateLicense);
+      licenseInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') activateLicense();
+        if (e.key === 'Escape') document.getElementById('license-cancel').click();
+      });
+
+      // === Au boot : vérifie si déjà connecté (callback OAuth ou session reprise) ===
+      // detectSessionInUrl=true dans auth.js → la session est captée automatiquement
+      // au chargement de la page si l'URL contient #access_token=…
+      setTimeout(checkAlreadyLoggedIn, 200);
+      window.addEventListener('alpha:authChanged', (e) => {
+        if (e?.detail?.user) {
+          setStatus(T.loggedIn + (e.detail.user.email || ''), 'ok');
+          setTimeout(redirectToApp, 500);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

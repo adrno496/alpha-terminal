@@ -14,11 +14,13 @@
   function resolveRedirectUrl() {
     // - En localhost (dev), on garde un redirect prod pour éviter de casser Google qui exige
     //   des Authorized JS Origins déclarés. Override possible via ALPHA_CONFIG.AUTH_REDIRECT_URL.
-    // - En prod (alpha-terminal.app, *.vercel.app, etc.), utilise l'origin courant.
+    // - Sinon, on renvoie sur /login.html (qui capture la session puis forward vers /index.html).
+    //   Le passage par login.html évite un ping-pong avec la redirection de boot d'index.html.
     const cfgRedirect = window.ALPHA_CONFIG?.AUTH_REDIRECT_URL;
     if (cfgRedirect) return cfgRedirect;
     const isLocalhost = /^(localhost|127\.0\.0\.1|0\.0\.0\.0)/.test(window.location.hostname);
-    return isLocalhost ? 'https://alpha-terminal-sepia.vercel.app/' : window.location.origin + '/';
+    if (isLocalhost) return 'https://alpha-terminal-sepia.vercel.app/login.html';
+    return window.location.origin + '/login.html';
   }
 
   class AlphaAuth {
