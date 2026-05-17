@@ -1,6 +1,6 @@
-// Service Worker v103 — network-first pour HTML/navigation (toujours frais),
+// Service Worker v104 — network-first pour HTML/navigation (toujours frais),
 // cache-first pour JS/CSS/JSON/images (offline + rapide). Aucun cache pour les API calls.
-const CACHE = 'alpha-terminal-v103';
+const CACHE = 'alpha-terminal-v104';
 
 // Liste des assets pré-cachés au install pour fonctionner 100% offline.
 // Inclut HTML pages SEO + JS modules core + datasets JSON.
