@@ -224,10 +224,10 @@ const DICT = {
     'mod.newsletter-investor.desc': 'Newsletter générée dans ta voix',
     'mod.position-sizing.label': 'Position Sizing',
     'mod.position-sizing.desc': 'Kelly criterion & risk management',
-    'mod.dcf.label': 'DCF / Fair Value',
-    'mod.dcf.desc': 'Valorisation intrinsèque (Buffett style)',
-    'mod.pre-mortem.label': '🔥 Pre-Mortem',
-    'mod.pre-mortem.desc': 'Avocat du diable d\'une thèse',
+    'mod.dcf.label': '💹 Prix équitable (DCF)',
+    'mod.dcf.desc': 'Calcule ce que vaut vraiment une action selon ses cash-flows futurs (méthode Buffett)',
+    'mod.pre-mortem.label': '🔥 Tester ma thèse (Pre-Mortem)',
+    'mod.pre-mortem.desc': 'Imagine que ton investissement échoue : pourquoi ? Cherche les failles avant d\'acheter.',
     'mod.stock-screener.label': 'Stock Screener',
     'mod.stock-screener.desc': 'Discovery par critères fondamentaux',
     'mod.trade-journal.label': 'Trade Journal',
@@ -246,8 +246,8 @@ const DICT = {
     'mod.knowledge-base.desc': 'Tes notes/PDFs auto-injectés (RAG)',
     'mod.portfolio-audit.label': '🔎 Audit Portefeuille',
     'mod.portfolio-audit.desc': 'Audit profond Buffett-style : concentration, narrative, score 0-100',
-    'mod.youtube-transcript.label': '🎙 YouTube + CEO Forensics',
-    'mod.youtube-transcript.desc': 'Décode un transcript : sentiment verbal, topics évités, mémoire cross-modules',
+    'mod.youtube-transcript.label': '🎙 Décoder un dirigeant (transcripts)',
+    'mod.youtube-transcript.desc': 'Analyse une interview ou earnings call : sentiment, sujets évités, mensonges potentiels',
 
     // === Module HELP texts (popover (?) sidebar) ===
     'mod.help.missing': '_Pas de description disponible pour ce module._',
@@ -638,8 +638,8 @@ const DICT = {
     'mod.price-alerts.desc': 'Alertes prix extraites des transcripts YouTube + manuelles, vérifiées contre les cours live',
     'mod.price-alerts.help': '**À quoi ça sert :** quand tu analyses une vidéo YouTube qui mentionne des niveaux de prix (entrée, sortie, stop-loss, objectif) sur des actifs, ils sont extraits automatiquement. Si le cours franchit le seuil, un voyant rouge s\'affiche partout dans l\'app.\n\n**Comment :** vérification automatique horaire au boot. Manual check via le bouton "🔄 Vérifier les cours". Tu peux aussi créer des alertes manuelles.\n\n**Quand :** dès qu\'un transcript YouTube est analysé, ou en revue quotidienne.',
     // V9
-    'mod.ifi-simulator.label': '🇫🇷 Simulateur IFI',
-    'mod.ifi-simulator.desc': 'Calcul automatique IFI 2024 depuis tes biens immobiliers',
+    'mod.ifi-simulator.label': '🇫🇷 Impôt sur la fortune (IFI)',
+    'mod.ifi-simulator.desc': 'Calcul automatique de l\'IFI si ton immobilier net dépasse 1,3 M€',
     'mod.ifi-simulator.help': '**À quoi ça sert :** simule l\'Impôt sur la Fortune Immobilière dû selon tes biens (RP avec abattement 30%, locatif, secondaire, dettes déductibles).\n\n**Comment :** lit tes biens du module Patrimoine. Applique le barème 2024 + décote entre 1.3M€ et 1.4M€.\n\n**Quand :** une fois par an avant déclaration de revenus.',
     'mod.goals.label': '🎯 Objectifs financiers',
     'mod.goals.desc': 'Définis tes objectifs (FIRE, retraite, achat) et suis ta progression vs patrimoine',
@@ -654,14 +654,14 @@ const DICT = {
     'mod.projection.desc': 'Projection 5/10/20/30 ans avec 3 scénarios (pessimiste/médian/optimiste) + inflation',
     'mod.projection.help': '**À quoi ça sert :** projeter ton patrimoine futur selon hypothèses de rendement et d\'inflation. Affiche valeur nominale ET valeur réelle (déflatée).\n\n**Comment :** auto-rempli depuis ton patrimoine actuel + épargne mensuelle (depuis Budget). 3 scénarios pré-configurés (3%/4% inflation, 7%/2.5%, 10%/2%).\n\n**Quand :** planification long terme, simulation FIRE, anticipation retraite.',
     // V10
-    'mod.tax-loss-harvesting.label': '🧮 Tax-Loss Harvesting',
-    'mod.tax-loss-harvesting.desc': 'Identifie les ventes optimales sur CTO pour matérialiser des moins-values déductibles',
+    'mod.tax-loss-harvesting.label': '🧮 Réduire mes impôts (vendre en perte)',
+    'mod.tax-loss-harvesting.desc': 'Identifie les positions en perte à vendre pour économiser sur ta fiscalité (PFU 30%)',
     'mod.tax-loss-harvesting.help': '**À quoi ça sert :** sur tes positions CTO en moins-value latente, propose les ventes à matérialiser pour réduire ton imposition (déductible 10 ans en FR).\n\n**Comment :** scan les holdings CTO, calcule moins-values latentes, suggère stratégie de matérialisation + remplacement par actif similaire.\n\n**Quand :** fin d\'année fiscale (oct-nov-déc) pour optimiser la déclaration.',
     'mod.subscriptions-detector.label': '🔍 Détecteur abonnements',
     'mod.subscriptions-detector.desc': 'Auto-détecte abonnements récurrents + doublons (Netflix + Disney+ + Apple TV...)',
     'mod.subscriptions-detector.help': '**À quoi ça sert :** scan ton budget des 6 derniers mois pour identifier les abonnements récurrents et signaler les doublons (3 services video streaming, 2 forfaits mobile, etc.).\n\n**Comment :** algorithme local pur sur les entrées budget. Plus tu importes de CSV bancaires, plus la détection est fiable.\n\n**Quand :** revue mensuelle pour économiser ~€20-50/mois sur les abonnements oubliés.',
-    'mod.envelope-optimizer.label': '🇫🇷 Optimiseur enveloppe fiscale',
-    'mod.envelope-optimizer.desc': 'Répartition recommandée PEA/AV/PER/CTO selon ton âge + TMI',
+    'mod.envelope-optimizer.label': '🇫🇷 Quelle enveloppe choisir ? (PEA, AV, PER)',
+    'mod.envelope-optimizer.desc': 'Où placer ton argent (PEA, assurance-vie, PER, CTO) selon ton âge et ton imposition',
     'mod.envelope-optimizer.help': '**À quoi ça sert :** te dit la répartition idéale de tes investissements entre PEA / Assurance-vie / PER / CTO selon ton âge et ta tranche marginale d\'imposition.\n\n**Comment :** algorithme local + heuristiques FR (jeune actif → PEA dominant, pré-retraite → PER + AV, retraite → AV transmission).\n\n**Quand :** après chaque versement important ou changement de situation (héritage, augmentation, mariage).',
 
     // V11 — Donations & Succession / Capital Gains / Backtest
@@ -670,8 +670,8 @@ const DICT = {
     'mod.donations-succession.help': '**À quoi ça sert :** simule l\'impact fiscal d\'une donation ou d\'une succession en France selon les abattements 2026 (100k€/enfant tous les 15 ans, 152 500€ AV avant 70 ans).\n\n**Comment :** calculs locaux selon les barèmes du CGI (art. 779, 777, 990 I, 757 B). Simule aussi le démembrement temporaire (donation nue-propriété).\n\n**Quand :** avant chaque donation importante ou pour optimiser ta transmission patrimoniale.',
     'mod.donations-succession.example': 'Charger un exemple',
 
-    'mod.capital-gains-tracker.label': '🧾 Capital Gains (FIFO/CMP)',
-    'mod.capital-gains-tracker.desc': 'Suivi des lots d\'achat (FIFO/LIFO/CMP) pour anticiper les plus-values avant vente',
+    'mod.capital-gains-tracker.label': '🧾 Plus-values avant vente',
+    'mod.capital-gains-tracker.desc': 'Calcule à l\'avance ce que tu paieras d\'impôt si tu vends (méthode FIFO/CMP)',
     'mod.capital-gains-tracker.help': '**À quoi ça sert :** suit ton coût d\'achat lot par lot pour calculer la plus-value latente selon FIFO, LIFO ou CMP avant chaque vente.\n\n**Comment :** ajoute manuellement chaque lot ou importe depuis Patrimoine. La simulation de vente compare l\'imposition des 3 méthodes.\n\n**Quand :** avant toute vente sur CTO pour minimiser la plus-value imposable (PFU 30%).',
     'mod.capital-gains-tracker.example': 'Charger 3 lots Apple démo',
 
@@ -691,8 +691,8 @@ const DICT = {
     'mod.earnings-calendar.help': '**À quoi ça sert :** liste les prochains résultats trimestriels uniquement pour les actions/ETF que tu détiens, avec le compte à rebours en jours.\n\n**Comment :** dates inférées par cycle trimestriel typique (avr/juil/oct/jan). Tu peux corriger manuellement chaque ticker.\n\n**Quand :** chaque lundi pour anticiper la semaine et préparer les positions.',
     'mod.earnings-calendar.example': 'Rafraîchir',
 
-    'mod.correlation-matrix.label': '🌡️ Correlation Matrix',
-    'mod.correlation-matrix.desc': 'Heatmap des corrélations entre classes d\'actifs + corrélation moyenne de ton portefeuille',
+    'mod.correlation-matrix.label': '🌡️ Mes actifs bougent-ils ensemble ?',
+    'mod.correlation-matrix.desc': 'Vérifie que tes positions ne montent/descendent pas toutes en même temps (vraie diversification)',
     'mod.correlation-matrix.help': '**À quoi ça sert :** mesure la "vraie" diversification : un portefeuille de 10 ETF tech a une corrélation ~0.95, donc 10 lignes mais 1 seule exposition.\n\n**Comment :** matrice basée sur moyennes long terme (MSCI, BlackRock, Vanguard). Pondérée par tes positions pour obtenir un score 0-1.\n\n**Quand :** après chaque rebalancing pour vérifier que tu diversifies vraiment.',
 
     'mod.esg-impact.label': '🌍 ESG Impact',
@@ -707,8 +707,8 @@ const DICT = {
     'mod.macro-events-calendar.desc': 'Calendrier Fed/BCE/CPI/NFP/élections — 90 jours à venir',
     'mod.macro-events-calendar.help': '**À quoi ça sert :** anticipe les événements macro à fort impact marché (réunions banques centrales, statistiques d\'inflation, emploi US).\n\n**Comment :** dates 2026 connues + saisie d\'événements custom (élections, sommets, rapports d\'entreprise spécifiques).\n\n**Quand :** revue hebdo le lundi pour voir ce qui peut bouger les marchés cette semaine.',
 
-    'mod.performance-attribution.label': '📈 Performance Attribution',
-    'mod.performance-attribution.desc': 'Attribution Brinson : alpha vs benchmark décomposé en allocation + sélection',
+    'mod.performance-attribution.label': '📈 Pourquoi mon portefeuille a fait +X% ?',
+    'mod.performance-attribution.desc': 'Chance ou stock-picking ? Décompose ta performance vs. un indice (méthode Brinson)',
     'mod.performance-attribution.help': '**À quoi ça sert :** sépare ta performance en 2 sources : (1) allocation = bonnes pondérations sectorielles vs MSCI World, (2) sélection = bonnes actions choisies dans chaque secteur.\n\n**Comment :** modèle Brinson appliqué sur perf 12 mois TTM, benchmark = MSCI World standard.\n\n**Quand :** revue annuelle pour comprendre POURQUOI ton portefeuille a fait +X% (chance ou skill ?).',
 
     // V14 — Daily brief
@@ -732,8 +732,8 @@ const DICT = {
     'mod.watchpoints.help': '**À quoi ça sert :** centralise tes notes importantes (prix d\\u2019achat cible, take-profit, stop-loss, IPO à surveiller, FDA, deadline). Les modules <strong>Daily Brief</strong>, <strong>Today\\u2019s Actions</strong> et <strong>Smart Alerts Center</strong> les scannent automatiquement et te préviennent.\n\n**Comment :** stockage local IndexedDB. 8 types : entry / exit / stop_loss / take_profit / level / ipo / event / note.\n\n**Quand :** dès qu\\u2019une idée d\\u2019invest te traverse l\\u2019esprit (price target, IPO, événement).',
 
     // V13 — Analyse géopolitique
-    'mod.geopolitical-analysis.label': '🌍 Analyse géopolitique',
-    'mod.geopolitical-analysis.desc': 'Cartographie risques régionaux + impact marchés + hedges concrets · web search requis',
+    'mod.geopolitical-analysis.label': '🌍 Impact géopolitique sur mes placements',
+    'mod.geopolitical-analysis.desc': 'Comment les tensions mondiales (Taiwan, Ukraine, Moyen-Orient) affectent ton portefeuille + protections concrètes',
     'mod.geopolitical-analysis.help': '**À quoi ça sert :** comprend l\'impact des tensions géopolitiques (Taiwan, Ukraine, Moyen-Orient, élections) sur tes placements. Donne des scenarios probabilistes, l\'impact chiffré par classe d\'actifs, et des hedges concrets (tickers + tailles).\n\n**Comment :** LLM avec web search natif (Perplexity / Grok / Gemini) pour info temps réel + raisonnement nuancé sur scénarios. Wealth-aware : analyse l\'exposition de TON patrimoine.\n\n**Quand :** avant un événement majeur (élection, sommet OPEP, deadline sanctions), ou quand tu veux re-évaluer ton portefeuille face aux risques actuels.',
     'mod.geopolitical-analysis.example': 'Tensions Moyen-Orient : impact pétrole + industriels EU',
     'mod.geopolitical-analysis.run': '🌍 Lancer l\'analyse',
@@ -992,10 +992,10 @@ const DICT = {
     'mod.newsletter-investor.desc': 'Newsletter generated in your voice',
     'mod.position-sizing.label': 'Position Sizing',
     'mod.position-sizing.desc': 'Kelly criterion & risk management',
-    'mod.dcf.label': 'DCF / Fair Value',
-    'mod.dcf.desc': 'Intrinsic valuation (Buffett style)',
-    'mod.pre-mortem.label': '🔥 Pre-Mortem',
-    'mod.pre-mortem.desc': 'Devil\'s advocate against your thesis',
+    'mod.dcf.label': '💹 Fair price of a stock (DCF)',
+    'mod.dcf.desc': 'Compute what a stock is really worth based on future cash flows (Buffett method)',
+    'mod.pre-mortem.label': '🔥 Stress-test my thesis (Pre-Mortem)',
+    'mod.pre-mortem.desc': 'Imagine your investment fails: why? Find the flaws before you buy.',
     'mod.stock-screener.label': 'Stock Screener',
     'mod.stock-screener.desc': 'Discovery by fundamental criteria',
     'mod.trade-journal.label': 'Trade Journal',
@@ -1014,8 +1014,8 @@ const DICT = {
     'mod.knowledge-base.desc': 'Your notes/PDFs auto-injected (RAG)',
     'mod.portfolio-audit.label': '🔎 Portfolio Audit',
     'mod.portfolio-audit.desc': 'Deep Buffett-style audit: concentration, narrative, 0-100 score',
-    'mod.youtube-transcript.label': '🎙 YouTube + CEO Forensics',
-    'mod.youtube-transcript.desc': 'Decode a transcript: verbal sentiment, avoided topics, cross-module memory',
+    'mod.youtube-transcript.label': '🎙 Decode a CEO (transcripts)',
+    'mod.youtube-transcript.desc': 'Analyzes an interview or earnings call: sentiment, avoided topics, potential lies',
 
     'mod.help.missing': '_No help available for this module._',
     'mod.quick-analysis.help': '**What it does:** BUY / SELL / HOLD verdict in 30 seconds on an asset or portfolio.\n\n**How:** type a ticker (NVDA, BTC) or theme ("European luxury"). Add % for portfolio mode. Click "Analyze now".\n\n**When:** first reflex before digging in, or to quickly validate a hunch.',
@@ -1397,8 +1397,8 @@ const DICT = {
     'mod.price-alerts.desc': 'Price alerts extracted from YouTube transcripts + manual, checked against live prices',
     'mod.price-alerts.help': '**Purpose:** when you analyze a YouTube video that mentions price levels (entry, exit, stop-loss, target) on traded assets, they are extracted automatically. When live price crosses the threshold, a red indicator appears everywhere in the app.\n\n**How:** automatic hourly check on boot. Manual check via "🔄 Check prices now". You can also create alerts manually.\n\n**When:** as soon as a YouTube transcript is analyzed, or on daily review.',
     // V9
-    'mod.ifi-simulator.label': '🇫🇷 IFI Simulator',
-    'mod.ifi-simulator.desc': 'Automatic 2024 French Real-Estate Wealth Tax (IFI) computation from your properties',
+    'mod.ifi-simulator.label': '🇫🇷 French wealth tax (IFI)',
+    'mod.ifi-simulator.desc': 'Computes your IFI if your net real-estate value exceeds €1.3M',
     'mod.ifi-simulator.help': '**Purpose:** simulate the French Impôt sur la Fortune Immobilière based on your properties (main residence with 30% discount, rental, secondary, deductible debts).\n\n**How:** reads your properties from Patrimoine module. Applies 2024 brackets + decote between €1.3M and €1.4M.\n\n**When:** once a year before tax filing.',
     'mod.goals.label': '🎯 Financial Goals',
     'mod.goals.desc': 'Define your goals (FIRE, retirement, purchase) and track progress vs wealth',
@@ -1413,14 +1413,14 @@ const DICT = {
     'mod.projection.desc': '5/10/20/30 year projection across 3 scenarios (pessimistic/median/optimistic) + inflation',
     'mod.projection.help': '**Purpose:** project your future wealth based on return and inflation assumptions. Shows nominal value AND real value (inflation-adjusted).\n\n**How:** auto-filled from current wealth + monthly savings (from Budget). 3 pre-configured scenarios (3%/4% inflation, 7%/2.5%, 10%/2%).\n\n**When:** long-term planning, FIRE simulation, retirement anticipation.',
     // V10
-    'mod.tax-loss-harvesting.label': '🧮 Tax-Loss Harvesting',
-    'mod.tax-loss-harvesting.desc': 'Identify optimal sells on CTO to materialize deductible losses',
+    'mod.tax-loss-harvesting.label': '🧮 Cut my taxes (harvest losses)',
+    'mod.tax-loss-harvesting.desc': 'Identify losing positions to sell so you save on capital-gains taxes',
     'mod.tax-loss-harvesting.help': '**Purpose:** on your CTO positions in unrealized loss, suggest the sells to materialize to reduce your tax bill (deductible 10 years in FR, $3K/year US).\n\n**How:** scans CTO holdings, computes unrealized losses, suggests harvest strategy + replacement with similar asset.\n\n**When:** end of tax year (Oct-Dec) to optimize the filing.',
     'mod.subscriptions-detector.label': '🔍 Subscriptions Detector',
     'mod.subscriptions-detector.desc': 'Auto-detect recurring subscriptions + duplicates (Netflix + Disney+ + Apple TV...)',
     'mod.subscriptions-detector.help': '**Purpose:** scans your last 6 months of budget to identify recurring subscriptions and flag duplicates (3 video streaming services, 2 mobile plans, etc.).\n\n**How:** pure local algorithm on budget entries. The more CSV bank imports you do, the better detection.\n\n**When:** monthly review to save ~$20-50/month on forgotten subscriptions.',
-    'mod.envelope-optimizer.label': '🇫🇷 Tax-envelope Optimizer',
-    'mod.envelope-optimizer.desc': 'Recommended PEA/AV/PER/CTO split based on your age + tax bracket',
+    'mod.envelope-optimizer.label': '🇫🇷 Which French tax wrapper? (PEA, AV, PER)',
+    'mod.envelope-optimizer.desc': 'Tells you where to invest (PEA, life-insurance, PER, brokerage) based on age and tax bracket',
     'mod.envelope-optimizer.help': '**Purpose:** tells you the ideal split of your investments between PEA / life-insurance / PER / CTO based on your age and marginal tax bracket.\n\n**How:** local algorithm + FR heuristics (young → PEA-heavy, pre-retirement → PER + life-insurance, retirement → life-insurance for transmission).\n\n**When:** after a large contribution or change in situation (inheritance, raise, marriage).',
 
     'mod.donations-succession.label': '🎁 Donations & Inheritance (FR)',
@@ -1428,8 +1428,8 @@ const DICT = {
     'mod.donations-succession.help': '**Purpose:** simulate the tax impact of a gift or inheritance in France with the 2026 abatements (100k€/child every 15 years, 152,500€ life-insurance before age 70).\n\n**How:** local calculations following French tax code (art. 779, 777, 990 I, 757 B). Also simulates temporary dismemberment (bare-ownership gifts).\n\n**When:** before any large gift, or to optimize your wealth transfer plan.',
     'mod.donations-succession.example': 'Load example',
 
-    'mod.capital-gains-tracker.label': '🧾 Capital Gains (FIFO/WAC)',
-    'mod.capital-gains-tracker.desc': 'Lot-by-lot cost basis tracking (FIFO/LIFO/Weighted Avg) to anticipate gains before selling',
+    'mod.capital-gains-tracker.label': '🧾 Capital gains before sale',
+    'mod.capital-gains-tracker.desc': 'Pre-compute the tax you\'ll owe if you sell (FIFO / Weighted-Avg cost basis)',
     'mod.capital-gains-tracker.help': '**Purpose:** tracks your purchase cost lot by lot to compute unrealized gains under FIFO, LIFO or weighted-average before any sell.\n\n**How:** manually add each lot or import from Wealth. The sell simulator compares tax impact across the 3 methods.\n\n**When:** before any taxable sale to minimize the realized gain (FR PFU 30%, US LT/ST cap gains).',
     'mod.capital-gains-tracker.example': 'Load 3 Apple demo lots',
 
@@ -1448,8 +1448,8 @@ const DICT = {
     'mod.earnings-calendar.help': '**Purpose:** lists upcoming quarterly earnings for the stocks/ETFs you own only, with day countdown.\n\n**How:** dates inferred from typical quarterly cycle (Apr/Jul/Oct/Jan). You can override per ticker.\n\n**When:** every Monday to plan the week and prep positions.',
     'mod.earnings-calendar.example': 'Refresh',
 
-    'mod.correlation-matrix.label': '🌡️ Correlation Matrix',
-    'mod.correlation-matrix.desc': 'Asset class correlation heatmap + your portfolio average correlation',
+    'mod.correlation-matrix.label': '🌡️ Do my assets move together?',
+    'mod.correlation-matrix.desc': 'Check whether your positions all rise/fall in sync — true diversification check',
     'mod.correlation-matrix.help': '**Purpose:** measures "true" diversification: a portfolio of 10 tech ETFs has ~0.95 correlation, meaning 10 lines but 1 single exposure.\n\n**How:** matrix from long-term averages (MSCI, BlackRock, Vanguard). Weighted by your positions for a 0-1 score.\n\n**When:** after each rebalancing to verify you\'re actually diversifying.',
 
     'mod.esg-impact.label': '🌍 ESG Impact',
@@ -1464,8 +1464,8 @@ const DICT = {
     'mod.macro-events-calendar.desc': 'Fed/ECB/CPI/NFP/elections calendar — next 90 days',
     'mod.macro-events-calendar.help': '**Purpose:** anticipate high-impact macro events (central bank meetings, inflation prints, US jobs).\n\n**How:** known 2026 dates + custom event entry (elections, summits, specific company reports).\n\n**When:** weekly Monday review to see what could move markets this week.',
 
-    'mod.performance-attribution.label': '📈 Performance Attribution',
-    'mod.performance-attribution.desc': 'Brinson attribution: alpha vs benchmark decomposed into allocation + selection',
+    'mod.performance-attribution.label': '📈 Why did my portfolio return +X%?',
+    'mod.performance-attribution.desc': 'Luck or stock-picking? Breaks down your return vs. an index (Brinson method)',
     'mod.performance-attribution.help': '**Purpose:** splits your performance into 2 sources: (1) allocation = right sector weights vs MSCI World, (2) selection = right stocks within each sector.\n\n**How:** Brinson model on 12-month TTM, benchmark = standard MSCI World.\n\n**When:** annual review to understand WHY your portfolio did +X% (luck or skill?).',
 
     'mod.daily-briefing.label': '🌅 Daily Briefing',
@@ -1487,8 +1487,8 @@ const DICT = {
     'mod.watchpoints.desc': 'Notes shared across all modules: entry/exit prices, IPOs, events to scan',
     'mod.watchpoints.help': '**Purpose:** centralizes your important notes (target buy price, take-profit, stop-loss, upcoming IPO, FDA, deadline). The <strong>Daily Brief</strong>, <strong>Today\\u2019s Actions</strong>, and <strong>Smart Alerts Center</strong> modules scan them automatically and notify you.\n\n**How:** local IndexedDB storage. 8 types: entry / exit / stop_loss / take_profit / level / ipo / event / note.\n\n**When:** as soon as an investing idea hits you (price target, IPO, event).',
 
-    'mod.geopolitical-analysis.label': '🌍 Geopolitical Analysis',
-    'mod.geopolitical-analysis.desc': 'Regional risk mapping + market impact + concrete hedges · web search required',
+    'mod.geopolitical-analysis.label': '🌍 How world events affect my investments',
+    'mod.geopolitical-analysis.desc': 'How global tensions (Taiwan, Ukraine, Middle East) hit your portfolio + concrete hedges',
     'mod.geopolitical-analysis.help': '**Purpose:** understand the impact of geopolitical tensions (Taiwan, Ukraine, Middle East, elections) on your investments. Gives probabilistic scenarios, quantified impact per asset class, and concrete hedges (tickers + sizes).\n\n**How:** LLM with native web search (Perplexity / Grok / Gemini) for real-time info + nuanced reasoning on scenarios. Wealth-aware: analyzes YOUR portfolio exposure.\n\n**When:** before major events (elections, OPEC summits, sanction deadlines), or when reassessing your portfolio against current risks.',
     'mod.geopolitical-analysis.example': 'Middle East tensions: oil impact + EU industrials',
     'mod.geopolitical-analysis.run': '🌍 Run analysis',
