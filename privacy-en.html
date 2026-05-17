@@ -96,10 +96,10 @@
 
     <h2>1. Founding principle: 0 data collected by Alpha</h2>
     <p>Alpha Terminal is a <strong>100% client-side</strong> app. This means <strong>your data (API keys, holdings, analyses, notes, transcripts, budget) never leaves your browser</strong>. We operate no server that receives, stores, or processes your data.</p>
-    <p>Open verification: open your browser's DevTools (F12) → Network tab. During use, you only see calls to LLM provider APIs (api.anthropic.com, api.openai.com, etc.) and financial data providers (FMP, Polygon, etc.). No call to an alpha-terminal.app domain to transfer data.</p>
+    <p>Open verification: open your browser's DevTools (F12) → Network tab. During use, you only see calls to AI provider APIs (api.anthropic.com, api.openai.com, etc.) and financial data providers (FMP, Polygon, etc.). No call to an alpha-terminal.app domain to transfer data.</p>
 
-    <h2>2. BYOK model (Bring Your Own Key)</h2>
-    <p>You bring your own API key for LLM providers. Keys are encrypted locally (<strong>AES-GCM 256-bit + PBKDF2 100,000-iteration SHA-256 derivation</strong>) with a password only you know. The encrypted vault is stored in your browser's <code>localStorage</code>. Without your password, no one can decrypt your keys — not even us.</p>
+    <h2>2. You bring your own AI key (BYOK — Bring Your Own Key)</h2>
+    <p>In practice: you create an account at Anthropic, OpenAI, Google or another AI provider, you generate an API key there, and you paste it into Alpha. The key is encrypted locally (<strong>AES-GCM 256-bit + PBKDF2 100,000-iteration SHA-256 derivation</strong>) with a password only you know. The encrypted vault is stored in your browser's <code>localStorage</code>. Without your password, no one can decrypt your key — not even us.</p>
 
     <h2>3. Local storage only</h2>
     <ul>
@@ -119,8 +119,8 @@
       <li><strong>Rectification</strong>: directly from the app, Wealth / Knowledge Base / Settings modules.</li>
     </ul>
 
-    <h2>6. Data sent to LLM providers (BYOK)</h2>
-    <p>When you launch an analysis, the content (prompt + module data) is sent directly to the API of the LLM provider you chose (Anthropic, OpenAI, Google, etc.). Each provider has its own privacy policy — refer to their documentation. Alpha is not an intermediary in this flow.</p>
+    <h2>6. Data sent to AI providers (you bring your key)</h2>
+    <p>When you launch an analysis, the content (prompt + module data) is sent directly to the API of the AI provider you chose (Anthropic, OpenAI, Google, etc.). Each provider has its own privacy policy — refer to their documentation. Alpha is not an intermediary in this flow.</p>
 
     <h2>7. Premium account (optional) — data collected by Supabase</h2>
     <p>If you activate a Premium subscription (€9.99/month), an account is created on our <strong>Supabase</strong> infrastructure (EU-hosted — Frankfurt) solely for payment and access management. Strictly minimal data is collected:</p>
@@ -130,7 +130,7 @@
       <li><strong>Amount and currency</strong> of the payment (tax compliance).</li>
       <li><strong>Premium status</strong> — <code>is_active</code> boolean + expiration date.</li>
     </ul>
-    <p><strong>What is NEVER sent to Supabase:</strong> your analyses, prompts, wealth holdings, notes, transcripts, knowledge base. BYOK and 100% client-side remain intact. Open verification via DevTools → Network: you only observe calls to <code>*.supabase.co</code> at login + premium activation, never during analyses.</p>
+    <p><strong>What is NEVER sent to Supabase:</strong> your analyses, prompts, wealth holdings, notes, transcripts, knowledge base. The "your AI key, your data" principle and 100% client-side stay intact. Open verification via DevTools → Network: you only observe calls to <code>*.supabase.co</code> at login + premium activation, never during analyses.</p>
     <p>Premium account deletion: email <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a> — deletion within 30 days (auto CASCADE on <code>auth.users</code>, <code>premium_access</code>, <code>payments</code>).</p>
 
     <h2>8. Contact</h2>

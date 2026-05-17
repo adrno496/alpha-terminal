@@ -96,14 +96,14 @@
 
     <h2>1. Principe fondateur : 0 donnée collectée par Alpha</h2>
     <p>Alpha Terminal est une application <strong>100% client-side</strong>. Cela signifie que <strong>tes données (clés API, holdings, analyses, notes, transcripts, budget) ne quittent jamais ton navigateur</strong>. Nous n'opérons aucun serveur qui reçoit, stocke ou traite tes données.</p>
-    <p>Vérification ouverte : ouvre les DevTools de ton navigateur (F12) → onglet Network. Pendant ton utilisation, tu n'observes que des appels vers les APIs des fournisseurs LLM (api.anthropic.com, api.openai.com, etc.) et des providers de données financières (FMP, Polygon, etc.). Aucun appel vers un domaine alpha-terminal.app pour transférer des données.</p>
+    <p>Vérification ouverte : ouvre les DevTools de ton navigateur (F12) → onglet Network. Pendant ton utilisation, tu n'observes que des appels vers les APIs des fournisseurs d'IA (api.anthropic.com, api.openai.com, etc.) et des providers de données financières (FMP, Polygon, etc.). Aucun appel vers un domaine alpha-terminal.app pour transférer des données.</p>
 
-    <h2>2. Modèle BYOK (Bring Your Own Key)</h2>
-    <p>Tu apportes ta propre clé API auprès des fournisseurs LLM. Ces clés sont chiffrées localement (<strong>AES-GCM 256 bits + dérivation PBKDF2 100 000 itérations SHA-256</strong>) avec un mot de passe que toi seul connais. Le vault chiffré est stocké dans <code>localStorage</code> de ton navigateur. Sans ton mot de passe, personne ne peut déchiffrer tes clés — pas même nous.</p>
+    <h2>2. Tu apportes ta propre clé IA (modèle BYOK — Bring Your Own Key)</h2>
+    <p>Concrètement : tu crées un compte chez Anthropic, OpenAI, Google ou un autre fournisseur d'IA, tu y génères une clé d'API, et tu la colles dans Alpha. Cette clé est chiffrée localement (<strong>AES-GCM 256 bits + dérivation PBKDF2 100 000 itérations SHA-256</strong>) avec un mot de passe que toi seul connais. Le coffre chiffré est stocké dans <code>localStorage</code> de ton navigateur. Sans ton mot de passe, personne ne peut déchiffrer ta clé — pas même nous.</p>
 
     <h2>3. Stockage local uniquement</h2>
     <ul>
-      <li><strong>localStorage</strong> : préférences, vault chiffré des clés API, tags utilisateur (langue, thème, watchlist).</li>
+      <li><strong>localStorage</strong> : préférences, coffre chiffré de tes clés IA, marqueurs utilisateur (langue, thème, watchlist).</li>
       <li><strong>IndexedDB</strong> : analyses sauvegardées, holdings patrimoine, watchpoints, transcripts, knowledge base, snapshots historiques.</li>
       <li><strong>Service Worker</strong> : cache des assets statiques (HTML, CSS, JS, images) pour fonctionner offline. Aucun cache des appels API.</li>
     </ul>
@@ -119,8 +119,8 @@
       <li><strong>Rectification</strong> : depuis l'app directement, modules Patrimoine / Knowledge Base / Settings.</li>
     </ul>
 
-    <h2>6. Données envoyées aux fournisseurs LLM (BYOK)</h2>
-    <p>Lorsque tu lances une analyse, le contenu (prompt + données du module) est envoyé directement à l'API du fournisseur LLM que tu as choisi (Anthropic, OpenAI, Google, etc.). Chaque fournisseur a sa propre politique de confidentialité — réfère-toi à leur documentation. Alpha n'est pas intermédiaire dans ce flux.</p>
+    <h2>6. Données envoyées aux fournisseurs d'IA (tu apportes ta clé)</h2>
+    <p>Lorsque tu lances une analyse, le contenu (prompt + données du module) est envoyé directement à l'API du fournisseur d'IA que tu as choisi (Anthropic, OpenAI, Google, etc.). Chaque fournisseur a sa propre politique de confidentialité — réfère-toi à leur documentation. Alpha n'est pas intermédiaire dans ce flux.</p>
 
     <h2>7. Compte Premium (optionnel) — données collectées par Supabase</h2>
     <p>Si tu actives un abonnement Premium (9,99 €/mois), un compte est créé sur notre infrastructure <strong>Supabase</strong> (hébergée dans l'UE — Frankfurt) pour la seule gestion du paiement et de l'accès. Les données collectées sont strictement minimales :</p>
@@ -130,14 +130,14 @@
       <li><strong>Montant et devise</strong> du paiement (compliance fiscale).</li>
       <li><strong>Statut Premium</strong> — booléen <code>is_active</code> + date d'expiration.</li>
     </ul>
-    <p><strong>Ce qui n'est JAMAIS envoyé à Supabase :</strong> tes analyses, tes prompts, ton patrimoine, tes notes, transcripts, knowledge base. Le BYOK et le 100% client-side restent intacts. Vérification ouverte via DevTools → Network : tu observes uniquement des appels vers <code>*.supabase.co</code> au login + à l'activation premium, jamais pendant les analyses.</p>
+    <p><strong>Ce qui n'est JAMAIS envoyé à Supabase :</strong> tes analyses, tes prompts, ton patrimoine, tes notes, transcripts, base de connaissances. Le principe « ta clé IA, tes données » et le 100% client-side restent intacts. Vérification ouverte via DevTools → Network : tu observes uniquement des appels vers <code>*.supabase.co</code> au login + à l'activation premium, jamais pendant les analyses.</p>
     <p>Suppression du compte Premium : envoie un mail à <a href="mailto:savetheworldfr@gmail.com" style="color:var(--accent-green);">savetheworldfr@gmail.com</a> — suppression sous 30 jours (CASCADE auto sur <code>auth.users</code>, <code>premium_access</code>, <code>payments</code>).</p>
 
     <h2>8. Sync cloud optionnelle — chiffrement bout-en-bout (E2EE)</h2>
     <p>Alpha propose une <strong>option</strong> de sauvegarde cloud chiffrée pour faciliter la récupération de tes données sur un autre appareil (PC ↔ mobile). Cette feature est <strong>désactivée par défaut</strong> et doit être explicitement activée dans Settings → ☁️ Sync Cloud.</p>
     <p><strong>Comment ça marche :</strong></p>
     <ul>
-      <li><strong>Avant l'upload</strong>, l'intégralité de tes données (patrimoine, watchlist, goals, budget, dividendes, knowledge base, historique d'analyses) est chiffrée sur ton appareil avec ta passphrase vault (AES-GCM 256, PBKDF2 100k itérations).</li>
+      <li><strong>Avant l'upload</strong>, l'intégralité de tes données (patrimoine, watchlist, objectifs, budget, dividendes, base de connaissances, historique d'analyses) est chiffrée sur ton appareil avec la passphrase de ton coffre (AES-GCM 256, PBKDF2 100 000 itérations).</li>
       <li><strong>Le serveur Supabase ne voit que des bytes opaques</strong> : ni Alpha, ni Supabase, ni un attaquant qui pirate la base ne peut lire ton contenu sans ta passphrase.</li>
       <li><strong>La passphrase reste sur ton appareil</strong> : jamais transmise, jamais stockée côté serveur, jamais récupérable. C'est le coût du chiffrement E2EE.</li>
       <li><strong>Maximum 20 backups</strong> par utilisateur, auto-purge des plus anciens via trigger Postgres.</li>
