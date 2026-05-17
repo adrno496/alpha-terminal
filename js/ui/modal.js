@@ -421,8 +421,8 @@ function renderWizardStep2() {
   body.innerHTML = `
     ${stepperHtml(2)}
     <p style="color:var(--text-secondary);font-size:13px;line-height:1.6;margin-bottom:14px;">
-      <strong style="color:var(--accent-green);">Au moins une clé suffit</strong> pour faire tourner les 60+ modules.
-      Plus tu en mets, plus l'app sélectionne le meilleur modèle pour chaque tâche.
+      <strong style="color:var(--accent-green);">Une seule clé IA suffit</strong> pour faire tourner les 60+ modules.
+      Plus tu en ajoutes, mieux l'app pourra choisir l'IA optimale pour chaque type d'analyse.
     </p>
 
     <!-- A5 : Banner free providers -->
@@ -430,15 +430,15 @@ function renderWizardStep2() {
       <div style="font-weight:600;font-size:13px;margin-bottom:6px;">💡 ${isEnLocal ? 'Want to start free?' : 'Tu veux démarrer gratuitement ?'}</div>
       <p style="font-size:11.5px;color:var(--text-secondary);margin:0 0 8px;line-height:1.5;">
         ${isEnLocal
-          ? 'These 3 providers offer a free tier (rate-limited but enough for casual usage, ~50 analyses/month):'
-          : 'Ces 3 providers offrent un tier gratuit (rate-limit mais suffisant pour usage casual, ~50 analyses/mois) :'}
+          ? 'These 3 AIs are free to use (with a usage cap — ~50 analyses/month is enough to get started):'
+          : 'Ces 3 IA sont gratuites à utiliser (avec une limite — ~50 analyses/mois, c\'est largement de quoi démarrer) :'}
       </p>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <a href="https://github.com/settings/tokens" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;font-size:11.5px;color:var(--text-primary);">🐙 GitHub Models <span style="color:var(--accent-green);">${isEnLocal ? '(free with PAT)' : '(gratuit avec PAT)'}</span></a>
         <a href="https://cloud.cerebras.ai/?tab=api-keys" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;font-size:11.5px;color:var(--text-primary);">⚡ Cerebras <span style="color:var(--accent-green);">${isEnLocal ? '(free tier)' : '(tier gratuit)'}</span></a>
         <a href="https://console.mistral.ai/api-keys/" target="_blank" rel="noopener" style="text-decoration:none;padding:6px 10px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:4px;font-size:11.5px;color:var(--text-primary);">🇫🇷 Mistral <span style="color:var(--accent-green);">${isEnLocal ? '(free experimentation)' : '(expérimentation gratuite)'}</span></a>
       </div>
-      <p style="font-size:10.5px;color:var(--text-muted);margin:6px 0 0;">${isEnLocal ? 'You can always add Claude / OpenAI / Gemini later for premium quality.' : 'Tu pourras toujours ajouter Claude / OpenAI / Gemini plus tard pour la qualité premium.'}</p>
+      <p style="font-size:10.5px;color:var(--text-muted);margin:6px 0 0;">${isEnLocal ? 'You can always add Claude / OpenAI / Gemini later for top-tier analyses.' : 'Tu pourras toujours ajouter Claude / OpenAI / Gemini plus tard pour les analyses les plus pointues.'}</p>
     </div>
 
     <div style="display:flex;justify-content:center;margin-bottom:14px;">
@@ -459,13 +459,13 @@ function renderWizardStep2() {
   `;
   $('#wiz-keys').innerHTML = KNOWN_PROVIDERS.map(p => {
     const browserBadge = p.proxiedViaApp
-      ? `<span style="background:rgba(80,180,255,0.12);color:#5ab8ff;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">🔄 ${isEnLocal ? 'via Alpha proxy' : 'via proxy Alpha'}</span>`
+      ? `<span style="background:rgba(80,180,255,0.12);color:#5ab8ff;font-size:9.5px;padding:2px 5px;border-radius:3px;margin-left:6px;font-weight:600;">🔄 ${isEnLocal ? 'via Alpha relay' : 'via relais Alpha'}</span>`
       : '';
     const browserHint = p.proxiedViaApp
       ? `<div style="background:rgba(80,180,255,0.06);border-left:2px solid #5ab8ff;padding:6px 10px;margin-top:6px;font-size:10.5px;color:var(--text-secondary);border-radius:3px;line-height:1.45;">
           🔄 ${isEnLocal
-            ? 'This provider normally requires a backend. Alpha automatically routes via its secure CORS proxy (API key passes through, never stored).'
-            : 'Ce provider nécessite normalement un backend. Alpha route automatiquement via son proxy CORS sécurisé (clé API passe through, jamais stockée).'}
+            ? 'This AI normally blocks browser access. Alpha relays the call securely without storing your key — your key passes through, nothing is logged.'
+            : 'Cette IA bloque normalement les appels depuis un navigateur. Alpha relaie la requête de façon sécurisée — ta clé passe à travers, rien n\'est stocké chez nous.'}
         </div>`
       : '';
     return `
