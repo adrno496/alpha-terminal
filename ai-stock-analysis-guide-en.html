@@ -161,7 +161,7 @@
     <span>By Alpha</span> · <span>April 29, 2026</span> · <span>Reading time: 14 min</span>
   </div>
   <p style="font-size:17px;color:#ccc;">
-    In 2026, LLMs (Large Language Models) have caught up with junior equity research analysts on written fundamental analysis. Claude Opus 4.7, GPT-5, and Gemini 2.5 Pro produce in 30 seconds structured notes comparable to 4 hours of human work. But <strong>you still need to know how to use them</strong>. This complete guide covers the method, prompts, pitfalls, and real costs.
+    In 2026, AIs (Large Language Models) have caught up with junior equity research analysts on written fundamental analysis. Claude Opus 4.7, GPT-5, and Gemini 2.5 Pro produce in 30 seconds structured notes comparable to 4 hours of human work. But <strong>you still need to know how to use them</strong>. This complete guide covers the method, prompts, pitfalls, and real costs.
   </p>
 
   <div class="toc">
@@ -183,11 +183,11 @@
 
   <h2 id="why">1. Why AI changes stock analysis in 2026</h2>
   <p>For 30 years, fundamental analysis was blocked by a simple problem: <strong>it takes 3-5 hours to properly read a 10-K</strong>. Multiply by 50 companies in a watchlist, and you simply don't have the time. Investment funds solved this with teams of 10-50 junior analysts. Retail investors read summaries.</p>
-  <p>In 2026, an LLM reads a complete 10-K in 30 seconds and produces a 2,000-word analysis pointing to the real signals: moat quality, ROIC vs WACC, past capital allocation, accounting red flags, narrative shift vs previous quarter. <strong>The marginal cost dropped from €200/hour for a junior analyst to $0.50 per analysis</strong> (<a href="api-costs-en.html" title="API costs detail per module">see the API costs detail per module</a>). Alpha's <a href="features-en.html#10k-decoder" title="10-K Decoder — Alpha module">10-K Decoder</a> automates all of this.</p>
+  <p>In 2026, an AI reads a complete 10-K in 30 seconds and produces a 2,000-word analysis pointing to the real signals: moat quality, ROIC vs WACC, past capital allocation, accounting red flags, narrative shift vs previous quarter. <strong>The marginal cost dropped from €200/hour for a junior analyst to $0.50 per analysis</strong> (<a href="api-costs-en.html" title="API costs detail per module">see the API costs detail per module</a>). Alpha's <a href="features-en.html#10k-decoder" title="10-K Decoder — Alpha module">10-K Decoder</a> automates all of this.</p>
   <p>This cost × time compression is <em>the</em> revolution. It opens workflows previously impossible: screen 200 companies per week, full portfolio audit every month, compare 5 sector peers before each decision. It's the shift from <em>artisanal</em> to <em>industrial</em> analysis, accessible to retail.</p>
 
   <h2 id="models">2. Claude vs GPT vs Gemini vs Grok: which for what task?</h2>
-  <p>Not all LLMs are equal for finance. Here's an updated April 2026 matrix.</p>
+  <p>Not all AIs are equal for finance. Here's an updated April 2026 matrix.</p>
   <table class="compare-box">
     <thead><tr><th>Task</th><th>Best</th><th>Why</th></tr></thead>
     <tbody>
@@ -201,7 +201,7 @@
       <tr><td>Pure speed</td><td>Cerebras Llama 70B</td><td>&gt;2000 tokens/sec</td></tr>
     </tbody>
   </table>
-  <p>The trap: most SaaS tools force <em>one</em> provider on you (often OpenAI). You pay average quality on all tasks while the optimum varies. The right approach: a <strong>smart router</strong> that picks the LLM per task.</p>
+  <p>The trap: most SaaS tools force <em>one</em> provider on you (often OpenAI). You pay average quality on all tasks while the optimum varies. The right approach: a <strong>smart router</strong> that picks the AI per task.</p>
 
   <h2 id="byok">3. The BYOK (Bring Your Own Key) model — why it's winning</h2>
   <p>BYOK means you connect your API key <strong>directly</strong> to the AI provider in a client app, without going through the editor's servers. Three consequences:</p>
@@ -216,13 +216,13 @@
   <p>A bad prompt produces flat, generic analysis. A good prompt produces equity-research-grade analysis. The 5-step method:</p>
 
   <h4>Step 1 — Persona</h4>
-  <p>Define who the LLM should "embody." Instead of "analyze this stock," write:</p>
+  <p>Define who the AI should "embody." Instead of "analyze this stock," write:</p>
   <pre>You are a senior value analyst at Berkshire Hathaway, trained in the Buffett-Munger
 school. You seek companies with durable moats, ROIC &gt; 15%, and disciplined capital
 allocation. You reject hype and doubt by default.</pre>
 
   <h4>Step 2 — Context</h4>
-  <p>Provide ticker, sector, analysis period, sector peers. Don't assume the LLM knows the latest quarterly release — provide it.</p>
+  <p>Provide ticker, sector, analysis period, sector peers. Don't assume the AI knows the latest quarterly release — provide it.</p>
 
   <h4>Step 3 — Imposed response structure</h4>
   <p>The secret of readable analyses: enforce the markdown plan.</p>
@@ -234,7 +234,7 @@ allocation. You reject hype and doubt by default.</pre>
 ## 5. Verdict + 0-100 score</pre>
 
   <h4>Step 4 — Guardrails</h4>
-  <p>Force the LLM to say "I don't know" rather than invent. Examples:</p>
+  <p>Force the AI to say "I don't know" rather than invent. Examples:</p>
   <pre>If a data point isn't provided, write "missing data" rather than invent.
 Cite the source for each number. Avoid "we think" — say "this indicates."</pre>
 
@@ -292,23 +292,23 @@ Cite the source for each number. Avoid "we think" — say "this indicates."</pre
 
   <h2 id="pitfalls">9. The 7 pitfalls to absolutely avoid</h2>
   <ol>
-    <li><strong>Hallucinations on recent numbers.</strong> The LLM may invent a P/E of 28 when the real one is 35. Always cross-check with a live source (Yahoo Finance, FMP).</li>
+    <li><strong>Hallucinations on recent numbers.</strong> The AI may invent a P/E of 28 when the real one is 35. Always cross-check with a live source (Yahoo Finance, FMP).</li>
     <li><strong>Knowledge cutoff.</strong> Claude Opus 4.7 has a January 2026 cutoff. To analyze Q1 2026, you need either web search or manual injection of figures.</li>
-    <li><strong>Recency bias.</strong> The LLM may give too much weight to recent news (which it has seen) vs long-term structure.</li>
-    <li><strong>Sycophancy.</strong> If you write "I like this stock," the LLM tends to confirm. Force adversarial mode (Pre-Mortem).</li>
+    <li><strong>Recency bias.</strong> The AI may give too much weight to recent news (which it has seen) vs long-term structure.</li>
+    <li><strong>Sycophancy.</strong> If you write "I like this stock," the AI tends to confirm. Force adversarial mode (Pre-Mortem).</li>
     <li><strong>False numerical precision.</strong> A "P/E = 27.43" answer can seem precise but come from approximated data. Ask for the source.</li>
-    <li><strong>No "I don't know."</strong> By default, LLMs fill in the blanks. Set an explicit guardrail in the prompt.</li>
+    <li><strong>No "I don't know."</strong> By default, AIs fill in the blanks. Set an explicit guardrail in the prompt.</li>
     <li><strong>Vendor lock-in.</strong> If you build your whole workflow on GPT, you're stuck when OpenAI raises prices or downgrades a model. Multi-provider = freedom.</li>
   </ol>
 
   <h2 id="stack">10. The ideal 2026 stack</h2>
-  <p>Here's the optimal BYOK low-cost multi-LLM private stack:</p>
+  <p>Here's the optimal BYOK low-cost multi-AI private stack:</p>
   <ul>
     <li><strong>Analysis app</strong>: Alpha (€9.99/month) or open-source alternative.</li>
-    <li><strong>Main LLM</strong>: Claude Opus 4.7 or Sonnet 4.6 (best nuanced reasoning).</li>
-    <li><strong>Long-context LLM</strong>: Gemini 2.5 Pro (2M tokens, free up to a quota).</li>
-    <li><strong>Sentiment LLM</strong>: Grok 4 (real-time X) or Perplexity Sonar (native web search).</li>
-    <li><strong>Volume / speed LLM</strong>: Cerebras Llama 70B or GitHub Models (free rate-limited).</li>
+    <li><strong>Main AI</strong>: Claude Opus 4.7 or Sonnet 4.6 (best nuanced reasoning).</li>
+    <li><strong>Long-context AI</strong>: Gemini 2.5 Pro (2M tokens, free up to a quota).</li>
+    <li><strong>Sentiment AI</strong>: Grok 4 (real-time X) or Perplexity Sonar (native web search).</li>
+    <li><strong>Volume / speed AI</strong>: Cerebras Llama 70B or GitHub Models (free rate-limited).</li>
     <li><strong>Data</strong>: FMP (free tier 250 calls/day), CoinGecko (free), FRED (free, Fed macro).</li>
     <li><strong>Typical monthly cost</strong>: €5-15 (5 analyses/day × $0.05 average × 30 days).</li>
   </ul>
@@ -319,11 +319,11 @@ Cite the source for each number. Avoid "we think" — say "this indicates."</pre
     <li><strong>10M+ token long context</strong>: Gemini, next-gen Claude — enough to ingest 5 years of 10-Ks + earnings calls + transcripts at once.</li>
     <li><strong>Specialized financial embeddings</strong>: models fine-tuned only on finance (Voyage, BloombergGPT successors) for more precise RAG.</li>
     <li><strong>Voice analyst</strong>: voice interaction for analyses dictated on the go or while walking.</li>
-    <li><strong>Privacy convergence</strong>: rise of local LLMs (Llama 70B on Apple Silicon Macs), no more cloud needed for 80% of analyses.</li>
+    <li><strong>Privacy convergence</strong>: rise of local AIs (Llama 70B on Apple Silicon Macs), no more cloud needed for 80% of analyses.</li>
   </ul>
 
   <h2>Conclusion: the 2026 opportunity window</h2>
-  <p>Mastery of AI in stock analysis is today a real edge for retail. In 18 months, it'll be a commodity. <strong>2026 is the window.</strong> Pick a BYOK multi-LLM stack, learn the prompts that work, set up wealth memory that personalizes your analyses, and you operate with leverage comparable to an analyst fund — for a few euros per month.</p>
+  <p>Mastery of AI in stock analysis is today a real edge for retail. In 18 months, it'll be a commodity. <strong>2026 is the window.</strong> Pick a BYOK multi-AI stack, learn the prompts that work, set up wealth memory that personalizes your analyses, and you operate with leverage comparable to an analyst fund — for a few euros per month.</p>
 
   <h2>📚 Deep-dive guides</h2>
   <ul style="line-height:1.9;">

@@ -147,7 +147,7 @@
     <span class="step-num">5</span><h3>Observe le résultat</h3>
     <p>Pendant toute l'analyse, le panneau filtré sur <code>alpha-terminal.app</code> doit afficher :</p>
     <pre class="code-block">📭 Aucune requête.</pre>
-    <p>Toutes les requêtes partent directement vers le LLM provider que tu as choisi (api.anthropic.com, api.openai.com, generativelanguage.googleapis.com, etc.) — <strong>jamais vers nos serveurs</strong>.</p>
+    <p>Toutes les requêtes partent directement vers l'IA provider que tu as choisi (api.anthropic.com, api.openai.com, generativelanguage.googleapis.com, etc.) — <strong>jamais vers nos serveurs</strong>.</p>
   </div>
 
   <h2>Ce que tu vas voir partir, et où</h2>
@@ -157,8 +157,8 @@
       <tr><th>Donnée</th><th>Destination</th><th>Notre serveur ?</th></tr>
     </thead>
     <tbody>
-      <tr><td>Ticker analysé (AAPL, BTC…)</td><td>API LLM choisie</td><td class="no">❌ Non</td></tr>
-      <tr><td>Tes prompts</td><td>API LLM choisie</td><td class="no">❌ Non</td></tr>
+      <tr><td>Ticker analysé (AAPL, BTC…)</td><td>IA choisie</td><td class="no">❌ Non</td></tr>
+      <tr><td>Tes prompts</td><td>IA choisie</td><td class="no">❌ Non</td></tr>
       <tr><td>Ton portefeuille (Wealth)</td><td>localStorage navigateur</td><td class="no">❌ Non</td></tr>
       <tr><td>Tes documents RAG</td><td>IndexedDB navigateur</td><td class="no">❌ Non</td></tr>
       <tr><td>Données financières (cours, bilans)</td><td>FMP / Polygon / Yahoo / etc.</td><td class="no">❌ Non</td></tr>
@@ -177,7 +177,7 @@
 
   <div class="grid-tech">
     <div class="tech-card">
-      <strong>🧠 LLMs</strong>
+      <strong>🧠 IA</strong>
       Tes prompts vont directement à <code>api.anthropic.com</code>, <code>api.openai.com</code>, etc. via <code>fetch()</code> dans ton navigateur. Aucune route intermédiaire chez nous.
     </div>
     <div class="tech-card">
@@ -186,7 +186,7 @@
     </div>
     <div class="tech-card">
       <strong>🔐 Vault clés API</strong>
-      Tes clés sont chiffrées <code>AES-GCM-256</code> avec ta passphrase (PBKDF2 100k iter). Le vault chiffré reste en local. On ne le voit jamais.
+      Tes clés sont chiffrées <code>AES-GCM-256</code> avec ta passphrase (PBKDF2 100k iter). Le coffre chiffré reste en local. On ne le voit jamais.
     </div>
     <div class="tech-card">
       <strong>📊 Données financières</strong>
@@ -206,7 +206,7 @@
 
   <ul class="check-list">
     <li>Lire ton patrimoine ou tes positions — il n'a jamais quitté ton navigateur</li>
-    <li>Lire tes prompts d'analyse — ils vont directement au LLM provider</li>
+    <li>Lire tes prompts d'analyse — ils vont directement à l'IA provider</li>
     <li>Lire tes clés API — elles sont chiffrées avec ta passphrase</li>
     <li>Vendre ton activité à des annonceurs — on n'a pas la donnée</li>
     <li>Te subpoena (même sous demande légale) tes analyses — on ne les a jamais eues</li>

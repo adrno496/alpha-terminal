@@ -18,7 +18,7 @@
 
   <meta property="og:type" content="article" />
   <meta property="og:title" content="How to get an AI API key &amp; financial data — BYOK 2026 guide" />
-  <meta property="og:description" content="Direct links and step-by-step to create your API key: 14 LLMs (Claude, GPT, Gemini, Grok, Mistral...) + 11 financial data providers. 7 free providers included." />
+  <meta property="og:description" content="Direct links and step-by-step to create your API key: 14 AIs (Claude, GPT, Gemini, Grok, Mistral...) + 11 financial data providers. 7 free providers included." />
   <meta property="og:url" content="https://alpha-terminal.app/api-keys-guide-en.html" />
   <meta property="og:image" content="https://alpha-terminal.app/og-home.png" />
   <meta property="og:image:width" content="1200" />
@@ -29,7 +29,7 @@
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="How to get an API key: BYOK 2026 guide" />
-  <meta name="twitter:description" content="Direct links + steps for 14 LLMs and 11 data providers. 7 free." />
+  <meta name="twitter:description" content="Direct links + steps for 14 AIs and 11 data providers. 7 free." />
   <meta name="twitter:image" content="https://alpha-terminal.app/og-home.png" />
   <meta name="twitter:site" content="@AlphaTerminal" />
   <meta name="twitter:creator" content="@AlphaTerminal" />
@@ -73,7 +73,7 @@
   {
     "@context": "https://schema.org", "@type": "Article",
     "headline": "How to get an AI API key and financial data — BYOK 2026 guide",
-    "description": "Practical guide to create an API key with the 14 LLMs and 11 financial data providers supported by Alpha. Direct links, steps, free tiers.",
+    "description": "Practical guide to create an API key with the 14 AIs and 11 financial data providers supported by Alpha. Direct links, steps, free tiers.",
     "author": { "@type": "Person", "name": "Alpha team", "url": "https://alpha-terminal.app/about.html", "sameAs": ["https://twitter.com/AlphaTerminal"] },
     "datePublished": "2026-05-01", "dateModified": "2026-05-01",
     "publisher": { "@type": "Organization", "name": "Alpha", "url": "https://alpha-terminal.app/", "logo": { "@type": "ImageObject", "url": "https://alpha-terminal.app/icons/icon-192.png", "width": 192, "height": 192 } },
@@ -113,7 +113,7 @@
       { "@type": "Question", "name": "Do I need an API key to use Alpha?", "acceptedAnswer": { "@type": "Answer", "text": "For AI analyses: yes, but a free key is enough. For demo mode (pre-generated analyses): no key required. For wealth, watchlist and knowledge base modules: not required (but recommended for auto-refresh prices)." }},
       { "@type": "Question", "name": "Which key to pick to get started?", "acceptedAnswer": { "@type": "Answer", "text": "To explore for free: GitHub Models with your GitHub PAT (ultra-fast setup). For maximum quality from the start: Anthropic Claude ($5 free credit at signup) or OpenAI (credit card required but pay per token)." }},
       { "@type": "Question", "name": "Are my API keys safe?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Keys are encrypted locally with AES-GCM 256 + PBKDF2 100K iterations from a master password you choose. No Alpha server — the app calls provider APIs directly from your browser. Verifiable via DevTools > Network." }},
-      { "@type": "Question", "name": "Which financial data providers are supported?", "acceptedAnswer": { "@type": "Answer", "text": "11 providers: Financial Modeling Prep (FMP), Alpha Vantage, Polygon.io, Finnhub, Tiingo, Twelve Data, FRED (St-Louis Fed, macro), Etherscan (on-chain), CoinGecko (crypto, no key), DefiLlama (DeFi, no key), SEC EDGAR (filings, no key). Optional: enrich analyses with live data without changing LLM cost." }}
+      { "@type": "Question", "name": "Which financial data providers are supported?", "acceptedAnswer": { "@type": "Answer", "text": "11 providers: Financial Modeling Prep (FMP), Alpha Vantage, Polygon.io, Finnhub, Tiingo, Twelve Data, FRED (St-Louis Fed, macro), Etherscan (on-chain), CoinGecko (crypto, no key), DefiLlama (DeFi, no key), SEC EDGAR (filings, no key). Optional: enrich analyses with live data without changing AI cost." }}
     ]
   }
   </script>
@@ -140,7 +140,7 @@
 
   <article class="seo-article" style="max-width:880px;margin:40px auto;padding:0 20px;line-height:1.7;color:var(--text-primary);">
     <h1 style="font-size:34px;line-height:1.2;margin-bottom:8px;">🔑 How to get an AI API key &amp; financial data</h1>
-    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Practical 2026 guide — all keys supported by Alpha (14 LLMs + 11 data providers). Direct links, steps, free tier flagged.</p>
+    <p style="color:var(--text-secondary);font-size:16px;margin:0 0 24px;">Practical 2026 guide — all keys supported by Alpha (14 AIs + 11 data providers). Direct links, steps, free tier flagged.</p>
 
     <div style="padding:14px;background:var(--bg-tertiary);border-left:3px solid var(--accent-green);margin:20px 0;border-radius:4px;">
       <strong>📌 TL;DR</strong> — <strong>7 free AI providers</strong> let you use Alpha without spending a cent (GitHub Models, Cerebras, Mistral, NVIDIA, Cloudflare, HuggingFace, Cohere). One key is enough to start. For pro analyses (10-K, DCF, complex tax), upgrade to <strong>Claude / GPT-4o / Gemini Pro</strong> (~$0.005-0.10 per analysis).
@@ -331,7 +331,7 @@
     </div>
 
     <h2 id="section-4" style="font-size:28px;margin:40px 0 14px;">📊 Financial data providers <span style="color:var(--accent-green);">(11)</span></h2>
-    <p style="font-size:14px;color:var(--text-secondary);">Optional but recommended. They enrich modules with real-time prices, fundamentals, news, screeners. No additional LLM cost. <strong>Several don't even need a key.</strong></p>
+    <p style="font-size:14px;color:var(--text-secondary);">Optional but recommended. They enrich modules with real-time prices, fundamentals, news, screeners. No additional AI cost. <strong>Several don't even need a key.</strong></p>
 
     <h3 style="font-size:18px;margin-top:24px;color:var(--accent-green);">No key required (always active)</h3>
     <div class="grid-2">

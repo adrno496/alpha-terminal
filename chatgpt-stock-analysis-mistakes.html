@@ -51,8 +51,8 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
     {"@type":"Question","name":"Can ChatGPT analyze a stock?","acceptedAnswer":{"@type":"Answer","text":"For qualitative analysis (business model, sector context), yes. For precise numbers (revenue, margins, ratios): no, without structured data access it hallucinates regularly. Test it: ask for AAPL's PE on March 1, 2026 — it'll output a plausible but often wrong number."}},
-    {"@type":"Question","name":"Why does ChatGPT make up financial numbers?","acceptedAnswer":{"@type":"Answer","text":"Because LLMs are trained to produce the most probable text, not the truest. When you ask 'what's Tesla's ROIC in 2024', it generates a number that looks like a plausible ROIC, without checking a database. That's hallucination."}},
-    {"@type":"Question","name":"Which AI to use for serious stock analysis?","acceptedAnswer":{"@type":"Answer","text":"A specialized AI connected to structured-data APIs (FMP, Finnhub, SEC EDGAR) with finance-calibrated prompts and hallucination guardrails. Alpha uses 14 LLMs (Claude, GPT-5, Gemini, Grok) with this setup, BYOK for €9.99/month."}},
+    {"@type":"Question","name":"Why does ChatGPT make up financial numbers?","acceptedAnswer":{"@type":"Answer","text":"Because AIs are trained to produce the most probable text, not the truest. When you ask 'what's Tesla's ROIC in 2024', it generates a number that looks like a plausible ROIC, without checking a database. That's hallucination."}},
+    {"@type":"Question","name":"Which AI to use for serious stock analysis?","acceptedAnswer":{"@type":"Answer","text":"A specialized AI connected to structured-data APIs (FMP, Finnhub, SEC EDGAR) with finance-calibrated prompts and hallucination guardrails. Alpha uses 14 AIs (Claude, GPT-5, Gemini, Grok) with this setup, BYOK for €9.99/month."}},
     {"@type":"Question","name":"Does ChatGPT have access to the latest financial figures?","acceptedAnswer":{"@type":"Answer","text":"Without Browse mode on, its knowledge cutoff is the training date (often months back). With Browse on, it does web searches but without coherence and without access to proprietary financial APIs. Result: often incomplete or stale data."}},
     {"@type":"Question","name":"Can you trust ChatGPT for a DCF?","acceptedAnswer":{"@type":"Answer","text":"Not for a reproducible DCF. Without 10-year FCF history, live beta, and live risk-free rate, the calculation is approximate. Ask twice and you'll get two different fair values. For a rigorous DCF: use a dedicated module like Alpha's."}}
   ]}
@@ -100,7 +100,7 @@
 
     <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🎲 Mistake 1 — Number hallucinations</h2>
     <p>Reproducible test: ask ChatGPT (gpt-4o, Browse off) <em>"What was Apple's ROIC in FY2024?"</em>. You get answers like <em>"approximately 30%"</em> or <em>"45%"</em>. Real value is ~58%. Gap can hit 30 percentage points.</p>
-    <p><strong>Why?</strong> LLMs are text probability engines, not databases. When you ask for a number, the model generates <em>a number that looks like a plausible ROIC</em>, not the real one. PE, gross margin, ROE, net debt → same hallucinations.</p>
+    <p><strong>Why?</strong> AIs are text probability engines, not databases. When you ask for a number, the model generates <em>a number that looks like a plausible ROIC</em>, not the real one. PE, gross margin, ROE, net debt → same hallucinations.</p>
 
     <div style="padding:14px;background:#2a1a0a;border-left:3px solid var(--accent-orange);margin:14px 0;border-radius:4px;font-size:14px;">
       <strong>⚠️ Watch out</strong> — A FinanceBench study (2024) showed GPT-4 without tooling errors on <strong>83% of numerical questions</strong> from real 10-Ks. With document access: 27%. With a dedicated finance agent: &lt; 8%.
@@ -119,7 +119,7 @@
       <li><strong>Macro</strong> (FRED, OECD) — rates, inflation, GDP</li>
       <li><strong>Sentiment</strong> (X/Reddit/news) — real-time feeds</li>
     </ul>
-    <p>ChatGPT standalone has access to <strong>none</strong> of these. A specialized AI like <a href="features-en.html">Alpha</a> wires them all via API and feeds the structured data to the LLM in the prompt — yielding traceable, reproducible analyses.</p>
+    <p>ChatGPT standalone has access to <strong>none</strong> of these. A specialized AI like <a href="features-en.html">Alpha</a> wires them all via API and feeds the structured data to the AI in the prompt — yielding traceable, reproducible analyses.</p>
 
     <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">🧮 Mistake 4 — No reproducible DCF</h2>
     <p>Ask ChatGPT for an Apple DCF. It outputs a fair value. Ask twice (new session): two different numbers. Why?</p>
@@ -139,13 +139,13 @@
     <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">✅ The fix: specialized models + tooling</h2>
     <p>A finance-specialized AI combines 4 ingredients:</p>
     <ol style="line-height:1.9;">
-      <li><strong>Multiple LLMs to choose from</strong> — best model per task (Claude for 10-K, Grok for X sentiment, Gemini for native PDF). Alpha offers 14.</li>
+      <li><strong>Multiple AIs to choose from</strong> — best model per task (Claude for 10-K, Grok for X sentiment, Gemini for native PDF). Alpha offers 14.</li>
       <li><strong>Financial API connections</strong> — FMP, Finnhub, SEC EDGAR, FRED, CoinGecko, YouTube transcripts.</li>
       <li><strong>Finance-calibrated prompts</strong> — each module has a system prompt optimized over dozens of real cases.</li>
       <li><strong>Anti-hallucination guardrails</strong> — mandatory source citations, refusal if data missing, deterministic validation.</li>
     </ol>
 
-    <p>Alpha uses <strong>14 LLMs</strong> (Claude Opus/Sonnet/Haiku, GPT-5/Mini/Nano, Gemini Pro/Flash, Grok 4, Mistral, Llama, DeepSeek) with finance-calibrated prompts, wired to 8 data APIs. Typical monthly cost: <a href="api-costs-en.html">$2 to $40/month BYOK</a>, 5 to 10× cheaper than ChatGPT Plus + a pro terminal.</p>
+    <p>Alpha uses <strong>14 AIs</strong> (Claude Opus/Sonnet/Haiku, GPT-5/Mini/Nano, Gemini Pro/Flash, Grok 4, Mistral, Llama, DeepSeek) with finance-calibrated prompts, wired to 8 data APIs. Typical monthly cost: <a href="api-costs-en.html">$2 to $40/month BYOK</a>, 5 to 10× cheaper than ChatGPT Plus + a pro terminal.</p>
 
     <h2 id="section-7" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
 
@@ -155,11 +155,11 @@
     </details>
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Why does ChatGPT make up numbers?</summary>
-      <p>LLMs are text probability engines. Without a structured database, they generate a number that <em>looks</em> like the answer, not the true answer. That's hallucination.</p>
+      <p>AIs are text probability engines. Without a structured database, they generate a number that <em>looks</em> like the answer, not the true answer. That's hallucination.</p>
     </details>
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Which AI for stock analysis?</summary>
-      <p>Specialized AI wired to APIs (FMP, Finnhub, SEC) with finance-calibrated prompts. Alpha uses 14 LLMs BYOK for €9.99/month.</p>
+      <p>Specialized AI wired to APIs (FMP, Finnhub, SEC) with finance-calibrated prompts. Alpha uses 14 AIs BYOK for €9.99/month.</p>
     </details>
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Does ChatGPT have the latest figures?</summary>
@@ -171,7 +171,7 @@
     </details>
 
     <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
-      <h3 style="margin:0 0 10px;">🤖 Alpha uses 14 LLMs with finance-calibrated prompts</h3>
+      <h3 style="margin:0 0 10px;">🤖 Alpha uses 14 AIs with finance-calibrated prompts</h3>
       <p style="color:var(--text-secondary);margin:0 0 14px;">€9.99/month · BYOK · 14-day money back</p>
       <a href="pricing-en.html" class="btn-primary big plausible-event-name=Guide+CTA" style="text-decoration:none;display:inline-block;">Launch Alpha →</a>
     </div>

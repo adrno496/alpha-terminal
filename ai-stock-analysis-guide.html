@@ -189,7 +189,7 @@
     <span>Par Alpha</span> · <span>29 avril 2026</span> · <span>Temps de lecture : 14 min</span>
   </div>
   <p style="font-size:17px;color:#ccc;">
-    En 2026, les LLMs (Large Language Models) ont rattrapé les analystes equity research juniors sur l'analyse fondamentale écrite. Claude Opus 4.7, GPT-5 et Gemini 2.5 Pro produisent en 30 secondes des notes structurées comparables à 4 heures de travail humain. Mais <strong>encore faut-il savoir s'en servir</strong>. Ce guide complet couvre la méthode, les prompts, les pièges et les coûts réels.
+    En 2026, les IA (Large Language Models) ont rattrapé les analystes equity research juniors sur l'analyse fondamentale écrite. Claude Opus 4.7, GPT-5 et Gemini 2.5 Pro produisent en 30 secondes des notes structurées comparables à 4 heures de travail humain. Mais <strong>encore faut-il savoir s'en servir</strong>. Ce guide complet couvre la méthode, les prompts, les pièges et les coûts réels.
   </p>
 
   <div class="toc">
@@ -211,11 +211,11 @@
 
   <h2 id="why">1. Pourquoi l'IA change l'analyse boursière en 2026</h2>
   <p>Pendant 30 ans, l'analyse fondamentale était bloquée par un problème simple : <strong>il faut 3-5 heures pour bien lire un 10-K</strong>. Multiplie par 50 entreprises dans une watchlist, et tu n'as humainement pas le temps. Les fonds d'investissement résolvaient ça avec des équipes de 10-50 analystes juniors. Le particulier, lui, lisait les résumés.</p>
-  <p>En 2026, un LLM lit un 10-K complet en 30 secondes et produit une analyse de 2000 mots qui pointe les vrais signaux : qualité du moat, ROIC vs WACC, capital allocation passée, red flags comptables, narrative shift vs trimestre précédent. <strong>Le coût marginal est passé de 200€/heure d'analyste junior à $0.50 par analyse</strong> (<a href="api-costs.html" title="Détail des coûts API par module">voir le détail des coûts API par module</a>). Le module <a href="features.html#10k-decoder" title="10-K Decoder — module Alpha">10-K Decoder d'Alpha</a> automatise tout ça.</p>
+  <p>En 2026, une IA lit un 10-K complet en 30 secondes et produit une analyse de 2000 mots qui pointe les vrais signaux : qualité du moat, ROIC vs WACC, capital allocation passée, red flags comptables, narrative shift vs trimestre précédent. <strong>Le coût marginal est passé de 200€/heure d'analyste junior à $0.50 par analyse</strong> (<a href="api-costs.html" title="Détail des coûts API par module">voir le détail des coûts API par module</a>). Le module <a href="features.html#10k-decoder" title="10-K Decoder — module Alpha">10-K Decoder d'Alpha</a> automatise tout ça.</p>
   <p>Cette compression de coût × temps est <em>la</em> révolution. Elle ouvre des workflows impossibles avant : screen 200 entreprises par semaine, faire un audit complet de portefeuille tous les mois, comparer 5 entreprises sectorielles avant chaque décision. C'est le passage de l'analyse <em>artisanale</em> à l'analyse <em>industrielle</em>, accessible aux particuliers.</p>
 
   <h2 id="models">2. Claude vs GPT vs Gemini vs Grok : lequel pour quelle tâche ?</h2>
-  <p>Tous les LLMs ne se valent pas pour la finance. Voici une matrice à jour avril 2026.</p>
+  <p>Tous les IA ne se valent pas pour la finance. Voici une matrice à jour avril 2026.</p>
   <table class="compare-box">
     <thead><tr><th>Tâche</th><th>Meilleur</th><th>Pourquoi</th></tr></thead>
     <tbody>
@@ -229,7 +229,7 @@
       <tr><td>Vitesse pure</td><td>Cerebras Llama 70B</td><td>&gt;2000 tokens/sec</td></tr>
     </tbody>
   </table>
-  <p>Le piège : la plupart des outils SaaS te forcent <em>un seul</em> provider (souvent OpenAI). Tu paies une qualité moyenne sur toutes les tâches alors que l'optimum varie. La bonne approche : un <strong>smart router</strong> qui choisit le LLM selon la tâche.</p>
+  <p>Le piège : la plupart des outils SaaS te forcent <em>un seul</em> provider (souvent OpenAI). Tu paies une qualité moyenne sur toutes les tâches alors que l'optimum varie. La bonne approche : un <strong>smart router</strong> qui choisit l'IA selon la tâche.</p>
 
   <h2 id="byok">3. Le modèle BYOK (Bring Your Own Key) — pourquoi il s'impose</h2>
   <p>BYOK signifie que tu connectes <strong>directement</strong> ta clé API auprès du provider IA dans une app cliente, sans passer par les serveurs de l'éditeur. Trois conséquences :</p>
@@ -244,13 +244,13 @@
   <p>Un mauvais prompt produit une analyse plate et générique. Un bon prompt produit une analyse au niveau equity research. La méthode en 5 étapes :</p>
 
   <h4>Étape 1 — Persona</h4>
-  <p>Définis qui le LLM doit "incarner". Au lieu de "analyse cette action", écris :</p>
+  <p>Définis qui l'IA doit "incarner". Au lieu de "analyse cette action", écris :</p>
   <pre>Tu es analyste value senior chez Berkshire Hathaway, formé à l'école Buffett-Munger.
 Tu cherches des entreprises avec moat durable, ROIC &gt; 15%, et capital allocation
 disciplinée. Tu rejettes le hype et tu doutes par défaut.</pre>
 
   <h4>Étape 2 — Contexte</h4>
-  <p>Fournis le ticker, le secteur, la période d'analyse, les comparables sectoriels. Ne suppose pas que le LLM connaît la dernière publication trimestrielle — donne-la.</p>
+  <p>Fournis le ticker, le secteur, la période d'analyse, les comparables sectoriels. Ne suppose pas que l'IA connaît la dernière publication trimestrielle — donne-la.</p>
 
   <h4>Étape 3 — Structure de réponse imposée</h4>
   <p>Le secret des analyses lisibles : imposer le plan markdown.</p>
@@ -262,7 +262,7 @@ disciplinée. Tu rejettes le hype et tu doutes par défaut.</pre>
 ## 5. Verdict + score 0-100</pre>
 
   <h4>Étape 4 — Garde-fous</h4>
-  <p>Force le LLM à dire "je ne sais pas" plutôt qu'inventer. Exemples :</p>
+  <p>Force l'IA à dire "je ne sais pas" plutôt qu'inventer. Exemples :</p>
   <pre>Si une donnée n'est pas fournie, écris "donnée manquante" plutôt que d'inventer.
 Cite la source pour chaque chiffre. Évite "nous pensons" — dis "ceci indique".</pre>
 
@@ -321,23 +321,23 @@ Cite la source pour chaque chiffre. Évite "nous pensons" — dis "ceci indique"
 
   <h2 id="pitfalls">9. Les 7 pièges à éviter absolument</h2>
   <ol>
-    <li><strong>Hallucinations sur les chiffres récents.</strong> Le LLM peut inventer un P/E de 28 quand le vrai est 35. Toujours cross-check avec une source live (Yahoo Finance, FMP).</li>
+    <li><strong>Hallucinations sur les chiffres récents.</strong> L'IA peut inventer un P/E de 28 quand le vrai est 35. Toujours cross-check avec une source live (Yahoo Finance, FMP).</li>
     <li><strong>Cutoff de connaissance.</strong> Claude Opus 4.7 a un cutoff janvier 2026. Pour analyser Q1 2026, il faut soit web search soit injection manuelle des chiffres.</li>
-    <li><strong>Biais de récence.</strong> Le LLM peut donner trop de poids à la news récente (qu'il a vue) vs structure long terme.</li>
-    <li><strong>Sycophancy.</strong> Si tu écris "j'aime cette action", le LLM aura tendance à confirmer. Force le mode contradictoire (Pre-Mortem).</li>
+    <li><strong>Biais de récence.</strong> L'IA peut donner trop de poids à la news récente (qu'il a vue) vs structure long terme.</li>
+    <li><strong>Sycophancy.</strong> Si tu écris "j'aime cette action", l'IA aura tendance à confirmer. Force le mode contradictoire (Pre-Mortem).</li>
     <li><strong>Faux précision numérique.</strong> Une réponse "P/E = 27.43" peut sembler précise mais venir d'une donnée approximée. Demande la source.</li>
-    <li><strong>Pas de "je ne sais pas".</strong> Par défaut, les LLMs comblent les blancs. Mets un garde-fou explicite dans le prompt.</li>
+    <li><strong>Pas de "je ne sais pas".</strong> Par défaut, les IA comblent les blancs. Mets un garde-fou explicite dans le prompt.</li>
     <li><strong>Vendor lock-in.</strong> Si tu construis tout ton workflow sur GPT, tu es bloqué quand OpenAI augmente les prix ou downgrade un modèle. Multi-provider = liberté.</li>
   </ol>
 
   <h2 id="stack">10. La stack idéale en 2026</h2>
-  <p>Voici la stack BYOK optimale, low-cost, multi-LLM, privée :</p>
+  <p>Voici la stack BYOK optimale, low-cost, multi-IA, privée :</p>
   <ul>
     <li><strong>App d'analyse</strong> : Alpha (9,99€/mois) ou alternative open-source.</li>
-    <li><strong>LLM principal</strong> : Claude Opus 4.7 ou Sonnet 4.6 (best raisonnement nuancé).</li>
-    <li><strong>LLM long contexte</strong> : Gemini 2.5 Pro (2M tokens, gratuit jusqu'à un quota).</li>
-    <li><strong>LLM sentiment</strong> : Grok 4 (X temps réel) ou Perplexity Sonar (web search natif).</li>
-    <li><strong>LLM volume / vitesse</strong> : Cerebras Llama 70B ou GitHub Models (gratuit rate-limited).</li>
+    <li><strong>IA principale</strong> : Claude Opus 4.7 ou Sonnet 4.6 (best raisonnement nuancé).</li>
+    <li><strong>IA gros contexte</strong> : Gemini 2.5 Pro (2M tokens, gratuit jusqu'à un quota).</li>
+    <li><strong>IA sentiment</strong> : Grok 4 (X temps réel) ou Perplexity Sonar (web search natif).</li>
+    <li><strong>IA volume / vitesse</strong> : Cerebras Llama 70B ou GitHub Models (gratuit rate-limited).</li>
     <li><strong>Données</strong> : FMP (free tier 250 calls/jour), CoinGecko (gratuit), FRED (gratuit, macro Fed).</li>
     <li><strong>Coût mensuel typique</strong> : 5-15€ (5 analyses/jour × $0.05 moyenne × 30 jours).</li>
   </ul>
@@ -348,11 +348,11 @@ Cite la source pour chaque chiffre. Évite "nous pensons" — dis "ceci indique"
     <li><strong>Long contexte 10M+ tokens</strong> : Gemini, Claude prochaine génération, suffisant pour ingérer 5 ans de 10-K + earnings calls + transcripts d'un coup.</li>
     <li><strong>Embeddings financiers spécialisés</strong> : models fine-tuned uniquement sur la finance (Voyage, BloombergGPT successors) pour RAG plus précis.</li>
     <li><strong>Voice analyst</strong> : interaction vocale pour analyses dictées en route ou en marchant.</li>
-    <li><strong>Convergence privacy</strong> : montée des LLMs locaux (Llama 70B sur Mac M-series), plus besoin de cloud pour 80% des analyses.</li>
+    <li><strong>Convergence privacy</strong> : montée des IA locales (Llama 70B sur Mac M-series), plus besoin de cloud pour 80% des analyses.</li>
   </ul>
 
   <h2>Conclusion : la fenêtre d'opportunité 2026</h2>
-  <p>La maîtrise de l'IA en analyse boursière est aujourd'hui un edge réel pour le particulier. Dans 18 mois, ce sera une commodité. <strong>2026 est la fenêtre.</strong> Choisis une stack BYOK multi-LLM, apprends les prompts qui marchent, mets en place une mémoire patrimoine qui personnalise tes analyses, et tu opères avec un effet de levier comparable à un fonds d'analystes — pour quelques euros par mois.</p>
+  <p>La maîtrise de l'IA en analyse boursière est aujourd'hui un edge réel pour le particulier. Dans 18 mois, ce sera une commodité. <strong>2026 est la fenêtre.</strong> Choisis une stack BYOK multi-IA, apprends les prompts qui marchent, mets en place une mémoire patrimoine qui personnalise tes analyses, et tu opères avec un effet de levier comparable à un fonds d'analystes — pour quelques euros par mois.</p>
 
   <h2>📚 Guides approfondis</h2>
   <ul style="line-height:1.9;">

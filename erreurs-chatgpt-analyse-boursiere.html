@@ -51,8 +51,8 @@
   <script type="application/ld+json">
   {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
     {"@type":"Question","name":"ChatGPT peut-il analyser une action ?","acceptedAnswer":{"@type":"Answer","text":"Pour une analyse qualitative générale (modèle d'affaires, contexte sectoriel), oui. Pour des chiffres précis (CA, marges, ratios) : non, sans connexion aux données structurées il hallucine régulièrement. Tester soi-même : demande-lui le PER d'AAPL au 1er mars 2026, il sortira un nombre plausible mais souvent faux."}},
-    {"@type":"Question","name":"Pourquoi ChatGPT invente des chiffres financiers ?","acceptedAnswer":{"@type":"Answer","text":"Parce que les LLMs sont entraînés à produire le texte le plus probable, pas le plus vrai. Quand on lui demande 'quel est le ROIC de Tesla en 2024', il génère un nombre qui ressemble à un ROIC plausible, sans vérifier dans une base de données. C'est ce qu'on appelle une hallucination."}},
-    {"@type":"Question","name":"Quelle IA utiliser pour l'analyse boursière sérieusement ?","acceptedAnswer":{"@type":"Answer","text":"Une IA spécialisée connectée à des APIs de données structurées (FMP, Finnhub, SEC EDGAR) avec prompts calibrés finance et garde-fous sur les hallucinations. Alpha utilise 14 LLMs (Claude, GPT-5, Gemini, Grok) avec ce setup, en BYOK pour 9,99€/mois."}},
+    {"@type":"Question","name":"Pourquoi ChatGPT invente des chiffres financiers ?","acceptedAnswer":{"@type":"Answer","text":"Parce que les IA sont entraînés à produire le texte le plus probable, pas le plus vrai. Quand on lui demande 'quel est le ROIC de Tesla en 2024', il génère un nombre qui ressemble à un ROIC plausible, sans vérifier dans une base de données. C'est ce qu'on appelle une hallucination."}},
+    {"@type":"Question","name":"Quelle IA utiliser pour l'analyse boursière sérieusement ?","acceptedAnswer":{"@type":"Answer","text":"Une IA spécialisée connectée à des APIs de données structurées (FMP, Finnhub, SEC EDGAR) avec prompts calibrés finance et garde-fous sur les hallucinations. Alpha utilise 14 IA (Claude, GPT-5, Gemini, Grok) avec ce setup, en BYOK pour 9,99€/mois."}},
     {"@type":"Question","name":"ChatGPT a-t-il accès aux derniers chiffres financiers ?","acceptedAnswer":{"@type":"Answer","text":"Sans le mode 'Browse' activé, son cutoff de connaissance est celui de l'entraînement (souvent plusieurs mois en arrière). Avec Browse activé, il fait des recherches web mais sans cohérence et sans accès aux APIs financières propriétaires. Résultat : données souvent incomplètes ou périmées."}},
     {"@type":"Question","name":"Peut-on faire confiance à ChatGPT pour un DCF ?","acceptedAnswer":{"@type":"Answer","text":"Pas pour un DCF reproductible. Sans accès au FCF historique (10 ans), au beta vivant et au taux sans risque en live, le calcul est approximatif. Demande-lui deux fois et tu obtiendras deux fair values différentes. Pour un DCF rigoureux : utilise un module dédié comme celui d'Alpha."}}
   ]}
@@ -100,7 +100,7 @@
 
     <h2 id="section-1" style="font-size:24px;margin:32px 0 12px;">🎲 Erreur 1 — Hallucinations sur les chiffres</h2>
     <p>Test reproductible : demande à ChatGPT (gpt-4o, sans Browse) <em>"Quel était le ROIC d'Apple en FY2024 ?"</em>. Tu obtiens des réponses comme <em>"approximativement 30%"</em> ou <em>"45%"</em>. La vraie valeur est ~58%. L'écart peut atteindre 30 points.</p>
-    <p><strong>Pourquoi ?</strong> Les LLMs sont des moteurs de probabilité texte, pas des bases de données. Quand tu demandes un chiffre, le modèle génère <em>un nombre qui ressemble à un ROIC plausible</em>, pas le vrai. Sur un PER, marge brute, ROE, dette nette → mêmes hallucinations.</p>
+    <p><strong>Pourquoi ?</strong> Les IA sont des moteurs de probabilité texte, pas des bases de données. Quand tu demandes un chiffre, le modèle génère <em>un nombre qui ressemble à un ROIC plausible</em>, pas le vrai. Sur un PER, marge brute, ROE, dette nette → mêmes hallucinations.</p>
 
     <div style="padding:14px;background:#2a1a0a;border-left:3px solid var(--accent-orange);margin:14px 0;border-radius:4px;font-size:14px;">
       <strong>⚠️ Attention</strong> — Une étude FinanceBench (2024) a montré que GPT-4 sans tooling se trompe sur <strong>83% des questions chiffrées</strong> issues de 10-K réels. Avec accès aux documents : 27%. Avec un agent finance dédié : &lt; 8%.
@@ -119,7 +119,7 @@
       <li><strong>Macro</strong> (FRED, OECD) — taux, inflation, GDP</li>
       <li><strong>Sentiment</strong> (X/Reddit/news) — flux temps réel</li>
     </ul>
-    <p>ChatGPT en standalone n'a accès à <strong>aucune</strong> de ces sources. Une IA spécialisée comme <a href="features.html">Alpha</a> les branche toutes via API et passe les données structurées au LLM dans le prompt — d'où des analyses traçables et reproductibles.</p>
+    <p>ChatGPT en standalone n'a accès à <strong>aucune</strong> de ces sources. Une IA spécialisée comme <a href="features.html">Alpha</a> les branche toutes via API et passe les données structurées à l'IA dans le prompt — d'où des analyses traçables et reproductibles.</p>
 
     <h2 id="section-4" style="font-size:24px;margin:32px 0 12px;">🧮 Erreur 4 — Pas de DCF reproductible</h2>
     <p>Demande à ChatGPT de te calculer un DCF d'Apple. Il va te sortir une fair value. Demande-le deux fois (nouvelle session) : tu obtiens deux nombres différents. Pourquoi ?</p>
@@ -139,13 +139,13 @@
     <h2 id="section-6" style="font-size:24px;margin:32px 0 12px;">✅ La solution : modèles spécialisés + tooling</h2>
     <p>Une IA spécialisée pour la finance combine 4 ingrédients :</p>
     <ol style="line-height:1.9;">
-      <li><strong>Plusieurs LLMs au choix</strong> — pour profiter du meilleur sur chaque tâche (Claude pour 10-K, Grok pour sentiment X, Gemini pour PDF natif). Alpha en propose 14.</li>
+      <li><strong>Plusieurs IA au choix</strong> — pour profiter du meilleur sur chaque tâche (Claude pour 10-K, Grok pour sentiment X, Gemini pour PDF natif). Alpha en propose 14.</li>
       <li><strong>Connexion aux APIs financières</strong> — FMP, Finnhub, SEC EDGAR, FRED, CoinGecko, YouTube transcripts.</li>
       <li><strong>Prompts calibrés finance</strong> — chaque module a son system prompt optimisé sur des dizaines de cas réels.</li>
       <li><strong>Garde-fous anti-hallucination</strong> — citations sources obligatoires, refus de répondre si données manquantes, validation déterministe.</li>
     </ol>
 
-    <p>Alpha utilise <strong>14 LLMs</strong> (Claude Opus/Sonnet/Haiku, GPT-5/Mini/Nano, Gemini Pro/Flash, Grok 4, Mistral, Llama, DeepSeek) avec prompts calibrés finance, branchés à 8 APIs de données. Coût mensuel typique : <a href="api-costs.html">$2 à $40 par mois en BYOK</a>, soit 5 à 10× moins cher qu'un abonnement ChatGPT Plus + un terminal pro.</p>
+    <p>Alpha utilise <strong>14 IA</strong> (Claude Opus/Sonnet/Haiku, GPT-5/Mini/Nano, Gemini Pro/Flash, Grok 4, Mistral, Llama, DeepSeek) avec prompts calibrés finance, branchés à 8 APIs de données. Coût mensuel typique : <a href="api-costs.html">$2 à $40 par mois en BYOK</a>, soit 5 à 10× moins cher qu'un abonnement ChatGPT Plus + un terminal pro.</p>
 
     <h2 id="section-7" style="font-size:24px;margin:32px 0 12px;">❓ FAQ</h2>
 
@@ -155,11 +155,11 @@
     </details>
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Pourquoi ChatGPT invente des chiffres ?</summary>
-      <p>Les LLMs sont des moteurs de probabilité texte. Sans accès à une base de données structurée, ils génèrent un nombre <em>qui ressemble</em> à la réponse, pas la vraie réponse. C'est l'hallucination.</p>
+      <p>Les IA sont des moteurs de probabilité texte. Sans accès à une base de données structurée, ils génèrent un nombre <em>qui ressemble</em> à la réponse, pas la vraie réponse. C'est l'hallucination.</p>
     </details>
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">Quelle IA utiliser pour l'analyse boursière ?</summary>
-      <p>Une IA spécialisée connectée aux APIs (FMP, Finnhub, SEC) avec prompts calibrés finance. Alpha utilise 14 LLMs en BYOK pour 9,99€/mois.</p>
+      <p>Une IA spécialisée connectée aux APIs (FMP, Finnhub, SEC) avec prompts calibrés finance. Alpha utilise 14 IA en BYOK pour 9,99€/mois.</p>
     </details>
     <details style="margin:10px 0;border:1px solid var(--border);border-radius:4px;padding:0 14px;">
       <summary style="padding:14px 0;cursor:pointer;font-weight:600;">ChatGPT a-t-il accès aux derniers chiffres ?</summary>
@@ -171,7 +171,7 @@
     </details>
 
     <div style="margin-top:40px;padding:24px;background:linear-gradient(135deg,var(--bg-tertiary),var(--bg-secondary));border-radius:10px;text-align:center;">
-      <h3 style="margin:0 0 10px;">🤖 Alpha utilise 14 LLMs avec prompts calibrés finance</h3>
+      <h3 style="margin:0 0 10px;">🤖 Alpha utilise 14 IA avec prompts calibrés finance</h3>
       <p style="color:var(--text-secondary);margin:0 0 14px;">9,99€/mois · BYOK · 14 jours satisfait ou remboursé</p>
       <a href="pricing.html" class="btn-primary big plausible-event-name=Guide+CTA" style="text-decoration:none;display:inline-block;">Lancer Alpha →</a>
     </div>
