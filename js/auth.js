@@ -92,6 +92,62 @@
       return { ok: true, url: data?.url };
     }
 
+    // ---- Email + mot de passe ----
+    // Inscription : crée un compte et envoie l'email de confirmation Supabase.
+    // L'user doit cliquer le lien dans l'email avant de pouvoir se connecter
+    // (politique Supabase par défaut). On peut désactiver dans le dashboard
+    // si on veut un onboarding sans friction (Auth → Email → "Enable email confirmations").
+    async signUpWithEmail(email, password) {
+      await this.ready();
+      if (!this.client) throw new Error('Supabase non configuré');
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      if (!cleanEmail || !cleanEmail.includes('@')) throw new Error('Email invalide');
+      if (!password || password.length < 8) throw new Error('Mot de passe trop court (8 caractères min)');
+      const { data, error } = await this.client.auth.signUp({
+        email: cleanEmail,
+        password,
+        options: {
+          emailRedirectTo: resolveRedirectUrl(),
+        },
+      });
+      if (error) throw error;
+      // Si Supabase a "Confirm email" activé → user est en attente, pas encore connecté
+      // Si désactivé → user immédiatement connecté (session dans data.session)
+      return {
+        ok: true,
+        needsConfirmation: !data?.session,
+        user: data?.user || null,
+      };
+    }
+
+    // Connexion : email + mot de passe vérifiés par Supabase.
+    async signInWithEmail(email, password) {
+      await this.ready();
+      if (!this.client) throw new Error('Supabase non configuré');
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      if (!cleanEmail) throw new Error('Email requis');
+      if (!password) throw new Error('Mot de passe requis');
+      const { data, error } = await this.client.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+      if (error) throw error;
+      return { ok: true, user: data?.user || null };
+    }
+
+    // Reset mot de passe : envoie un email avec un lien de réinitialisation.
+    async resetPasswordForEmail(email) {
+      await this.ready();
+      if (!this.client) throw new Error('Supabase non configuré');
+      const cleanEmail = String(email || '').trim().toLowerCase();
+      if (!cleanEmail || !cleanEmail.includes('@')) throw new Error('Email invalide');
+      const { error } = await this.client.auth.resetPasswordForEmail(cleanEmail, {
+        redirectTo: resolveRedirectUrl(),
+      });
+      if (error) throw error;
+      return { ok: true };
+    }
+
     // ---- Getters ----
     async getUser() {
       await this.ready();
